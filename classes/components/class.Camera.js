@@ -1,6 +1,8 @@
 class Camera extends Component {
 
     Init() {
+        if (Camera.main == null) Camera.main = this;
+
         this.rect = new Rect(0, 0, 1, 1);
 
         this.aspect = 1;
@@ -8,7 +10,7 @@ class Camera extends Component {
         this.farClipPlane = 1000;
         this.fieldOfView = 90;
 
-        this.orthographic = this.farClipPlane;
+        this.orthographic = false;
         this.orthographicSize = 100;
 
         this.viewMatrix = Matrix4x4.Identity()
@@ -18,12 +20,11 @@ class Camera extends Component {
 
     Update() {
         Matrix4x4.Inverse(this.transform.matrix4x4, this.viewMatrix);
-        if (this.orthographic) {
-            Matrix4x4.Ortho(0, this.orthographicSize, this.orthographicSize, 0, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
-        } else {
-            Matrix4x4.Perspective(Math.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
-        }
+        if (this.orthographic) Matrix4x4.Ortho(0, this.orthographicSize, this.orthographicSize, 0, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
+        else Matrix4x4.Perspective(Math.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
         Matrix4x4.Multiply(this.projectionMatrix, this.viewMatrix, this.viewProjectionMatrix);
+
+        this.transform.position.z += 0.016;
     }
 
 }

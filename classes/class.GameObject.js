@@ -1,10 +1,13 @@
 class GameObject extends Object {
 
-    constructor(name = 'GameObject') {
+    constructor(name = 'GameObject', parent = null) {
         super();
+
         this.name = name;
         this.components = new Array();
         this.transform = this.AddComponent(Transform);
+
+        this.transform.SetParent(parent ?? (Engine.Instance.scene ? Engine.Instance.scene.transform : null));
     }
 
     GetComponent(type) {
@@ -18,13 +21,13 @@ class GameObject extends Object {
     }
 
     Start() {
-        for (component of this.components) component.Start();
-        for (child of this.transform.children) child.Start();
+        for (let component of this.components) component.Start();
+        for (let child of (this.transform.children)) child.Start();
     }
 
     Update() {
-        for (component of this.components) component.Update();
-        for (child of this.transform.children) child.Update();
+        for (let component of this.components) component.Update();
+        for (let child of (this.transform.children)) child.Update();
     }
 
 }

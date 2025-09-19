@@ -5,7 +5,24 @@ class Transform extends Component {
         this.rotation = Quaternion.identity;
         this.scale = Vector3.one;
 
+        this.parent = null;
+        this.children = [];
+
         this.matrix4x4 = Matrix4x4.Identity();
+    }
+
+    ClearParent() {
+        if (this.parent) {
+            let index = this.parent.children.indexOf(this);
+            this.parent.children.splice(index, 1);
+            this.parent = null;
+        }
+    }
+
+    SetParent(newParent) {
+        this.ClearParent();
+        if (newParent) newParent.children.push(this);
+        this.parent = newParent;
     }
 
     Update() {

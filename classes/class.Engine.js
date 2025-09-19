@@ -1,27 +1,42 @@
 class Engine {
 
     constructor() {
-        this.graphics = new Graphics();
+        Engine.Instance = this;
+        this.Init();
+    }
+
+    Init() {
+        let object = this;
+
         this.scene = new Scene();
+        this.graphics = new Graphics();
+
+        this.graphics.Init(function () {
+            object.Start();
+        });
     }
 
     Start() {
         let object = this;
+        if (this.scene) this.scene.Start();
 
-        this.scene.Start();
-
-        requestAnimationFrame(function (time) {
-            object.Loop(time);
+        main(function (renderer) {
+            object.renderer = renderer;
+            requestAnimationFrame(function (time) {
+                object.Update(time);
+            });
         });
     }
 
-    Loop(time) {
+    Update(time) {
         let object = this;
 
-        this.scene.Loop();
+        if (this.scene) this.scene.Update();
+
+        object.renderer();
 
         requestAnimationFrame(function (time) {
-            object.Loop(time);
+            object.Update(time);
         });
     }
 

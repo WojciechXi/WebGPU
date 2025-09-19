@@ -101,90 +101,13 @@ function createFVertices() {
     };
 }
 
-async function main() {
-    const adapter = await navigator.gpu?.requestAdapter();
-    const device = await adapter?.requestDevice();
-    if (!device) {
-        fail('need a browser that supports WebGPU');
-        return;
-    }
-
-    // Get a WebGPU context from the canvas and configure it
-    const canvas = document.querySelector('canvas');
-    const context = canvas.getContext('webgpu');
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
-    context.configure({
-        device,
-        format: presentationFormat,
-        alphaMode: 'premultiplied',
-    });
-
-    const module = device.createShaderModule({
-        code: `
-      struct Uniforms {
-        matrix: mat4x4f,
-      };
-
-      struct Vertex {
-        @location(0) position: vec4f,
-        @location(1) color: vec4f,
-      };
-
-      struct VSOutput {
-        @builtin(position) position: vec4f,
-        @location(0) color: vec4f,
-      };
-
-      @group(0) @binding(0) var<uniform> uni: Uniforms;
-
-      @vertex fn vs(vert: Vertex) -> VSOutput {
-        var vsOut: VSOutput;
-        vsOut.position = uni.matrix * vert.position;
-        vsOut.color = vert.color;
-        return vsOut;
-      }
-
-      @fragment fn fs(vsOut: VSOutput) -> @location(0) vec4f {
-        return vsOut.color;
-      }
-    `,
-    });
-
-    const pipeline = device.createRenderPipeline({
-        label: '2 attributes',
-        layout: 'auto',
-        vertex: {
-            module,
-            buffers: [
-                {
-                    arrayStride: (4) * 4, // (3) floats 4 bytes each + one 4 byte color
-                    attributes: [
-                        { shaderLocation: 0, offset: 0, format: 'float32x3' },  // position
-                        { shaderLocation: 1, offset: 12, format: 'unorm8x4' },  // color
-                    ],
-                },
-            ],
-        },
-        fragment: {
-            module,
-            targets: [{ format: presentationFormat }],
-        },
-        primitive: {
-            cullMode: 'back',
-        },
-        depthStencil: {
-            depthWriteEnabled: true,
-            depthCompare: 'less',
-            format: 'depth24plus',
-        },
-    });
-
+async function main(callback) {
     const numFs = 5;
     const objectInfos = [];
     for (let i = 0; i < numFs; ++i) {
         // matrix
         const uniformBufferSize = (16) * 4;
-        const uniformBuffer = device.createBuffer({
+        const uniformBuffer = Graphics.Instance.device.createBuffer({
             label: 'uniforms',
             size: uniformBufferSize,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
@@ -197,9 +120,9 @@ async function main() {
 
         const matrixValue = uniformValues.subarray(kMatrixOffset, kMatrixOffset + 16);
 
-        const bindGroup = device.createBindGroup({
+        const bindGroup = Graphics.Instance.device.createBindGroup({
             label: 'bind group for object',
-            layout: pipeline.getBindGroupLayout(0),
+            layout: Graphics.Instance.pipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: uniformBuffer } },
             ],
@@ -214,12 +137,12 @@ async function main() {
     }
 
     const { vertexData, numVertices } = createFVertices();
-    const vertexBuffer = device.createBuffer({
+    const vertexBuffer = Graphics.Instance.device.createBuffer({
         label: 'vertex buffer vertices',
         size: vertexData.byteLength,
         usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
     });
-    device.queue.writeBuffer(vertexBuffer, 0, vertexData);
+    Graphics.Instance.device.queue.writeBuffer(vertexBuffer, 0, vertexData);
 
     const renderPassDescriptor = {
         label: 'our basic canvas renderPass',
@@ -242,32 +165,25 @@ async function main() {
 
     let depthTexture;
 
-    let gameObject = new GameObject('Camera');
-    let camera = gameObject.AddComponent(Camera);
+    callback(function render(time) {
+        if (!Camera.main) return;
 
-    window.camera = camera;
+        Graphics.Instance.canvas.width = Graphics.Instance.canvas.clientWidth;
+        Graphics.Instance.canvas.height = Graphics.Instance.canvas.clientHeight;
 
-    function render(time) {
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
-
-        camera.Update();
-        camera.transform.Update();
+        Camera.main.Update();
+        Camera.main.transform.Update();
 
         // Get the current texture from the canvas context and
         // set it as the texture to render to.
-        const canvasTexture = context.getCurrentTexture();
+        const canvasTexture = Graphics.Instance.context.getCurrentTexture();
         renderPassDescriptor.colorAttachments[0].view = canvasTexture.createView();
 
         // If we don't have a depth texture OR if its size is different
         // from the canvasTexture when make a new depth texture
-        if (!depthTexture ||
-            depthTexture.width !== canvasTexture.width ||
-            depthTexture.height !== canvasTexture.height) {
-            if (depthTexture) {
-                depthTexture.destroy();
-            }
-            depthTexture = device.createTexture({
+        if (!depthTexture || depthTexture.width !== canvasTexture.width || depthTexture.height !== canvasTexture.height) {
+            if (depthTexture) depthTexture.destroy();
+            depthTexture = Graphics.Instance.device.createTexture({
                 size: [canvasTexture.width, canvasTexture.height],
                 format: 'depth24plus',
                 usage: GPUTextureUsage.RENDER_ATTACHMENT,
@@ -275,9 +191,9 @@ async function main() {
         }
         renderPassDescriptor.depthStencilAttachment.view = depthTexture.createView();
 
-        const encoder = device.createCommandEncoder();
+        const encoder = Graphics.Instance.device.createCommandEncoder();
         const pass = encoder.beginRenderPass(renderPassDescriptor);
-        pass.setPipeline(pipeline);
+        pass.setPipeline(Graphics.Instance.pipeline);
         pass.setVertexBuffer(0, vertexBuffer);
 
         objectInfos.forEach(({
@@ -290,10 +206,10 @@ async function main() {
             const x = Math.cos(angle) * radius;
             const z = Math.sin(angle) * radius;
 
-            Matrix4x4.Translate(camera.viewProjectionMatrix, [x, 0, z], matrixValue);
+            Matrix4x4.Translate(Camera.main.viewProjectionMatrix, [x, 0, z], matrixValue);
 
             // upload the uniform values to the uniform buffer
-            device.queue.writeBuffer(uniformBuffer, 0, uniformValues);
+            Graphics.Instance.device.queue.writeBuffer(uniformBuffer, 0, uniformValues);
 
             pass.setBindGroup(0, bindGroup);
             pass.draw(numVertices);
@@ -302,16 +218,7 @@ async function main() {
         pass.end();
 
         const commandBuffer = encoder.finish();
-        device.queue.submit([commandBuffer]);
-
-        requestAnimationFrame(function (time) {
-            render(time);
-        });
-    }
-
-
-    requestAnimationFrame(function (time) {
-        render(time);
+        Graphics.Instance.device.queue.submit([commandBuffer]);
     });
 }
 
@@ -319,4 +226,10 @@ function fail(msg) {
     alert(msg);
 }
 
-main();
+window.addEventListener('load', function (event) {
+    let engine = new Engine();
+    engine.scene = new Scene();
+
+    let cameraGameObject = new GameObject('Camera');
+    let camera = cameraGameObject.AddComponent(Camera);
+});
