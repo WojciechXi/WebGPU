@@ -1,6 +1,6 @@
 class Mesh {
 
-    constructor(name) {
+    constructor(name = 'Mesh') {
         this.name = name;
         this.colors = [];
         this.vertices = [];
@@ -19,45 +19,20 @@ class Mesh {
 class MeshBuffer {
 
     constructor() {
-        this.colors = [];
-        this.vertices = [];
-        this.normals = [];
-        this.uvs = [];
-        this.triangles = [];
+        this.data = new Float32Array(0);
     }
 
     Update(mesh) {
-        this.colors = [];
-        this.vertices = [];
-        this.normals = [];
-        this.uvs = [];
-        this.triangles = [];
+        this.data = new Float32Array(mesh.triangles.length * (3 + 3));
 
-        for (let color of mesh.colors) {
-            this.colors.push(color.r);
-            this.colors.push(color.g);
-            this.colors.push(color.b);
-        }
+        for (let i = 0; i < mesh.triangles.length; i++) {
+            let index = mesh.triangles[i];
 
-        for (let vertex of mesh.vertices) {
-            this.vertices.push(vertex.x);
-            this.vertices.push(vertex.y);
-            this.vertices.push(vertex.z);
-        }
+            let vertex = mesh.vertices[index];
+            let normal = mesh.normals[index];
 
-        for (let normal of mesh.normals) {
-            this.normals.push(normal.x);
-            this.normals.push(normal.y);
-            this.normals.push(normal.z);
-        }
-
-        for (let uv of mesh.uvs) {
-            this.uvs.push(uv.x);
-            this.uvs.push(uv.y);
-        }
-
-        for (let triangle of mesh.triangles) {
-            this.triangles.push(triangle);
+            if (vertex) this.data.set(vertex, i * 6);
+            if (normal) this.data.set(normal, i * 6 + 3);
         }
     }
 

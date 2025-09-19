@@ -1,13 +1,13 @@
 class Graphics {
 
+    static get Width() { return this.canvas.width; }
+    static get Height() { return this.canvas.height; }
+
     static async Init(callback) {
         let adapter = this.adapter = await navigator.gpu?.requestAdapter();
         let device = this.device = await adapter?.requestDevice();
 
-        if (!device) {
-            fail('need a browser that supports WebGPU');
-            return;
-        }
+        if (!device) return alert('need a browser that supports WebGPU');
 
         let canvas = this.canvas = document.querySelector('canvas');
         let context = this.context = canvas.getContext('webgpu');
@@ -17,13 +17,11 @@ class Graphics {
             label: 'our basic canvas renderPass',
             colorAttachments: [
                 {
-                    // view: <- to be filled out when we render
                     loadOp: 'clear',
                     storeOp: 'store',
                 },
             ],
             depthStencilAttachment: {
-                // view: <- to be filled out when we render
                 depthClearValue: 1.0,
                 depthLoadOp: 'clear',
                 depthStoreOp: 'store',
@@ -34,52 +32,40 @@ class Graphics {
     }
 
     static Update() {
-
+        this.canvas.width = this.canvas.clientWidth;
+        this.canvas.height = this.canvas.clientHeight;
     }
 
     static PreRender() {
-        if (!Camera.main) return;
-        let object = this;
+        let renderPassDescriptor = this.renderPassDescriptor;
+        let currentTexture = this.currentTexture = this.context.getCurrentTexture();
 
-        object.canvas.width = object.canvas.clientWidth;
-        object.canvas.height = object.canvas.clientHeight;
+        renderPassDescriptor.colorAttachments[0].view = currentTexture.createView();
 
-        Camera.main.aspect = object.canvas.width / object.canvas.height;
-
-        Camera.main.Update();
-        Camera.main.transform.Update();
-
-        const canvasTexture = object.context.getCurrentTexture();
-        object.renderPassDescriptor.colorAttachments[0].view = canvasTexture.createView();
-
-        if (!object.depthTexture || object.depthTexture.width !== canvasTexture.width || object.depthTexture.height !== canvasTexture.height) {
-            if (object.depthTexture) object.depthTexture.destroy();
-            object.depthTexture = object.device.createTexture({
-                size: [canvasTexture.width, canvasTexture.height],
+        if (!this.depthTexture || this.depthTexture.width !== currentTexture.width || this.depthTexture.height !== currentTexture.height) {
+            if (this.depthTexture) this.depthTexture.destroy();
+            this.depthTexture = this.device.createTexture({
+                size: [currentTexture.width, currentTexture.height],
                 format: 'depth24plus',
                 usage: GPUTextureUsage.RENDER_ATTACHMENT,
             });
         }
-        object.renderPassDescriptor.depthStencilAttachment.view = object.depthTexture.createView();
 
-        let encoder = object.encoder = object.device.createCommandEncoder();
-        let pass = object.pass = encoder.beginRenderPass(object.renderPassDescriptor);
+        renderPassDescriptor.depthStencilAttachment.view = this.depthTexture.createView();
+
+        this.encoder = this.device.createCommandEncoder();
+        this.pass = this.encoder.beginRenderPass(this.renderPassDescriptor);
     }
 
     static Render() {
-        let object = this;
-        let pass = object.pass;
+
     }
 
     static PostRender() {
-        let object = this;
-        let pass = object.pass;
-        let encoder = object.encoder;
+        this.pass.end();
 
-        pass.end();
-
-        const commandBuffer = encoder.finish();
-        object.device.queue.submit([commandBuffer]);
+        const commandBuffer = this.encoder.finish();
+        this.device.queue.submit([commandBuffer]);
     }
 
 }

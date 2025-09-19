@@ -28,6 +28,7 @@ class Transform extends Component {
     Update() {
         Matrix4x4.Identity(this.matrix4x4);
         Matrix4x4.Translate(this.matrix4x4, this.position, this.matrix4x4);
+        Matrix4x4.Scale(this.matrix4x4, this.scale, this.matrix4x4);
     }
 
 }

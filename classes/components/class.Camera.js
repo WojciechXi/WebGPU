@@ -19,6 +19,8 @@ class Camera extends Component {
     }
 
     Update() {
+        this.aspect = Graphics.Width / Graphics.Height;
+
         Matrix4x4.Inverse(this.transform.matrix4x4, this.viewMatrix);
         if (this.orthographic) Matrix4x4.Ortho(0, this.orthographicSize, this.orthographicSize, 0, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
         else Matrix4x4.Perspective(Math.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);

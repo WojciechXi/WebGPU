@@ -3,6 +3,8 @@ class Vector3 extends Float32Array {
     static get zero() { return new Vector3(0, 0, 0); }
     static get one() { return new Vector3(1, 1, 1); }
 
+    static get down() { return new Vector3(0, -1, 0); }
+
     static Cross(a, b, dst) {
         dst = dst || new Float32Array(3);
 
@@ -13,6 +15,16 @@ class Vector3 extends Float32Array {
         dst[0] = t0;
         dst[1] = t1;
         dst[2] = t2;
+
+        return dst;
+    }
+
+    static Add(a, b, dst) {
+        dst = dst || new Float32Array(3);
+
+        dst[0] = a[0] + b[0];
+        dst[1] = a[1] + b[1];
+        dst[2] = a[2] + b[2];
 
         return dst;
     }
@@ -55,5 +67,17 @@ class Vector3 extends Float32Array {
     get x() { return this[0]; } set x(f) { return this[0] = f; }
     get y() { return this[1]; } set y(f) { return this[1] = f; }
     get z() { return this[2]; } set z(f) { return this[2] = f; }
+
+    Set(value) {
+        if (Number.isFinite(value)) this[0] = this[1] = this[2] = value;
+        else if (value instanceof Vector2) {
+            this[0] = value[0];
+            this[1] = value[1];
+        } else if (value instanceof Vector3 || value instanceof Vector4 || value instanceof Color) {
+            this[0] = value[0];
+            this[1] = value[1];
+            this[2] = value[2];
+        }
+    }
 
 }
