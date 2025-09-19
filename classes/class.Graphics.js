@@ -1,10 +1,6 @@
 class Graphics {
 
-    constructor() {
-        Graphics.Instance = this;
-    }
-
-    async Init(callback) {
+    static async Init(callback) {
         let adapter = this.adapter = await navigator.gpu?.requestAdapter();
         let device = this.device = await adapter?.requestDevice();
 
@@ -15,74 +11,75 @@ class Graphics {
 
         let canvas = this.canvas = document.querySelector('canvas');
         let context = this.context = canvas.getContext('webgpu');
-        let presentationFormat = this.presentationFormat = navigator.gpu.getPreferredCanvasFormat();
-        context.configure({
-            device,
-            format: presentationFormat,
-            alphaMode: 'premultiplied',
-        });
+        let depthTexture = this.depthTexture = null;
 
-        let module = this.module = device.createShaderModule({
-            code: `
-      struct Uniforms {
-        matrix: mat4x4f,
-      };
-
-      struct Vertex {
-        @location(0) position: vec4f,
-        @location(1) color: vec4f,
-      };
-
-      struct VSOutput {
-        @builtin(position) position: vec4f,
-        @location(0) color: vec4f,
-      };
-
-      @group(0) @binding(0) var<uniform> uni: Uniforms;
-
-      @vertex fn vs(vert: Vertex) -> VSOutput {
-        var vsOut: VSOutput;
-        vsOut.position = uni.matrix * vert.position;
-        vsOut.color = vert.color;
-        return vsOut;
-      }
-
-      @fragment fn fs(vsOut: VSOutput) -> @location(0) vec4f {
-        return vsOut.color;
-      }
-    `,
-        });
-
-        let pipeline = this.pipeline = device.createRenderPipeline({
-            label: '2 attributes',
-            layout: 'auto',
-            vertex: {
-                module,
-                buffers: [
-                    {
-                        arrayStride: (4) * 4, // (3) floats 4 bytes each + one 4 byte color
-                        attributes: [
-                            { shaderLocation: 0, offset: 0, format: 'float32x3' },  // position
-                            { shaderLocation: 1, offset: 12, format: 'unorm8x4' },  // color
-                        ],
-                    },
-                ],
+        let renderPassDescriptor = this.renderPassDescriptor = {
+            label: 'our basic canvas renderPass',
+            colorAttachments: [
+                {
+                    // view: <- to be filled out when we render
+                    loadOp: 'clear',
+                    storeOp: 'store',
+                },
+            ],
+            depthStencilAttachment: {
+                // view: <- to be filled out when we render
+                depthClearValue: 1.0,
+                depthLoadOp: 'clear',
+                depthStoreOp: 'store',
             },
-            fragment: {
-                module,
-                targets: [{ format: presentationFormat }],
-            },
-            primitive: {
-                cullMode: 'back',
-            },
-            depthStencil: {
-                depthWriteEnabled: true,
-                depthCompare: 'less',
-                format: 'depth24plus',
-            },
-        });
+        };
 
         callback();
+    }
+
+    static Update() {
+
+    }
+
+    static PreRender() {
+        if (!Camera.main) return;
+        let object = this;
+
+        object.canvas.width = object.canvas.clientWidth;
+        object.canvas.height = object.canvas.clientHeight;
+
+        Camera.main.aspect = object.canvas.width / object.canvas.height;
+
+        Camera.main.Update();
+        Camera.main.transform.Update();
+
+        const canvasTexture = object.context.getCurrentTexture();
+        object.renderPassDescriptor.colorAttachments[0].view = canvasTexture.createView();
+
+        if (!object.depthTexture || object.depthTexture.width !== canvasTexture.width || object.depthTexture.height !== canvasTexture.height) {
+            if (object.depthTexture) object.depthTexture.destroy();
+            object.depthTexture = object.device.createTexture({
+                size: [canvasTexture.width, canvasTexture.height],
+                format: 'depth24plus',
+                usage: GPUTextureUsage.RENDER_ATTACHMENT,
+            });
+        }
+        object.renderPassDescriptor.depthStencilAttachment.view = object.depthTexture.createView();
+
+        let encoder = object.encoder = object.device.createCommandEncoder();
+        let pass = object.pass = encoder.beginRenderPass(object.renderPassDescriptor);
+    }
+
+    static Render() {
+        let object = this;
+        let pass = object.pass;
+    }
+
+    static PostRender() {
+        let object = this;
+        let pass = object.pass;
+        let encoder = object.encoder;
+
+        pass.end();
+
+        const commandBuffer = encoder.finish();
+        object.device.queue.submit([commandBuffer]);
     }
 
 }

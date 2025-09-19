@@ -21,13 +21,28 @@ class GameObject extends Object {
     }
 
     Start() {
-        for (let component of this.components) component.Start();
-        for (let child of (this.transform.children)) child.Start();
+        for (let component of (this.components)) component.Start();
+        for (let child of (this.transform.children)) child.gameObject.Start();
     }
 
     Update() {
-        for (let component of this.components) component.Update();
-        for (let child of (this.transform.children)) child.Update();
+        for (let component of (this.components)) component.Update();
+        for (let child of (this.transform.children)) child.gameObject.Update();
+    }
+
+    PreRender() {
+        for (let component of (this.components)) component.PreRender();
+        for (let child of (this.transform.children)) child.gameObject.PreRender();
+    }
+
+    Render() {
+        for (let component of (this.components)) component.Render();
+        for (let child of (this.transform.children)) child.gameObject.Render();
+    }
+
+    PostRender() {
+        for (let component of (this.components)) component.PostRender();
+        for (let child of (this.transform.children)) child.gameObject.PostRender();
     }
 
 }

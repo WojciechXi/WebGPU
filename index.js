@@ -1,83 +1,34 @@
-function createFVertices() {
+function createCubeVertices() {
     const positions = [
-        // left column
-        -50, 75, 15,
-        -20, 75, 15,
-        -50, -75, 15,
-        -20, -75, 15,
+        // left
+        0, 0, 0,
+        0, 0, -1,
+        0, 1, 0,
+        0, 1, -1,
 
-        // top rung
-        -20, 75, 15,
-        50, 75, 15,
-        -20, 45, 15,
-        50, 45, 15,
-
-        // middle rung
-        -20, 15, 15,
-        20, 15, 15,
-        -20, -15, 15,
-        20, -15, 15,
-
-        // left column back
-        -50, 75, -15,
-        -20, 75, -15,
-        -50, -75, -15,
-        -20, -75, -15,
-
-        // top rung back
-        -20, 75, -15,
-        50, 75, -15,
-        -20, 45, -15,
-        50, 45, -15,
-
-        // middle rung back
-        -20, 15, -15,
-        20, 15, -15,
-        -20, -15, -15,
-        20, -15, -15,
+        // right
+        1, 0, 0,
+        1, 0, -1,
+        1, 1, 0,
+        1, 1, -1,
     ];
 
     const indices = [
-        0, 2, 1, 2, 3, 1,   // left column
-        4, 6, 5, 6, 7, 5,   // top run
-        8, 10, 9, 10, 11, 9,   // middle run
-
-        12, 13, 14, 14, 13, 15,   // left column back
-        16, 17, 18, 18, 17, 19,   // top run back
-        20, 21, 22, 22, 21, 23,   // middle run back
-
-        0, 5, 12, 12, 5, 17,   // top
-        5, 7, 17, 17, 7, 19,   // top rung right
-        6, 18, 7, 18, 19, 7,   // top rung bottom
-        6, 8, 18, 18, 8, 20,   // between top and middle rung
-        8, 9, 20, 20, 9, 21,   // middle rung top
-        9, 11, 21, 21, 11, 23,   // middle rung right
-        10, 22, 11, 22, 23, 11,   // middle rung bottom
-        10, 3, 22, 22, 3, 15,   // stem right
-        2, 14, 3, 14, 15, 3,   // bottom
-        0, 12, 2, 12, 14, 2,   // left
+        0, 2, 1, 2, 3, 1,   // left
+        4, 5, 6, 6, 5, 7,   // right
+        0, 4, 2, 2, 4, 6,   // front
+        1, 3, 5, 5, 3, 7,   // back
+        0, 1, 4, 4, 1, 5,   // bottom
+        2, 6, 3, 3, 6, 7,   // top
     ];
-
 
     const quadColors = [
         200, 70, 120,  // left column front
-        200, 70, 120,  // top rung front
-        200, 70, 120,  // middle rung front
-
         80, 70, 200,  // left column back
-        80, 70, 200,  // top rung back
-        80, 70, 200,  // middle rung back
-
         70, 200, 210,  // top
         160, 160, 220,  // top rung right
         90, 130, 110,  // top rung bottom
         200, 200, 70,  // between top and middle rung
-        210, 100, 70,  // middle rung top
-        210, 160, 70,  // middle rung right
-        70, 180, 210,  // middle rung bottom
-        100, 70, 210,  // stem right
-        76, 210, 100,  // bottom
-        140, 210, 80,  // left
     ];
 
     const numVertices = indices.length;
@@ -101,127 +52,6 @@ function createFVertices() {
     };
 }
 
-async function main(callback) {
-    const numFs = 5;
-    const objectInfos = [];
-    for (let i = 0; i < numFs; ++i) {
-        // matrix
-        const uniformBufferSize = (16) * 4;
-        const uniformBuffer = Graphics.Instance.device.createBuffer({
-            label: 'uniforms',
-            size: uniformBufferSize,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
-
-        const uniformValues = new Float32Array(uniformBufferSize / 4);
-
-        // offsets to the various uniform values in float32 indices
-        const kMatrixOffset = 0;
-
-        const matrixValue = uniformValues.subarray(kMatrixOffset, kMatrixOffset + 16);
-
-        const bindGroup = Graphics.Instance.device.createBindGroup({
-            label: 'bind group for object',
-            layout: Graphics.Instance.pipeline.getBindGroupLayout(0),
-            entries: [
-                { binding: 0, resource: { buffer: uniformBuffer } },
-            ],
-        });
-
-        objectInfos.push({
-            uniformBuffer,
-            uniformValues,
-            matrixValue,
-            bindGroup,
-        });
-    }
-
-    const { vertexData, numVertices } = createFVertices();
-    const vertexBuffer = Graphics.Instance.device.createBuffer({
-        label: 'vertex buffer vertices',
-        size: vertexData.byteLength,
-        usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-    });
-    Graphics.Instance.device.queue.writeBuffer(vertexBuffer, 0, vertexData);
-
-    const renderPassDescriptor = {
-        label: 'our basic canvas renderPass',
-        colorAttachments: [
-            {
-                // view: <- to be filled out when we render
-                loadOp: 'clear',
-                storeOp: 'store',
-            },
-        ],
-        depthStencilAttachment: {
-            // view: <- to be filled out when we render
-            depthClearValue: 1.0,
-            depthLoadOp: 'clear',
-            depthStoreOp: 'store',
-        },
-    };
-
-    const radius = 200;
-
-    let depthTexture;
-
-    callback(function render(time) {
-        if (!Camera.main) return;
-
-        Graphics.Instance.canvas.width = Graphics.Instance.canvas.clientWidth;
-        Graphics.Instance.canvas.height = Graphics.Instance.canvas.clientHeight;
-
-        Camera.main.Update();
-        Camera.main.transform.Update();
-
-        // Get the current texture from the canvas context and
-        // set it as the texture to render to.
-        const canvasTexture = Graphics.Instance.context.getCurrentTexture();
-        renderPassDescriptor.colorAttachments[0].view = canvasTexture.createView();
-
-        // If we don't have a depth texture OR if its size is different
-        // from the canvasTexture when make a new depth texture
-        if (!depthTexture || depthTexture.width !== canvasTexture.width || depthTexture.height !== canvasTexture.height) {
-            if (depthTexture) depthTexture.destroy();
-            depthTexture = Graphics.Instance.device.createTexture({
-                size: [canvasTexture.width, canvasTexture.height],
-                format: 'depth24plus',
-                usage: GPUTextureUsage.RENDER_ATTACHMENT,
-            });
-        }
-        renderPassDescriptor.depthStencilAttachment.view = depthTexture.createView();
-
-        const encoder = Graphics.Instance.device.createCommandEncoder();
-        const pass = encoder.beginRenderPass(renderPassDescriptor);
-        pass.setPipeline(Graphics.Instance.pipeline);
-        pass.setVertexBuffer(0, vertexBuffer);
-
-        objectInfos.forEach(({
-            matrixValue,
-            uniformBuffer,
-            uniformValues,
-            bindGroup,
-        }, i) => {
-            const angle = i / numFs * Math.PI * 2;
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-
-            Matrix4x4.Translate(Camera.main.viewProjectionMatrix, [x, 0, z], matrixValue);
-
-            // upload the uniform values to the uniform buffer
-            Graphics.Instance.device.queue.writeBuffer(uniformBuffer, 0, uniformValues);
-
-            pass.setBindGroup(0, bindGroup);
-            pass.draw(numVertices);
-        });
-
-        pass.end();
-
-        const commandBuffer = encoder.finish();
-        Graphics.Instance.device.queue.submit([commandBuffer]);
-    });
-}
-
 function fail(msg) {
     alert(msg);
 }
@@ -230,6 +60,85 @@ window.addEventListener('load', function (event) {
     let engine = new Engine();
     engine.scene = new Scene();
 
-    let cameraGameObject = new GameObject('Camera');
-    let camera = cameraGameObject.AddComponent(Camera);
+    engine.Init(function (engine) {
+        let shader = new Shader(`
+            struct Uniforms {
+                matrix: mat4x4f,
+                color: vec4f,
+            };
+
+            struct Vertex {
+                @location(0) position: vec4f,
+                @location(1) color: vec4f,
+            };
+
+            struct VSOutput {
+                @builtin(position) position: vec4f,
+                @location(0) color: vec4f,
+            };
+
+            @group(0) @binding(0) var<uniform> uni: Uniforms;
+
+            @vertex fn vs(vert: Vertex) -> VSOutput {
+                var vsOut: VSOutput;
+                vsOut.position = uni.matrix * vert.position;
+                vsOut.color = vert.color;
+                return vsOut;
+            }
+
+            @fragment fn fs(vsOut: VSOutput) -> @location(0) vec4f {
+                return vsOut.color * uni.color;
+            }
+            `);
+
+        shader.Compile(engine.graphics);
+
+        let material = new Material(shader);
+
+        material.Init(engine.graphics);
+
+        let mesh = new Mesh();
+        mesh.vertices = [
+            new Vector3(0, 0, 0),
+            new Vector3(0, 0, -1),
+            new Vector3(0, 1, 0),
+            new Vector3(0, 1, -1),
+
+            new Vector3(1, 0, 0),
+            new Vector3(1, 0, -1),
+            new Vector3(1, 1, 0),
+            new Vector3(1, 1, -1),
+        ];
+
+        mesh.triangles = [
+            0, 2, 1, 2, 3, 1,   // left
+            4, 5, 6, 6, 5, 7,   // right
+            0, 4, 2, 2, 4, 6,   // front
+            1, 3, 5, 5, 3, 7,   // back
+            0, 1, 4, 4, 1, 5,   // bottom
+            2, 6, 3, 3, 6, 7,   // top
+        ];
+
+        mesh.colors = [
+            new Color(200 / 255, 70 / 255, 120 / 255),
+            new Color(80 / 255, 70 / 255, 200 / 255),
+            new Color(70 / 255, 200 / 255, 210 / 255),
+            new Color(160 / 255, 160 / 255, 220 / 255),
+            new Color(90 / 255, 130 / 255, 110 / 255),
+            new Color(200 / 255, 200 / 255, 70 / 255),
+        ];
+
+        mesh.Update();
+
+        let cubeGameObject = new GameObject('Cube');
+        let meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
+        let test = cubeGameObject.AddComponent(Test);
+        meshRenderer.mesh = mesh;
+        meshRenderer.material = material;
+        meshRenderer.Read(engine.graphics);
+
+        let cameraGameObject = new GameObject('Camera');
+        cameraGameObject.transform.position.z = 10;
+        let camera = cameraGameObject.AddComponent(Camera);
+    });
 });

@@ -2,16 +2,15 @@ class Engine {
 
     constructor() {
         Engine.Instance = this;
-        this.Init();
     }
 
-    Init() {
+    Init(callback) {
         let object = this;
 
         this.scene = new Scene();
-        this.graphics = new Graphics();
 
-        this.graphics.Init(function () {
+        Graphics.Init(function () {
+            callback(object);
             object.Start();
         });
     }
@@ -20,23 +19,29 @@ class Engine {
         let object = this;
         if (this.scene) this.scene.Start();
 
-        main(function (renderer) {
-            object.renderer = renderer;
-            requestAnimationFrame(function (time) {
-                object.Update(time);
-            });
+        requestAnimationFrame(function (time) {
+            object.Loop(time);
         });
     }
 
-    Update(time) {
+    Loop(time) {
         let object = this;
 
+        Time.Update(time / 1000);
+        Graphics.Update();
         if (this.scene) this.scene.Update();
 
-        object.renderer();
+        Graphics.PreRender();
+        if (this.scene) this.scene.PreRender();
+
+        Graphics.Render();
+        if (this.scene) this.scene.Render();
+
+        Graphics.PostRender();
+        if (this.scene) this.scene.PostRender();
 
         requestAnimationFrame(function (time) {
-            object.Update(time);
+            object.Loop(time);
         });
     }
 

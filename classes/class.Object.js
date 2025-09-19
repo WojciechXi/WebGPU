@@ -8,4 +8,16 @@ class Object {
 
     }
 
+    PreRender() {
+
+    }
+
+    Render() {
+
+    }
+
+    PostRender() {
+
+    }
+
 }
