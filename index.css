@@ -1,0 +1,22 @@
+* {
+    box-sizing: border-box;
+    margin: initial;
+    padding: initial;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+}
