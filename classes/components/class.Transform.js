@@ -32,32 +32,26 @@ class Transform extends Component {
         if (!this.parent) {
             this._localPosition = worldPos;
         } else {
-            // world → local
             const invParent = Matrix4x4.Inverse(this.parent.matrix4x4);
             const localPos = Matrix4x4.MultiplyVector3(invParent, worldPos);
             this._localPosition = localPos;
         }
-        this.Update();
     }
 
     get rotation() {
-        // world quaternion z matrix4x4
         return Matrix4x4.ToQuaternion(this.matrix4x4);
     }
     set rotation(worldRot) {
         if (!this.parent) {
             this._localRotation = worldRot;
         } else {
-            // world → local quaternion
             const parentRot = this.parent.rotation;
             const invParentRot = Quaternion.Inverse(parentRot);
             this._localRotation = Quaternion.Multiply(invParentRot, worldRot);
         }
-        this.Update();
     }
 
     get scale() {
-        // uproszczone: tylko długości wektorów osi
         const sx = Vector3.length([this.matrix4x4[0], this.matrix4x4[1], this.matrix4x4[2]]);
         const sy = Vector3.length([this.matrix4x4[4], this.matrix4x4[5], this.matrix4x4[6]]);
         const sz = Vector3.length([this.matrix4x4[8], this.matrix4x4[9], this.matrix4x4[10]]);
@@ -74,16 +68,13 @@ class Transform extends Component {
                 worldScale.z / parentScale.z
             );
         }
-        this.Update();
     }
 
     // ---------- HIERARCHIA ----------
     ClearParent() {
         if (this.parent) {
             const index = this.parent.children.indexOf(this);
-            if (index !== -1) {
-                this.parent.children.splice(index, 1);
-            }
+            if (index !== -1) this.parent.children.splice(index, 1);
             this.parent = null;
         }
     }
@@ -92,7 +83,6 @@ class Transform extends Component {
         this.ClearParent();
         if (newParent) newParent.children.push(this);
         this.parent = newParent;
-        this.Update();
     }
 
     // ---------- UPDATE ----------
@@ -116,4 +106,51 @@ class Transform extends Component {
         }
     }
 
+    // ---------- DIRECTION VECTORS ----------
+    get forward() {
+        const m = this.matrix4x4;
+        return new Vector3(-m[8], -m[9], -m[10]).normalize(); // -Z
+    }
+
+    get up() {
+        const m = this.matrix4x4;
+        return new Vector3(m[4], m[5], m[6]).normalize(); // Y
+    }
+
+    get right() {
+        const m = this.matrix4x4;
+        return new Vector3(m[0], m[1], m[2]).normalize(); // X
+    }
+
+    get back() {
+        return this.forward.multiplyScalar(-1); // przeciwieństwo forward
+    }
+
+    get down() {
+        return this.up.multiplyScalar(-1); // przeciwieństwo up
+    }
+
+    get left() {
+        return this.right.multiplyScalar(-1); // przeciwieństwo right
+    }
+
+    transformDirection(localDir) {
+        const m = this.matrix4x4;
+
+        return new Vector3(
+            localDir.x * m[0] + localDir.y * m[4] + localDir.z * m[8],
+            localDir.x * m[1] + localDir.y * m[5] + localDir.z * m[9],
+            localDir.x * m[2] + localDir.y * m[6] + localDir.z * m[10]
+        ).normalize();
+    }
+
+    inverseTransformDirection(worldDir) {
+        const m = this.matrix4x4;
+
+        return new Vector3(
+            worldDir.x * m[0] + worldDir.y * m[1] + worldDir.z * m[2],
+            worldDir.x * m[4] + worldDir.y * m[5] + worldDir.z * m[6],
+            worldDir.x * m[8] + worldDir.y * m[9] + worldDir.z * m[10]
+        ).normalize();
+    }
 }

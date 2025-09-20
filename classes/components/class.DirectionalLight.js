@@ -5,7 +5,7 @@ class DirectionalLight extends Component {
     }
 
     Update() {
-
+        Graphics.directionalLightDirection = this.transform.down;
     }
 
 }

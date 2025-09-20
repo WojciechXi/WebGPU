@@ -2,8 +2,7 @@ class Material {
 
     constructor(shader) {
         this.shader = shader;
-        this.color = Color.red;              // Float32Array [r,g,b,a]
-        this.lightDirection = Vector3.right; // Float32Array [x,y,z]
+        this.color = Color.red;
     }
 
     Use(passEncoder, viewProjectionMatrix, modelMatrix) {
@@ -12,7 +11,7 @@ class Material {
 
         // ustaw uniformy
         this.shader.SetColor(this.color);
-        this.shader.SetLightDirection(this.lightDirection);
+        this.shader.SetLightDirection(Graphics.directionalLightDirection);
         this.shader.SetViewProjectionMatrix(viewProjectionMatrix);
         this.shader.SetModelMatrix(modelMatrix);
     }
