@@ -71,6 +71,11 @@ class Vector3 extends Float32Array {
     get y() { return this[1]; } set y(f) { return this[1] = f; }
     get z() { return this[2]; } set z(f) { return this[2] = f; }
 
+    Normalize() {
+        Vector3.Normalize(this, this);
+        return this;
+    }
+
     Set(value) {
         if (Number.isFinite(value)) this[0] = this[1] = this[2] = value;
         else if (value instanceof Vector2) {

@@ -11,7 +11,9 @@ class Material {
 
         // ustaw uniformy
         this.shader.SetColor(this.color);
-        this.shader.SetLightDirection(Graphics.directionalLightDirection);
+        this.shader.SetLightDirection(Graphics.lightDirection);
+        this.shader.SetLightColor(Graphics.lightColor);
+        this.shader.SetAmbientLightColor(Graphics.ambientLightColor);
         this.shader.SetViewProjectionMatrix(viewProjectionMatrix);
         this.shader.SetModelMatrix(modelMatrix);
     }

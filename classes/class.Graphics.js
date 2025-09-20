@@ -4,7 +4,9 @@ class Graphics {
     static get Height() { return this.canvas.height; }
 
     static async Init(callback) {
-        this.directionalLightDirection = Vector3.down;
+        this.lightDirection = Vector3.down;
+        this.lightColor = Color.white;
+        this.ambientLightColor = Color.zero;
 
         let adapter = this.adapter = await navigator.gpu?.requestAdapter();
         let device = this.device = await adapter?.requestDevice();

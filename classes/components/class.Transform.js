@@ -109,29 +109,41 @@ class Transform extends Component {
     // ---------- DIRECTION VECTORS ----------
     get forward() {
         const m = this.matrix4x4;
-        return new Vector3(-m[8], -m[9], -m[10]).normalize(); // -Z
+        return new Vector3(-m[8], -m[9], -m[10]).Normalize(); // -Z
     }
 
     get up() {
         const m = this.matrix4x4;
-        return new Vector3(m[4], m[5], m[6]).normalize(); // Y
+        return new Vector3(m[4], m[5], m[6]).Normalize(); // Y
     }
 
     get right() {
         const m = this.matrix4x4;
-        return new Vector3(m[0], m[1], m[2]).normalize(); // X
+        return new Vector3(m[0], m[1], m[2]).Normalize(); // X
     }
 
     get back() {
-        return this.forward.multiplyScalar(-1); // przeciwieństwo forward
+        const v = this.forward;
+        v.x = -v.x;
+        v.y = -v.y;
+        v.z = -v.z;
+        return v;
     }
 
     get down() {
-        return this.up.multiplyScalar(-1); // przeciwieństwo up
+        const v = this.up;
+        v.x = -v.x;
+        v.y = -v.y;
+        v.z = -v.z;
+        return v;
     }
 
     get left() {
-        return this.right.multiplyScalar(-1); // przeciwieństwo right
+        const v = this.right;
+        v.x = -v.x;
+        v.y = -v.y;
+        v.z = -v.z;
+        return v;
     }
 
     transformDirection(localDir) {

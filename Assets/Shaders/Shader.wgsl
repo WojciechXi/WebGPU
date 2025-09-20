@@ -3,6 +3,8 @@ struct Uniforms {
     matrix: mat4x4f,
     color: vec4f,
     lightDirection: vec3f,
+    lightColor: vec4f,
+    ambientLightColor: vec4f,
 };
 
 struct Vertex {
@@ -38,10 +40,15 @@ struct VSOutput {
 
 @fragment fn fs(vsOut: VSOutput) -> @location(0) vec4f {
     let normal = normalize(vsOut.normal);
-    let light = max(dot(normal, -uni.lightDirection), 0.0);
+    
+    let diffuse = max(dot(normal, -uni.lightDirection), 0.0);
 
-    // Pobranie koloru z tekstury
+    let lightColor = uni.lightColor.rgb * uni.lightColor.a;
+    let ambient = uni.ambientLightColor.rgb * uni.ambientLightColor.a;
+
     let texColor = textureSample(myTexture, mySampler, vsOut.uv);
 
-    return vec4f(uni.color.rgb * texColor.rgb * light, texColor.a);
+    let finalColor = (ambient + diffuse * lightColor) * uni.color.rgb * texColor.rgb;
+
+    return vec4f(finalColor, texColor.a);
 }

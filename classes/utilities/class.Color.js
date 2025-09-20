@@ -22,4 +22,11 @@ class Color extends Float32Array {
     get b() { return this[2]; } set b(f) { return this[2] = f; }
     get a() { return this[3]; } set a(f) { return this[3] = f; }
 
+    Clear() {
+        this[0] = 0;
+        this[1] = 0;
+        this[2] = 0;
+        this[3] = 0;
+    }
+
 }

@@ -1,7 +1,9 @@
 class Shader {
 
-    constructor(code) {
+    constructor(code, renderPipelineBuffers, buffers) {
         this.code = code;
+        this.renderPipelineBuffers = renderPipelineBuffers;
+        this.buffers = buffers;
         this.module = null;
         this.pipeline = null;
     }
@@ -28,16 +30,7 @@ class Shader {
             vertex: {
                 module: this.module,
                 entryPoint: 'vs',
-                buffers: [
-                    {
-                        arrayStride: (3 + 3 + 2) * 4, // position + normal + uv
-                        attributes: [
-                            { shaderLocation: 0, offset: 0, format: 'float32x3' },       // position
-                            { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' },   // normal
-                            { shaderLocation: 2, offset: 6 * 4, format: 'float32x2' },   // uv
-                        ],
-                    },
-                ],
+                buffers: this.renderPipelineBuffers
             },
             fragment: {
                 module: this.module,
@@ -56,7 +49,7 @@ class Shader {
         });
 
         // Tworzymy buffer uniformów (mat4x4 = 16 floatów, vec4 = 4 floatów, vec3 = 3 floaty + padding)
-        const uniformSize = (16 + 16 + 4 + 4) * 4; // VP + model + color + light (padding do 4 floatów dla vec3)
+        const uniformSize = (16 + 16 + 4 + 4 + 4 + 4) * 4; // VP + model + color + lightDirection + lightColor + ambientLightColor
         this.uniformBuffer = device.createBuffer({
             label: 'uniform buffer',
             size: uniformSize,
@@ -68,7 +61,9 @@ class Shader {
         this.viewProjectionMatrix = this.uniformValues.subarray(0, 16);
         this.modelMatrix = this.uniformValues.subarray(16, 32);
         this.color = this.uniformValues.subarray(32, 36);
-        this.lightDirection = this.uniformValues.subarray(36, 39); // ostatni float zostaje paddingiem
+        this.lightDirection = this.uniformValues.subarray(36, 39);
+        this.lightColor = this.uniformValues.subarray(40, 44);
+        this.ambientLightColor = this.uniformValues.subarray(44, 48);
 
         // Tworzymy teksturę i sampler
         this.texture = device.createTexture({
@@ -76,6 +71,7 @@ class Shader {
             format: 'rgba8unorm',
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
         });
+
         device.queue.copyExternalImageToTexture(
             { source: imageBitmap },
             { texture: this.texture },
@@ -120,6 +116,14 @@ class Shader {
 
     SetLightDirection(direction) {
         this.lightDirection.set(direction);
+    }
+
+    SetLightColor(color) {
+        this.lightColor.set(color);
+    }
+
+    SetAmbientLightColor(color) {
+        this.ambientLightColor.set(color);
     }
 
 }
