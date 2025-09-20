@@ -18,8 +18,8 @@ struct VSOutput {
 };
 
 @group(0) @binding(0) var<uniform> uni: Uniforms;
-@group(0) @binding(1) var myTexture: texture_2d<f32>;
-@group(0) @binding(2) var mySampler: sampler;
+@group(0) @binding(1) var mySampler: sampler;
+@group(0) @binding(2) var myTexture: texture_2d<f32>;
 
 @vertex fn vs(vert: Vertex) -> VSOutput {
     var vsOut: VSOutput;
@@ -43,5 +43,5 @@ struct VSOutput {
     // Pobranie koloru z tekstury
     let texColor = textureSample(myTexture, mySampler, vsOut.uv);
 
-    return vec4f(texColor.rgb * light, texColor.a);
+    return vec4f(uni.color.rgb * texColor.rgb * light, texColor.a);
 }

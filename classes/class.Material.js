@@ -2,7 +2,7 @@ class Material {
 
     constructor(shader) {
         this.shader = shader;
-        this.color = Color.red;
+        this.color = Color.white;
     }
 
     Use(passEncoder, viewProjectionMatrix, modelMatrix) {

@@ -94,8 +94,8 @@ class Shader {
             layout: this.pipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: this.texture.createView() },
-                { binding: 2, resource: this.sampler },
+                { binding: 1, resource: this.sampler },
+                { binding: 2, resource: this.texture.createView() },
             ],
         });
     }

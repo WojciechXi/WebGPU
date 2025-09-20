@@ -17,6 +17,7 @@ window.addEventListener('load', function (event) {
                 let material = new Material(shader);
 
                 let cameraGameObject = new GameObject('Camera');
+                cameraGameObject.transform.localPosition.y = 1;
                 cameraGameObject.transform.localPosition.z = -2;
                 let camera = cameraGameObject.AddComponent(Camera);
 

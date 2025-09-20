@@ -35,7 +35,7 @@ class MeshBuffer {
 
             if (vertex) this.data.set(vertex, i * offset);
             if (normal) this.data.set(normal, i * offset + 3);
-            if (uv) this.data.set(uv, i * offset + 3);
+            if (uv) this.data.set(uv, i * offset + 6);
         }
     }
 
