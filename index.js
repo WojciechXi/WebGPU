@@ -85,7 +85,7 @@ window.addEventListener('load', function (event) {
         meshRenderer.material = material;
 
         let cameraGameObject = new GameObject('Camera');
-        cameraGameObject.transform.position.z = 5;
+        cameraGameObject.transform.localPosition.z = -5;
         let camera = cameraGameObject.AddComponent(Camera);
     });
 });

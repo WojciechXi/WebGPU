@@ -33,6 +33,34 @@ class Matrix4x4 extends Float32Array {
         return dst;
     }
 
+    static PerspectiveLeftHanded(fieldOfViewYInRadians, aspect, zNear, zFar, dst) {
+        dst = dst || new Matrix4x4();
+
+        const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
+
+        dst[0] = f / aspect;
+        dst[1] = 0;
+        dst[2] = 0;
+        dst[3] = 0;
+
+        dst[4] = 0;
+        dst[5] = f;
+        dst[6] = 0;
+        dst[7] = 0;
+
+        dst[8] = 0;
+        dst[9] = 0;
+        dst[10] = zFar / (zFar - zNear);
+        dst[11] = 1;
+
+        dst[12] = 0;
+        dst[13] = 0;
+        dst[14] = (-zNear * zFar) / (zFar - zNear);
+        dst[15] = 0;
+
+        return dst;
+    }
+
     static Ortho(left, right, bottom, top, near, far, dst) {
         dst = dst || new Matrix4x4();
 
@@ -287,24 +315,116 @@ class Matrix4x4 extends Float32Array {
         return Matrix4x4.Multiply(m, Matrix4x4.Scaling(scale), dst);
     }
 
+    /** Z translacji, rotacji (quaternion) i skali */
+    static FromTRS(position, rotation, scale, dst) {
+        dst = dst || new Matrix4x4();
+        Matrix4x4.Identity(dst);
+
+        // skala
+        Matrix4x4.Scale(dst, scale, dst);
+
+        // rotacja
+        const [x, y, z, w] = rotation;
+        const xx = x * x, yy = y * y, zz = z * z;
+        const xy = x * y, xz = x * z, yz = y * z;
+        const wx = w * x, wy = w * y, wz = w * z;
+
+        dst[0] = 1 - 2 * (yy + zz);
+        dst[1] = 2 * (xy + wz);
+        dst[2] = 2 * (xz - wy);
+        dst[3] = 0;
+
+        dst[4] = 2 * (xy - wz);
+        dst[5] = 1 - 2 * (xx + zz);
+        dst[6] = 2 * (yz + wx);
+        dst[7] = 0;
+
+        dst[8] = 2 * (xz + wy);
+        dst[9] = 2 * (yz - wx);
+        dst[10] = 1 - 2 * (xx + yy);
+        dst[11] = 0;
+
+        dst[12] = position.x;
+        dst[13] = position.y;
+        dst[14] = position.z;
+        dst[15] = 1;
+
+        return dst;
+    }
+
+    /** Wyciąga pozycję, rotację (quat) i skalę z macierzy */
+    static Decompose(m) {
+        const position = new Vector3(m[12], m[13], m[14]);
+
+        // skale to długości wektorów osi
+        const sx = Math.hypot(m[0], m[1], m[2]);
+        const sy = Math.hypot(m[4], m[5], m[6]);
+        const sz = Math.hypot(m[8], m[9], m[10]);
+        const scale = new Vector3(sx, sy, sz);
+
+        // normalizowana macierz rotacji
+        const rm = new Matrix4x4();
+        rm.set(m);
+        rm[0] /= sx; rm[1] /= sx; rm[2] /= sx;
+        rm[4] /= sy; rm[5] /= sy; rm[6] /= sy;
+        rm[8] /= sz; rm[9] /= sz; rm[10] /= sz;
+
+        const rotation = Matrix4x4.ToQuaternion(rm);
+
+        return { position, rotation, scale };
+    }
+
+    /** Konwersja macierzy rotacji na quaternion */
+    static ToQuaternion(m) {
+        const trace = m[0] + m[5] + m[10];
+        let x, y, z, w;
+
+        if (trace > 0) {
+            let s = 0.5 / Math.sqrt(trace + 1.0);
+            w = 0.25 / s;
+            x = (m[6] - m[9]) * s;
+            y = (m[8] - m[2]) * s;
+            z = (m[1] - m[4]) * s;
+        } else {
+            if (m[0] > m[5] && m[0] > m[10]) {
+                let s = 2.0 * Math.sqrt(1.0 + m[0] - m[5] - m[10]);
+                w = (m[6] - m[9]) / s;
+                x = 0.25 * s;
+                y = (m[1] + m[4]) / s;
+                z = (m[2] + m[8]) / s;
+            } else if (m[5] > m[10]) {
+                let s = 2.0 * Math.sqrt(1.0 + m[5] - m[0] - m[10]);
+                w = (m[8] - m[2]) / s;
+                x = (m[1] + m[4]) / s;
+                y = 0.25 * s;
+                z = (m[6] + m[9]) / s;
+            } else {
+                let s = 2.0 * Math.sqrt(1.0 + m[10] - m[0] - m[5]);
+                w = (m[1] - m[4]) / s;
+                x = (m[2] + m[8]) / s;
+                y = (m[6] + m[9]) / s;
+                z = 0.25 * s;
+            }
+        }
+
+        return new Quaternion(x, y, z, w);
+    }
+
+    /** Mnożenie wektora 3D przez macierz (punkt, w=1) */
+    static MultiplyVector3(m, v, dst) {
+        const x = v.x, y = v.y, z = v.z;
+        const d = dst || new Vector3();
+
+        d.x = m[0] * x + m[4] * y + m[8] * z + m[12];
+        d.y = m[1] * x + m[5] * y + m[9] * z + m[13];
+        d.z = m[2] * x + m[6] * y + m[10] * z + m[14];
+
+        return d;
+    }
+
     constructor() {
         super(16);
-        this[0] = 0;
-        this[1] = 0;
-        this[2] = 0;
-        this[3] = 0;
-        this[4] = 0;
-        this[5] = 0;
-        this[6] = 0;
-        this[7] = 0;
-        this[8] = 0;
-        this[9] = 0;
-        this[10] = 0;
-        this[11] = 0;
-        this[12] = 0;
-        this[13] = 0;
-        this[14] = 0;
-        this[15] = 0;
+        Matrix4x4.Identity(this);
     }
 
 }
