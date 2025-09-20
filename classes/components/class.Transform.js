@@ -109,7 +109,7 @@ class Transform extends Component {
     // ---------- DIRECTION VECTORS ----------
     get forward() {
         const m = this.matrix4x4;
-        return new Vector3(-m[8], -m[9], -m[10]).Normalize(); // -Z
+        return new Vector3(m[8], m[9], m[10]).Normalize(); // -Z
     }
 
     get up() {

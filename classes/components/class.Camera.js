@@ -8,7 +8,7 @@ class Camera extends Component {
         this.aspect = 1;
         this.nearClipPlane = 0.1;
         this.farClipPlane = 1000;
-        this.fieldOfView = 90;
+        this.fieldOfView = 60;
 
         this.orthographic = false;
         this.orthographicSize = 100;

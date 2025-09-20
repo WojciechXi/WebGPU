@@ -79,6 +79,8 @@ class Shader {
         );
 
         this.sampler = device.createSampler({
+            addressModeU: 'repeat',
+            addressModeV: 'repeat',
             magFilter: 'linear',
             minFilter: 'linear',
             mipmapFilter: 'linear',

@@ -42,6 +42,31 @@ class Vector3 extends Float32Array {
         return dst;
     }
 
+    static Multiply(a, b, dst) {
+        dst = dst || new Float32Array(3);
+
+        a[0] *= b;
+        a[1] *= b;
+        a[2] *= b;
+
+        return dst;
+    }
+
+    static Scale(a, b, dst) {
+        dst = dst || new Float32Array(3);
+
+        if (b instanceof Vector3 || b instanceof Vector4) {
+            a[0] *= b[0];
+            a[1] *= b[1];
+            a[2] *= b[2];
+        } else if (b instanceof Vector2) {
+            a[0] *= b[0];
+            a[1] *= b[1];
+        }
+
+        return dst;
+    }
+
     static Normalize(v, dst) {
         dst = dst || new Float32Array(3);
 
@@ -73,6 +98,16 @@ class Vector3 extends Float32Array {
 
     Normalize() {
         Vector3.Normalize(this, this);
+        return this;
+    }
+
+    Add(v) {
+        Vector3.Add(this, v, this);
+        return this;
+    }
+
+    Multiply(v) {
+        Vector3.Multiply(this, v, this);
         return this;
     }
 

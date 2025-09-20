@@ -1,49 +1,50 @@
 window.addEventListener('load', function (event) {
-    let image = new Image();
+    const image = new Image();
     image.src = '/Assets/Images/D3025 OW DAB SONOMA.jpg';
 
-    let engine = new Engine();
+    const engine = new Engine();
     engine.scene = new Scene();
 
     image.onload = async function (event) {
-        let imageBitmap = await createImageBitmap(image);
+        const imageBitmap = await createImageBitmap(image);
 
-        Ajax.Get('/Assets/Shaders/Shader.wgsl', function (shaderCode) {
+        Ajax.Get('/Assets/Shaders/Unlit.wgsl', function (shaderCode) {
             engine.Init(function (engine) {
-                let shader = new Shader(shaderCode, [
+                let unlitShader = new Shader(shaderCode, [
                     {
-                        arrayStride: (3 + 3 + 2) * 4, // position + normal + uv
+                        arrayStride: (3 + 3 + 3 + 2) * 4, // position + normal + color + uv
                         attributes: [
                             { shaderLocation: 0, offset: 0, format: 'float32x3' },       // position
                             { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' },   // normal
-                            { shaderLocation: 2, offset: 6 * 4, format: 'float32x2' },   // uv
+                            { shaderLocation: 2, offset: 6 * 4, format: 'float32x3' },   // color
+                            { shaderLocation: 3, offset: 9 * 4, format: 'float32x2' },   // uv
                         ],
                     }
                 ]);
 
-                shader.Compile(imageBitmap);
+                unlitShader.Compile(imageBitmap);
 
-                let material = new Material(shader);
+                const unlitMaterial = new Material(unlitShader);
 
-                let directionalLightGameObject = new GameObject('DirectionalLight');
-                let directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
+                const directionalLightGameObject = new GameObject('DirectionalLight');
+                const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
-                let ambientLightGameObject = new GameObject('AmbientLight');
-                let ambientLight = ambientLightGameObject.AddComponent(AmbientLight);
+                const ambientLightGameObject = new GameObject('AmbientLight');
+                const ambientLight = ambientLightGameObject.AddComponent(AmbientLight);
                 ambientLight.color.a = 0.6;
 
-                let cameraGameObject = new GameObject('Camera');
-                cameraGameObject.transform.localPosition.y = 1;
-                cameraGameObject.transform.localPosition.z = -2;
-                let camera = cameraGameObject.AddComponent(Camera);
+                const cameraGameObject = new GameObject('Camera');
+                cameraGameObject.AddComponent(Camera);
+                cameraGameObject.AddComponent(Test);
 
                 Ajax.Get('/Assets/Models/Odlegla.obj', function (obj) {
-                    Importer.Obj(obj, function (mesh) {
-                        let cubeGameObject = new GameObject('Cube');
-                        let meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
-                        cubeGameObject.AddComponent(Test);
-                        meshRenderer.material = material;
-                        meshRenderer.mesh = mesh;
+                    Importer.Obj(obj, function (meshes) {
+                        for (const mesh of meshes) {
+                            const cubeGameObject = new GameObject('Cube');
+                            const meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
+                            meshRenderer.material = unlitMaterial;
+                            meshRenderer.mesh = mesh;
+                        }
                     });
                 });
             });

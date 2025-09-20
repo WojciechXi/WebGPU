@@ -37,34 +37,39 @@ class Importer {
             }
         }
 
-        let mesh = new Mesh();
+        let meshes = [];
 
+        let mesh = null;
         for (let line of lines) {
-            if (line.startsWith('f ')) {
+            if (line.startsWith('usemtl')) {
+                if (mesh) {
+                    mesh.Update();
+                    meshes.push(mesh);
+                }
+
+                mesh = new Mesh(line);
+            } else if (line.startsWith('f ')) {
                 line = line.split(' ');
                 for (let l of line) {
                     if (l == 'f') continue;
                     l = l.split('/');
 
                     let vertexIndex = parseInt(l[0]) - 1;
-                    let uvIndex = parseInt(l[1]) - 1;
                     let normalIndex = parseInt(l[2]) - 1;
+                    let uvIndex = parseInt(l[1]) - 1;
 
                     mesh.vertices.push(vertices[vertexIndex]);
-                    mesh.uvs.push(uvs[uvIndex]);
                     mesh.normals.push(normals[normalIndex]);
-
+                    mesh.uvs.push(uvs[uvIndex]);
                     mesh.triangles.push(mesh.vertices.length - 1);
                 }
             }
         }
 
         console.log(lines);
-        console.log(mesh);
+        console.log(meshes);
 
-        mesh.Update();
-
-        callback(mesh);
+        callback(meshes);
     }
 
 }

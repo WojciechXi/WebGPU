@@ -10,7 +10,8 @@ struct Uniforms {
 struct Vertex {
     @location(0) position: vec4f,
     @location(1) normal: vec3f,
-    @location(2) uv: vec2f,
+    @location(2) color: vec3f,
+    @location(3) uv: vec2f,
 };
 
 struct VSOutput {
