@@ -3,6 +3,7 @@ class Vector3 extends Float32Array {
     static get zero() { return new Vector3(0, 0, 0); }
     static get one() { return new Vector3(1, 1, 1); }
 
+    static get up() { return new Vector3(0, 1, 0); }
     static get down() { return new Vector3(0, -1, 0); }
 
     static Cross(a, b, dst) {

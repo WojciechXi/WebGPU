@@ -7,6 +7,18 @@ class Quaternion extends Float32Array {
         return dst;
     }
 
+    static Inverse(q, dst = null) {
+        dst = dst || new Quaternion();
+
+        const dot = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
+        dst[0] = -q.x / dot;
+        dst[1] = -q.y / dot;
+        dst[2] = -q.z / dot;
+        dst[3] = -q.w / dot;
+
+        return dst;
+    }
+
     // Quaternion multiplication (combines rotations)
     static Multiply(a, b, dst = null) {
         dst = dst || new Quaternion();
@@ -40,9 +52,9 @@ class Quaternion extends Float32Array {
     }
 
     // Create quaternion from axis and angle
-    static FromAxisAngle(axis, angleRad, dst = null) {
+    static FromAxisAngle(axis, angle, dst = null) {
         dst = dst || new Quaternion();
-        const half = angleRad * 0.5;
+        const half = Math.DegToRad(angle) * 0.5;
         const s = Math.sin(half);
         dst[0] = axis[0] * s;
         dst[1] = axis[1] * s;
