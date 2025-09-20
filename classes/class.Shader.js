@@ -22,7 +22,7 @@ class Shader {
         });
 
         let pipeline = this.pipeline = this.pipeline = Graphics.device.createRenderPipeline({
-            label: '2 attributes with color',
+            label: '3 attributes',
             layout: 'auto',
             vertex: {
                 module,

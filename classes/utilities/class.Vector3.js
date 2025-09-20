@@ -59,9 +59,9 @@ class Vector3 extends Float32Array {
 
     constructor(x = 0, y = 0, z = 0) {
         super(3);
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this[0] = x;
+        this[1] = y;
+        this[2] = z;
     }
 
     get x() { return this[0]; } set x(f) { return this[0] = f; }

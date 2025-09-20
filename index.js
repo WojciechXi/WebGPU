@@ -1,7 +1,6 @@
 window.addEventListener('load', function (event) {
     let engine = new Engine();
     engine.scene = new Scene();
-
     engine.Init(function (engine) {
         let shader = new Shader(`
             struct Uniforms {
@@ -26,7 +25,7 @@ window.addEventListener('load', function (event) {
             @vertex fn vs(vert: Vertex) -> VSOutput {
                 var vsOut: VSOutput;
                 vsOut.position = uni.viewProjectionMatrix * uni.matrix * vert.position;
-                vsOut.normal = vert.normal;
+                vsOut.normal = (uni.viewProjectionMatrix * vec4f(vert.normal, 0)).xyz;
                 return vsOut;
             }
 
@@ -81,12 +80,12 @@ window.addEventListener('load', function (event) {
 
         let cubeGameObject = new GameObject('Cube');
         let meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
+        cubeGameObject.AddComponent(Test);
         meshRenderer.mesh = mesh;
         meshRenderer.material = material;
 
         let cameraGameObject = new GameObject('Camera');
         cameraGameObject.transform.position.z = 5;
-        cameraGameObject.transform.position.x = 5;
         let camera = cameraGameObject.AddComponent(Camera);
     });
 });

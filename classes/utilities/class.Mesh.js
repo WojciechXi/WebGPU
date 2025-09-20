@@ -23,7 +23,8 @@ class MeshBuffer {
     }
 
     Update(mesh) {
-        this.data = new Float32Array(mesh.triangles.length * (3 + 3));
+        let offset = 3 + 3;
+        this.data = new Float32Array(mesh.triangles.length * offset);
 
         for (let i = 0; i < mesh.triangles.length; i++) {
             let index = mesh.triangles[i];
@@ -31,8 +32,8 @@ class MeshBuffer {
             let vertex = mesh.vertices[index];
             let normal = mesh.normals[index];
 
-            if (vertex) this.data.set(vertex, i * 6);
-            if (normal) this.data.set(normal, i * 6 + 3);
+            if (vertex) this.data.set(vertex, i * offset);
+            if (normal) this.data.set(normal, i * offset + 3);
         }
     }
 
