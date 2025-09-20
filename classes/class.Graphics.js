@@ -38,8 +38,8 @@ class Graphics {
 
     static PreRender() {
         let renderPassDescriptor = this.renderPassDescriptor;
-        let currentTexture = this.currentTexture = this.context.getCurrentTexture();
 
+        let currentTexture = this.currentTexture = this.context.getCurrentTexture();
         renderPassDescriptor.colorAttachments[0].view = currentTexture.createView();
 
         if (!this.depthTexture || this.depthTexture.width !== currentTexture.width || this.depthTexture.height !== currentTexture.height) {
