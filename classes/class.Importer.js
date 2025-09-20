@@ -38,9 +38,6 @@ class Importer {
         }
 
         let mesh = new Mesh();
-        mesh.vertices = vertices;
-        mesh.normals = normals;
-        mesh.uvs = uvs;
 
         for (let line of lines) {
             if (line.startsWith('f ')) {
@@ -53,7 +50,11 @@ class Importer {
                     let uvIndex = parseInt(l[1]) - 1;
                     let normalIndex = parseInt(l[2]) - 1;
 
-                    mesh.triangles.push(vertexIndex);
+                    mesh.vertices.push(vertices[vertexIndex]);
+                    mesh.uvs.push(uvs[uvIndex]);
+                    mesh.normals.push(normals[normalIndex]);
+
+                    mesh.triangles.push(mesh.vertices.length - 1);
                 }
             }
         }

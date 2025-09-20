@@ -6,42 +6,47 @@ class Shader {
         this.pipeline = null;
     }
 
-    Compile() {
-        let context = Graphics.context;
-        let device = Graphics.device;
+    Compile(imageBitmap) {
+        const device = Graphics.device;
+        const context = Graphics.context;
 
-        let presentationFormat = this.presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+        // Konfiguracja kontekstu
+        const presentationFormat = this.presentationFormat = navigator.gpu.getPreferredCanvasFormat();
         context.configure({
             device,
             format: presentationFormat,
             alphaMode: 'premultiplied',
         });
 
-        let module = this.module = this.module = Graphics.device.createShaderModule({
-            code: this.code,
-        });
+        // Tworzymy shader module
+        this.module = device.createShaderModule({ code: this.code });
 
-        let pipeline = this.pipeline = this.pipeline = Graphics.device.createRenderPipeline({
-            label: '3 attributes',
+        // Tworzymy pipeline
+        this.pipeline = device.createRenderPipeline({
+            label: 'shader pipeline',
             layout: 'auto',
             vertex: {
-                module,
+                module: this.module,
+                entryPoint: 'vs',
                 buffers: [
                     {
-                        arrayStride: (3 + 3) * 4,
+                        arrayStride: (3 + 3 + 2) * 4, // position + normal + uv
                         attributes: [
-                            { shaderLocation: 0, offset: 0, format: 'float32x3' },  // position
-                            { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' },  // normal
+                            { shaderLocation: 0, offset: 0, format: 'float32x3' },       // position
+                            { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' },   // normal
+                            { shaderLocation: 2, offset: 6 * 4, format: 'float32x2' },   // uv
                         ],
                     },
                 ],
             },
             fragment: {
-                module,
+                module: this.module,
+                entryPoint: 'fs',
                 targets: [{ format: presentationFormat }],
             },
             primitive: {
-                cullMode: 'front',
+                cullMode: "back",
+                frontFace: "cw",
             },
             depthStencil: {
                 depthWriteEnabled: true,
@@ -50,56 +55,71 @@ class Shader {
             },
         });
 
-        let viewProjectionMatrixSize = 16;
-        let modelMatrixSize = 16;
-        let colorSize = 4;
-        let lightDirectionSize = 4;
-
-        let totalSize = viewProjectionMatrixSize + modelMatrixSize + colorSize + lightDirectionSize;
-
-        let uniformBufferSize = this.uniformBufferSize = totalSize * 4;
-        let uniformBuffer = this.uniformBuffer = Graphics.device.createBuffer({
-            label: 'uniforms',
-            size: uniformBufferSize,
+        // Tworzymy buffer uniformów (mat4x4 = 16 floatów, vec4 = 4 floatów, vec3 = 3 floaty + padding)
+        const uniformSize = (16 + 16 + 4 + 4) * 4; // VP + model + color + light (padding do 4 floatów dla vec3)
+        this.uniformBuffer = device.createBuffer({
+            label: 'uniform buffer',
+            size: uniformSize,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
-        let uniformValues = this.uniformValues = new Float32Array(totalSize);
+        // Float32Array do łatwego ustawiania wartości
+        this.uniformValues = new Float32Array(uniformSize / 4);
+        this.viewProjectionMatrix = this.uniformValues.subarray(0, 16);
+        this.modelMatrix = this.uniformValues.subarray(16, 32);
+        this.color = this.uniformValues.subarray(32, 36);
+        this.lightDirection = this.uniformValues.subarray(36, 39); // ostatni float zostaje paddingiem
 
-        this.viewProjectionMatrix = uniformValues.subarray(0, 16);
-        this.modelMatrix = uniformValues.subarray(16, 32);
-        this.color = uniformValues.subarray(32, 36);
-        this.lightDirection = uniformValues.subarray(36, 39);
+        // Tworzymy teksturę i sampler
+        this.texture = device.createTexture({
+            size: [imageBitmap.width, imageBitmap.height, 1],
+            format: 'rgba8unorm',
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
+        });
+        device.queue.copyExternalImageToTexture(
+            { source: imageBitmap },
+            { texture: this.texture },
+            [imageBitmap.width, imageBitmap.height, 1]
+        );
 
-        this.bindGroup = Graphics.device.createBindGroup({
-            label: 'bind group for object',
-            layout: pipeline.getBindGroupLayout(0),
+        this.sampler = device.createSampler({
+            magFilter: 'linear',
+            minFilter: 'linear',
+            mipmapFilter: 'linear',
+        });
+
+        // Bind group: uniform + texture + sampler
+        this.bindGroup = device.createBindGroup({
+            label: 'bind group',
+            layout: this.pipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: { buffer: uniformBuffer } },
+                { binding: 0, resource: { buffer: this.uniformBuffer } },
+                { binding: 1, resource: this.texture.createView() },
+                { binding: 2, resource: this.sampler },
             ],
         });
     }
 
-    Use() {
-        Graphics.pass.setPipeline(this.pipeline);
-        Graphics.pass.setBindGroup(0, this.bindGroup);
+    Use(passEncoder) {
+        passEncoder.setPipeline(this.pipeline);
+        passEncoder.setBindGroup(0, this.bindGroup);
         Graphics.device.queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
     }
 
-    SetViewProjectionMatrix(viewProjectionMatrix) {
-        this.viewProjectionMatrix.set(viewProjectionMatrix);
+    SetViewProjectionMatrix(matrix) {
+        this.viewProjectionMatrix.set(matrix);
     }
 
-    SetModelMatrix(modelMatrix) {
-        this.modelMatrix.set(modelMatrix);
+    SetModelMatrix(matrix) {
+        this.modelMatrix.set(matrix);
     }
 
     SetColor(color) {
         this.color.set(color);
     }
 
-    SetLightDirection(lightDirection) {
-        this.lightDirection.set(lightDirection);
+    SetLightDirection(direction) {
+        this.lightDirection.set(direction);
     }
 
 }
