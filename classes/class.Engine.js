@@ -27,6 +27,7 @@ class Engine {
         let object = this;
 
         Time.Update(time / 1000);
+        Input.Update();
         Graphics.Update();
 
         if (this.scene) this.scene.Update();

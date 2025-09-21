@@ -38,7 +38,7 @@ class Matrix4x4 extends Float32Array {
 
         const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
 
-        dst[0] = -(f / aspect);
+        dst[0] = f / aspect;
         dst[1] = 0;
         dst[2] = 0;
         dst[3] = 0;

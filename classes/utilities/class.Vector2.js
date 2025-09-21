@@ -48,6 +48,22 @@ class Vector2 extends Float32Array {
     get x() { return this[0]; } set x(f) { return this[0] = f; }
     get y() { return this[1]; } set y(f) { return this[1] = f; }
 
+    Add(v) {
+        Vector2.Add(this, v, this);
+        return this;
+    }
+
+    Multiply(f) {
+        this[0] *= f;
+        this[1] *= f;
+        return this;
+    }
+
+    SetXY(x, y) {
+        this[0] = x;
+        this[1] = y;
+    }
+
     Set(value) {
         if (Number.isFinite(value)) this[0] = this[1] = this[2] = value;
         else if (value instanceof Vector2) {

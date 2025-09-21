@@ -10,11 +10,6 @@ function loadBitmap(src, callback) {
 window.addEventListener('load', function (event) {
     const engine = new Engine();
     engine.Init(function (engine) {
-        window.addEventListener('mousemove', function (event) {
-            Input.mousePosition.x = event.clientX / window.innerWidth;
-            Input.mousePosition.y = event.clientY / window.innerHeight;
-        });
-
         Ajax.Get('/assets.php', function (response) {
             response = JSON.parse(response);
             const skyboxShader = new Shader(response.shaders['Skybox.wgsl'], null, {
@@ -100,6 +95,7 @@ window.addEventListener('load', function (event) {
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
+            cameraGameObject.transform.position = new Vector3(0, 1, 5);
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
