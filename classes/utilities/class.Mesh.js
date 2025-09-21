@@ -14,6 +14,15 @@ class Mesh {
         this.meshBuffer.Update(this);
     }
 
+    Clear() {
+        this.colors = [];
+        this.vertices = [];
+        this.normals = [];
+        this.uvs = [];
+        this.triangles = [];
+        this.Update();
+    }
+
 }
 
 class MeshBuffer {

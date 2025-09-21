@@ -99,6 +99,10 @@ window.addEventListener('load', function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
+            const terrainGameObject = new GameObject('Terrain');
+            const terrain = terrainGameObject.AddComponent(Terrain);
+            terrain.material = unlitMaterial;
+
             Ajax.Get('/Assets/Models/Odlegla.obj', function (obj) {
                 Importer.Obj(obj, function (meshes) {
                     let i = 0;
