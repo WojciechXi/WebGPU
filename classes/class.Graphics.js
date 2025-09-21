@@ -1,35 +1,50 @@
 class Graphics {
 
-    static get Width() { return this.canvas.width; }
-    static get Height() { return this.canvas.height; }
-
-    static async Init(callback) {
+    static {
         this.lightDirection = Vector3.down;
         this.lightColor = Color.white;
         this.ambientLightColor = Color.zero;
+    }
 
-        let adapter = this.adapter = await navigator.gpu?.requestAdapter();
-        let device = this.device = await adapter?.requestDevice();
+    static get Width() { return this.canvas.width; }
+    static get Height() { return this.canvas.height; }
 
-        if (!device) return alert('need a browser that supports WebGPU');
+    static async request() {
+        this.adapter = await navigator.gpu?.requestAdapter();
+        this.device = await this.adapter?.requestDevice();
 
-        let canvas = this.canvas = document.querySelector('canvas');
-        let context = this.context = canvas.getContext('webgpu');
-        let depthTexture = this.depthTexture = null;
+        if (!this.device) return alert('need a browser that supports WebGPU');
+    }
 
-        let renderPassDescriptor = this.renderPassDescriptor = {
+    static async Init(callback) {
+        await this.request();
+
+        const adapter = this.adapter;
+        const device = this.device;
+
+        const canvas = this.canvas = document.querySelector('canvas');
+        const context = this.context = canvas.getContext('webgpu');
+        const currentTexture = this.currentTexture = null;
+        const depthTexture = this.depthTexture = null;
+
+        this.colorAttachment = {
+            clearValue: { r: 0, g: 0, b: 0, a: 1 },
+            loadOp: 'clear',
+            storeOp: 'store',
+        };
+
+        this.depthStencilAttachment = {
+            depthLoadOp: 'clear',
+            depthClearValue: 1.0,
+            depthStoreOp: 'store',
+        };
+
+        this.renderPassDescriptor = {
             label: 'our basic canvas renderPass',
             colorAttachments: [
-                {
-                    loadOp: 'clear',
-                    storeOp: 'store',
-                },
+                this.colorAttachment,
             ],
-            depthStencilAttachment: {
-                depthClearValue: 1.0,
-                depthLoadOp: 'clear',
-                depthStoreOp: 'store',
-            },
+            depthStencilAttachment: this.depthStencilAttachment,
         };
 
         callback();
@@ -41,24 +56,21 @@ class Graphics {
     }
 
     static PreRender() {
-        let renderPassDescriptor = this.renderPassDescriptor;
-
-        let currentTexture = this.currentTexture = this.context.getCurrentTexture();
-        renderPassDescriptor.colorAttachments[0].view = currentTexture.createView();
-
-        if (!this.depthTexture || this.depthTexture.width !== currentTexture.width || this.depthTexture.height !== currentTexture.height) {
+        this.currentTexture = this.context.getCurrentTexture();
+        if (!this.depthTexture || this.depthTexture.width !== this.currentTexture.width || this.depthTexture.height !== this.currentTexture.height) {
             if (this.depthTexture) this.depthTexture.destroy();
             this.depthTexture = this.device.createTexture({
-                size: [currentTexture.width, currentTexture.height],
+                size: [this.currentTexture.width, this.currentTexture.height],
                 format: 'depth24plus',
                 usage: GPUTextureUsage.RENDER_ATTACHMENT,
             });
         }
 
-        renderPassDescriptor.depthStencilAttachment.view = this.depthTexture.createView();
+        this.colorAttachment.view = this.currentTexture.createView();
+        this.depthStencilAttachment.view = this.depthTexture.createView();
 
-        this.encoder = this.device.createCommandEncoder();
-        this.pass = this.encoder.beginRenderPass(this.renderPassDescriptor);
+        this.commandEncoder = this.device.createCommandEncoder();
+        this.passEncoder = this.commandEncoder.beginRenderPass(this.renderPassDescriptor);
     }
 
     static Render() {
@@ -66,10 +78,8 @@ class Graphics {
     }
 
     static PostRender() {
-        this.pass.end();
-
-        const commandBuffer = this.encoder.finish();
-        this.device.queue.submit([commandBuffer]);
+        this.passEncoder.end();
+        this.device.queue.submit([this.commandEncoder.finish()]);
     }
 
 }

@@ -1,5 +1,7 @@
 class Quaternion extends Float32Array {
 
+    static get identity() { return new Quaternion(0, 0, 0, 1); }
+
     // Identity quaternion (no rotation)
     static Identity(dst = null) {
         dst = dst || new Quaternion();
@@ -158,7 +160,29 @@ class Quaternion extends Float32Array {
         const cosy_cosp = 1 - 2 * (y * y + z * z);
         dst[2] = Math.atan2(siny_cosp, cosy_cosp);
 
+        dst[0] = Math.RadToDeg(dst[0]);
+        dst[1] = Math.RadToDeg(dst[1]);
+        dst[2] = Math.RadToDeg(dst[2]);
         return dst; // [roll, pitch, yaw]
+    }
+
+    static FromEuler(x, y, z, dst = null) {
+        dst = dst || Quaternion.Identity();
+
+        x = Math.DegToRad(x);
+        y = Math.DegToRad(y);
+        z = Math.DegToRad(z);
+
+        const c1 = Math.cos(y / 2), s1 = Math.sin(y / 2);
+        const c2 = Math.cos(z / 2), s2 = Math.sin(z / 2);
+        const c3 = Math.cos(x / 2), s3 = Math.sin(x / 2);
+
+        dst.w = c1 * c2 * c3 + s1 * s2 * s3;
+        dst.x = c1 * c2 * s3 - s1 * s2 * c3;
+        dst.y = c1 * s2 * c3 + s1 * c2 * s3;
+        dst.z = s1 * c2 * c3 - c1 * s2 * s3;
+
+        return dst;
     }
 
     constructor(x = 0, y = 0, z = 0, w = 1) {
@@ -173,4 +197,8 @@ class Quaternion extends Float32Array {
     get y() { return this[1]; } set y(f) { return this[1] = f; }
     get z() { return this[2]; } set z(f) { return this[2] = f; }
     get w() { return this[3]; } set w(f) { return this[3] = f; }
+
+    Clone() {
+        return new Quaternion(this[0], this[1], this[2], this[3]);
+    }
 }

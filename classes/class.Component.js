@@ -1,4 +1,4 @@
-class Component extends Object {
+class Component extends Obj {
 
     constructor(gameObject) {
         super();

@@ -1,4 +1,4 @@
-class GameObject extends Object {
+class GameObject extends Obj {
 
     constructor(name = 'GameObject', parent = null) {
         super();

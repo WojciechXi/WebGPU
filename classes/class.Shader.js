@@ -1,14 +1,30 @@
 class Shader {
 
-    constructor(code, renderPipelineBuffers, buffers) {
-        this.code = code;
-        this.renderPipelineBuffers = renderPipelineBuffers;
-        this.buffers = buffers;
-        this.module = null;
-        this.pipeline = null;
+    constructor(code, renderPipelineBuffers = null, settings = {}) {
+        let _this = this;
+
+        _this.code = code;
+        _this.renderPipelineBuffers = renderPipelineBuffers ?? [];
+
+        _this.settings = {
+            layout: 'auto',
+            cullMode: 'back',
+            frontFace: 'ccw',
+            depthWriteEnabled: true,
+            depthCompare: 'less',
+            format: 'depth24plus',
+            blend: null,
+        };
+
+        Object.keys(settings).forEach(function (key) {
+            _this.settings[key] = settings[key];
+        });
+
+        _this.module = null;
+        _this.pipeline = null;
     }
 
-    Compile(imageBitmap) {
+    Compile() {
         const device = Graphics.device;
         const context = Graphics.context;
 
@@ -26,7 +42,7 @@ class Shader {
         // Tworzymy pipeline
         this.pipeline = device.createRenderPipeline({
             label: 'shader pipeline',
-            layout: 'auto',
+            layout: this.settings.layout,
             vertex: {
                 module: this.module,
                 entryPoint: 'vs',
@@ -35,97 +51,25 @@ class Shader {
             fragment: {
                 module: this.module,
                 entryPoint: 'fs',
-                targets: [{ format: presentationFormat }],
+                targets: [
+                    this.settings.blend ? {
+                        format: presentationFormat,
+                        blend: this.settings.blend,
+                    } : {
+                        format: presentationFormat,
+                    }
+                ],
             },
             primitive: {
-                cullMode: "back",
-                frontFace: "cw",
+                cullMode: this.settings.cullMode,
+                frontFace: this.settings.frontFace,
             },
             depthStencil: {
-                depthWriteEnabled: true,
-                depthCompare: 'less',
-                format: 'depth24plus',
+                depthWriteEnabled: this.settings.depthWriteEnabled,
+                depthCompare: this.settings.depthCompare,
+                format: this.settings.format,
             },
         });
-
-        // Tworzymy buffer uniformów (mat4x4 = 16 floatów, vec4 = 4 floatów, vec3 = 3 floaty + padding)
-        const uniformSize = (16 + 16 + 4 + 4 + 4 + 4) * 4; // VP + model + color + lightDirection + lightColor + ambientLightColor
-        this.uniformBuffer = device.createBuffer({
-            label: 'uniform buffer',
-            size: uniformSize,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
-
-        // Float32Array do łatwego ustawiania wartości
-        this.uniformValues = new Float32Array(uniformSize / 4);
-        this.viewProjectionMatrix = this.uniformValues.subarray(0, 16);
-        this.modelMatrix = this.uniformValues.subarray(16, 32);
-        this.color = this.uniformValues.subarray(32, 36);
-        this.lightDirection = this.uniformValues.subarray(36, 39);
-        this.lightColor = this.uniformValues.subarray(40, 44);
-        this.ambientLightColor = this.uniformValues.subarray(44, 48);
-
-        // Tworzymy teksturę i sampler
-        this.texture = device.createTexture({
-            size: [imageBitmap.width, imageBitmap.height, 1],
-            format: 'rgba8unorm',
-            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
-        });
-
-        device.queue.copyExternalImageToTexture(
-            { source: imageBitmap },
-            { texture: this.texture },
-            [imageBitmap.width, imageBitmap.height, 1]
-        );
-
-        this.sampler = device.createSampler({
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
-        });
-
-        // Bind group: uniform + texture + sampler
-        this.bindGroup = device.createBindGroup({
-            label: 'bind group',
-            layout: this.pipeline.getBindGroupLayout(0),
-            entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: this.sampler },
-                { binding: 2, resource: this.texture.createView() },
-            ],
-        });
-    }
-
-    Use(passEncoder) {
-        passEncoder.setPipeline(this.pipeline);
-        passEncoder.setBindGroup(0, this.bindGroup);
-        Graphics.device.queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
-    }
-
-    SetViewProjectionMatrix(matrix) {
-        this.viewProjectionMatrix.set(matrix);
-    }
-
-    SetModelMatrix(matrix) {
-        this.modelMatrix.set(matrix);
-    }
-
-    SetColor(color) {
-        this.color.set(color);
-    }
-
-    SetLightDirection(direction) {
-        this.lightDirection.set(direction);
-    }
-
-    SetLightColor(color) {
-        this.lightColor.set(color);
-    }
-
-    SetAmbientLightColor(color) {
-        this.ambientLightColor.set(color);
     }
 
 }

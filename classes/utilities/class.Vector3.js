@@ -8,6 +8,10 @@ class Vector3 extends Float32Array {
     static get up() { return new Vector3(0, 1, 0); }
     static get down() { return new Vector3(0, -1, 0); }
 
+    static Length(v) {
+        return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    }
+
     static Cross(a, b, dst) {
         dst = dst || new Float32Array(3);
 
@@ -70,7 +74,7 @@ class Vector3 extends Float32Array {
     static Normalize(v, dst) {
         dst = dst || new Float32Array(3);
 
-        const length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+        const length = this.Length(v);
         // make sure we don't divide by 0.
         if (length > 0.00001) {
             dst[0] = v[0] / length;
@@ -96,6 +100,10 @@ class Vector3 extends Float32Array {
     get y() { return this[1]; } set y(f) { return this[1] = f; }
     get z() { return this[2]; } set z(f) { return this[2] = f; }
 
+    get length() {
+        return Vector3.Length(this);
+    }
+
     Normalize() {
         Vector3.Normalize(this, this);
         return this;
@@ -103,6 +111,11 @@ class Vector3 extends Float32Array {
 
     Add(v) {
         Vector3.Add(this, v, this);
+        return this;
+    }
+
+    Subtract(v) {
+        Vector3.Subtract(this, v, this);
         return this;
     }
 
@@ -121,6 +134,9 @@ class Vector3 extends Float32Array {
             this[1] = value[1];
             this[2] = value[2];
         }
+        return this;
     }
+
+    Clone() { return new Vector3(this.x, this.y, this.z); }
 
 }

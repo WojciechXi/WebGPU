@@ -27,7 +27,8 @@ struct VSOutput {
 @group(0) @binding(1) var ourSampler: sampler;
 @group(0) @binding(2) var ourTexture: texture_2d<f32>;
 
-@vertex fn vs(vert: Vertex) -> VSOutput {
+@vertex
+fn vs(vert: Vertex) -> VSOutput {
     var vsOut: VSOutput;
     vsOut.position = uni.viewProjectionMatrix * uni.matrix * vert.position;
 
@@ -42,7 +43,8 @@ struct VSOutput {
     return vsOut;
 }
 
-@fragment fn fs(vsOut: VSOutput) -> @location(0) vec4f {
+@fragment
+fn fs(vsOut: VSOutput) -> @location(0) vec4f {
     var normal = normalize(vsOut.normal);
     normal.x = -normal.x;
     
@@ -54,6 +56,7 @@ struct VSOutput {
     let texColor = textureSample(ourTexture, ourSampler, vsOut.uv);
 
     let finalColor = (ambient + diffuse * lightColor) * uni.color.rgb * texColor.rgb;
+    let alpha = texColor.a * uni.color.a;
 
-    return vec4f(finalColor, texColor.a);
+    return vec4f(finalColor, alpha);
 }

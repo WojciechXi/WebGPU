@@ -2,12 +2,11 @@ class Engine {
 
     constructor() {
         Engine.Instance = this;
+        this.scene = new Scene();
     }
 
     Init(callback) {
         let object = this;
-
-        this.scene = new Scene();
 
         Graphics.Init(function () {
             callback(object);
@@ -29,15 +28,10 @@ class Engine {
 
         Time.Update(time / 1000);
         Graphics.Update();
+
         if (this.scene) this.scene.Update();
-
-        Graphics.PreRender();
         if (this.scene) this.scene.PreRender();
-
-        Graphics.Render();
         if (this.scene) this.scene.Render();
-
-        Graphics.PostRender();
         if (this.scene) this.scene.PostRender();
 
         requestAnimationFrame(function (time) {

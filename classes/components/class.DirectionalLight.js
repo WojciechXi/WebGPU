@@ -1,4 +1,8 @@
-class DirectionalLight extends Light {
+class DirectionalLight extends Component {
+
+    Init() {
+        this.color = Color.white;
+    }
 
     Update() {
         Graphics.lightDirection = this.transform.down;

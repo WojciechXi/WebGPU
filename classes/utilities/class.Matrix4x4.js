@@ -38,7 +38,7 @@ class Matrix4x4 extends Float32Array {
 
         const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
 
-        dst[0] = f / aspect;
+        dst[0] = -(f / aspect);
         dst[1] = 0;
         dst[2] = 0;
         dst[3] = 0;
@@ -295,20 +295,36 @@ class Matrix4x4 extends Float32Array {
         return dst;
     }
 
+    static SetTranslation(matrix, v) {
+        matrix[12] = v.x;
+        matrix[13] = v.y;
+        matrix[14] = v.z;
+        return matrix;
+    }
+
+    // Jeśli chcesz, można zrobić też wersję, która zwraca nową macierz
+    static WithTranslation(matrix, v) {
+        const out = new Float32Array(matrix);
+        out[12] = v.x;
+        out[13] = v.y;
+        out[14] = v.z;
+        return out;
+    }
+
     static Translate(m, Translation, dst) {
         return Matrix4x4.Multiply(m, Matrix4x4.Translation(Translation), dst);
     }
 
-    static RotateX(m, angleInRadians, dst) {
-        return Matrix4x4.Multiply(m, Matrix4x4.RotationX(angleInRadians), dst);
+    static RotateX(m, angle, dst) {
+        return Matrix4x4.Multiply(m, Matrix4x4.RotationX(Math.DegToRad(angle)), dst);
     }
 
-    static RotateY(m, angleInRadians, dst) {
-        return Matrix4x4.Multiply(m, Matrix4x4.RotationY(angleInRadians), dst);
+    static RotateY(m, angle, dst) {
+        return Matrix4x4.Multiply(m, Matrix4x4.RotationY(Math.DegToRad(angle)), dst);
     }
 
-    static RotateZ(m, angleInRadians, dst) {
-        return Matrix4x4.Multiply(m, Matrix4x4.RotationZ(angleInRadians), dst);
+    static RotateZ(m, angle, dst) {
+        return Matrix4x4.Multiply(m, Matrix4x4.RotationZ(Math.DegToRad(angle)), dst);
     }
 
     static Scale(m, scale, dst) {
@@ -350,6 +366,38 @@ class Matrix4x4 extends Float32Array {
         dst[15] = 1;
 
         return dst;
+    }
+
+    static FromQuaternion(q, out = null) {
+        if (!out) out = Matrix4x4.Identity();
+        const x = q.x, y = q.y, z = q.z, w = q.w;
+
+        const x2 = x + x, y2 = y + y, z2 = z + z;
+        const xx = x * x2, xy = x * y2, xz = x * z2;
+        const yy = y * y2, yz = y * z2, zz = z * z2;
+        const wx = w * x2, wy = w * y2, wz = w * z2;
+
+        out[0] = 1 - (yy + zz);
+        out[1] = xy + wz;
+        out[2] = xz - wy;
+        out[3] = 0;
+
+        out[4] = xy - wz;
+        out[5] = 1 - (xx + zz);
+        out[6] = yz + wx;
+        out[7] = 0;
+
+        out[8] = xz + wy;
+        out[9] = yz - wx;
+        out[10] = 1 - (xx + yy);
+        out[11] = 0;
+
+        out[12] = 0;
+        out[13] = 0;
+        out[14] = 0;
+        out[15] = 1;
+
+        return out;
     }
 
     /** Wyciąga pozycję, rotację (quat) i skalę z macierzy */
@@ -425,6 +473,12 @@ class Matrix4x4 extends Float32Array {
     constructor() {
         super(16);
         Matrix4x4.Identity(this);
+    }
+
+    set(m) {
+        for (let i = 0; i < this.length; i++) {
+            this[i] = m[i];
+        }
     }
 
 }

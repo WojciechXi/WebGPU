@@ -1,4 +1,4 @@
-class Object {
+class Obj {
 
     Start() {
 

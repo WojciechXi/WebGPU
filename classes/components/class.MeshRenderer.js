@@ -27,11 +27,11 @@ class MeshRenderer extends Component {
         if (!this.mesh || !this.material) return;
 
         // ustaw shader i uniformy
-        this.material.Use(Graphics.pass, Camera.main.viewProjectionMatrix, this.transform.matrix4x4);
+        this.material.Use(Graphics.passEncoder, Camera.main.viewProjectionMatrix, Camera.main.viewProjectionInverseMatrix, this.transform.matrix4x4);
 
         // użyj istniejącego vertex buffer
-        Graphics.pass.setVertexBuffer(0, this.vertexBuffer);
-        Graphics.pass.draw(this.mesh.triangles.length);
+        Graphics.passEncoder.setVertexBuffer(0, this.vertexBuffer);
+        Graphics.passEncoder.draw(this.mesh.triangles.length);
     }
 
     Destroy() {
