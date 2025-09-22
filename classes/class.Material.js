@@ -49,22 +49,36 @@ class Material {
                 { texture: this._texture },
                 [width, height, 1]
             );
+        } else {
+            GPU.Queue.writeTexture(
+                { texture: this._texture },
+                new Uint8Array([255, 255, 255, 255]),
+                { bytesPerRow: width * 4 },
+                { width, height, depthOrArrayLayers: 1 }
+            );
         }
-
-        this.bindGroup = GPU.CreateBindGroup({
-            layout: this.shader.pipeline.getBindGroupLayout(0),
-            entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: this.sampler },
-                { binding: 2, resource: this._texture.createView() },
-            ],
-        });
     }
 
-    Use(renderPass, viewProjectionMatrix, viewProjectionInverseMatrix, modelMatrix) {
+    Use(renderPass, pipeline, viewProjectionMatrix, viewProjectionInverseMatrix, modelMatrix) {
         // ustaw pipeline i bind group
-        // renderPass.setPipeline(this.shader.pipeline);
-        renderPass.setBindGroup(0, this.bindGroup);
+        if (pipeline) {
+            renderPass.setBindGroup(0, GPU.CreateBindGroup({
+                layout: pipeline.getBindGroupLayout(0),
+                entries: [
+                    { binding: 0, resource: { buffer: this.uniformBuffer } },
+                ],
+            }));
+        } else {
+            renderPass.setPipeline(this.shader.pipeline);
+            renderPass.setBindGroup(0, GPU.CreateBindGroup({
+                layout: this.shader.pipeline.getBindGroupLayout(0),
+                entries: [
+                    { binding: 0, resource: { buffer: this.uniformBuffer } },
+                    { binding: 1, resource: this.sampler },
+                    { binding: 2, resource: this._texture.createView() },
+                ],
+            }));
+        }
 
         this.uniformValues.set(viewProjectionMatrix, 0);
         this.uniformValues.set(viewProjectionInverseMatrix, 16);

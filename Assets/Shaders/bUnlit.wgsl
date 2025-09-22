@@ -39,16 +39,14 @@ fn vs(vert: Vertex) -> VSOut {
 }
 
 struct FSOut {
-  @location(0) positionOut : vec4<f32>,
-  @location(1) normalOut : vec4<f32>,
+  @location(0) colorOut : vec4<f32>,
 };
 
 @fragment
 fn fs(in: VSOut) -> FSOut {
   var out: FSOut;
 
-  out.positionOut = vec4<f32>(in.worldPosition,1.0);
-  out.normalOut = vec4<f32>(normalize(in.normal),1.0);
+  out.colorOut = vec4<f32>(normalize(in.normal),1.0);
 
   return out;
 }

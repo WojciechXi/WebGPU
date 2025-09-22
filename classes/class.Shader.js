@@ -48,27 +48,34 @@ class Shader {
                 entryPoint: 'vs',
                 buffers: this.renderPipelineBuffers
             },
+            // fragment: {
+            //     module: this.module,
+            //     entryPoint: 'fs',
+            //     targets: [
+            //         { format: presentationFormat, }
+            //     ],
+            // },
             fragment: {
                 module: this.module,
-                entryPoint: 'fs',
+                entryPoint: "fs",
                 targets: [
-                    this.settings.blend ? {
-                        format: presentationFormat,
-                        blend: this.settings.blend,
-                    } : {
-                        format: presentationFormat,
-                    }
-                ],
+                    { format: "rgba16float" }, // color
+                ]
             },
             primitive: {
                 cullMode: this.settings.cullMode,
                 frontFace: this.settings.frontFace,
             },
+            // depthStencil: {
+            //     depthWriteEnabled: this.settings.depthWriteEnabled,
+            //     depthCompare: this.settings.depthCompare,
+            //     format: this.settings.format,
+            // },
             depthStencil: {
-                depthWriteEnabled: this.settings.depthWriteEnabled,
-                depthCompare: this.settings.depthCompare,
-                format: this.settings.format,
-            },
+                format: "depth24plus",
+                depthWriteEnabled: true,
+                depthCompare: "less"
+            }
         });
     }
 

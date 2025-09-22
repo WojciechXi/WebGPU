@@ -23,11 +23,11 @@ class MeshRenderer extends Component {
         }
     }
 
-    Render(renderPass) {
+    Render(renderPass, pipeline) {
         if (!this.mesh || !this.material) return;
 
         // ustaw shader i uniformy
-        this.material.Use(renderPass, Camera.main.viewProjectionMatrix, Camera.main.viewProjectionInverseMatrix, this.transform.matrix4x4);
+        this.material.Use(renderPass, pipeline, Camera.main.viewProjectionMatrix, Camera.main.viewProjectionInverseMatrix, this.transform.matrix4x4);
 
         // użyj istniejącego vertex buffer
         renderPass.setVertexBuffer(0, this._vertexBuffer);

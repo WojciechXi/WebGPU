@@ -40,7 +40,7 @@ class MeshBuffer {
 
             let vertex = mesh.vertices[index];
             let normal = mesh.normals[index];
-            let color = mesh.colors[index];
+            let color = Color.random;// mesh.colors[index];
             let uv = mesh.uvs[index];
 
             if (vertex) this.data.set(vertex, i * offset);

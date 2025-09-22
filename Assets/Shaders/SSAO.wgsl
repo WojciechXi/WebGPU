@@ -10,12 +10,12 @@ struct VSOut {
     vec2<f32>(-1.0,1.0),  vec2<f32>(1.0,-1.0), vec2<f32>(1.0,1.0)
   );
   out.uv = (pos[vid] + vec2<f32>(1.0)) * 0.5;
-  out.pos = vec4<f32>(pos[vid],0.0,1.0);
+  out.pos = vec4<f32>(pos[vid].x, -pos[vid].y, 0.0, 1.0);
   return out;
 }
 
-@group(0) @binding(0) var posTex: texture_2d<f32>;
-@group(0) @binding(1) var normTex: texture_2d<f32>;
+@group(0) @binding(0) var positionTexture: texture_2d<f32>;
+@group(0) @binding(1) var normalTexture: texture_2d<f32>;
 @group(0) @binding(2) var samp: sampler;
 
 const kernelSize: u32 = 16u;
@@ -34,8 +34,8 @@ struct FSOut {
 };
 
 @fragment fn fs(in: VSOut) -> FSOut {
-  let fragPos = textureSample(posTex,samp,in.uv).xyz;
-  let normal = normalize(textureSample(normTex,samp,in.uv).xyz);
+  let fragPos = textureSample(positionTexture,samp,in.uv).xyz;
+  let normal = normalize(textureSample(normalTexture,samp,in.uv).xyz);
 
   var occlusion: f32 = 0.0;
   let radius: f32 = 0.5;
@@ -48,6 +48,8 @@ struct FSOut {
   occlusion = 1.0 - (occlusion / f32(kernelSize));
 
   var out: FSOut;
-  out.aoOut = vec4<f32>(vec3<f32>(occlusion),1.0);
+
+  out.aoOut = vec4<f32>(vec3<f32>(occlusion), 1.0);
+
   return out;
 }

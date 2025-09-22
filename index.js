@@ -90,6 +90,10 @@ window.addEventListener('load', async function (event) {
                 u702pmst9Material.diffuse = bitmap;
             });
 
+            loadBitmap('/Assets/Images/D1038 BS BETON MILLENIUM.jpg', function (bitmap) {
+                concreteMaterial.diffuse = bitmap;
+            });
+
             loadBitmap('/Assets/Images/WoodFloor057_1K-JPG_Color.jpg', function (bitmap) {
                 floorMaterial.diffuse = bitmap;
             });
@@ -106,14 +110,13 @@ window.addEventListener('load', async function (event) {
                 White: whiteMaterial,
                 Concrete: concreteMaterial,
                 Floor: floorMaterial,
-                Glass: glassMaterial,
                 'H1386-ST40': sonomaMaterial,
                 'U702-PM': u702pmst9Material,
                 'U702-ST9': u702pmst9Material,
             };
 
-            const skybox = engine.scene.AddComponent(Skybox);
-            skybox.material = skyboxMaterial;
+            // const skybox = engine.scene.AddComponent(Skybox);
+            // skybox.material = skyboxMaterial;
 
             const ambientLight = engine.scene.AddComponent(AmbientLight);
             ambientLight.color.Set(0.95, 0.975, 1, 0.6);

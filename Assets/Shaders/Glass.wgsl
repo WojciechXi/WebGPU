@@ -1,13 +1,13 @@
 struct Uniforms {
-    viewProjectionMatrix: mat4x4f,
-    viewProjectionInverseMatrix: mat4x4f,
-    matrix: mat4x4f,
-    
-    lightDirection: vec3f,
-    lightColor: vec4f,
-    ambientLightColor: vec4f,
+    viewProjectionMatrix : mat4x4<f32>,
+    viewProjectionInverseMatrix : mat4x4<f32>,
+    matrix : mat4x4<f32>,
 
-    color: vec4f,
+    lightDirection : vec3<f32>,
+    lightColor : vec4<f32>,
+    ambientLightColor : vec4<f32>,
+
+    color : vec4<f32>,
 };
 
 struct Vertex {
@@ -46,7 +46,6 @@ fn vs(vert: Vertex) -> VSOutput {
 @fragment
 fn fs(vsOut: VSOutput) -> @location(0) vec4f {
     var normal = normalize(vsOut.normal);
-    normal.x = -normal.x;
     
     let diffuse = max(dot(normal, -uni.lightDirection), 0.0);
 
