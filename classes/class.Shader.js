@@ -25,7 +25,7 @@ class Shader {
     }
 
     Compile() {
-        const device = Graphics.device;
+        const device = GPU.device;
         const context = Graphics.context;
 
         // Konfiguracja kontekstu

@@ -13,13 +13,13 @@ class MeshRenderer extends Component {
         if (this._vertexBuffer) this._vertexBuffer.destroy();
 
         if (this._mesh) {
-            this._vertexBuffer = Graphics.device.createBuffer({
+            this._vertexBuffer = GPU.CreateBuffer({
                 label: 'vertex buffer vertices',
                 size: mesh.meshBuffer.data.byteLength,
                 usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
             });
 
-            Graphics.device.queue.writeBuffer(this._vertexBuffer, 0, mesh.meshBuffer.data);
+            GPU.Queue.writeBuffer(this._vertexBuffer, 0, mesh.meshBuffer.data);
         }
     }
 

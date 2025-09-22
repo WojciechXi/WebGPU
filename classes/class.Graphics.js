@@ -9,19 +9,7 @@ class Graphics {
     static get Width() { return this.canvas.width; }
     static get Height() { return this.canvas.height; }
 
-    static async request() {
-        this.adapter = await navigator.gpu?.requestAdapter();
-        this.device = await this.adapter?.requestDevice();
-
-        if (!this.device) return alert('need a browser that supports WebGPU');
-    }
-
     static async Init(callback) {
-        await this.request();
-
-        const adapter = this.adapter;
-        const device = this.device;
-
         const canvas = this.canvas = document.querySelector('canvas');
         const context = this.context = canvas.getContext('webgpu');
         const currentTexture = this.currentTexture = null;
@@ -59,7 +47,7 @@ class Graphics {
         this.currentTexture = this.context.getCurrentTexture();
         if (!this.depthTexture || this.depthTexture.width !== this.currentTexture.width || this.depthTexture.height !== this.currentTexture.height) {
             if (this.depthTexture) this.depthTexture.destroy();
-            this.depthTexture = this.device.createTexture({
+            this.depthTexture = GPU.CreateTexture({
                 size: [this.currentTexture.width, this.currentTexture.height],
                 format: 'depth24plus',
                 usage: GPUTextureUsage.RENDER_ATTACHMENT,
@@ -69,7 +57,7 @@ class Graphics {
         this.colorAttachment.view = this.currentTexture.createView();
         this.depthStencilAttachment.view = this.depthTexture.createView();
 
-        this.commandEncoder = this.device.createCommandEncoder();
+        this.commandEncoder = GPU.CreateCommandEncoder();
         this.passEncoder = this.commandEncoder.beginRenderPass(this.renderPassDescriptor);
     }
 
@@ -79,7 +67,7 @@ class Graphics {
 
     static PostRender() {
         this.passEncoder.end();
-        this.device.queue.submit([this.commandEncoder.finish()]);
+        GPU.Queue.submit([this.commandEncoder.finish()]);
     }
 
 }

@@ -7,7 +7,7 @@ class Material {
         this._texture = null;
 
         const uniformSize = (16 + 16 + 16 + 4 + 4 + 4 + 4) * 4;
-        this.uniformBuffer = Graphics.device.createBuffer({
+        this.uniformBuffer = GPU.CreateBuffer({
             label: 'uniform buffer',
             size: uniformSize,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
@@ -17,7 +17,7 @@ class Material {
         this.uniformValues = new Float32Array(uniformSize / 4);
 
         //sampler
-        this.sampler = Graphics.device.createSampler({
+        this.sampler = GPU.CreateSampler({
             addressModeU: 'repeat',
             addressModeV: 'repeat',
             magFilter: 'linear',
@@ -37,21 +37,21 @@ class Material {
         const width = this._diffuse ? this._diffuse.width : 1;
         const height = this._diffuse ? this._diffuse.height : 1;
 
-        this._texture = Graphics.device.createTexture({
+        this._texture = GPU.CreateTexture({
             size: [width, height, 1],
             format: 'rgba8unorm',
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
         });
 
         if (this._diffuse) {
-            Graphics.device.queue.copyExternalImageToTexture(
+            GPU.Queue.copyExternalImageToTexture(
                 { source: this._diffuse },
                 { texture: this._texture },
                 [width, height, 1]
             );
         }
 
-        this.bindGroup = Graphics.device.createBindGroup({
+        this.bindGroup = GPU.CreateBindGroup({
             layout: this.shader.pipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
@@ -76,7 +76,7 @@ class Material {
 
         this.uniformValues.set(this.color, 60);
 
-        Graphics.device.queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
+        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
     }
 
 }

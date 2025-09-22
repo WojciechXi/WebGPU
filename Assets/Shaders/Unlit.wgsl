@@ -29,6 +29,7 @@ struct VSOutput {
 
 @vertex fn vs(vert: Vertex) -> VSOutput {
     var vsOut: VSOutput;
+    // zakładamy że viewProjectionMatrix jest right-handed
     vsOut.position = uni.viewProjectionMatrix * uni.matrix * vert.position;
 
     let normalMatrix = mat3x3f(
@@ -38,15 +39,16 @@ struct VSOutput {
     );
     vsOut.normal = normalize(normalMatrix * vert.normal);
 
-    vsOut.uv = vert.uv; // przekazujemy UV do fragment shadera
+    vsOut.uv = vert.uv;
     return vsOut;
 }
 
 @fragment fn fs(vsOut: VSOutput) -> @location(0) vec4f {
     var normal = normalize(vsOut.normal);
-    normal.x = -normal.x;
-    
-    let diffuse = max(dot(normal, -uni.lightDirection), 0.0);
+
+    // odwracamy Z kierunku światła
+    let lightDir = vec3f(uni.lightDirection.x, uni.lightDirection.y, -uni.lightDirection.z);
+    let diffuse = max(dot(normal, -lightDir), 0.0);
 
     let lightColor = uni.lightColor.rgb * uni.lightColor.a;
     let ambient = uni.ambientLightColor.rgb * uni.ambientLightColor.a;

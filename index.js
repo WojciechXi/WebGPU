@@ -7,7 +7,10 @@ function loadBitmap(src, callback) {
     };
 }
 
-window.addEventListener('load', function (event) {
+window.addEventListener('load', async function (event) {
+    let device = await GPU.Request();
+    if (!device) return alert('need a browser that supports WebGPU');
+
     const engine = new Engine();
     engine.Init(function (engine) {
         Ajax.Get('/assets.php', function (response) {
@@ -66,22 +69,46 @@ window.addEventListener('load', function (event) {
             });
             glassShader.Compile();
 
-            const unlitMaterial = new Material(unlitShader);
-            const unlit2Material = new Material(unlitShader);
+            const whiteMaterial = new Material(unlitShader);
+            const goldMaterial = new Material(unlitShader);
+            goldMaterial.color.Set(1, 0.5, 0, 1);
+            const blackMaterial = new Material(unlitShader);
+            blackMaterial.color.Set(0, 0, 0, 1);
+            const concreteMaterial = new Material(unlitShader);
+            const floorMaterial = new Material(unlitShader);
+            const u702pmst9Material = new Material(unlitShader);
+            const u702st9Material = new Material(unlitShader);
+
             const glassMaterial = new Material(glassShader);
             glassMaterial.color.a = 0.5;
 
-            loadBitmap('/Assets/Images/D3025 OW DAB SONOMA.jpg', function (bitmap) {
-                unlitMaterial.diffuse = bitmap;
+            const sonomaMaterial = new Material(unlitShader);
+            const unlit2Material = new Material(unlitShader);
 
-                loadBitmap('/Assets/Images/D4428_OV_Dąb_naturalny.jpg', function (bitmap) {
-                    unlit2Material.diffuse = bitmap;
-                });
+            loadBitmap('/Assets/Images/U702 PMST9.jpg', function (bitmap) {
+                u702pmst9Material.diffuse = bitmap;
+            });
+
+            loadBitmap('/Assets/Images/WoodFloor057_1K-JPG_Color.jpg', function (bitmap) {
+                floorMaterial.diffuse = bitmap;
+            });
+
+            loadBitmap('/Assets/Images/D3025 OW DAB SONOMA.jpg', function (bitmap) {
+                sonomaMaterial.diffuse = bitmap;
+            });
+
+            loadBitmap('/Assets/Images/D4428_OV_Dąb_naturalny.jpg', function (bitmap) {
+                unlit2Material.diffuse = bitmap;
             });
 
             const materials = {
+                White: whiteMaterial,
+                Concrete: concreteMaterial,
+                Floor: floorMaterial,
                 Glass: glassMaterial,
-                Wardrobe: unlit2Material,
+                'H1386-ST40': sonomaMaterial,
+                'U702-PM': u702pmst9Material,
+                'U702-ST9': u702pmst9Material,
             };
 
             const skybox = engine.scene.AddComponent(Skybox);
@@ -99,18 +126,15 @@ window.addEventListener('load', function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            const terrainGameObject = new GameObject('Terrain');
-            const terrain = terrainGameObject.AddComponent(Terrain);
-            terrain.material = unlitMaterial;
-
-            Ajax.Get('/Assets/Models/Odlegla.obj', function (obj) {
+            Ajax.Get('/Assets/Models/Krakow.obj', function (obj) {
                 Importer.Obj(obj, function (meshes) {
                     let i = 0;
                     for (const mesh of meshes) {
                         const cubeGameObject = new GameObject('Cube');
                         const meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
-                        meshRenderer.material = materials[mesh.name] ?? unlitMaterial;
+                        meshRenderer.material = materials[mesh.name] ?? whiteMaterial;
                         meshRenderer.mesh = mesh;
+                        console.log(mesh.name);
                     }
                 });
             });
