@@ -28,7 +28,12 @@ var<private> kernel: array<vec3<f32>,16> = array<vec3<f32>,16>(
   vec3<f32>(0.1,0.6,-0.4)
 );
 
-@fragment fn fs(in: VSOut) -> @location(0) vec4<f32> {
+// ===== poprawione =====
+struct FSOut {
+  @location(0) aoOut : vec4<f32>,
+};
+
+@fragment fn fs(in: VSOut) -> FSOut {
   let fragPos = textureSample(posTex,samp,in.uv).xyz;
   let normal = normalize(textureSample(normTex,samp,in.uv).xyz);
 
@@ -36,11 +41,13 @@ var<private> kernel: array<vec3<f32>,16> = array<vec3<f32>,16>(
   let radius: f32 = 0.5;
   for (var i=0u; i<kernelSize; i++) {
     let samplePos = fragPos + normal * kernel[i] * radius;
-    // tu uproszczenie: w pełnym SSAO porównujesz głębokości
     if (dot(normal, samplePos-fragPos) < 0.0) {
       occlusion += 1.0;
     }
   }
   occlusion = 1.0 - (occlusion / f32(kernelSize));
-  return vec4<f32>(vec3<f32>(occlusion),1.0);
+
+  var out: FSOut;
+  out.aoOut = vec4<f32>(vec3<f32>(occlusion),1.0);
+  return out;
 }

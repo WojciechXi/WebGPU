@@ -18,8 +18,16 @@ struct VSOut {
 @group(0) @binding(1) var aoTex: texture_2d<f32>;
 @group(0) @binding(2) var samp: sampler;
 
-@fragment fn fs(in: VSOut) -> @location(0) vec4<f32> {
+// ===== poprawione =====
+struct FSOut {
+  @location(0) finalColor : vec4<f32>,
+};
+
+@fragment fn fs(in: VSOut) -> FSOut {
   let baseColor = textureSample(colorTex,samp,in.uv).rgb;
   let ao = textureSample(aoTex,samp,in.uv).r;
-  return vec4<f32>(baseColor * ao, 1.0);
+
+  var out: FSOut;
+  out.finalColor = vec4<f32>(baseColor * ao, 1.0);
+  return out;
 }

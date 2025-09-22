@@ -4,12 +4,12 @@ class Skybox extends Component {
         this.material = null;
     }
 
-    Render() {
+    Render(renderPass) {
         if (!this.material) return;
 
         // ustaw shader i uniformy
-        this.material.Use(Graphics.passEncoder, Camera.main.viewProjectionMatrix, Camera.main.viewProjectionInverseMatrix, this.transform.matrix4x4);
-        Graphics.passEncoder.draw(3);
+        this.material.Use(renderPass, Camera.main.viewProjectionMatrix, Camera.main.viewProjectionInverseMatrix, this.transform.matrix4x4);
+        renderPass.draw(3);
     }
 
     Destroy() {

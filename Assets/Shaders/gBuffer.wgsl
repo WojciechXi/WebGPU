@@ -20,6 +20,15 @@ struct VSOut {
   return out;
 }
 
-@fragment fn fs(in: VSOut) -> (@location(0) vec4<f32>, @location(1) vec4<f32>) {
-  return (vec4<f32>(in.worldPos,1.0), vec4<f32>(normalize(in.normal),1.0));
+// ===== poprawione =====
+struct FSOut {
+  @location(0) posOut : vec4<f32>,
+  @location(1) normOut : vec4<f32>,
+};
+
+@fragment fn fs(in: VSOut) -> FSOut {
+  var out: FSOut;
+  out.posOut = vec4<f32>(in.worldPos,1.0);
+  out.normOut = vec4<f32>(normalize(in.normal),1.0);
+  return out;
 }

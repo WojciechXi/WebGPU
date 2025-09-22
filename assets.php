@@ -1,14 +1,22 @@
 <?php
-$shaders = [];
+$response = [
+    'shaders' => [],
+    'models' => [],
+];
 
 $shaderPath = './Assets/Shaders';
-$shaderFiles = array_diff(scandir($shaderPath), ['.', '..']);
+$files = array_diff(scandir($shaderPath), ['.', '..']);
+foreach ($files as $file) {
+    if (!str_ends_with($file, '.wgsl')) continue;
+    $response['shaders'][$file] = file_get_contents("{$shaderPath}/{$file}");
+}
 
-foreach ($shaderFiles as $shaderFile) {
-    $shaders[$shaderFile] = file_get_contents("{$shaderPath}/{$shaderFile}");
+$shaderPath = './Assets/Models';
+$files = array_diff(scandir($shaderPath), ['.', '..']);
+foreach ($files as $file) {
+    if (!str_ends_with($file, '.obj')) continue;
+    $response['models'][$file] = file_get_contents("{$shaderPath}/{$file}");
 }
 
 header('content-type: application/json');
-die(json_encode([
-    'shaders' => $shaders,
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+die(json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));

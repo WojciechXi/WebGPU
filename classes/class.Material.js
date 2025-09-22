@@ -61,10 +61,10 @@ class Material {
         });
     }
 
-    Use(passEncoder, viewProjectionMatrix, viewProjectionInverseMatrix, modelMatrix) {
+    Use(renderPass, viewProjectionMatrix, viewProjectionInverseMatrix, modelMatrix) {
         // ustaw pipeline i bind group
-        passEncoder.setPipeline(this.shader.pipeline);
-        passEncoder.setBindGroup(0, this.bindGroup);
+        // renderPass.setPipeline(this.shader.pipeline);
+        renderPass.setBindGroup(0, this.bindGroup);
 
         this.uniformValues.set(viewProjectionMatrix, 0);
         this.uniformValues.set(viewProjectionInverseMatrix, 16);

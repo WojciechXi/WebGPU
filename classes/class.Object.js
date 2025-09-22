@@ -12,7 +12,7 @@ class Obj {
 
     }
 
-    Render() {
+    Render(renderPass) {
 
     }
 

@@ -29,16 +29,4 @@ class Camera extends Component {
         Matrix4x4.Inverse(this.viewProjectionMatrix, this.viewProjectionInverseMatrix);
     }
 
-    PreRender() {
-        Graphics.PreRender();
-    }
-
-    Render() {
-
-    }
-
-    PostRender() {
-        Graphics.PostRender();
-    }
-
 }

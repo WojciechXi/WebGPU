@@ -11,11 +11,12 @@ window.addEventListener('load', async function (event) {
     let device = await GPU.Request();
     if (!device) return alert('need a browser that supports WebGPU');
 
-    const engine = new Engine();
-    engine.Init(function (engine) {
-        Ajax.Get('/assets.php', function (response) {
-            response = JSON.parse(response);
-            const skyboxShader = new Shader(response.shaders['Skybox.wgsl'], null, {
+    Ajax.Get('/assets.php', function (response) {
+        const assets = JSON.parse(response);
+
+        const engine = new Engine(assets);
+        engine.Init(function (engine) {
+            const skyboxShader = new Shader(assets.shaders['Skybox.wgsl'], null, {
                 cullMode: 'none',
                 depthWriteEnabled: false,
                 depthCompare: 'always',
@@ -25,7 +26,7 @@ window.addEventListener('load', async function (event) {
             const skyboxMaterial = new Material(skyboxShader);
             skyboxMaterial.color.Set(0.95, 0.975, 1, 1);
 
-            const unlitShader = new Shader(response.shaders['Unlit.wgsl'], [
+            const unlitShader = new Shader(assets.shaders['Unlit.wgsl'], [
                 {
                     arrayStride: (3 + 3 + 3 + 2) * 4, // position + normal + color + uv
                     attributes: [
@@ -40,7 +41,7 @@ window.addEventListener('load', async function (event) {
             });
             unlitShader.Compile();
 
-            const glassShader = new Shader(response.shaders['Glass.wgsl'], [
+            const glassShader = new Shader(assets.shaders['Glass.wgsl'], [
                 {
                     arrayStride: (3 + 3 + 3 + 2) * 4, // position + normal + color + uv
                     attributes: [
@@ -126,17 +127,15 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Ajax.Get('/Assets/Models/Krakow.obj', function (obj) {
-                Importer.Obj(obj, function (meshes) {
-                    let i = 0;
-                    for (const mesh of meshes) {
-                        const cubeGameObject = new GameObject('Cube');
-                        const meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
-                        meshRenderer.material = materials[mesh.name] ?? whiteMaterial;
-                        meshRenderer.mesh = mesh;
-                        console.log(mesh.name);
-                    }
-                });
+            Importer.Obj(assets.models['Krakow.obj'], function (meshes) {
+                let i = 0;
+                for (const mesh of meshes) {
+                    const cubeGameObject = new GameObject('Cube');
+                    const meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
+                    meshRenderer.material = materials[mesh.name] ?? whiteMaterial;
+                    meshRenderer.mesh = mesh;
+                    console.log(mesh.name);
+                }
             });
         });
     });

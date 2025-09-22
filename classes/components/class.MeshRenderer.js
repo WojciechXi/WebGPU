@@ -23,15 +23,15 @@ class MeshRenderer extends Component {
         }
     }
 
-    Render() {
+    Render(renderPass) {
         if (!this.mesh || !this.material) return;
 
         // ustaw shader i uniformy
-        this.material.Use(Graphics.passEncoder, Camera.main.viewProjectionMatrix, Camera.main.viewProjectionInverseMatrix, this.transform.matrix4x4);
+        this.material.Use(renderPass, Camera.main.viewProjectionMatrix, Camera.main.viewProjectionInverseMatrix, this.transform.matrix4x4);
 
         // użyj istniejącego vertex buffer
-        Graphics.passEncoder.setVertexBuffer(0, this._vertexBuffer);
-        Graphics.passEncoder.draw(this.mesh.triangles.length);
+        renderPass.setVertexBuffer(0, this._vertexBuffer);
+        renderPass.draw(this.mesh.triangles.length);
     }
 
     Destroy() {

@@ -16,24 +16,46 @@ class GPU {
         return this.device.queue;
     }
 
-    static CreateTexture(data) {
-        return this.device.createTexture(data);
+    static CreateShaderModule(data, callback = null) {
+        const shaderModule = this.device.createShaderModule(data);
+        if (callback) callback(shaderModule);
+        return shaderModule;
     }
 
-    static CreateBuffer(data) {
-        return this.device.createBuffer(data);
+    static CreateTexture(data, callback = null) {
+        const texture = this.device.createTexture(data);
+        if (callback) callback(texture);
+        return texture;
     }
 
-    static CreateSampler(data) {
-        return this.device.createSampler(data);
+    static CreateBuffer(data, callback = null) {
+        const buffer = this.device.createBuffer(data);
+        if (callback) callback(buffer);
+        return buffer;
     }
 
-    static CreateBindGroup(data) {
-        return this.device.createBindGroup(data);
+    static CreateSampler(data, callback = null) {
+        const sampler = this.device.createSampler(data);
+        if (callback) callback(sampler);
+        return sampler;
     }
 
-    static CreateCommandEncoder() {
-        return this.device.createCommandEncoder();
+    static CreateBindGroup(data, callback = null) {
+        const bindGroup = this.device.createBindGroup(data);
+        if (callback) callback(bindGroup);
+        return bindGroup;
+    }
+
+    static CreateCommandEncoder(callback = null) {
+        const commandEncoder = this.device.createCommandEncoder();
+        if (callback) callback(commandEncoder);
+        return commandEncoder;
+    }
+
+    static CreateRenderPipeline(data, callback = null) {
+        const renderPipeline = this.device.createRenderPipeline(data);
+        if (callback) callback(renderPipeline);
+        return renderPipeline;
     }
 
 }
