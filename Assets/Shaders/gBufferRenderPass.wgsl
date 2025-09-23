@@ -35,12 +35,12 @@ fn vs(vert: Vertex) -> VSOut {
   var out: VSOut;
 
   // world position
-  let worldPos3 = (uni.modelMatrix * vert.position).xyz;
-  out.positionWorld = vec4<f32>(worldPos3, 1.0);
+  let worldPos = vec4<f32>((uni.modelMatrix * vert.position).xyz, 1.0);
+  out.positionWorld = worldPos;
 
   // clip space position
-  let viewPos3 = (uni.viewProjectionMatrix * vec4<f32>(worldPos3, 1.0)).xyz;
-  out.positionView = vec4<f32>(viewPos3, 1.0);
+  let viewPos = (uni.viewProjectionMatrix * worldPos);
+  out.positionView = viewPos;
 
   // normal w space światowym
   let normalWorld = normalize(vert.normal);
