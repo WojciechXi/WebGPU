@@ -6,15 +6,15 @@ class Material {
         this._diffuse = null;
         this._texture = null;
 
-        const uniformSize = (16 + 16 + 16 + 4 + 4 + 4 + 4) * 4;
+        const uniformSize = 96;
         this.uniformBuffer = GPU.CreateBuffer({
             label: 'uniform buffer',
-            size: uniformSize,
+            size: uniformSize * 4,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
         // Float32Array do łatwego ustawiania wartości
-        this.uniformValues = new Float32Array(uniformSize / 4);
+        this.uniformValues = new Float32Array(uniformSize);
 
         //sampler
         this.sampler = GPU.CreateSampler({
@@ -59,7 +59,7 @@ class Material {
         }
     }
 
-    Use(renderPass, pipeline, viewProjectionMatrix, viewProjectionInverseMatrix, modelMatrix) {
+    Use(renderPass, pipeline, viewMatrix, projectionMatrix, viewProjectionMatrix, viewProjectionInverseMatrix, modelMatrix) {
         // ustaw pipeline i bind group
         if (pipeline) {
             renderPass.setBindGroup(0, GPU.CreateBindGroup({
@@ -80,15 +80,17 @@ class Material {
             }));
         }
 
-        this.uniformValues.set(viewProjectionMatrix, 0);
-        this.uniformValues.set(viewProjectionInverseMatrix, 16);
-        this.uniformValues.set(modelMatrix, 32);
+        this.uniformValues.set(viewMatrix, 0);
+        this.uniformValues.set(projectionMatrix, 16);
+        this.uniformValues.set(viewProjectionMatrix, 32);
+        this.uniformValues.set(viewProjectionInverseMatrix, 48);
+        this.uniformValues.set(modelMatrix, 64);
 
-        this.uniformValues.set(Graphics.lightDirection, 48);
-        this.uniformValues.set(Graphics.lightColor, 52);
-        this.uniformValues.set(Graphics.ambientLightColor, 56);
+        this.uniformValues.set(Graphics.lightDirection, 80);
+        this.uniformValues.set(Graphics.lightColor, 84);
+        this.uniformValues.set(Graphics.ambientLightColor, 88);
 
-        this.uniformValues.set(this.color, 60);
+        this.uniformValues.set(this.color, 92);
 
         GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
     }

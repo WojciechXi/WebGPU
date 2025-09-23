@@ -37,7 +37,7 @@ class Shader {
         });
 
         // Tworzymy shader module
-        this.module = device.createShaderModule({ code: this.code });
+        this.module = GPU.CreateShaderModule({ code: this.code });
 
         // Tworzymy pipeline
         this.pipeline = device.createRenderPipeline({

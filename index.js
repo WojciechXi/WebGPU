@@ -126,7 +126,7 @@ window.addEventListener('load', async function (event) {
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
-            cameraGameObject.transform.position = new Vector3(0, 1, 5);
+            cameraGameObject.transform.position = new Vector3(-1, 1, 5);
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 

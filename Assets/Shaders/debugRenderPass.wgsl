@@ -17,12 +17,12 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
     return out;
 }
 
-
-@group(0) @binding(0) var ssaoTexture: texture_2d<f32>;
+@group(0) @binding(0) var texture: texture_2d<f32>;
 @group(0) @binding(1) var samp: sampler;
 
 @fragment
 fn fs_debug(in: VSOut) -> @location(0) vec4<f32> {
-    let ao = textureSample(ssaoTexture, samp, in.uv).r;
-    return vec4<f32>(vec3<f32>(ao), 1.0);
+    let color = textureSample(texture, samp, in.uv);
+    let rgb = abs(color.rgb);
+    return vec4<f32>(rgb, 1.0);
 }

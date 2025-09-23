@@ -16,11 +16,10 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
 }
 
 
-@group(0) @binding(0) var positionTexture: texture_2d<f32>;
-@group(0) @binding(1) var normalTexture: texture_2d<f32>;
-@group(0) @binding(2) var colorTexture: texture_2d<f32>;
-@group(0) @binding(3) var ssaoTexture: texture_2d<f32>;
-@group(0) @binding(4) var samp: sampler;
+@group(0) @binding(0) var normalTexture   : texture_2d<f32>;
+@group(0) @binding(1) var colorTexture: texture_2d<f32>;
+@group(0) @binding(2) var ssaoTexture: texture_2d<f32>;
+@group(0) @binding(3) var samp: sampler;
 
 struct FSOut {
   @location(0) finalColor: vec4<f32>,
@@ -30,7 +29,6 @@ struct FSOut {
 fn fs(in: VSOut) -> FSOut {
     var out: FSOut;
 
-    let position = textureSample(positionTexture, samp, in.uv).rgb;
     let normal = textureSample(normalTexture, samp, in.uv).rgb;
     let color = textureSample(colorTexture, samp, in.uv).rgb;
     let ssao = textureSample(ssaoTexture, samp, in.uv).rgb;

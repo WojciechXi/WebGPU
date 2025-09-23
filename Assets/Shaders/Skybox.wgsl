@@ -1,7 +1,9 @@
 struct Uniforms {
+    viewMatrix : mat4x4<f32>,
+    projectionMatrix : mat4x4<f32>,
     viewProjectionMatrix : mat4x4<f32>,
     viewProjectionInverseMatrix : mat4x4<f32>,
-    matrix : mat4x4<f32>,
+    modelMatrix : mat4x4<f32>,
 
     lightDirection : vec3<f32>,
     lightColor : vec4<f32>,

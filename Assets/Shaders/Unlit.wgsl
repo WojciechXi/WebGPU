@@ -1,7 +1,9 @@
 struct Uniforms {
+    viewMatrix : mat4x4<f32>,
+    projectionMatrix : mat4x4<f32>,
     viewProjectionMatrix : mat4x4<f32>,
     viewProjectionInverseMatrix : mat4x4<f32>,
-    matrix : mat4x4<f32>,
+    modelMatrix : mat4x4<f32>,
 
     lightDirection : vec3<f32>,
     lightColor : vec4<f32>,
@@ -30,12 +32,12 @@ struct VSOut {
 @vertex
 fn vs(vert: Vertex) -> VSOut {
   var vsOut: VSOut;
-    vsOut.position = uni.viewProjectionMatrix * uni.matrix * vert.position;
+    vsOut.position = uni.viewProjectionMatrix * uni.modelMatrix * vert.position;
 
     let normalMatrix = mat3x3f(
-        uni.matrix[0].xyz,
-        uni.matrix[1].xyz,
-        uni.matrix[2].xyz
+        uni.modelMatrix[0].xyz,
+        uni.modelMatrix[1].xyz,
+        uni.modelMatrix[2].xyz
     );
     vsOut.normal = normalize(normalMatrix * vert.normal);
 

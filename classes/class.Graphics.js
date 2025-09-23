@@ -20,8 +20,6 @@ class Graphics {
         const format = navigator.gpu.getPreferredCanvasFormat();
         context.configure({ device, format });
 
-        this.ssaoKernel = this.GenerateKernel(32);
-
         const finalShaderModule = GPU.CreateShaderModule({ code: assets.shaders['Final.wgsl'] });
 
         //sampler
@@ -33,13 +31,19 @@ class Graphics {
             mipmapFilter: 'linear',
         });
 
+        const depthTexture = this.depthTexture = GPU.CreateTexture({
+            size: [canvas.width, canvas.height],
+            format: "depth24plus",
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        });
+
         const gBufferTextures = this.gBufferTextures = {
-            color: GPU.CreateTexture({
+            positionWorld: GPU.CreateTexture({
                 size: [canvas.width, canvas.height],
                 format: "rgba16float",
                 usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
             }),
-            position: GPU.CreateTexture({
+            positionView: GPU.CreateTexture({
                 size: [canvas.width, canvas.height],
                 format: "rgba16float",
                 usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
@@ -49,11 +53,16 @@ class Graphics {
                 format: "rgba16float",
                 usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
             }),
-            depth: GPU.CreateTexture({
+            normalView: GPU.CreateTexture({
                 size: [canvas.width, canvas.height],
-                format: "depth24plus",
+                format: "rgba16float",
                 usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-            })
+            }),
+            color: GPU.CreateTexture({
+                size: [canvas.width, canvas.height],
+                format: "rgba16float",
+                usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+            }),
         };
 
         const ssaoTexture = this.ssaoTexture = GPU.CreateTexture({
@@ -63,7 +72,7 @@ class Graphics {
         });
 
         //gBuffer
-        const gBufferShaderModule = GPU.CreateShaderModule({ code: assets.shaders['gBuffer.wgsl'] });
+        const gBufferShaderModule = GPU.CreateShaderModule({ code: assets.shaders['gBufferRenderPass.wgsl'] });
         const gBufferPipeline = this.gBufferPipeline = GPU.CreateRenderPipeline({
             layout: "auto",
             vertex: {
@@ -85,8 +94,10 @@ class Graphics {
                 module: gBufferShaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: "rgba16float" }, // position
-                    { format: "rgba16float" },  // normal
+                    { format: "rgba16float" }, // positionWorld
+                    { format: "rgba16float" }, // positionView
+                    { format: "rgba16float" },  // normalWorld
+                    { format: "rgba16float" },  // normalView
                 ]
             },
             depthStencil: {
@@ -96,31 +107,9 @@ class Graphics {
             }
         });
 
-        //gBufferDebug
-        const gBufferDebugShaderModule = GPU.CreateShaderModule({ code: assets.shaders['gBufferDebug.wgsl'] });
-        const gBufferDebugPipeline = this.gBufferDebugPipeline = GPU.CreateRenderPipeline({
-            layout: "auto",
-            vertex: { module: gBufferDebugShaderModule, entryPoint: "vs", buffers: [] },
-            fragment: {
-                module: gBufferDebugShaderModule,
-                entryPoint: "fs_debug",
-                targets: [
-                    { format: format } // <- pasuje do canvas
-                ]
-            },
-            primitive: { topology: "triangle-list" },
-        });
-        const gBufferDebugBindGroup = this.gBufferDebugBindGroup = GPU.CreateBindGroup({
-            layout: this.gBufferDebugPipeline.getBindGroupLayout(0),
-            entries: [
-                { binding: 0, resource: this.gBufferTextures.position.createView() },
-                { binding: 1, resource: this.gBufferTextures.normal.createView() },
-                { binding: 2, resource: this.sampler },
-            ],
-        });
-
         //ssao
-        const ssaoShaderModule = GPU.CreateShaderModule({ code: assets.shaders['ssao.wgsl'] });
+        const ssaoKernel = this.ssaoKernel = this.GenerateKernel(32);
+        const ssaoShaderModule = GPU.CreateShaderModule({ code: assets.shaders['ssaoRenderPass.wgsl'] });
         const ssaoPipeline = this.ssaoPipeline = GPU.CreateRenderPipeline({
             layout: "auto",
             vertex: {
@@ -135,32 +124,19 @@ class Graphics {
                 ]
             }
         });
+        const ssaoUniformValues = this.ssaoUniformValues = new Float32Array(16 + ssaoKernel.length);
+        const ssaoUniformBuffer = this.ssaoUniformBuffer = device.createBuffer({
+            size: ssaoUniformValues.length * 4, // mat4x4<f32> = 16 * 4 bajty
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+        this.ssaoUniformValues.set(ssaoKernel, 16);
         const ssaoBindGroup = this.ssaoBindGroup = GPU.CreateBindGroup({
             layout: this.ssaoPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this.gBufferTextures.position.createView() },
-                { binding: 1, resource: this.gBufferTextures.normal.createView() },
+                { binding: 0, resource: this.gBufferTextures.positionView.createView() },
+                { binding: 1, resource: this.gBufferTextures.normalView.createView() },
                 { binding: 2, resource: this.sampler },
-            ],
-        });
-
-        //ssaoDebug
-        const ssaoDebugShaderModule = GPU.CreateShaderModule({ code: assets.shaders['ssaoDebug.wgsl'] });
-        const ssaoDebugPipeline = this.ssaoDebugPipeline = GPU.CreateRenderPipeline({
-            layout: "auto",
-            vertex: { module: ssaoDebugShaderModule, entryPoint: "vs", buffers: [] },
-            fragment: {
-                module: ssaoDebugShaderModule,
-                entryPoint: "fs_debug",
-                targets: [{ format }] // używamy preferowanego formatu
-            },
-            primitive: { topology: "triangle-list" },
-        });
-        const ssaoDebugBindGroup = this.ssaoDebugBindGroup = GPU.CreateBindGroup({
-            layout: this.ssaoDebugPipeline.getBindGroupLayout(0),
-            entries: [
-                { binding: 0, resource: this.ssaoTexture.createView() },
-                { binding: 1, resource: this.sampler },
+                { binding: 3, resource: { buffer: ssaoUniformBuffer } },
             ],
         });
 
@@ -180,12 +156,24 @@ class Graphics {
         const finalBindGroup = this.finalBindGroup = GPU.CreateBindGroup({
             layout: this.finalPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this.gBufferTextures.position.createView() },
-                { binding: 1, resource: this.gBufferTextures.normal.createView() },
-                { binding: 2, resource: this.gBufferTextures.color.createView() },
-                { binding: 3, resource: this.ssaoTexture.createView() },
-                { binding: 4, resource: this.sampler },
+                { binding: 0, resource: this.gBufferTextures.normal.createView() },
+                { binding: 1, resource: this.gBufferTextures.color.createView() },
+                { binding: 2, resource: this.ssaoTexture.createView() },
+                { binding: 3, resource: this.sampler },
             ],
+        });
+
+        //debug
+        const debugShaderModule = GPU.CreateShaderModule({ code: assets.shaders['debugRenderPass.wgsl'] });
+        const debugPipeline = this.debugPipeline = GPU.CreateRenderPipeline({
+            layout: "auto",
+            vertex: { module: debugShaderModule, entryPoint: "vs", buffers: [] },
+            fragment: {
+                module: debugShaderModule,
+                entryPoint: "fs_debug",
+                targets: [{ format }] // używamy preferowanego formatu
+            },
+            primitive: { topology: "triangle-list" },
         });
 
         callback();
@@ -202,16 +190,16 @@ class Graphics {
 
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-        //New
-
         // 1.gBuffer
         const gBufferPass = this.gBufferPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                { view: this.gBufferTextures.position.createView(), loadOp: "clear", storeOp: "store" },
+                { view: this.gBufferTextures.positionWorld.createView(), loadOp: "clear", storeOp: "store" },
+                { view: this.gBufferTextures.positionView.createView(), loadOp: "clear", storeOp: "store" },
                 { view: this.gBufferTextures.normal.createView(), loadOp: "clear", storeOp: "store" },
+                { view: this.gBufferTextures.normalView.createView(), loadOp: "clear", storeOp: "store" },
             ],
             depthStencilAttachment: {
-                view: this.gBufferTextures.depth.createView(),
+                view: this.depthTexture.createView(),
                 depthClearValue: 1.0,
                 depthLoadOp: "clear",
                 depthStoreOp: "store"
@@ -224,72 +212,64 @@ class Graphics {
         // 1.gBuffer
 
         // 2.SSAO
-        const ssaoPass = commandEncoder.beginRenderPass({
-            colorAttachments: [{ view: this.ssaoTexture.createView(), loadOp: "clear", storeOp: "store" }]
-        });
-        ssaoPass.setPipeline(this.ssaoPipeline);
-        ssaoPass.setBindGroup(0, this.ssaoBindGroup); // bind group z posTex, normTex, sampler
-        ssaoPass.draw(6);
-        ssaoPass.end();
+        // const ssaoPass = commandEncoder.beginRenderPass({
+        //     colorAttachments: [{ view: this.ssaoTexture.createView(), loadOp: "clear", storeOp: "store" }]
+        // });
+        // ssaoPass.setPipeline(this.ssaoPipeline);
+        // ssaoPass.setBindGroup(0, this.ssaoBindGroup);
+        // this.ssaoUniformValues.set(Camera.main.viewProjectionInverseMatrix, 0);
+        // GPU.Queue.writeBuffer(this.ssaoUniformBuffer, 0, this.ssaoUniformValues);
+        // ssaoPass.draw(6);
+        // ssaoPass.end();
         // 2.SSAO
 
         // 3.Color
-        const renderPass = this.renderPass = this.commandEncoder.beginRenderPass({
-            colorAttachments: [
-                { view: this.gBufferTextures.color.createView(), loadOp: "clear", storeOp: "store" },
-            ],
-            depthStencilAttachment: {
-                view: this.gBufferTextures.depth.createView(),
-                depthClearValue: 1.0,
-                depthLoadOp: "clear",
-                depthStoreOp: "store"
-            },
-        });
-        if (engine.scene) engine.scene.Render(renderPass);
-        renderPass.end();
+        // const renderPass = this.renderPass = this.commandEncoder.beginRenderPass({
+        //     colorAttachments: [
+        //         { view: this.gBufferTextures.color.createView(), loadOp: "clear", storeOp: "store" },
+        //     ],
+        //     depthStencilAttachment: {
+        //         view: this.depthTexture.createView(),
+        //         depthClearValue: 1.0,
+        //         depthLoadOp: "clear",
+        //         depthStoreOp: "store"
+        //     },
+        // });
+        // if (engine.scene) engine.scene.Render(renderPass);
+        // renderPass.end();
         // 3.Color
 
         // 4.final
-        const finalPass = commandEncoder.beginRenderPass({
-            colorAttachments: [{ view: this.context.getCurrentTexture().createView(), loadOp: "clear", storeOp: "store" }]
-        });
-        finalPass.setPipeline(this.finalPipeline);
-        finalPass.setBindGroup(0, this.finalBindGroup); // bind group z posTex, normTex, sampler
-        finalPass.draw(6);
-        finalPass.end();
+        // const finalPass = commandEncoder.beginRenderPass({
+        //     colorAttachments: [{ view: this.context.getCurrentTexture().createView(), loadOp: "clear", storeOp: "store" }]
+        // });
+        // finalPass.setPipeline(this.finalPipeline);
+        // finalPass.setBindGroup(0, this.finalBindGroup); // bind group z posTex, normTex, sampler
+        // finalPass.draw(6);
+        // finalPass.end();
         // 4.final
 
-        // 1.gBufferDebug
-        // const gBufferDebugPass = commandEncoder.beginRenderPass({
-        //     colorAttachments: [
-        //         {
-        //             view: this.context.getCurrentTexture().createView(), // wyświetlamy na ekranie
-        //             loadOp: "clear",
-        //             storeOp: "store"
-        //         }
-        //     ],
-        // });
-        // gBufferDebugPass.setPipeline(this.gBufferDebugPipeline);
-        // gBufferDebugPass.setBindGroup(0, this.gBufferDebugBindGroup); // bind group z posTex, normTex, sampler
-        // gBufferDebugPass.draw(6);
-        // gBufferDebugPass.end();
-        // 1.gBufferDebug
-
-        // 2.ssaoDebug
-        // const ssaoDebugPass = commandEncoder.beginRenderPass({
-        //     colorAttachments: [
-        //         {
-        //             view: this.context.getCurrentTexture().createView(), // wyświetlamy na ekranie
-        //             loadOp: "clear",
-        //             storeOp: "store"
-        //         }
-        //     ],
-        // });
-        // ssaoDebugPass.setPipeline(this.ssaoDebugPipeline);
-        // ssaoDebugPass.setBindGroup(0, this.ssaoDebugBindGroup); // bind group z posTex, normTex, sampler
-        // ssaoDebugPass.draw(6);
-        // ssaoDebugPass.end();
-        // 2.ssaoDebug
+        // debug
+        const debugPass = commandEncoder.beginRenderPass({
+            colorAttachments: [
+                {
+                    view: this.context.getCurrentTexture().createView(), // wyświetlamy na ekranie
+                    loadOp: "clear",
+                    storeOp: "store"
+                }
+            ],
+        });
+        debugPass.setPipeline(this.debugPipeline);
+        debugPass.setBindGroup(0, GPU.CreateBindGroup({
+            layout: this.debugPipeline.getBindGroupLayout(0),
+            entries: [
+                { binding: 0, resource: this.gBufferTextures.positionView.createView() },
+                { binding: 1, resource: this.sampler },
+            ],
+        }));
+        debugPass.draw(6);
+        debugPass.end();
+        // debug
 
         GPU.Queue.submit([commandEncoder.finish()]);
     }
@@ -307,7 +287,7 @@ class Graphics {
             sample.Normalize(sample);
             sample.Multiply(Math.random());
 
-            kernel.push(sample);
+            kernel.push(sample[0], sample[1], sample[2], 0);
         }
 
         return kernel;
