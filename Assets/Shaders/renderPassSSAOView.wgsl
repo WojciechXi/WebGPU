@@ -16,8 +16,8 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
 }
 
 // Bindings
-@group(0) @binding(0) var positionTexture : texture_2d<f32>; // world-space position
-@group(0) @binding(1) var normalTexture   : texture_2d<f32>; // world-space normal
+@group(0) @binding(0) var positionTexture : texture_2d<f32>; // view-space position
+@group(0) @binding(1) var normalTexture   : texture_2d<f32>; // view-space normal
 @group(0) @binding(2) var samp            : sampler;
 
 struct SSAOUniforms {
@@ -32,16 +32,13 @@ struct FSOut {
 };
 
 @fragment
-fn fs(vsOut: VSOut) -> FSOut {
-  var fsOut: FSOut;
-
-  // fragment world-space position i normal
-  let fragPos = textureSample(positionTexture, samp, vsOut.uv).xyz;
-  var normal  = normalize(textureSample(normalTexture, samp, vsOut.uv).xyz);
+fn fs(input: VSOut) -> FSOut {
+  let fragPos = textureSample(positionTexture, samp, input.uv).xyz;
+  var normal  = normalize(textureSample(normalTexture, samp, input.uv).xyz);
 
   var occlusion = 0.0;
 
-  // TBN dla world-space
+  // TBN dla view-space
   var up: vec3f;
   if (abs(normal.z) < 0.999) {
       up = vec3f(0.0,0.0,1.0);
@@ -55,22 +52,22 @@ fn fs(vsOut: VSOut) -> FSOut {
   for (var i = 0u; i < 32u; i = i + 1u) {
     let sampleVec = ssaoUni.samples[i].xyz;
 
-    // próbka w world-space
+    // próbka w view-space
     let samplePos = fragPos + TBN * sampleVec * ssaoUni.radius;
 
-    // konwersja world-space -> screen UV (przybliżona, jeśli masz matrycę view-proj w JS)
-    // najlepiej użyć pozycji w view-space do rzutowania, jeśli masz dostęp do view-proj
-    // tutaj zakładamy, że samplePos i fragPos w world-space i tekstura już jest z kamery
-    let uv = vsOut.uv; // prosty wariant, można doprecyzować rzutem view-proj
-
-    let sampleDepth = textureSample(positionTexture, samp, uv).z;
-    if (sampleDepth >= samplePos.z + ssaoUni.bias) {
-      occlusion += 1.0;
+    // rzutowanie próbki do UV tekstury
+    let offset = vec2f(0.5) + vec2f(samplePos.x / samplePos.z, samplePos.y / samplePos.z) * 0.5;
+    if (offset.x >= 0.0 && offset.x <= 1.0 && offset.y >= 0.0 && offset.y <= 1.0) {
+      let sampleDepth = textureSample(positionTexture, samp, offset).z;
+      if (sampleDepth >= samplePos.z - ssaoUni.bias) {
+        occlusion += 1.0;
+      }
     }
   }
 
   occlusion = 1.0 - (occlusion / 32.0);
 
-  fsOut.aoOut = vec4f(occlusion, occlusion, occlusion, 1.0);
-  return fsOut;
+  var out: FSOut;
+  out.aoOut = vec4f(occlusion, occlusion, occlusion, 1.0);
+  return out;
 }

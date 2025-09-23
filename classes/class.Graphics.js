@@ -39,6 +39,7 @@ class Graphics {
             code: assets.shaders['renderPassFinal.wgsl'],
             gBufferRenderPass: gBufferRenderPass,
             ssaoRenderPass: ssaoRenderPass,
+            colorRenderPass: colorRenderPass,
             canvas: canvas,
         });
 
@@ -47,7 +48,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        this.debugRenderPass.texture = this.gBufferRenderPass.positionTexture;
+        this.debugRenderPass.texture = this.colorRenderPass.colorTexture;
 
         callback();
     }
@@ -58,16 +59,13 @@ class Graphics {
     }
 
     static Render(engine) {
-        const canvas = this.canvas;
-        const context = this.context;
-
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
         this.gBufferRenderPass.Render(engine, commandEncoder);
-        // this.ssaoRenderPass.Render(engine, commandEncoder);
-        // this.colorRenderPass.Render(engine, commandEncoder);
-        // this.finalRenderPass.Render(engine, commandEncoder);
-        this.debugRenderPass.Render(engine, commandEncoder);
+        this.ssaoRenderPass.Render(engine, commandEncoder);
+        this.colorRenderPass.Render(engine, commandEncoder);
+        this.finalRenderPass.Render(engine, commandEncoder);
+        // this.debugRenderPass.Render(engine, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);
     }

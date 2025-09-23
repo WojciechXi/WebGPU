@@ -15,7 +15,9 @@ class DebugRenderPass extends RenderPass {
             fragment: {
                 module: this.shaderModule,
                 entryPoint: "fs_debug",
-                targets: [{ format }] // używamy preferowanego formatu
+                targets: [
+                    { format: format },
+                ],
             },
             primitive: { topology: "triangle-list" },
         });
@@ -23,9 +25,9 @@ class DebugRenderPass extends RenderPass {
         this.sampler = GPU.CreateSampler({
             addressModeU: 'repeat',
             addressModeV: 'repeat',
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
+            magFilter: 'nearest',
+            minFilter: 'nearest',
+            mipmapFilter: 'nearest',
         });
 
         this.bindGroup = null;
@@ -62,7 +64,6 @@ class DebugRenderPass extends RenderPass {
 
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, this.bindGroup);
-
         renderPass.draw(6);
         renderPass.end();
     }

@@ -86,15 +86,15 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Test);
 
             Importer.Obj(assets.models['Krakow.obj'], function (meshes) {
-                let i = 0;
                 for (const mesh of meshes) {
                     const cubeGameObject = new GameObject('Cube');
                     const meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
                     meshRenderer.material = materials[mesh.name] ?? whiteMaterial;
                     meshRenderer.mesh = mesh;
-                    console.log(mesh.name);
                 }
             });
+
+            console.clear();
         });
     });
 });

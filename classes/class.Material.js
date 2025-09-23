@@ -37,12 +37,12 @@ class Material {
         this._texture = GPU.CreateTexture({
             size: [width, height, 1],
             format: 'rgba8unorm',
-            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
         });
 
-        if (this._diffuse) {
+        if (diffuse) {
             GPU.Queue.copyExternalImageToTexture(
-                { source: this._diffuse },
+                { source: diffuse },
                 { texture: this._texture },
                 [width, height, 1]
             );
@@ -81,7 +81,14 @@ class Material {
             }));
         } else {
             renderPass.setPipeline(this.shader.pipeline);
-            renderPass.setBindGroup(0, this.bindGroup);
+            renderPass.setBindGroup(0, GPU.CreateBindGroup({
+                layout: this.shader.pipeline.getBindGroupLayout(0),
+                entries: [
+                    { binding: 0, resource: { buffer: this.uniformBuffer } },
+                    { binding: 1, resource: this.sampler },
+                    { binding: 2, resource: this._texture.createView() },
+                ],
+            }));
         }
 
         GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);

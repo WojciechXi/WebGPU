@@ -1,4 +1,4 @@
-class SSAORenderPass extends RenderPass {
+class SSAOViewRenderPass extends RenderPass {
 
     Init(data) {
         const canvas = data.canvas;
@@ -47,8 +47,8 @@ class SSAORenderPass extends RenderPass {
         this.bindGroup = GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: gBufferRenderPass.positionTexture.createView() },
-                { binding: 1, resource: gBufferRenderPass.normalTexture.createView() },
+                { binding: 0, resource: gBufferRenderPass.viewPositionTexture.createView() },
+                { binding: 1, resource: gBufferRenderPass.viewNormalTexture.createView() },
                 { binding: 2, resource: this.sampler },
                 { binding: 3, resource: { buffer: this.uniformBuffer } },
             ],

@@ -1,12 +1,12 @@
 struct Uniforms {
-    modelMatrix : mat4x4<f32>,
-    viewMatrix : mat4x4<f32>,
-    projectionMatrix : mat4x4<f32>,
-    viewProjectionMatrix : mat4x4<f32>,
+    modelMatrix : mat4x4f,
+    viewMatrix : mat4x4f,
+    projectionMatrix : mat4x4f,
+    viewProjectionMatrix : mat4x4f,
 };
 
 struct Vertex {
-    @location(0) position: vec4f,
+    @location(0) position: vec3f,
     @location(1) normal: vec3f,
     @location(2) color: vec3f,
     @location(3) uv: vec2f,
@@ -17,21 +17,34 @@ struct Vertex {
 @group(0) @binding(2) var ourTexture: texture_2d<f32>;
 
 struct VSOut {
-    @builtin(position) position: vec4f,
-    @location(1) uv: vec2f,
+  @builtin(position) position : vec4f,
+  @location(0) normal  : vec3f,
+  @location(1) viewPos : vec3f,
+  @location(2) worldPos : vec3f,
+  @location(3) uv : vec2f,
 };
 
 @vertex
 fn vs(vert: Vertex) -> VSOut {
   var vsOut: VSOut;
-    vsOut.position = uni.viewProjectionMatrix * uni.modelMatrix * vert.position;
-    vsOut.uv = vert.uv;
-    return vsOut;
+
+  let worldPos = uni.modelMatrix * vec4f(vert.position, 1.0);
+  let viewPos  = uni.viewMatrix * worldPos;
+
+  vsOut.position = uni.projectionMatrix * viewPos;
+
+  vsOut.uv = vert.uv;
+
+  return vsOut;
 }
 
 struct FSOut {
-  @location(0) colorOut : vec4<f32>,
+  @location(0) colorOut : vec4f,
 };
+
+fn encodeVector(n: vec3f) -> vec3f {
+  return n * 0.5 + vec3f(0.5);
+}
 
 @fragment
 fn fs(vsOut: VSOut) -> FSOut {

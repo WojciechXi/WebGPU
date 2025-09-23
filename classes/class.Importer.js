@@ -47,7 +47,7 @@ class Importer {
                     meshes.push(mesh);
                 }
 
-                mesh = new Mesh(line.split(' ')[1]);
+                mesh = new Mesh((line.split(' ')[1]).trim());
             } else if (line.startsWith('f ')) {
                 line = line.split(' ');
                 for (let l of line) {

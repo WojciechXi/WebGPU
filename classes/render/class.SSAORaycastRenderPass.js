@@ -1,4 +1,4 @@
-class SSAORenderPass extends RenderPass {
+class SSAORaycastRenderPass extends RenderPass {
 
     Init(data) {
         const canvas = data.canvas;
@@ -6,9 +6,9 @@ class SSAORenderPass extends RenderPass {
 
         this.ssaoKernel = this.GenerateKernel(32);
 
-        this.uniformValues = new Float32Array(4 + this.ssaoKernel.length);
+        this.uniformValues = new Float32Array(4 + 16 + 16 + this.ssaoKernel.length);
         this.uniformValues.set([0.5, 0.025, 0, 0]); //radius / bias
-        this.uniformValues.set(this.ssaoKernel, 4);
+        this.uniformValues.set(this.ssaoKernel, 36);
 
         this.uniformBuffer = GPU.CreateBuffer({
             size: this.uniformValues.length * 4,
@@ -47,8 +47,8 @@ class SSAORenderPass extends RenderPass {
         this.bindGroup = GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: gBufferRenderPass.positionTexture.createView() },
-                { binding: 1, resource: gBufferRenderPass.normalTexture.createView() },
+                { binding: 0, resource: gBufferRenderPass.viewPositionTexture.createView() },
+                { binding: 1, resource: gBufferRenderPass.viewNormalTexture.createView() },
                 { binding: 2, resource: this.sampler },
                 { binding: 3, resource: { buffer: this.uniformBuffer } },
             ],
@@ -56,6 +56,9 @@ class SSAORenderPass extends RenderPass {
     }
 
     Render(engine, commandEncoder) {
+        this.uniformValues.set(Camera.main.viewProjectionMatrix, 4);
+        this.uniformValues.set(Camera.main.inverseViewProjectionMatrix, 20);
+
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [{ view: this.ssaoTexture.createView(), loadOp: "clear", storeOp: "store" }]
         });

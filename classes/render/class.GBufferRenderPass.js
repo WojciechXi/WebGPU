@@ -9,7 +9,19 @@ class GBufferRenderPass extends RenderPass {
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
 
+        this.viewPositionTexture = GPU.CreateTexture({
+            size: [canvas.width, canvas.height],
+            format: "rgba16float",
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        });
+
         this.normalTexture = GPU.CreateTexture({
+            size: [canvas.width, canvas.height],
+            format: "rgba16float",
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        });
+
+        this.viewNormalTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
             format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
@@ -43,7 +55,9 @@ class GBufferRenderPass extends RenderPass {
                 entryPoint: "fs",
                 targets: [
                     { format: "rgba16float" }, // positionTexture
+                    { format: "rgba16float" }, // viewPositionTexture
                     { format: "rgba16float" }, // normalTexture
+                    { format: "rgba16float" }, // viewNormalTexture
                 ]
             },
             depthStencil: {
@@ -58,7 +72,9 @@ class GBufferRenderPass extends RenderPass {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 { view: this.positionTexture.createView(), loadOp: "clear", storeOp: "store" },
+                { view: this.viewPositionTexture.createView(), loadOp: "clear", storeOp: "store" },
                 { view: this.normalTexture.createView(), loadOp: "clear", storeOp: "store" },
+                { view: this.viewNormalTexture.createView(), loadOp: "clear", storeOp: "store" },
             ],
             depthStencilAttachment: {
                 view: this.depthTexture.createView(),
