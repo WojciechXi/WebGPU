@@ -74,7 +74,7 @@ class Terrain extends Component {
         if (!this.material || !this._mesh) return;
 
         // ustaw shader i uniformy
-        this.material.Use(renderPass, pipeline, Camera.main.viewMatrix, Camera.main.projectionMatrix, Camera.main.viewProjectionMatrix, Camera.main.viewProjectionInverseMatrix, this.transform.matrix4x4);
+        this.material.Use(renderPass, pipeline, this.transform.matrix4x4, Camera.main.viewMatrix, Camera.main.projectionMatrix, Camera.main.viewProjectionMatrix);
 
         // użyj istniejącego vertex buffer
         renderPass.setVertexBuffer(0, this._vertexBuffer);

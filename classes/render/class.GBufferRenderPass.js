@@ -1,6 +1,8 @@
 class GBufferRenderPass extends RenderPass {
 
-    Init(canvas) {
+    Init(data) {
+        const canvas = data.canvas;
+
         this.positionTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
             format: "rgba16float",

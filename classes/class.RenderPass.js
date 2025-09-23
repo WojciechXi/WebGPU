@@ -1,7 +1,7 @@
 class RenderPass {
 
-    constructor(shaderCode, canvas) {
-        this.shaderModule = GPU.CreateShaderModule({ code: shaderCode });
+    constructor(data) {
+        this.shaderModule = data.code ? GPU.CreateShaderModule({ code: data.code }) : null;
         this.sampler = GPU.CreateSampler({
             addressModeU: 'repeat',
             addressModeV: 'repeat',
@@ -9,11 +9,12 @@ class RenderPass {
             minFilter: 'linear',
             mipmapFilter: 'linear',
         });
+        this.renderPipeline = null;
 
-        this.Init(canvas);
+        this.Init(data);
     }
 
-    Init(canvas) {
+    Init(data) {
 
     }
 

@@ -31,7 +31,9 @@
     <script src="./classes/class.RenderPass.js"></script>
     <script src="./classes/render/class.GBufferRenderPass.js"></script>
     <script src="./classes/render/class.SSAORenderPass.js"></script>
+    <script src="./classes/render/class.ColorRenderPass.js"></script>
     <script src="./classes/render/class.FinalRenderPass.js"></script>
+    <script src="./classes/render/class.DebugRenderPass.js"></script>
 
     <script src="./classes/class.Object.js"></script>
     <script src="./classes/class.Component.js"></script>

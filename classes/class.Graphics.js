@@ -20,103 +20,34 @@ class Graphics {
         const format = navigator.gpu.getPreferredCanvasFormat();
         context.configure({ device, format });
 
-        const gBufferRenderPass = this.gBufferRenderPass = new GBufferRenderPass(assets.shaders['renderPassGBuffer.wgsl'], canvas);
-        const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass(assets.shaders['renderPassSSAO.wgsl'], canvas);
-        const finalRenderPass = this.finalRenderPass = new SSAORenderPass(assets.shaders['renderPassFinal.wgsl'], canvas);
-
-        const finalShaderModule = GPU.CreateShaderModule({ code: assets.shaders['renderPassFinal.wgsl'] });
-
-        //sampler
-        const sampler = this.sampler = GPU.CreateSampler({
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
+        const gBufferRenderPass = this.gBufferRenderPass = new GBufferRenderPass({
+            code: assets.shaders['renderPassGBuffer.wgsl'],
+            canvas: canvas,
         });
 
-        const depthTexture = this.depthTexture = GPU.CreateTexture({
-            size: [canvas.width, canvas.height],
-            format: "depth24plus",
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
+            code: assets.shaders['renderPassSSAO.wgsl'],
+            gBufferRenderPass: gBufferRenderPass,
+            canvas: canvas,
         });
 
-        const ssaoTexture = this.ssaoTexture = GPU.CreateTexture({
-            size: [canvas.width, canvas.height],
-            format: "rgba8unorm",
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        const colorRenderPass = this.colorRenderPass = new ColorRenderPass({
+            canvas: canvas,
         });
 
-        /*
-        //ssao
-        const ssaoKernel = this.ssaoKernel = this.GenerateKernel(32);
-        const ssaoShaderModule = GPU.CreateShaderModule({ code: assets.shaders['renderPassSSAO.wgsl'] });
-        const ssaoPipeline = this.ssaoPipeline = GPU.CreateRenderPipeline({
-            layout: "auto",
-            vertex: {
-                module: ssaoShaderModule,
-                entryPoint: "vs"
-            },
-            fragment: {
-                module: ssaoShaderModule,
-                entryPoint: "fs",
-                targets: [
-                    { format: "rgba8unorm" }
-                ]
-            }
-        });
-        const ssaoUniformValues = this.ssaoUniformValues = new Float32Array(16 + ssaoKernel.length);
-        const ssaoUniformBuffer = this.ssaoUniformBuffer = device.createBuffer({
-            size: ssaoUniformValues.length * 4, // mat4x4<f32> = 16 * 4 bajty
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
-        this.ssaoUniformValues.set(ssaoKernel, 16);
-        const ssaoBindGroup = this.ssaoBindGroup = GPU.CreateBindGroup({
-            layout: this.ssaoPipeline.getBindGroupLayout(0),
-            entries: [
-                { binding: 0, resource: this.gBufferTextures.positionView.createView() },
-                { binding: 1, resource: this.gBufferTextures.normalView.createView() },
-                { binding: 2, resource: this.sampler },
-                { binding: 3, resource: { buffer: ssaoUniformBuffer } },
-            ],
+        const finalRenderPass = this.finalRenderPass = new FinalRenderPass({
+            code: assets.shaders['renderPassFinal.wgsl'],
+            gBufferRenderPass: gBufferRenderPass,
+            ssaoRenderPass: ssaoRenderPass,
+            canvas: canvas,
         });
 
-        //Final
-        const finalPipeline = this.finalPipeline = GPU.CreateRenderPipeline({
-            layout: "auto",
-            vertex: {
-                module: finalShaderModule,
-                entryPoint: "vs"
-            },
-            fragment: {
-                module: finalShaderModule,
-                entryPoint: "fs",
-                targets: [{ format }]
-            }
+        const debugRenderPass = this.debugRenderPass = new DebugRenderPass({
+            code: assets.shaders['debugRenderPass.wgsl'],
+            canvas: canvas,
         });
-        const finalBindGroup = this.finalBindGroup = GPU.CreateBindGroup({
-            layout: this.finalPipeline.getBindGroupLayout(0),
-            entries: [
-                { binding: 0, resource: this.gBufferTextures.normal.createView() },
-                { binding: 1, resource: this.gBufferTextures.color.createView() },
-                { binding: 2, resource: this.ssaoTexture.createView() },
-                { binding: 3, resource: this.sampler },
-            ],
-        });
-        */
 
-        //debug
-        const debugShaderModule = GPU.CreateShaderModule({ code: assets.shaders['debugRenderPass.wgsl'] });
-        const debugPipeline = this.debugPipeline = GPU.CreateRenderPipeline({
-            layout: "auto",
-            vertex: { module: debugShaderModule, entryPoint: "vs", buffers: [] },
-            fragment: {
-                module: debugShaderModule,
-                entryPoint: "fs_debug",
-                targets: [{ format }] // używamy preferowanego formatu
-            },
-            primitive: { topology: "triangle-list" },
-        });
+        this.debugRenderPass.texture = this.gBufferRenderPass.positionTexture;
 
         callback();
     }
@@ -133,87 +64,12 @@ class Graphics {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
         this.gBufferRenderPass.Render(engine, commandEncoder);
-
-        // 2.SSAO
-        // const ssaoPass = commandEncoder.beginRenderPass({
-        //     colorAttachments: [{ view: this.ssaoTexture.createView(), loadOp: "clear", storeOp: "store" }]
-        // });
-        // ssaoPass.setPipeline(this.ssaoPipeline);
-        // ssaoPass.setBindGroup(0, this.ssaoBindGroup);
-        // this.ssaoUniformValues.set(Camera.main.viewProjectionInverseMatrix, 0);
-        // GPU.Queue.writeBuffer(this.ssaoUniformBuffer, 0, this.ssaoUniformValues);
-        // ssaoPass.draw(6);
-        // ssaoPass.end();
-        // 2.SSAO
-
-        // 3.Color
-        // const renderPass = this.renderPass = this.commandEncoder.beginRenderPass({
-        //     colorAttachments: [
-        //         { view: this.gBufferTextures.color.createView(), loadOp: "clear", storeOp: "store" },
-        //     ],
-        //     depthStencilAttachment: {
-        //         view: this.depthTexture.createView(),
-        //         depthClearValue: 1.0,
-        //         depthLoadOp: "clear",
-        //         depthStoreOp: "store"
-        //     },
-        // });
-        // if (engine.scene) engine.scene.Render(renderPass);
-        // renderPass.end();
-        // 3.Color
-
-        // 4.final
-        // const finalPass = commandEncoder.beginRenderPass({
-        //     colorAttachments: [{ view: this.context.getCurrentTexture().createView(), loadOp: "clear", storeOp: "store" }]
-        // });
-        // finalPass.setPipeline(this.finalPipeline);
-        // finalPass.setBindGroup(0, this.finalBindGroup); // bind group z posTex, normTex, sampler
-        // finalPass.draw(6);
-        // finalPass.end();
-        // 4.final
-
-        // debug
-        const debugPass = commandEncoder.beginRenderPass({
-            colorAttachments: [
-                {
-                    view: this.context.getCurrentTexture().createView(), // wyświetlamy na ekranie
-                    loadOp: "clear",
-                    storeOp: "store"
-                }
-            ],
-        });
-        debugPass.setPipeline(this.debugPipeline);
-        debugPass.setBindGroup(0, GPU.CreateBindGroup({
-            layout: this.debugPipeline.getBindGroupLayout(0),
-            entries: [
-                { binding: 0, resource: this.gBufferRenderPass.positionTexture.createView() },
-                { binding: 1, resource: this.sampler },
-            ],
-        }));
-        debugPass.draw(6);
-        debugPass.end();
-        // debug
+        // this.ssaoRenderPass.Render(engine, commandEncoder);
+        // this.colorRenderPass.Render(engine, commandEncoder);
+        // this.finalRenderPass.Render(engine, commandEncoder);
+        this.debugRenderPass.Render(engine, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);
-    }
-
-    static GenerateKernel(size = 64) {
-        const kernel = [];
-
-        for (let i = 0; i < size; i++) {
-            let sample = new Vector3(
-                Math.random() * 2.0 - 1.0,
-                Math.random() * 2.0 - 1.0,
-                Math.random()
-            );
-
-            sample.Normalize(sample);
-            sample.Multiply(Math.random());
-
-            kernel.push(sample[0], sample[1], sample[2], 0);
-        }
-
-        return kernel;
     }
 
 }

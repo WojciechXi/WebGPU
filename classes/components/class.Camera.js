@@ -13,20 +13,17 @@ class Camera extends Component {
         this.orthographic = false;
         this.orthographicSize = 100;
 
-        this.viewMatrix = Matrix4x4.Identity()
+        this.viewMatrix = Matrix4x4.Identity();
         this.projectionMatrix = Matrix4x4.Identity();
         this.viewProjectionMatrix = Matrix4x4.Identity();
-        this.viewProjectionInverseMatrix = Matrix4x4.Identity();
     }
 
     Update() {
         this.aspect = Graphics.Width / Graphics.Height;
 
         Matrix4x4.Inverse(this.transform.matrix4x4, this.viewMatrix);
-        if (this.orthographic) Matrix4x4.Ortho(0, this.orthographicSize, this.orthographicSize, 0, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
-        else Matrix4x4.Perspective(Math.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
-        Matrix4x4.Multiply(this.projectionMatrix, this.viewMatrix, this.viewProjectionMatrix);
-        Matrix4x4.Inverse(this.viewProjectionMatrix, this.viewProjectionInverseMatrix);
+        Matrix4x4.Perspective(Math.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
+        Matrix4x4.Multiply(this.viewMatrix, this.projectionMatrix, this.viewProjectionMatrix);
     }
 
 }

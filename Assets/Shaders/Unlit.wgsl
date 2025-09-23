@@ -1,15 +1,8 @@
 struct Uniforms {
+    modelMatrix : mat4x4<f32>,
     viewMatrix : mat4x4<f32>,
     projectionMatrix : mat4x4<f32>,
     viewProjectionMatrix : mat4x4<f32>,
-    viewProjectionInverseMatrix : mat4x4<f32>,
-    modelMatrix : mat4x4<f32>,
-
-    lightDirection : vec3<f32>,
-    lightColor : vec4<f32>,
-    ambientLightColor : vec4<f32>,
-
-    color : vec4<f32>,
 };
 
 struct Vertex {
@@ -25,7 +18,6 @@ struct Vertex {
 
 struct VSOut {
     @builtin(position) position: vec4f,
-    @location(0) normal: vec3f,
     @location(1) uv: vec2f,
 };
 
@@ -33,15 +25,7 @@ struct VSOut {
 fn vs(vert: Vertex) -> VSOut {
   var vsOut: VSOut;
     vsOut.position = uni.viewProjectionMatrix * uni.modelMatrix * vert.position;
-
-    let normalMatrix = mat3x3f(
-        uni.modelMatrix[0].xyz,
-        uni.modelMatrix[1].xyz,
-        uni.modelMatrix[2].xyz
-    );
-    vsOut.normal = normalize(normalMatrix * vert.normal);
-
-    vsOut.uv = vert.uv; // przekazujemy UV do fragment shadera
+    vsOut.uv = vert.uv;
     return vsOut;
 }
 
@@ -53,19 +37,7 @@ struct FSOut {
 fn fs(vsOut: VSOut) -> FSOut {
     var fsOut: FSOut;
 
-    let normal = normalize(vsOut.normal);
-    
-    let diffuse = max(dot(normal, -uni.lightDirection), 0.0);
-
-    let lightColor = uni.lightColor.rgb * uni.lightColor.a;
-    let ambient = uni.ambientLightColor.rgb * uni.ambientLightColor.a;
-
-    let texColor = textureSample(ourTexture, ourSampler, vsOut.uv);
-
-    let finalColor = (ambient + diffuse * lightColor) * uni.color.rgb * texColor.rgb;
-    let alpha = texColor.a * uni.color.a;
-
-    fsOut.colorOut = vec4f(finalColor, alpha);
+    fsOut.colorOut = textureSample(ourTexture, ourSampler, vsOut.uv);
 
     return fsOut;
 }
