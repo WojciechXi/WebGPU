@@ -48,7 +48,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        this.debugRenderPass.texture = this.colorRenderPass.colorTexture;
+        this.debugRenderPass.texture = this.ssaoRenderPass.ssaoTexture;
 
         callback();
     }

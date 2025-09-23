@@ -7,8 +7,6 @@ class DebugRenderPass extends RenderPass {
 
         const format = navigator.gpu.getPreferredCanvasFormat();
 
-        this._texture = null;
-
         this.renderPipeline = GPU.CreateRenderPipeline({
             layout: "auto",
             vertex: { module: this.shaderModule, entryPoint: "vs", buffers: [] },
@@ -21,6 +19,8 @@ class DebugRenderPass extends RenderPass {
             },
             primitive: { topology: "triangle-list" },
         });
+
+        this._texture = null;
 
         this.sampler = GPU.CreateSampler({
             addressModeU: 'repeat',

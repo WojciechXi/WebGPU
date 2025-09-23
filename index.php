@@ -31,8 +31,6 @@
     <script src="./classes/class.RenderPass.js"></script>
     <script src="./classes/render/class.GBufferRenderPass.js"></script>
     <script src="./classes/render/class.SSAORenderPass.js"></script>
-    <script src="./classes/render/class.SSAOViewRenderPass.js"></script>
-    <script src="./classes/render/class.SSAORaycastRenderPass.js"></script>
     <script src="./classes/render/class.ColorRenderPass.js"></script>
     <script src="./classes/render/class.FinalRenderPass.js"></script>
     <script src="./classes/render/class.DebugRenderPass.js"></script>

@@ -17,10 +17,14 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
     return out;
 }
 
+struct FinalUniforms {
+  screenSize : vec2f,
+};
 
-@group(0) @binding(0) var colorTexture: texture_2d<f32>;
-@group(0) @binding(1) var ssaoTexture: texture_2d<f32>;
-@group(0) @binding(2) var samp: sampler;
+@group(0) @binding(0) var<uniform> uni : FinalUniforms;
+@group(0) @binding(1) var colorTexture: texture_2d<f32>;
+@group(0) @binding(2) var ssaoTexture: texture_2d<f32>;
+@group(0) @binding(3) var samp: sampler;
 
 struct FSOut {
   @location(0) colorOut: vec4f,
@@ -28,12 +32,14 @@ struct FSOut {
 
 @fragment
 fn fs(vsOut: VSOut) -> FSOut {
-    var out: FSOut;
+  var out: FSOut;
 
-    let color = textureSample(colorTexture, samp, vsOut.uv).rgb;
-    let ssao = textureSample(ssaoTexture, samp, vsOut.uv).rgb;
+  let screenSize = uni.screenSize;
 
-    out.colorOut = vec4f(color * ssao, 1.0);
+  let ssao = textureSample(ssaoTexture, samp, vsOut.uv).r;
+  let color = textureSample(colorTexture, samp, vsOut.uv).rgb;
 
-    return out;
+  out.colorOut = vec4f(color * ssao, 1.0);
+
+  return out;
 }

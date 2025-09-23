@@ -45,6 +45,7 @@ class Importer {
                 if (mesh) {
                     mesh.Update();
                     meshes.push(mesh);
+                    mesh = null;
                 }
 
                 mesh = new Mesh((line.split(' ')[1]).trim());
@@ -64,6 +65,12 @@ class Importer {
                     mesh.triangles.push(mesh.vertices.length - 1);
                 }
             }
+        }
+
+        if (mesh) {
+            mesh.Update();
+            meshes.push(mesh);
+            mesh = null;
         }
 
         console.log(lines);

@@ -29,8 +29,14 @@ class GBufferRenderPass extends RenderPass {
 
         this.depthTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
-            format: "depth24plus",
+            format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        });
+
+        this.depthStencilTexture = GPU.CreateTexture({
+            size: [canvas.width, canvas.height],
+            format: "depth24plus",
+            usage: GPUTextureUsage.RENDER_ATTACHMENT
         });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
@@ -58,6 +64,7 @@ class GBufferRenderPass extends RenderPass {
                     { format: "rgba16float" }, // viewPositionTexture
                     { format: "rgba16float" }, // normalTexture
                     { format: "rgba16float" }, // viewNormalTexture
+                    { format: "rgba16float" }, // depthTexture
                 ]
             },
             depthStencil: {
@@ -75,13 +82,9 @@ class GBufferRenderPass extends RenderPass {
                 { view: this.viewPositionTexture.createView(), loadOp: "clear", storeOp: "store" },
                 { view: this.normalTexture.createView(), loadOp: "clear", storeOp: "store" },
                 { view: this.viewNormalTexture.createView(), loadOp: "clear", storeOp: "store" },
+                { view: this.depthTexture.createView(), clearValue: { r: 1.0, g: 0, b: 0, a: 1 }, loadOp: "clear", storeOp: "store", }
             ],
-            depthStencilAttachment: {
-                view: this.depthTexture.createView(),
-                depthClearValue: 1.0,
-                depthLoadOp: "clear",
-                depthStoreOp: "store"
-            }
+            depthStencilAttachment: { view: this.depthStencilTexture.createView(), depthClearValue: 1.0, depthLoadOp: "clear", depthStoreOp: "store" },
         });
 
         renderPass.setPipeline(this.renderPipeline);

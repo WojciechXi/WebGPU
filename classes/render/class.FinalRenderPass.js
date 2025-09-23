@@ -8,6 +8,14 @@ class FinalRenderPass extends RenderPass {
 
         const format = navigator.gpu.getPreferredCanvasFormat();
 
+        this.uniformValues = new Float32Array(4);
+        this.uniformValues.set([canvas.width, canvas.height]); //radius / bias / screen size
+
+        this.uniformBuffer = GPU.CreateBuffer({
+            size: this.uniformValues.length * 4,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+
         this.renderPipeline = GPU.CreateRenderPipeline({
             layout: "auto",
             vertex: {
@@ -32,9 +40,10 @@ class FinalRenderPass extends RenderPass {
         const bindGroup = this.bindGroup = GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: colorRenderPass.colorTexture.createView() },
-                { binding: 1, resource: ssaoRenderPass.ssaoTexture.createView() },
-                { binding: 2, resource: this.sampler },
+                { binding: 0, resource: { buffer: this.uniformBuffer } },
+                { binding: 1, resource: colorRenderPass.colorTexture.createView() },
+                { binding: 2, resource: ssaoRenderPass.ssaoTexture.createView() },
+                { binding: 3, resource: this.sampler },
             ],
         });
     }
@@ -52,6 +61,9 @@ class FinalRenderPass extends RenderPass {
 
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, this.bindGroup);
+
+        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
+
         renderPass.draw(6);
         renderPass.end();
     }

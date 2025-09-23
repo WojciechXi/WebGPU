@@ -41,6 +41,7 @@ struct FSOut {
   @location(1) viewPositionOut : vec4f,
   @location(2) normalOut : vec4f,
   @location(3) viewNormalOut : vec4f,
+  @location(4) depthOut : vec4f,
 };
 
 fn encodeVector(n: vec3f) -> vec3f {
@@ -62,6 +63,8 @@ fn fs(vsOut: VSOut) -> FSOut {
 
   let viewNormal = normalize((uni.viewMatrix * vec4f(vsOut.normal, 0.0)).xyz);
   fsOut.viewNormalOut = vec4f(viewNormal, 0.0);
+
+  fsOut.depthOut = vec4f(vsOut.position.z / vsOut.position.w, 0.0, 0.0, 1.0);
 
   return fsOut;
 }

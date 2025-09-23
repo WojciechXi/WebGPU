@@ -8,6 +8,8 @@ function loadBitmap(src, callback) {
 }
 
 window.addEventListener('load', async function (event) {
+    console.clear();
+
     let device = await GPU.Request();
     if (!device) return alert('need a browser that supports WebGPU');
 
@@ -68,6 +70,7 @@ window.addEventListener('load', async function (event) {
                 White: whiteMaterial,
                 Concrete: concreteMaterial,
                 Floor: floorMaterial,
+                Wardrobe: unlit2Material,
                 'H1386-ST40': sonomaMaterial,
                 'U702-PM': u702pmst9Material,
                 'U702-ST9': u702pmst9Material,
@@ -85,16 +88,15 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.Obj(assets.models['Krakow.obj'], function (meshes) {
+            Importer.Obj(assets.models['Ablewicza 15.obj'], function (meshes) {
                 for (const mesh of meshes) {
+                    if (mesh.triangles.length % 3 != 0) continue;
                     const cubeGameObject = new GameObject('Cube');
                     const meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
                     meshRenderer.material = materials[mesh.name] ?? whiteMaterial;
                     meshRenderer.mesh = mesh;
                 }
             });
-
-            console.clear();
         });
     });
 });
