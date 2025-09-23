@@ -43,4 +43,8 @@ class Engine {
         });
     }
 
+    Render(renderPass, renderPipeline) {
+        if (this.scene) this.scene.Render(renderPass, renderPipeline);
+    }
+
 }

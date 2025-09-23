@@ -20,7 +20,11 @@ class Graphics {
         const format = navigator.gpu.getPreferredCanvasFormat();
         context.configure({ device, format });
 
-        const finalShaderModule = GPU.CreateShaderModule({ code: assets.shaders['Final.wgsl'] });
+        const gBufferRenderPass = this.gBufferRenderPass = new GBufferRenderPass(assets.shaders['renderPassGBuffer.wgsl'], canvas);
+        const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass(assets.shaders['renderPassSSAO.wgsl'], canvas);
+        const finalRenderPass = this.finalRenderPass = new SSAORenderPass(assets.shaders['renderPassFinal.wgsl'], canvas);
+
+        const finalShaderModule = GPU.CreateShaderModule({ code: assets.shaders['renderPassFinal.wgsl'] });
 
         //sampler
         const sampler = this.sampler = GPU.CreateSampler({
@@ -37,79 +41,16 @@ class Graphics {
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
 
-        const gBufferTextures = this.gBufferTextures = {
-            positionWorld: GPU.CreateTexture({
-                size: [canvas.width, canvas.height],
-                format: "rgba16float",
-                usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-            }),
-            positionView: GPU.CreateTexture({
-                size: [canvas.width, canvas.height],
-                format: "rgba16float",
-                usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-            }),
-            normal: GPU.CreateTexture({
-                size: [canvas.width, canvas.height],
-                format: "rgba16float",
-                usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-            }),
-            normalView: GPU.CreateTexture({
-                size: [canvas.width, canvas.height],
-                format: "rgba16float",
-                usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-            }),
-            color: GPU.CreateTexture({
-                size: [canvas.width, canvas.height],
-                format: "rgba16float",
-                usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-            }),
-        };
-
         const ssaoTexture = this.ssaoTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
             format: "rgba8unorm",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
 
-        //gBuffer
-        const gBufferShaderModule = GPU.CreateShaderModule({ code: assets.shaders['gBufferRenderPass.wgsl'] });
-        const gBufferPipeline = this.gBufferPipeline = GPU.CreateRenderPipeline({
-            layout: "auto",
-            vertex: {
-                module: gBufferShaderModule,
-                entryPoint: "vs",
-                buffers: [
-                    {
-                        arrayStride: (3 + 3 + 3 + 2) * 4, // position + normal + color + uv
-                        attributes: [
-                            { shaderLocation: 0, offset: 0, format: 'float32x3' },       // position
-                            { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' },   // normal
-                            { shaderLocation: 2, offset: 6 * 4, format: 'float32x3' },   // color
-                            { shaderLocation: 3, offset: 9 * 4, format: 'float32x2' },   // uv
-                        ],
-                    },
-                ],
-            },
-            fragment: {
-                module: gBufferShaderModule,
-                entryPoint: "fs",
-                targets: [
-                    { format: "rgba16float" }, // positionWorld
-                    { format: "rgba16float" }, // positionView
-                    { format: "rgba16float" },  // normalWorld
-                    { format: "rgba16float" },  // normalView
-                ]
-            },
-            depthStencil: {
-                format: "depth24plus",
-                depthWriteEnabled: true,
-                depthCompare: "less"
-            }
-        });
-
+        /*
         //ssao
         const ssaoKernel = this.ssaoKernel = this.GenerateKernel(32);
-        const ssaoShaderModule = GPU.CreateShaderModule({ code: assets.shaders['ssaoRenderPass.wgsl'] });
+        const ssaoShaderModule = GPU.CreateShaderModule({ code: assets.shaders['renderPassSSAO.wgsl'] });
         const ssaoPipeline = this.ssaoPipeline = GPU.CreateRenderPipeline({
             layout: "auto",
             vertex: {
@@ -162,6 +103,7 @@ class Graphics {
                 { binding: 3, resource: this.sampler },
             ],
         });
+        */
 
         //debug
         const debugShaderModule = GPU.CreateShaderModule({ code: assets.shaders['debugRenderPass.wgsl'] });
@@ -190,26 +132,7 @@ class Graphics {
 
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-        // 1.gBuffer
-        const gBufferPass = this.gBufferPass = commandEncoder.beginRenderPass({
-            colorAttachments: [
-                { view: this.gBufferTextures.positionWorld.createView(), loadOp: "clear", storeOp: "store" },
-                { view: this.gBufferTextures.positionView.createView(), loadOp: "clear", storeOp: "store" },
-                { view: this.gBufferTextures.normal.createView(), loadOp: "clear", storeOp: "store" },
-                { view: this.gBufferTextures.normalView.createView(), loadOp: "clear", storeOp: "store" },
-            ],
-            depthStencilAttachment: {
-                view: this.depthTexture.createView(),
-                depthClearValue: 1.0,
-                depthLoadOp: "clear",
-                depthStoreOp: "store"
-            }
-        });
-
-        gBufferPass.setPipeline(this.gBufferPipeline);
-        if (engine.scene) engine.scene.Render(gBufferPass, this.gBufferPipeline);
-        gBufferPass.end();
-        // 1.gBuffer
+        this.gBufferRenderPass.Render(engine, commandEncoder);
 
         // 2.SSAO
         // const ssaoPass = commandEncoder.beginRenderPass({
@@ -263,7 +186,7 @@ class Graphics {
         debugPass.setBindGroup(0, GPU.CreateBindGroup({
             layout: this.debugPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this.gBufferTextures.positionView.createView() },
+                { binding: 0, resource: this.gBufferRenderPass.positionTexture.createView() },
                 { binding: 1, resource: this.sampler },
             ],
         }));

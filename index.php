@@ -28,6 +28,10 @@
     <script src="./classes/class.Shader.js"></script>
     <script src="./classes/class.Material.js"></script>
     <script src="./classes/class.Graphics.js"></script>
+    <script src="./classes/class.RenderPass.js"></script>
+    <script src="./classes/render/class.GBufferRenderPass.js"></script>
+    <script src="./classes/render/class.SSAORenderPass.js"></script>
+    <script src="./classes/render/class.FinalRenderPass.js"></script>
 
     <script src="./classes/class.Object.js"></script>
     <script src="./classes/class.Component.js"></script>
