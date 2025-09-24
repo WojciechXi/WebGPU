@@ -1,3 +1,11 @@
+struct SSAOUniforms {
+  radius  : f32,
+  bias    : f32,
+  screenSize : vec2f,
+  matrix : mat4x4f,
+  samples : array<vec4f, 64>,
+};
+
 struct VSOut {
   @builtin(position) pos : vec4f,
   @location(0) uv : vec2f,
@@ -14,14 +22,6 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
   out.pos = vec4f(pos[vid].x, -pos[vid].y, 0.0, 1.0);
   return out;
 }
-
-struct SSAOUniforms {
-  radius  : f32,
-  bias    : f32,
-  screenSize : vec2f,
-  matrix : mat4x4f,
-  samples : array<vec4f, 64>,
-};
 
 // Bindings
 @group(0) @binding(0) var<uniform> uni : SSAOUniforms;

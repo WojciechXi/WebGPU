@@ -1,9 +1,11 @@
 class FinalRenderPass extends RenderPass {
 
     Init(data) {
+        const clearRenderPass = data.clearRenderPass;
         const gBufferRenderPass = data.gBufferRenderPass;
+        const lightingRenderPass = data.lightingRenderPass;
+        const forwardRenderPass = data.forwardRenderPass;
         const ssaoRenderPass = data.ssaoRenderPass;
-        const colorRenderPass = data.colorRenderPass;
         const canvas = data.canvas;
 
         const format = navigator.gpu.getPreferredCanvasFormat();
@@ -41,9 +43,13 @@ class FinalRenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: colorRenderPass.colorTexture.createView() },
-                { binding: 2, resource: ssaoRenderPass.ssaoTexture.createView() },
-                { binding: 3, resource: this.sampler },
+                { binding: 1, resource: clearRenderPass.colorTexture.createView() },
+                { binding: 2, resource: lightingRenderPass.lightingTexture.createView() },
+                { binding: 3, resource: gBufferRenderPass.depthTexture.createView() },
+                { binding: 4, resource: forwardRenderPass.colorTexture.createView() },
+                { binding: 5, resource: forwardRenderPass.depthTexture.createView() },
+                { binding: 6, resource: ssaoRenderPass.ssaoTexture.createView() },
+                { binding: 7, resource: this.sampler },
             ],
         });
     }

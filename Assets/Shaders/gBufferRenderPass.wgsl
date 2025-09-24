@@ -64,7 +64,7 @@ fn fs(vsOut: VSOut) -> FSOut {
   let viewNormal = normalize((uni.viewMatrix * vec4f(vsOut.normal, 0.0)).xyz);
   fsOut.viewNormalOut = vec4f(viewNormal, 0.0);
 
-  fsOut.depthOut = vec4f(vsOut.position.z / vsOut.position.w, 0.0, 0.0, 1.0);
+  fsOut.depthOut = vec4f(vsOut.position.z, 0.0, 0.0, 1.0);
 
   return fsOut;
 }

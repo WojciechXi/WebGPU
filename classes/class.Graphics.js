@@ -1,6 +1,7 @@
 class Graphics {
 
     static {
+        this.lightViewProjectionMatrix = Matrix4x4.Identity();
         this.lightDirection = Vector3.down;
         this.lightColor = Color.white;
         this.ambientLightColor = Color.zero;
@@ -20,35 +21,69 @@ class Graphics {
         const format = navigator.gpu.getPreferredCanvasFormat();
         context.configure({ device, format });
 
+        const clearRenderPass = this.clearRenderPass = new ClearRenderPass({
+            name: 'clearRenderPass',
+            code: assets.shaders['clearRenderPass.wgsl'],
+            canvas: canvas,
+        });
+
         const gBufferRenderPass = this.gBufferRenderPass = new GBufferRenderPass({
-            code: assets.shaders['renderPassGBuffer.wgsl'],
+            name: 'gBufferRenderPass',
+            code: assets.shaders['gBufferRenderPass.wgsl'],
+            canvas: canvas,
+        });
+
+        const shadowRenderPass = this.shadowRenderPass = new ShadowRenderPass({
+            name: 'shadowRenderPass',
+            code: assets.shaders['shadowRenderPass.wgsl'],
+            canvas: canvas,
+        });
+
+        const lightingRenderPass = this.lightingRenderPass = new LightingRenderPass({
+            name: 'lightingRenderPass',
+            code: assets.shaders['lightingRenderPass.wgsl'],
+            gBufferRenderPass: gBufferRenderPass,
+            canvas: canvas,
+        });
+
+        const forwardRenderPass = this.forwardRenderPass = new ForwardRenderPass({
+            name: 'forwardRenderPass',
+            code: assets.shaders['forwardRenderPass.wgsl'],
+            lightingRenderPass: lightingRenderPass,
             canvas: canvas,
         });
 
         const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
-            code: assets.shaders['renderPassSSAO.wgsl'],
+            name: 'ssaoRenderPass',
+            code: assets.shaders['ssaoRenderPass.wgsl'],
             gBufferRenderPass: gBufferRenderPass,
-            canvas: canvas,
-        });
-
-        const colorRenderPass = this.colorRenderPass = new ColorRenderPass({
             canvas: canvas,
         });
 
         const finalRenderPass = this.finalRenderPass = new FinalRenderPass({
-            code: assets.shaders['renderPassFinal.wgsl'],
+            name: 'finalRenderPass',
+            code: assets.shaders['finalRenderPass.wgsl'],
+            clearRenderPass: clearRenderPass,
             gBufferRenderPass: gBufferRenderPass,
+            lightingRenderPass: lightingRenderPass,
+            forwardRenderPass: forwardRenderPass,
             ssaoRenderPass: ssaoRenderPass,
-            colorRenderPass: colorRenderPass,
             canvas: canvas,
         });
 
         const debugRenderPass = this.debugRenderPass = new DebugRenderPass({
+            name: 'debugRenderPass',
             code: assets.shaders['debugRenderPass.wgsl'],
             canvas: canvas,
         });
+        this.debugRenderPass.texture = this.clearRenderPass.colorTexture;
 
-        this.debugRenderPass.texture = this.ssaoRenderPass.ssaoTexture;
+        // const debugDepthRenderPass = this.debugDepthRenderPass = new DebugDepthRenderPass({
+        //     name: 'debugDepthRenderPass',
+        //     code: assets.shaders['debugDepthRenderPass.wgsl'],
+        //     canvas: canvas,
+        // });
+        // this.debugDepthRenderPass.texture = this.gBufferRenderPass.depthStencilTexture;
 
         callback();
     }
@@ -61,11 +96,15 @@ class Graphics {
     static Render(engine) {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
+        this.clearRenderPass.Render(engine, commandEncoder);
         this.gBufferRenderPass.Render(engine, commandEncoder);
+        this.shadowRenderPass.Render(engine, commandEncoder);
+        this.lightingRenderPass.Render(engine, commandEncoder);
+        this.forwardRenderPass.Render(engine, commandEncoder);
         this.ssaoRenderPass.Render(engine, commandEncoder);
-        this.colorRenderPass.Render(engine, commandEncoder);
         this.finalRenderPass.Render(engine, commandEncoder);
         // this.debugRenderPass.Render(engine, commandEncoder);
+        // this.debugDepthRenderPass.Render(engine, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);
     }

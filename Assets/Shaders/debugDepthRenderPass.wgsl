@@ -17,11 +17,11 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
     return out;
 }
 
-@group(0) @binding(0) var debugTexture: texture_2d<f32>;
-@group(0) @binding(1) var debugSampler: sampler;
+@group(0) @binding(0) var depthTexture: texture_depth_2d;
+@group(0) @binding(1) var depthSampler: sampler_comparison;
 
 @fragment
 fn fs(in: VSOut) -> @location(0) vec4f {
-    let color = textureSample(debugTexture, debugSampler, in.uv).rgb;
-    return vec4f(color, 1.0);
+    var depth = textureSampleCompare(depthTexture, depthSampler, in.uv, 0.5);
+    return vec4f(depth, 0, 0, 1.0);
 }

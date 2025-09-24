@@ -1,9 +1,7 @@
-class DebugRenderPass extends RenderPass {
+class DebugDepthRenderPass extends RenderPass {
 
     Init(data) {
         const canvas = data.canvas;
-
-        const format = navigator.gpu.getPreferredCanvasFormat();
 
         this.renderPipeline = GPU.CreateRenderPipeline({
             layout: "auto",
@@ -16,7 +14,7 @@ class DebugRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: format },
+                    { format: "bgra8unorm" },
                 ],
             },
             primitive: { topology: "triangle-list" },
@@ -24,10 +22,10 @@ class DebugRenderPass extends RenderPass {
 
         this._texture = null;
 
-        this.sampler = GPU.CreateSampler({
-            magFilter: 'linear',
+        this.depthSampler = GPU.CreateSampler({
+            compare: 'less',
             minFilter: 'linear',
-            mipmapFilter: 'linear',
+            magFilter: 'linear',
         });
 
         this.bindGroup = null;
@@ -44,7 +42,7 @@ class DebugRenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: this._texture.createView() },
-                { binding: 1, resource: this.sampler },
+                { binding: 1, resource: this.depthSampler },
             ],
         }) : null;
     }

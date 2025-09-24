@@ -29,11 +29,16 @@
     <script src="./classes/class.Material.js"></script>
     <script src="./classes/class.Graphics.js"></script>
     <script src="./classes/class.RenderPass.js"></script>
+
+    <script src="./classes/render/class.ClearRenderPass.js"></script>
     <script src="./classes/render/class.GBufferRenderPass.js"></script>
+    <script src="./classes/render/class.ShadowRenderPass.js"></script>
+    <script src="./classes/render/class.LightingRenderPass.js"></script>
+    <script src="./classes/render/class.ForwardRenderPass.js"></script>
     <script src="./classes/render/class.SSAORenderPass.js"></script>
-    <script src="./classes/render/class.ColorRenderPass.js"></script>
     <script src="./classes/render/class.FinalRenderPass.js"></script>
     <script src="./classes/render/class.DebugRenderPass.js"></script>
+    <script src="./classes/render/class.DebugDepthRenderPass.js"></script>
 
     <script src="./classes/class.Object.js"></script>
     <script src="./classes/class.Component.js"></script>
@@ -42,7 +47,6 @@
 
     <script src="./classes/components/class.Transform.js"></script>
     <script src="./classes/components/class.Camera.js"></script>
-    <script src="./classes/components/class.Skybox.js"></script>
     <script src="./classes/components/class.MeshRenderer.js"></script>
     <script src="./classes/components/class.AmbientLight.js"></script>
     <script src="./classes/components/class.DirectionalLight.js"></script>

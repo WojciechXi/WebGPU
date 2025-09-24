@@ -43,8 +43,8 @@ class Engine {
         });
     }
 
-    Render(renderPass, renderPipeline = null) {
-        if (this.scene) this.scene.Render(renderPass, renderPipeline);
+    Render(renderPass) {
+        if (this.scene) this.scene.Render(renderPass);
     }
 
 }

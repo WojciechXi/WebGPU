@@ -12,7 +12,7 @@ class Obj {
 
     }
 
-    Render(renderPass, pipeline = null) {
+    Render(renderPass) {
 
     }
 

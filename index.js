@@ -18,26 +18,25 @@ window.addEventListener('load', async function (event) {
 
         const engine = new Engine(assets);
         engine.Init(function (engine) {
-            const unlitShader = new Shader(assets.shaders['Unlit.wgsl'], [
-                {
-                    arrayStride: (3 + 3 + 3 + 2) * 4, // position + normal + color + uv
-                    attributes: [
-                        { shaderLocation: 0, offset: 0, format: 'float32x3' },       // position
-                        { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' },   // normal
-                        { shaderLocation: 2, offset: 6 * 4, format: 'float32x3' },   // color
-                        { shaderLocation: 3, offset: 9 * 4, format: 'float32x2' },   // uv
-                    ],
-                }
-            ], {
-                cullMode: 'none',
-            });
+            const unlitShader = new Shader(assets.shaders['Unlit.wgsl']);
             unlitShader.Compile();
 
+            const glassShader = new Shader(assets.shaders['Glass.wgsl']);
+            glassShader.Compile();
+
+            const glassMaterial = new Material(glassShader);
+            glassMaterial.color.Set(0, 0, 0, 0.5);
+
             const whiteMaterial = new Material(unlitShader);
-            const goldMaterial = new Material(unlitShader);
-            goldMaterial.color.Set(1, 0.5, 0, 1);
             const blackMaterial = new Material(unlitShader);
             blackMaterial.color.Set(0, 0, 0, 1);
+            const goldMaterial = new Material(unlitShader);
+            goldMaterial.color.Set(1, 0.5, 0, 1);
+            const beigeMaterial = new Material(unlitShader);
+            beigeMaterial.color.Set(223 / 255, 212 / 255, 200 / 255, 1);
+            const oliveMaterial = new Material(unlitShader);
+            oliveMaterial.color.Set(167 / 255, 169 / 255, 148 / 255, 1);
+
             const concreteMaterial = new Material(unlitShader);
             const floorMaterial = new Material(unlitShader);
             const u702pmst9Material = new Material(unlitShader);
@@ -67,20 +66,50 @@ window.addEventListener('load', async function (event) {
             });
 
             const materials = {
+                Glass: glassMaterial,
+
+                White_Glossy: whiteMaterial,
+                Plastic: whiteMaterial,
+
                 White: whiteMaterial,
+                Beige: beigeMaterial,
+                Gold: goldMaterial,
+                Black: blackMaterial,
+
                 Concrete: concreteMaterial,
                 Floor: floorMaterial,
-                Wardrobe: unlit2Material,
+                Tiles: floorMaterial,
+                Walnut: sonomaMaterial,
+                Wardrobe: sonomaMaterial,
                 'H1386-ST40': sonomaMaterial,
                 'U702-PM': u702pmst9Material,
                 'U702-ST9': u702pmst9Material,
+
+                Bedroom_S: oliveMaterial,
+                Bedroom_E: oliveMaterial,
+                Bedroom_N: oliveMaterial,
+                Bedroom_W: oliveMaterial,
+
+                Wall_S: oliveMaterial,
+                Wall_E: oliveMaterial,
+                Wall_N: oliveMaterial,
+                Wall_W: oliveMaterial,
+
+                Wall_K_S: oliveMaterial,
+                Wall_K_S_2: oliveMaterial,
+                Wall_K_S_3: oliveMaterial,
+                Wall_K_S_4: oliveMaterial,
+                Wall_K_W: oliveMaterial,
+                Wall_K: oliveMaterial,
+                Wall_K_2: oliveMaterial,
             };
 
             const ambientLight = engine.scene.AddComponent(AmbientLight);
-            ambientLight.color.Set(0.95, 0.975, 1, 0.6);
+            ambientLight.color.Set(0.95, 0.975, 1, 0.8);
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
-            directionalLightGameObject.transform.eulerAngles = new Vector3(-45, 0, 0);
+            directionalLightGameObject.transform.position = new Vector3(0, 10, 0);
+            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(45, 0, 0);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
@@ -88,13 +117,14 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.Obj(assets.models['Ablewicza 15.obj'], function (meshes) {
+            Importer.Obj(assets.models['Krakow.obj'], function (meshes) {
                 for (const mesh of meshes) {
                     if (mesh.triangles.length % 3 != 0) continue;
                     const cubeGameObject = new GameObject('Cube');
                     const meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
                     meshRenderer.material = materials[mesh.name] ?? whiteMaterial;
                     meshRenderer.mesh = mesh;
+                    if (Object.keys(materials).indexOf(mesh.name) === -1) console.log(mesh.name);
                 }
             });
         });

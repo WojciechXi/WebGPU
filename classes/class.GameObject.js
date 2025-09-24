@@ -35,9 +35,9 @@ class GameObject extends Obj {
         for (let child of (this.transform.children)) child.gameObject.PreRender();
     }
 
-    Render(renderPass, pipeline = null) {
-        for (let component of (this.components)) component.Render(renderPass, pipeline);
-        for (let child of (this.transform.children)) child.gameObject.Render(renderPass, pipeline);
+    Render(renderPass) {
+        for (let component of (this.components)) component.Render(renderPass);
+        for (let child of (this.transform.children)) child.gameObject.Render(renderPass);
     }
 
     PostRender() {

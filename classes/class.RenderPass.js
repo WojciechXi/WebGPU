@@ -1,6 +1,7 @@
 class RenderPass {
 
     constructor(data) {
+        this.name = data.name ?? 'renderPass';
         this.shaderModule = data.code ? GPU.CreateShaderModule({ code: data.code }) : null;
         this.sampler = GPU.CreateSampler({
             addressModeU: 'repeat',
@@ -20,6 +21,22 @@ class RenderPass {
 
     Render(engine, commandEncoder) {
 
+    }
+
+    SetBindGroup(index, bindGroup) {
+        this.renderPass.setBindGroup(index, bindGroup);
+    }
+
+    SetPipeline(renderPipeline) {
+        this.renderPass.setPipeline(renderPipeline);
+    }
+
+    SetVertexBuffer(index, vertexBuffer) {
+        this.renderPass.setVertexBuffer(index, vertexBuffer);
+    }
+
+    Draw(count) {
+        this.renderPass.draw(count);
     }
 
 }

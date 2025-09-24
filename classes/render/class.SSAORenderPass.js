@@ -38,7 +38,6 @@ class SSAORenderPass extends RenderPass {
         this.uniformValues = new Float32Array(4 + 16 + this.ssaoKernel.length);
         this.uniformValues.set([0.1, 0.025, canvas.width, canvas.height]); //radius / bias / screen size
         this.uniformValues.set(this.ssaoKernel, 20);
-
         this.uniformBuffer = GPU.CreateBuffer({
             size: this.uniformValues.length * 4,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
@@ -67,8 +66,8 @@ class SSAORenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: gBufferRenderPass.viewPositionTexture.createView() },
-                { binding: 2, resource: gBufferRenderPass.viewNormalTexture.createView() },
+                { binding: 1, resource: gBufferRenderPass.screenPositionTexture.createView() },
+                { binding: 2, resource: gBufferRenderPass.screenNormalTexture.createView() },
                 { binding: 3, resource: this.sampler },
                 { binding: 4, resource: noiseTex.createView() },
                 { binding: 5, resource: this.noiseSampler },
@@ -78,6 +77,7 @@ class SSAORenderPass extends RenderPass {
 
     Render(engine, commandEncoder) {
         this.uniformValues.set(Camera.main.projectionMatrix, 4);
+
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [{ view: this.ssaoTexture.createView(), loadOp: "clear", storeOp: "store" }]
         });

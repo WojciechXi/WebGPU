@@ -1,82 +1,132 @@
 class Shader {
 
     constructor(code, renderPipelineBuffers = null, settings = {}) {
-        let _this = this;
+        const _this = this;
 
         _this.code = code;
-        _this.renderPipelineBuffers = renderPipelineBuffers ?? [];
-
-        _this.settings = {
-            layout: 'auto',
-            cullMode: 'back',
-            frontFace: 'ccw',
-            depthWriteEnabled: true,
-            depthCompare: 'less',
-            format: 'depth24plus',
-            blend: null,
-        };
-
-        Object.keys(settings).forEach(function (key) {
-            _this.settings[key] = settings[key];
-        });
-
-        _this.module = null;
+        _this.shaderModule = null;
         _this.pipeline = null;
+        _this.renderPipelines = [];
+        _this.renderPipelineBuffers = renderPipelineBuffers ?? [];
+    }
+
+    Use(renderPass) {
+        let renderPipeline = this.renderPipelines[renderPass.name];
+        if (renderPipeline) {
+            renderPass.SetPipeline(renderPipeline);
+            return renderPipeline;
+        }
+        return null;
     }
 
     Compile() {
+        const _this = this;
+
         const device = GPU.device;
         const context = Graphics.context;
 
         // Konfiguracja kontekstu
-        const presentationFormat = this.presentationFormat = navigator.gpu.getPreferredCanvasFormat();
         context.configure({
             device,
-            format: presentationFormat,
+            format: navigator.gpu.getPreferredCanvasFormat(),
             alphaMode: 'premultiplied',
         });
 
         // Tworzymy shader module
-        this.module = GPU.CreateShaderModule({ code: this.code });
+        _this.shaderModule = GPU.CreateShaderModule({ code: _this.code });
 
-        // Tworzymy pipeline
-        this.pipeline = device.createRenderPipeline({
-            label: 'shader pipeline',
-            layout: this.settings.layout,
-            vertex: {
-                module: this.module,
-                entryPoint: 'vs',
-                buffers: this.renderPipelineBuffers
-            },
-            // fragment: {
-            //     module: this.module,
-            //     entryPoint: 'fs',
-            //     targets: [
-            //         { format: presentationFormat, }
-            //     ],
-            // },
-            fragment: {
-                module: this.module,
-                entryPoint: "fs",
-                targets: [
-                    { format: "rgba16float" }, // color
-                ]
-            },
-            primitive: {
-                cullMode: this.settings.cullMode,
-                frontFace: this.settings.frontFace,
-            },
-            // depthStencil: {
-            //     depthWriteEnabled: this.settings.depthWriteEnabled,
-            //     depthCompare: this.settings.depthCompare,
-            //     format: this.settings.format,
-            // },
-            depthStencil: {
-                format: "depth24plus",
-                depthWriteEnabled: true,
-                depthCompare: "less"
-            }
-        });
+        if (_this.code.indexOf('fn gBufferRenderPass') !== -1) {
+            _this.renderPipelines['gBufferRenderPass'] = GPU.CreateRenderPipeline({
+                layout: "auto",
+                vertex: {
+                    module: _this.shaderModule,
+                    entryPoint: "vs",
+                    buffers: [
+                        {
+                            arrayStride: (3 + 3 + 3 + 2) * 4, // position + normal + color + uv
+                            attributes: [
+                                { shaderLocation: 0, offset: 0, format: 'float32x3' },       // position
+                                { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' },   // normal
+                                { shaderLocation: 2, offset: 6 * 4, format: 'float32x3' },   // color
+                                { shaderLocation: 3, offset: 9 * 4, format: 'float32x2' },   // uv
+                            ],
+                        },
+                    ],
+                },
+                fragment: {
+                    module: _this.shaderModule,
+                    entryPoint: "gBufferRenderPass",
+                    targets: [
+                        { format: "rgba16float" }, // screenPositionTexture
+                        { format: "rgba16float" }, // screenNormalTexture
+                        { format: "rgba16float" }, // screenTangentTexture
+
+                        { format: "rgba16float" }, // colorTexture
+                        { format: "rgba16float" }, // normalTexture
+                        { format: "rgba16float" }, // emisssionTexture
+                        { format: "rgba16float" }, // pbrTexture
+
+                        { format: "rgba16float" }, // depthTExture
+                    ]
+                },
+                depthStencil: {
+                    format: "depth24plus",
+                    depthWriteEnabled: true,
+                    depthCompare: "less"
+                },
+                primitive: {
+                    cullMode: 'none',
+                    frontFace: 'ccw',
+                },
+            });
+        }
+
+        if (_this.code.indexOf('fn shadowRenderPass') !== -1) {
+
+        }
+
+        if (_this.code.indexOf('fn lightingRenderPass') !== -1) {
+
+        }
+
+        if (_this.code.indexOf('fn forwardRenderPass') !== -1) {
+            _this.renderPipelines['forwardRenderPass'] = GPU.CreateRenderPipeline({
+                layout: "auto",
+                vertex: {
+                    module: _this.shaderModule,
+                    entryPoint: "vs",
+                    buffers: [
+                        {
+                            arrayStride: (3 + 3 + 3 + 2) * 4, // position + normal + color + uv
+                            attributes: [
+                                { shaderLocation: 0, offset: 0, format: 'float32x3' },       // position
+                                { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' },   // normal
+                                { shaderLocation: 2, offset: 6 * 4, format: 'float32x3' },   // color
+                                { shaderLocation: 3, offset: 9 * 4, format: 'float32x2' },   // uv
+                            ],
+                        },
+                    ],
+                },
+                fragment: {
+                    module: _this.shaderModule,
+                    entryPoint: "forwardRenderPass",
+                    targets: [
+                        { format: "rgba16float" }, // colorTexture
+
+                        { format: "rgba16float" }, // depthTexture
+                    ]
+                },
+                depthStencil: {
+                    format: "depth24plus",
+                    depthWriteEnabled: true,
+                    depthCompare: "less"
+                },
+                primitive: {
+                    cullMode: 'back',
+                    frontFace: 'ccw',
+                },
+            });
+        }
     }
 
 }
