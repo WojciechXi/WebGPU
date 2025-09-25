@@ -8,9 +8,6 @@ class Material {
         this.metallic = 0;
         this.ambientOcclusion = 0;
 
-        this._diffuse = null;
-        this._texture = null;
-
         const uniformSize = 16 + 16 + 16 + 4 + 4; // modelMatrix, viewMatrix, projectionMatrix, color, pbr
         this.uniformValues = new Float32Array(uniformSize);
         this.uniformBuffer = GPU.CreateBuffer({
@@ -27,33 +24,32 @@ class Material {
             mipmapFilter: 'linear',
         });
 
-        this.diffuse = null;
+        this.albedo = null;
     }
 
-    get diffuse() {
-        return this._diffuse;
+    get albedo() {
+        return this._albedo;
     }
-    set diffuse(diffuse) {
-        this._diffuse = diffuse;
 
-        const width = this._diffuse ? this._diffuse.width : 1;
-        const height = this._diffuse ? this._diffuse.height : 1;
+    set albedo(albedo) {
+        const width = albedo ? albedo.width : 1;
+        const height = albedo ? albedo.height : 1;
 
-        this._texture = GPU.CreateTexture({
+        this._albedo = GPU.CreateTexture({
             size: [width, height, 1],
             format: 'rgba8unorm',
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
         });
 
-        if (diffuse) {
+        if (albedo) {
             GPU.Queue.copyExternalImageToTexture(
-                { source: diffuse },
-                { texture: this._texture },
+                { source: albedo },
+                { texture: this._albedo },
                 [width, height, 1]
             );
         } else {
             GPU.Queue.writeTexture(
-                { texture: this._texture },
+                { texture: this._albedo },
                 new Uint8Array([255, 255, 255, 255]),
                 { bytesPerRow: width * 4 },
                 { width, height, depthOrArrayLayers: 1 }
@@ -69,7 +65,7 @@ class Material {
                 entries: [
                     { binding: 0, resource: { buffer: this.uniformBuffer } },
                     { binding: 1, resource: this.sampler },
-                    { binding: 2, resource: this._texture.createView() },
+                    { binding: 2, resource: this.albedo.createView() },
                 ],
             }));
 

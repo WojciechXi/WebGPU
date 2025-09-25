@@ -56,12 +56,12 @@ class Importer {
                     l = l.split('/');
 
                     let vertexIndex = parseInt(l[0]) - 1;
-                    let normalIndex = parseInt(l[2]) - 1;
                     let uvIndex = parseInt(l[1]) - 1;
+                    let normalIndex = parseInt(l[2]) - 1;
 
                     mesh.vertices.push(vertices[vertexIndex]);
-                    mesh.normals.push(normals[normalIndex]);
                     mesh.uvs.push(uvs[uvIndex]);
+                    mesh.normals.push(normals[normalIndex]);
                     mesh.triangles.push(mesh.vertices.length - 1);
                 }
             }
@@ -73,7 +73,7 @@ class Importer {
             mesh = null;
         }
 
-        console.log(lines);
+        console.log(uvs);
         console.log(meshes);
 
         callback(meshes);

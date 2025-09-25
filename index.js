@@ -48,27 +48,27 @@ window.addEventListener('load', async function (event) {
             const unlit2Material = new Material(unlitShader);
 
             loadBitmap('/Assets/Images/Stack of Bricks/Albedo.jpg', function (bitmap) {
-                stackOfBricksMaterial.diffuse = bitmap;
+                stackOfBricksMaterial.albedo = bitmap;
             });
 
             loadBitmap('/Assets/Images/U702 PMST9.jpg', function (bitmap) {
-                u702pmst9Material.diffuse = bitmap;
+                u702pmst9Material.albedo = bitmap;
             });
 
             loadBitmap('/Assets/Images/D1038 BS BETON MILLENIUM.jpg', function (bitmap) {
-                concreteMaterial.diffuse = bitmap;
+                concreteMaterial.albedo = bitmap;
             });
 
             loadBitmap('/Assets/Images/WoodFloor057_1K-JPG_Color.jpg', function (bitmap) {
-                floorMaterial.diffuse = bitmap;
+                floorMaterial.albedo = bitmap;
             });
 
             loadBitmap('/Assets/Images/D3025 OW DAB SONOMA.jpg', function (bitmap) {
-                sonomaMaterial.diffuse = bitmap;
+                sonomaMaterial.albedo = bitmap;
             });
 
             loadBitmap('/Assets/Images/D4428_OV_Dąb_naturalny.jpg', function (bitmap) {
-                unlit2Material.diffuse = bitmap;
+                unlit2Material.albedo = bitmap;
             });
 
             const materials = {
