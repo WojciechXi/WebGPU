@@ -38,7 +38,7 @@ fn vs(vert: Vertex) -> VSOut {
   let viewPos  = uni.viewMatrix * worldPos;
 
   vsOut.position = uni.projectionMatrix * viewPos;
-  vsOut.normal   = (uni.modelMatrix * vec4f(vert.normal, 0.0)).xyz;
+  vsOut.normal   = (uni.viewMatrix * uni.modelMatrix * vec4f(vert.normal, 0.0)).xyz;
   vsOut.viewPos  = viewPos.xyz;
   vsOut.worldPos = worldPos.xyz;
   vsOut.uv = vert.uv;
@@ -67,7 +67,7 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
 
   let color = uni.color;
   let albedo = textureSample(albedo, textureSampler, vsOut.uv);
-  let viewNormal = normalize((uni.viewMatrix * vec4f(vsOut.normal, 0.0)).xyz);
+  let viewNormal = normalize(vec4f(vsOut.normal, 0.0).xyz);
 
   gBufferRenderPass.screenPositionOut = vec4f(vsOut.viewPos, 1.0);
   gBufferRenderPass.screenNormalOut = vec4f(viewNormal, 0.0);

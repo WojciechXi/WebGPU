@@ -43,12 +43,12 @@ class FinalRenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: clearRenderPass.colorTexture.createView() },
-                { binding: 2, resource: lightingRenderPass.lightingTexture.createView() },
-                { binding: 3, resource: gBufferRenderPass.depthTexture.createView() },
-                { binding: 4, resource: forwardRenderPass.colorTexture.createView() },
-                { binding: 5, resource: forwardRenderPass.depthTexture.createView() },
-                { binding: 6, resource: ssaoRenderPass.ssaoTexture.createView() },
+                { binding: 1, resource: clearRenderPass.colorTextureView },
+                { binding: 2, resource: lightingRenderPass.lightingTextureView },
+                { binding: 3, resource: gBufferRenderPass.depthTextureView },
+                { binding: 4, resource: forwardRenderPass.colorTextureView },
+                { binding: 5, resource: forwardRenderPass.depthTextureView },
+                { binding: 6, resource: ssaoRenderPass.ssaoTextureView },
                 { binding: 7, resource: this.sampler },
             ],
         });

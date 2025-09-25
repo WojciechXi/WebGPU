@@ -8,6 +8,7 @@ class ShadowRenderPass extends RenderPass {
             format: "depth24plus",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
+        this.shadowTextureView = this.shadowTexture.createView();
 
         this.uniformValues = new Float32Array(16);
         this.uniformBuffer = GPU.CreateBuffer({
@@ -51,7 +52,7 @@ class ShadowRenderPass extends RenderPass {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [], // brak, tylko depth
             depthStencilAttachment: {
-                view: this.shadowTexture.createView(),
+                view: this.shadowTextureView,
                 depthClearValue: 1.0,
                 depthLoadOp: "clear",
                 depthStoreOp: "store"

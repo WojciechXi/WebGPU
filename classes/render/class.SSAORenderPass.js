@@ -26,12 +26,13 @@ class SSAORenderPass extends RenderPass {
             noise[i * 4 + 2] = 0;
             noise[i * 4 + 3] = 0;
         }
-        const noiseTex = GPU.CreateTexture({
+        this.noiseTexture = GPU.CreateTexture({
             size: [4, 4, 1],
             format: "rgba16float",
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
         });
-        GPU.Queue.writeTexture({ texture: noiseTex }, noise, { bytesPerRow: 4 * 16 }, [4, 4, 1]);
+        this.noiseTextureView = this.noiseTexture.createView();
+        GPU.Queue.writeTexture({ texture: this.noiseTexture }, noise, { bytesPerRow: 4 * 16 }, [4, 4, 1]);
 
         this.ssaoKernel = this.GenerateKernel(64);
 
@@ -48,6 +49,7 @@ class SSAORenderPass extends RenderPass {
             format: "rgba8unorm",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
+        this.ssaoTextureView = this.ssaoTexture.createView();
 
         this.sampler = GPU.CreateSampler({
             addressModeU: 'repeat',
@@ -66,10 +68,10 @@ class SSAORenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: gBufferRenderPass.screenPositionTexture.createView() },
-                { binding: 2, resource: gBufferRenderPass.screenNormalTexture.createView() },
+                { binding: 1, resource: gBufferRenderPass.screenPositionTextureView },
+                { binding: 2, resource: gBufferRenderPass.screenNormalTextureView },
                 { binding: 3, resource: this.sampler },
-                { binding: 4, resource: noiseTex.createView() },
+                { binding: 4, resource: this.noiseTextureView },
                 { binding: 5, resource: this.noiseSampler },
             ],
         });
@@ -79,7 +81,7 @@ class SSAORenderPass extends RenderPass {
         this.uniformValues.set(Camera.main.projectionMatrix, 4);
 
         const renderPass = commandEncoder.beginRenderPass({
-            colorAttachments: [{ view: this.ssaoTexture.createView(), loadOp: "clear", storeOp: "store" }]
+            colorAttachments: [{ view: this.ssaoTextureView, loadOp: "clear", storeOp: "store" }]
         });
 
         renderPass.setPipeline(this.renderPipeline);

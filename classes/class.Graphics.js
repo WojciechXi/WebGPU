@@ -76,7 +76,8 @@ class Graphics {
             code: assets.shaders['debugRenderPass.wgsl'],
             canvas: canvas,
         });
-        this.debugRenderPass.texture = this.clearRenderPass.colorTexture;
+
+        // this.debugRenderPass.texture = this.gBufferRenderPass.screenNormalTexture;
 
         // const debugDepthRenderPass = this.debugDepthRenderPass = new DebugDepthRenderPass({
         //     name: 'debugDepthRenderPass',
@@ -103,7 +104,7 @@ class Graphics {
         this.forwardRenderPass.Render(engine, commandEncoder);
         this.ssaoRenderPass.Render(engine, commandEncoder);
         this.finalRenderPass.Render(engine, commandEncoder);
-        // this.debugRenderPass.Render(engine, commandEncoder);
+        this.debugRenderPass.Render(engine, commandEncoder);
         // this.debugDepthRenderPass.Render(engine, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);

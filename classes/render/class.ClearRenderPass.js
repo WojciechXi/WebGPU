@@ -8,6 +8,7 @@ class ClearRenderPass extends RenderPass {
             format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
+        this.colorTextureView = this.colorTexture.createView();
 
         this.uniformValues = new Float32Array(4);
         this.uniformBuffer = GPU.CreateBuffer({
@@ -44,7 +45,7 @@ class ClearRenderPass extends RenderPass {
 
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                { view: this.colorTexture.createView(), loadOp: "clear", storeOp: "store" },
+                { view: this.colorTextureView, loadOp: "clear", storeOp: "store" },
             ],
         });
 

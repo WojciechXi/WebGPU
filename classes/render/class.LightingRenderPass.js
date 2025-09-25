@@ -9,6 +9,7 @@ class LightingRenderPass extends RenderPass {
             format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
+        this.lightingTextureView = this.lightingTexture.createView();
 
         this.uniformValues = new Float32Array(4 + 4 + 4);
         this.uniformBuffer = GPU.CreateBuffer({
@@ -35,10 +36,10 @@ class LightingRenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: gBufferRenderPass.screenPositionTexture.createView() },
-                { binding: 2, resource: gBufferRenderPass.screenNormalTexture.createView() },
-                { binding: 3, resource: gBufferRenderPass.colorTexture.createView() },
-                { binding: 4, resource: gBufferRenderPass.pbrTexture.createView() },
+                { binding: 1, resource: gBufferRenderPass.screenPositionTextureView },
+                { binding: 2, resource: gBufferRenderPass.screenNormalTextureView },
+                { binding: 3, resource: gBufferRenderPass.colorTextureView },
+                { binding: 4, resource: gBufferRenderPass.pbrTextureView },
             ],
         });
     }
@@ -50,7 +51,7 @@ class LightingRenderPass extends RenderPass {
 
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                { view: this.lightingTexture.createView(), loadOp: "clear", storeOp: "store" }
+                { view: this.lightingTextureView, loadOp: "clear", storeOp: "store" }
             ],
         });
 
