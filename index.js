@@ -27,6 +27,8 @@ window.addEventListener('load', async function (event) {
             const glassMaterial = new Material(glassShader);
             glassMaterial.color.Set(0, 0, 0, 0.5);
 
+            const stackOfBricksMaterial = new Material(unlitShader);
+
             const whiteMaterial = new Material(unlitShader);
             const blackMaterial = new Material(unlitShader);
             blackMaterial.color.Set(0, 0, 0, 1);
@@ -44,6 +46,10 @@ window.addEventListener('load', async function (event) {
 
             const sonomaMaterial = new Material(unlitShader);
             const unlit2Material = new Material(unlitShader);
+
+            loadBitmap('/Assets/Images/Stack of Bricks/Albedo.jpg', function (bitmap) {
+                stackOfBricksMaterial.diffuse = bitmap;
+            });
 
             loadBitmap('/Assets/Images/U702 PMST9.jpg', function (bitmap) {
                 u702pmst9Material.diffuse = bitmap;
@@ -67,6 +73,7 @@ window.addEventListener('load', async function (event) {
 
             const materials = {
                 // Glass: glassMaterial,
+                Stack_of_Bricks: stackOfBricksMaterial,
 
                 White_Glossy: whiteMaterial,
                 Plastic: whiteMaterial,
@@ -117,7 +124,7 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.Obj(assets.models['Krakow.obj'], function (meshes) {
+            Importer.Obj(assets.models['Stack of Bricks.obj'], function (meshes) {
                 for (const mesh of meshes) {
                     if (mesh.triangles.length % 3 != 0) continue;
                     const cubeGameObject = new GameObject('Cube');
