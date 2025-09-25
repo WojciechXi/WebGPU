@@ -122,6 +122,7 @@ window.addEventListener('load', async function (event) {
                     if (mesh.triangles.length % 3 != 0) continue;
                     const cubeGameObject = new GameObject('Cube');
                     const meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
+                    // meshRenderer.transform.rotation = Quaternion.FromEuler(0, 0, 0);
                     meshRenderer.material = materials[mesh.name] ?? whiteMaterial;
                     meshRenderer.mesh = mesh;
                     if (Object.keys(materials).indexOf(mesh.name) === -1) console.log(mesh.name);

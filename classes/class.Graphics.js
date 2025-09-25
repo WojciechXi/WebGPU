@@ -77,7 +77,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        // this.debugRenderPass.texture = this.gBufferRenderPass.screenNormalTexture;
+        this.debugRenderPass.texture = this.gBufferRenderPass.screenPositionTexture;
 
         // const debugDepthRenderPass = this.debugDepthRenderPass = new DebugDepthRenderPass({
         //     name: 'debugDepthRenderPass',
@@ -99,11 +99,11 @@ class Graphics {
 
         this.clearRenderPass.Render(engine, commandEncoder);
         this.gBufferRenderPass.Render(engine, commandEncoder);
-        this.shadowRenderPass.Render(engine, commandEncoder);
-        this.lightingRenderPass.Render(engine, commandEncoder);
-        this.forwardRenderPass.Render(engine, commandEncoder);
-        this.ssaoRenderPass.Render(engine, commandEncoder);
-        this.finalRenderPass.Render(engine, commandEncoder);
+        // this.shadowRenderPass.Render(engine, commandEncoder);
+        // this.lightingRenderPass.Render(engine, commandEncoder);
+        // this.forwardRenderPass.Render(engine, commandEncoder);
+        // this.ssaoRenderPass.Render(engine, commandEncoder);
+        // this.finalRenderPass.Render(engine, commandEncoder);
         this.debugRenderPass.Render(engine, commandEncoder);
         // this.debugDepthRenderPass.Render(engine, commandEncoder);
 
