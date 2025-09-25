@@ -27,15 +27,15 @@ class Graphics {
             canvas: canvas,
         });
 
-        const gBufferRenderPass = this.gBufferRenderPass = new GBufferRenderPass({
-            name: 'gBufferRenderPass',
-            code: assets.shaders['gBufferRenderPass.wgsl'],
-            canvas: canvas,
-        });
-
         const shadowRenderPass = this.shadowRenderPass = new ShadowRenderPass({
             name: 'shadowRenderPass',
             code: assets.shaders['shadowRenderPass.wgsl'],
+            canvas: canvas,
+        });
+
+        const gBufferRenderPass = this.gBufferRenderPass = new GBufferRenderPass({
+            name: 'gBufferRenderPass',
+            code: assets.shaders['gBufferRenderPass.wgsl'],
             canvas: canvas,
         });
 
@@ -107,8 +107,8 @@ class Graphics {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
         this.clearRenderPass.Render(engine, commandEncoder);
-        this.gBufferRenderPass.Render(engine, commandEncoder);
         this.shadowRenderPass.Render(engine, commandEncoder);
+        this.gBufferRenderPass.Render(engine, commandEncoder);
         this.lightingRenderPass.Render(engine, commandEncoder);
         this.forwardRenderPass.Render(engine, commandEncoder);
         this.ssaoRenderPass.Render(engine, commandEncoder);
