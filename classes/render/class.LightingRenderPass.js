@@ -2,6 +2,7 @@ class LightingRenderPass extends RenderPass {
 
     Init(data) {
         const canvas = data.canvas;
+        const shadowRenderPass = data.shadowRenderPass;
         const gBufferRenderPass = data.gBufferRenderPass;
 
         this.lightingTexture = GPU.CreateTexture({
@@ -36,10 +37,11 @@ class LightingRenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: gBufferRenderPass.screenPositionTextureView },
-                { binding: 2, resource: gBufferRenderPass.screenNormalTextureView },
-                { binding: 3, resource: gBufferRenderPass.colorTextureView },
-                { binding: 4, resource: gBufferRenderPass.pbrTextureView },
+                { binding: 1, resource: shadowRenderPass.depthTextureView },
+                { binding: 2, resource: gBufferRenderPass.screenPositionTextureView },
+                { binding: 3, resource: gBufferRenderPass.screenNormalTextureView },
+                { binding: 4, resource: gBufferRenderPass.colorTextureView },
+                { binding: 5, resource: gBufferRenderPass.pbrTextureView },
             ],
         });
     }

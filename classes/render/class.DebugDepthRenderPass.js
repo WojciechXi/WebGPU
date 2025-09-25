@@ -1,6 +1,8 @@
 class DebugDepthRenderPass extends RenderPass {
 
     Init(data) {
+        this._textureView = null;
+
         const canvas = data.canvas;
 
         this.renderPipeline = GPU.CreateRenderPipeline({
@@ -22,27 +24,28 @@ class DebugDepthRenderPass extends RenderPass {
 
         this._texture = null;
 
-        this.depthSampler = GPU.CreateSampler({
-            compare: 'less',
-            minFilter: 'linear',
-            magFilter: 'linear',
+        this.sampler = GPU.CreateSampler({
+            magFilter: "linear",
+            minFilter: "linear",
+            addressModeU: "clamp-to-edge",
+            addressModeV: "clamp-to-edge",
         });
 
         this.bindGroup = null;
     }
 
-    get texture() {
-        return this._texture;
+    get textureView() {
+        return this._textureView;
     }
 
-    set texture(value) {
-        this._texture = value;
+    set textureView(textureView) {
+        this._textureView = textureView;
 
-        this.bindGroup = this._texture ? GPU.CreateBindGroup({
+        this.bindGroup = this._textureView ? GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this._texture.createView() },
-                { binding: 1, resource: this.depthSampler },
+                { binding: 0, resource: this._textureView },
+                { binding: 1, resource: this.sampler },
             ],
         }) : null;
     }

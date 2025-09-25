@@ -29,7 +29,6 @@ class Graphics {
 
         const shadowRenderPass = this.shadowRenderPass = new ShadowRenderPass({
             name: 'shadowRenderPass',
-            code: assets.shaders['shadowRenderPass.wgsl'],
             canvas: canvas,
         });
 
@@ -42,6 +41,7 @@ class Graphics {
         const lightingRenderPass = this.lightingRenderPass = new LightingRenderPass({
             name: 'lightingRenderPass',
             code: assets.shaders['lightingRenderPass.wgsl'],
+            shadowRenderPass: shadowRenderPass,
             gBufferRenderPass: gBufferRenderPass,
             canvas: canvas,
         });
@@ -86,14 +86,14 @@ class Graphics {
             canvas: canvas,
         });
 
-        this.debugRenderPass.textureView = this.ssaoRenderPass.ssaoTextureView;
+        this.debugRenderPass.textureView = this.shadowRenderPass.depthTextureView;
 
-        // const debugDepthRenderPass = this.debugDepthRenderPass = new DebugDepthRenderPass({
-        //     name: 'debugDepthRenderPass',
-        //     code: assets.shaders['debugDepthRenderPass.wgsl'],
-        //     canvas: canvas,
-        // });
-        // this.debugDepthRenderPass.texture = this.gBufferRenderPass.depthStencilTexture;
+        const debugDepthRenderPass = this.debugDepthRenderPass = new DebugDepthRenderPass({
+            name: 'debugDepthRenderPass',
+            code: assets.shaders['debugDepthRenderPass.wgsl'],
+            canvas: canvas,
+        });
+        this.debugDepthRenderPass.textureView = this.shadowRenderPass.shadowTextureView;
 
         callback();
     }

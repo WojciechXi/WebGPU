@@ -30,7 +30,7 @@ class MeshRenderer extends Component {
         if (!this.mesh || !this.material) return;
 
         if (renderPass.name === 'shadowRenderPass') {
-            if (this.castShadows) {
+            if (this.castShadows && this.material.Use(renderPass, this.transform.matrix4x4, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix)) {
                 renderPass.SetVertexBuffer(0, this._vertexBuffer);
                 renderPass.Draw(this.mesh.triangles.length);
             }

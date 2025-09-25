@@ -5,10 +5,11 @@ struct Uniforms {
 };
 
 @group(0) @binding(0) var<uniform> uni : Uniforms;
-@group(0) @binding(1) var positionTexure : texture_2d<f32>;
-@group(0) @binding(2) var normalTexture : texture_2d<f32>;
-@group(0) @binding(3) var colorTexture : texture_2d<f32>;
-@group(0) @binding(4) var pbrTexture : texture_2d<f32>;
+@group(0) @binding(1) var shadowTexture : texture_2d<f32>;
+@group(0) @binding(2) var positionTexure : texture_2d<f32>;
+@group(0) @binding(3) var normalTexture : texture_2d<f32>;
+@group(0) @binding(4) var colorTexture : texture_2d<f32>;
+@group(0) @binding(5) var pbrTexture : texture_2d<f32>;
 
 @vertex
 fn vs(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4<f32> {
@@ -27,10 +28,11 @@ fn vs(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4<f32> 
 @fragment
 fn fs(@builtin(position) fragCoord : vec4<f32>) -> @location(0) vec4<f32> {
     // Odczyt z G-buffer
-    let albedo   = textureLoad(colorTexture,   vec2<i32>(fragCoord.xy), 0).rgb;
-    let normal = textureLoad(normalTexture,   vec2<i32>(fragCoord.xy), 0).xyz;
+    let shadow = textureLoad(shadowTexture, vec2<i32>(fragCoord.xy), 0);
+    let albedo = textureLoad(colorTexture, vec2<i32>(fragCoord.xy), 0).rgb;
+    let normal = textureLoad(normalTexture, vec2<i32>(fragCoord.xy), 0).xyz;
     let pos_view = textureLoad(positionTexure, vec2<i32>(fragCoord.xy), 0).xyz;
-    let pbr      = textureLoad(pbrTexture,      vec2<i32>(fragCoord.xy), 0).rgb;
+    let pbr = textureLoad(pbrTexture, vec2<i32>(fragCoord.xy), 0).rgb;
 
     let N = normalize(normal);
     let L = normalize(-uni.lightDirection);

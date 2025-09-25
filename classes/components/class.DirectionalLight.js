@@ -1,15 +1,24 @@
 class DirectionalLight extends Component {
 
     Init() {
+        if (DirectionalLight.main == null) DirectionalLight.main = this;
+
         this.color = Color.white;
+
+        this.viewMatrix = Matrix4x4.Identity();
+        this.projectionMatrix = Matrix4x4.Identity();
+        this.viewProjectionMatrix = Matrix4x4.Identity();
+        this.inverseViewProjectionMatrix = Matrix4x4.Identity();
     }
 
     Update() {
-        Matrix4x4.Ortho(-128, 128, -128, 128, 0.1, 1000, Graphics.lightViewProjectionMatrix);
-        Matrix4x4.Multiply(Graphics.lightViewProjectionMatrix, this.transform.matrix4x4);
-
         Graphics.lightDirection = this.transform.down;
         Graphics.lightColor = this.color;
+
+        Matrix4x4.Inverse(this.transform.matrix4x4, this.viewMatrix);
+        Matrix4x4.Ortho(-16, 16, -16, 16, 0.1, 100, this.projectionMatrix);
+        Matrix4x4.Multiply(this.viewMatrix, this.projectionMatrix, this.viewProjectionMatrix);
+        Matrix4x4.Inverse(this.viewProjectionMatrix, this.inverseViewProjectionMatrix);
     }
 
 }

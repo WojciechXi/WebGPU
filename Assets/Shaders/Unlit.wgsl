@@ -93,6 +93,24 @@ fn vs(vert: Vertex) -> VSOut {
   return vsOut;
 }
 
+//shadowRenderPass
+
+struct ShadowRenderPass {
+  @location(0) depthOut : vec4f,
+}
+
+@fragment
+fn shadowRenderPass(vsOut: VSOut) -> ShadowRenderPass {
+  var shadowRenderPass: ShadowRenderPass;
+
+  let color = uni.color;
+  let albedo = textureSample(albedo, textureSampler, vsOut.uv);
+
+  shadowRenderPass.depthOut = vec4f(vsOut.viewPosition.z, 0.0, 0.0, 1.0);
+
+  return shadowRenderPass;
+}
+
 //gBufferRenderPass
 
 struct GBufferRenderPass {

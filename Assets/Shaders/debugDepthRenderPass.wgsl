@@ -18,10 +18,11 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
 }
 
 @group(0) @binding(0) var depthTexture: texture_depth_2d;
-@group(0) @binding(1) var depthSampler: sampler_comparison;
+@group(0) @binding(1) var depthSampler: sampler;
 
 @fragment
-fn fs(in: VSOut) -> @location(0) vec4f {
-    var depth = textureSampleCompare(depthTexture, depthSampler, in.uv, 0.5);
-    return vec4f(depth, 0, 0, 1.0);
+fn fs(vsOut: VSOut) -> @location(0) vec4f {
+    let uv = vsOut.pos.xy / vec2f(800, 600); // 0-1
+    let d = textureSample(depthTexture, depthSampler, uv); // daje float w [0,1]
+    return vec4f(vec3(d), 1.0);
 }
