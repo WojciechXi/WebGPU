@@ -86,8 +86,8 @@ fn vs(vert: Vertex) -> VSOut {
   vsOut.worldPosition = worldPosition;
   vsOut.viewPosition = viewPosition;
 
-  let normalMatrix = transpose3(inverse3(mat3_from_mat4(modelMatrix)));
-  vsOut.normal = normalize(normalMatrix * vert.normal) * 0.5 + vec3f(0.5);
+  let normalMatrix = transpose3(inverse3(mat3_from_mat4(viewMatrix * modelMatrix)));
+  vsOut.normal = normalize(normalMatrix * vert.normal);
   vsOut.uv = vert.uv;
 
   return vsOut;
@@ -115,7 +115,7 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   let color = uni.color;
   let albedo = textureSample(albedo, textureSampler, vsOut.uv);
 
-  gBufferRenderPass.screenPositionOut = vec4f(vsOut.clipPosition.xyz / vsOut.clipPosition.w, 1.0);
+  gBufferRenderPass.screenPositionOut = vec4f(vsOut.viewPosition, 1.0);
   gBufferRenderPass.screenNormalOut = vec4f(vsOut.normal, 0.0);
   gBufferRenderPass.screenTangentOut = vec4f(1.0, 0.5, 0.0, 1.0);
 

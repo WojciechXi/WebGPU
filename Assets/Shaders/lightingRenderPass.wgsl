@@ -28,11 +28,11 @@ fn vs(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4<f32> 
 fn fs(@builtin(position) fragCoord : vec4<f32>) -> @location(0) vec4<f32> {
     // Odczyt z G-buffer
     let albedo   = textureLoad(colorTexture,   vec2<i32>(fragCoord.xy), 0).rgb;
-    let normal01 = textureLoad(normalTexture,   vec2<i32>(fragCoord.xy), 0).xyz;
+    let normal = textureLoad(normalTexture,   vec2<i32>(fragCoord.xy), 0).xyz;
     let pos_view = textureLoad(positionTexure, vec2<i32>(fragCoord.xy), 0).xyz;
     let pbr      = textureLoad(pbrTexture,      vec2<i32>(fragCoord.xy), 0).rgb;
 
-    let N = normalize(normal01 * 2.0 - 1.0);
+    let N = normalize(normal);
     let L = normalize(-uni.lightDirection);
     let V = normalize(-pos_view);
     let H = normalize(L + V);

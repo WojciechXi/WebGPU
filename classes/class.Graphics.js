@@ -58,6 +58,15 @@ class Graphics {
             code: assets.shaders['ssaoRenderPass.wgsl'],
             gBufferRenderPass: gBufferRenderPass,
             canvas: canvas,
+            radius: 0.25,
+            bias: 0.025,
+        });
+
+        const ssaoBlurRenderPass = this.ssaoBlurRenderPass = new SSAOBlurRenderPass({
+            name: 'ssaoBlurRenderPass',
+            code: assets.shaders['ssaoBlurRenderPass.wgsl'],
+            ssaoRenderPass: ssaoRenderPass,
+            canvas: canvas,
         });
 
         const finalRenderPass = this.finalRenderPass = new FinalRenderPass({
@@ -77,7 +86,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        this.debugRenderPass.textureView = this.gBufferRenderPass.colorTextureView;
+        this.debugRenderPass.textureView = this.ssaoRenderPass.ssaoTextureView;
 
         // const debugDepthRenderPass = this.debugDepthRenderPass = new DebugDepthRenderPass({
         //     name: 'debugDepthRenderPass',
@@ -97,14 +106,15 @@ class Graphics {
     static Render(engine) {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-        // this.clearRenderPass.Render(engine, commandEncoder);
+        this.clearRenderPass.Render(engine, commandEncoder);
         this.gBufferRenderPass.Render(engine, commandEncoder);
-        // this.shadowRenderPass.Render(engine, commandEncoder);
-        // this.lightingRenderPass.Render(engine, commandEncoder);
-        // this.forwardRenderPass.Render(engine, commandEncoder);
-        // this.ssaoRenderPass.Render(engine, commandEncoder);
-        // this.finalRenderPass.Render(engine, commandEncoder);
-        this.debugRenderPass.Render(engine, commandEncoder);
+        this.shadowRenderPass.Render(engine, commandEncoder);
+        this.lightingRenderPass.Render(engine, commandEncoder);
+        this.forwardRenderPass.Render(engine, commandEncoder);
+        this.ssaoRenderPass.Render(engine, commandEncoder);
+        this.ssaoBlurRenderPass.Render(engine, commandEncoder);
+        this.finalRenderPass.Render(engine, commandEncoder);
+        // this.debugRenderPass.Render(engine, commandEncoder);
         // this.debugDepthRenderPass.Render(engine, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);

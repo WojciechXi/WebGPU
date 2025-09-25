@@ -1,6 +1,9 @@
 class SSAORenderPass extends RenderPass {
 
     Init(data) {
+        this.radius = data.radius ?? 0.5;
+        this.bias = data.bias ?? 0.025;
+
         const canvas = data.canvas;
         const gBufferRenderPass = data.gBufferRenderPass;
 
@@ -14,7 +17,7 @@ class SSAORenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: "rgba8unorm" }
+                    { format: "rgba16float" }
                 ]
             },
         });
@@ -36,9 +39,9 @@ class SSAORenderPass extends RenderPass {
 
         this.ssaoKernel = this.GenerateKernel(64);
 
-        this.uniformValues = new Float32Array(4 + 16 + this.ssaoKernel.length);
-        this.uniformValues.set([0.1, 0.025, canvas.width, canvas.height]); //radius / bias / screen size
-        this.uniformValues.set(this.ssaoKernel, 20);
+        this.uniformValues = new Float32Array(4 + 16 + 16 + this.ssaoKernel.length);
+        this.uniformValues.set([this.radius, this.bias, canvas.width, canvas.height]); //radius / bias / screen size
+        this.uniformValues.set(this.ssaoKernel, 36);
         this.uniformBuffer = GPU.CreateBuffer({
             size: this.uniformValues.length * 4,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
@@ -46,7 +49,7 @@ class SSAORenderPass extends RenderPass {
 
         this.ssaoTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
-            format: "rgba8unorm",
+            format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.ssaoTextureView = this.ssaoTexture.createView();
@@ -78,7 +81,9 @@ class SSAORenderPass extends RenderPass {
     }
 
     Render(engine, commandEncoder) {
-        this.uniformValues.set(Camera.main.projectionMatrix, 4);
+        this.uniformValues.set([this.radius, this.bias]);
+        this.uniformValues.set(Camera.main.viewMatrix, 4);
+        this.uniformValues.set(Camera.main.projectionMatrix, 20);
 
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [{ view: this.ssaoTextureView, loadOp: "clear", storeOp: "store" }]

@@ -36,6 +36,7 @@
     <script src="./classes/render/class.LightingRenderPass.js"></script>
     <script src="./classes/render/class.ForwardRenderPass.js"></script>
     <script src="./classes/render/class.SSAORenderPass.js"></script>
+    <script src="./classes/render/class.SSAOBlurRenderPass.js"></script>
     <script src="./classes/render/class.FinalRenderPass.js"></script>
     <script src="./classes/render/class.DebugRenderPass.js"></script>
     <script src="./classes/render/class.DebugDepthRenderPass.js"></script>

@@ -105,7 +105,7 @@ window.addEventListener('load', async function (event) {
             };
 
             const ambientLight = engine.scene.AddComponent(AmbientLight);
-            ambientLight.color.Set(0.95, 0.975, 1, 0.8);
+            ambientLight.color.Set(0.95, 0.975, 1, 0.4);
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
             directionalLightGameObject.transform.position = new Vector3(0, 10, 0);
