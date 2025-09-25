@@ -3,13 +3,15 @@ class Material {
     constructor(shader) {
         this.shader = shader;
         this.color = Color.white;
+
         this.smoothness = 0;
         this.metallic = 0;
         this.ambientOcclusion = 0;
+
         this._diffuse = null;
         this._texture = null;
 
-        const uniformSize = 16 * 4 + 4 + 4; // movelMatrix, viewMatrix, projectionMatrix, viewProjectionMatrix, color, pbr
+        const uniformSize = 16 + 16 + 16 + 4 + 4; // modelMatrix, viewMatrix, projectionMatrix, color, pbr
         this.uniformValues = new Float32Array(uniformSize);
         this.uniformBuffer = GPU.CreateBuffer({
             label: 'uniform buffer',
@@ -59,7 +61,7 @@ class Material {
         }
     }
 
-    Use(renderPass, modelMatrix, viewMatrix, projectionMatrix, viewProjectionMatrix) {
+    Use(renderPass, modelMatrix, viewMatrix, projectionMatrix) {
         let renderPipeline = this.shader.Use(renderPass);
         if (renderPipeline) {
             renderPass.SetBindGroup(0, GPU.CreateBindGroup({
@@ -74,9 +76,8 @@ class Material {
             this.uniformValues.set(modelMatrix, 0);
             this.uniformValues.set(viewMatrix, 16);
             this.uniformValues.set(projectionMatrix, 32);
-            this.uniformValues.set(viewProjectionMatrix, 48);
-            this.uniformValues.set(this.color, 64);
-            this.uniformValues.set([this.smoothness, this.metallic, this.ambientOcclusion], 68);
+            this.uniformValues.set(this.color, 48);
+            this.uniformValues.set([this.smoothness, this.metallic, this.ambientOcclusion], 52);
 
             GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
             return true;

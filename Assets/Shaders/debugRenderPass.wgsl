@@ -22,6 +22,5 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
 
 @fragment
 fn fs(in: VSOut) -> @location(0) vec4f {
-    let color = textureSample(debugTexture, debugSampler, in.uv).rgb;
-    return vec4f(color, 1.0);
+    return vec4f(textureSample(debugTexture, debugSampler, in.uv).rgb, 1.0);
 }

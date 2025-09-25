@@ -47,7 +47,6 @@ struct Uniforms {
     modelMatrix : mat4x4f,
     viewMatrix : mat4x4f,
     projectionMatrix : mat4x4f,
-    viewProjectionMatrix : mat4x4f,
     color : vec4f,
     pbr : vec4f,
 };
@@ -64,9 +63,11 @@ struct Vertex {
 @group(0) @binding(2) var albedo : texture_2d<f32>;
 
 struct VSOut {
-  @builtin(position) position : vec4f,
-  @location(0) normal  : vec3f,
-  @location(1) uv : vec2f,
+  @builtin(position) clipPosition : vec4f,
+  @location(0) worldPosition : vec3f,
+  @location(2) viewPosition : vec3f,
+  @location(3) normal  : vec3f,
+  @location(4) uv : vec2f,
 };
 
 @vertex
@@ -75,12 +76,17 @@ fn vs(vert: Vertex) -> VSOut {
 
   let modelMatrix = uni.modelMatrix;
   let viewMatrix = uni.viewMatrix;
+  let projectionMatrix = uni.projectionMatrix;
+
+  let worldPosition = (modelMatrix * vec4f(vert.position, 1.0)).xyz;
+  let viewPosition = (viewMatrix * vec4f(worldPosition, 1.0)).xyz;
+  let clipPosition = projectionMatrix * viewMatrix * vec4f(worldPosition, 1.0);
+
+  vsOut.clipPosition = clipPosition;
+  vsOut.worldPosition = worldPosition;
+  vsOut.viewPosition = viewPosition;
+
   let normalMatrix = transpose3(inverse3(mat3_from_mat4(modelMatrix)));
-
-  let worldPosition = modelMatrix * vec4f(vert.position, 1.0);
-  let viewPosition  = viewMatrix * worldPosition;
-
-  vsOut.position = uni.projectionMatrix * viewPosition;
   vsOut.normal = normalize(normalMatrix * vert.normal) * 0.5 + vec3f(0.5);
   vsOut.uv = vert.uv;
 
@@ -109,7 +115,7 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   let color = uni.color;
   let albedo = textureSample(albedo, textureSampler, vsOut.uv);
 
-  gBufferRenderPass.screenPositionOut = vec4f(vsOut.position.xyz, 1.0);
+  gBufferRenderPass.screenPositionOut = vec4f(vsOut.clipPosition.xyz / vsOut.clipPosition.w, 1.0);
   gBufferRenderPass.screenNormalOut = vec4f(vsOut.normal, 0.0);
   gBufferRenderPass.screenTangentOut = vec4f(1.0, 0.5, 0.0, 1.0);
 
@@ -118,7 +124,7 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   gBufferRenderPass.emissionOut = vec4f(0.0, 0.0, 0.0, 1.0);
   gBufferRenderPass.pbrOut = vec4f(0.0, 0.0, 0.0, 1.0);
 
-  gBufferRenderPass.depthOut = vec4f(vsOut.position.z, 0.0, 0.0, 1.0);
+  gBufferRenderPass.depthOut = vec4f(vsOut.viewPosition.z, 0.0, 0.0, 1.0);
 
   return gBufferRenderPass;
 }

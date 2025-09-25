@@ -6,7 +6,6 @@ struct Uniforms {
     modelMatrix : mat4x4f,
     viewMatrix : mat4x4f,
     projectionMatrix : mat4x4f,
-    viewProjectionMatrix : mat4x4f,
 };
 
 struct Vertex {

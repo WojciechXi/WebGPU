@@ -66,7 +66,7 @@ window.addEventListener('load', async function (event) {
             });
 
             const materials = {
-                Glass: glassMaterial,
+                // Glass: glassMaterial,
 
                 White_Glossy: whiteMaterial,
                 Plastic: whiteMaterial,

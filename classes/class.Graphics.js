@@ -77,7 +77,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        this.debugRenderPass.texture = this.gBufferRenderPass.screenPositionTexture;
+        this.debugRenderPass.textureView = this.gBufferRenderPass.colorTextureView;
 
         // const debugDepthRenderPass = this.debugDepthRenderPass = new DebugDepthRenderPass({
         //     name: 'debugDepthRenderPass',
@@ -97,7 +97,7 @@ class Graphics {
     static Render(engine) {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-        this.clearRenderPass.Render(engine, commandEncoder);
+        // this.clearRenderPass.Render(engine, commandEncoder);
         this.gBufferRenderPass.Render(engine, commandEncoder);
         // this.shadowRenderPass.Render(engine, commandEncoder);
         // this.lightingRenderPass.Render(engine, commandEncoder);

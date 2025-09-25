@@ -1,6 +1,8 @@
 class DebugRenderPass extends RenderPass {
 
     Init(data) {
+        this._textureView = null;
+
         const canvas = data.canvas;
 
         const format = navigator.gpu.getPreferredCanvasFormat();
@@ -22,8 +24,6 @@ class DebugRenderPass extends RenderPass {
             primitive: { topology: "triangle-list" },
         });
 
-        this._texture = null;
-
         this.sampler = GPU.CreateSampler({
             magFilter: 'linear',
             minFilter: 'linear',
@@ -33,17 +33,17 @@ class DebugRenderPass extends RenderPass {
         this.bindGroup = null;
     }
 
-    get texture() {
-        return this._texture;
+    get textureView() {
+        return this._textureView;
     }
 
-    set texture(value) {
-        this._texture = value;
+    set textureView(textureView) {
+        this._textureView = textureView;
 
-        this.bindGroup = this._texture ? GPU.CreateBindGroup({
+        this.bindGroup = this._textureView ? GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this._texture.createView() },
+                { binding: 0, resource: this._textureView },
                 { binding: 1, resource: this.sampler },
             ],
         }) : null;

@@ -66,7 +66,7 @@ class Shader {
                         { format: "rgba16float" }, // emisssionTexture
                         { format: "rgba16float" }, // pbrTexture
 
-                        { format: "rgba16float" }, // depthTExture
+                        { format: "rgba16float" }, // depthTexture
                     ]
                 },
                 depthStencil: {
@@ -90,42 +90,7 @@ class Shader {
         }
 
         if (_this.code.indexOf('fn forwardRenderPass') !== -1) {
-            _this.renderPipelines['forwardRenderPass'] = GPU.CreateRenderPipeline({
-                layout: "auto",
-                vertex: {
-                    module: _this.shaderModule,
-                    entryPoint: "vs",
-                    buffers: [
-                        {
-                            arrayStride: (3 + 3 + 3 + 2) * 4, // position + normal + color + uv
-                            attributes: [
-                                { shaderLocation: 0, offset: 0, format: 'float32x3' },       // position
-                                { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' },   // normal
-                                { shaderLocation: 2, offset: 6 * 4, format: 'float32x3' },   // color
-                                { shaderLocation: 3, offset: 9 * 4, format: 'float32x2' },   // uv
-                            ],
-                        },
-                    ],
-                },
-                fragment: {
-                    module: _this.shaderModule,
-                    entryPoint: "forwardRenderPass",
-                    targets: [
-                        { format: "rgba16float" }, // colorTexture
 
-                        { format: "rgba16float" }, // depthTexture
-                    ]
-                },
-                depthStencil: {
-                    format: "depth24plus",
-                    depthWriteEnabled: true,
-                    depthCompare: "less"
-                },
-                primitive: {
-                    cullMode: 'back',
-                    frontFace: 'ccw',
-                },
-            });
         }
     }
 
