@@ -1,7 +1,7 @@
 class SSAORenderPass extends RenderPass {
 
     Init(data) {
-        this.radius = data.radius ?? 0.5;
+        this.radius = data.radius ?? 0.25;
         this.bias = data.bias ?? 0.025;
 
         const canvas = data.canvas;

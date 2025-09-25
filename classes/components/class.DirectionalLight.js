@@ -12,7 +12,7 @@ class DirectionalLight extends Component {
     }
 
     Update() {
-        Graphics.lightDirection = this.transform.down;
+        Graphics.lightDirection = this.transform.forward;
         Graphics.lightColor = this.color;
 
         Matrix4x4.Inverse(this.transform.matrix4x4, this.viewMatrix);

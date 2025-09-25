@@ -58,11 +58,13 @@ class Graphics {
             code: assets.shaders['ssaoRenderPass.wgsl'],
             gBufferRenderPass: gBufferRenderPass,
             canvas: canvas,
-            radius: 0.25,
-            bias: 0.025,
+            radius: 0.5,
+            bias: 0.05,
         });
 
         const ssaoBlurRenderPass = this.ssaoBlurRenderPass = new SSAOBlurRenderPass({
+            radius: 4,
+            sigmaDepth: 0.3,
             name: 'ssaoBlurRenderPass',
             code: assets.shaders['ssaoBlurRenderPass.wgsl'],
             ssaoRenderPass: ssaoRenderPass,
@@ -112,7 +114,7 @@ class Graphics {
         this.lightingRenderPass.Render(engine, commandEncoder);
         this.forwardRenderPass.Render(engine, commandEncoder);
         this.ssaoRenderPass.Render(engine, commandEncoder);
-        this.ssaoBlurRenderPass.Render(engine, commandEncoder);
+        // this.ssaoBlurRenderPass.Render(engine, commandEncoder);
         this.finalRenderPass.Render(engine, commandEncoder);
         // this.debugRenderPass.Render(engine, commandEncoder);
         // this.debugDepthRenderPass.Render(engine, commandEncoder);

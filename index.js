@@ -72,7 +72,7 @@ window.addEventListener('load', async function (event) {
             });
 
             const materials = {
-                // Glass: glassMaterial,
+                Glass: null,
                 Stack_of_Bricks: stackOfBricksMaterial,
 
                 White_Glossy: whiteMaterial,
@@ -124,13 +124,13 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.Obj(assets.models['Stack of Bricks.obj'], function (meshes) {
+            Importer.Obj(assets.models['Ablewicza 15.obj'], function (meshes) {
                 for (const mesh of meshes) {
                     if (mesh.triangles.length % 3 != 0) continue;
                     const cubeGameObject = new GameObject('Cube');
                     const meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
                     // meshRenderer.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-                    meshRenderer.material = materials[mesh.name] ?? whiteMaterial;
+                    meshRenderer.material = Object(materials).hasOwnProperty(mesh.name) ? materials[mesh.name] : whiteMaterial;
                     meshRenderer.mesh = mesh;
                     if (Object.keys(materials).indexOf(mesh.name) === -1) console.log(mesh.name);
                 }
