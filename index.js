@@ -10,11 +10,6 @@ function loadBitmap(src, callback) {
 window.addEventListener('load', async function (event) {
     // console.clear();
 
-    // Wywołanie funkcji
-    Importer.GLTF('/Assets/Models', 'Cubes.gltf');
-
-    return;
-
     let device = await GPU.Request();
     if (!device) return alert('need a browser that supports WebGPU');
 
@@ -145,15 +140,16 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.Obj(assets.models['Krakow.obj'], function (meshes) {
+            Importer.GLTF('/Assets/Models', 'Cubes.gltf', function (meshes) {
+                console.log(meshes);
                 for (const mesh of meshes) {
-                    if (mesh.triangles.length % 3 != 0) continue;
-                    const cubeGameObject = new GameObject('Cube');
-                    const meshRenderer = cubeGameObject.AddComponent(MeshRenderer);
+                    const gameObject = new GameObject(mesh.name);
+                    const meshRenderer = gameObject.AddComponent(MeshRenderer);
                     // meshRenderer.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-                    meshRenderer.material = Object(materials).hasOwnProperty(mesh.name) ? materials[mesh.name] : whiteMaterial;
                     meshRenderer.mesh = mesh;
+                    meshRenderer.material = Object(materials).hasOwnProperty(mesh.name) ? materials[mesh.name] : whiteMaterial;
                     if (Object.keys(materials).indexOf(mesh.name) === -1) console.log(mesh.name);
+                    return;
                 }
             });
         });

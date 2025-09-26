@@ -80,7 +80,6 @@ class Importer {
         // 1. Pobieramy plik JSON glTF
         const res = await fetch(`${path}/${file}`);
         const gltf = await res.json();
-        console.log('Cały glTF JSON:', gltf);
 
         // 2. Zakładamy, że pierwszy buffer jest binarny
         const bufferUri = gltf.buffers[0].uri;
@@ -168,8 +167,6 @@ class Importer {
             mesh.Update();
             meshes.push(mesh);
         });
-
-        console.log(meshes);
 
         if (callback) callback(meshes);
     }

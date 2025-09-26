@@ -31,8 +31,12 @@ class RenderPass {
         this.renderPass.setPipeline(renderPipeline);
     }
 
-    SetVertexBuffer(index, vertexBuffer) {
-        this.renderPass.setVertexBuffer(index, vertexBuffer);
+    SetVertexBuffer(slot, buffer, offset = 0, size = 0) {
+        this.renderPass.setVertexBuffer(slot, buffer, offset, size ? size : buffer.size);
+    }
+
+    SetIndexBuffer(buffer, format = 'uint16', offset = 0, size = 0) {
+        this.renderPass.setIndexBuffer(buffer, format, offset, size ? size : buffer.size);
     }
 
     Draw(count) {

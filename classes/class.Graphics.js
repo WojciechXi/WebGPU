@@ -88,7 +88,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        this.debugRenderPass.textureView = this.gBufferRenderPass.viewNormalTextureView;
+        this.debugRenderPass.textureView = this.gBufferRenderPass.colorTextureView;
 
         callback();
     }
