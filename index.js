@@ -8,7 +8,7 @@ function loadBitmap(src, callback) {
 }
 
 window.addEventListener('load', async function (event) {
-    console.clear();
+    // console.clear();
 
     let device = await GPU.Request();
     if (!device) return alert('need a browser that supports WebGPU');
@@ -60,7 +60,23 @@ window.addEventListener('load', async function (event) {
             });
 
             loadBitmap('/Assets/Images/WoodFloor057_1K-JPG_Color.jpg', function (bitmap) {
+                // floorMaterial.albedo = bitmap;
+            });
+
+            loadBitmap('/Assets/Images/red-scifi-metal-unity/red-scifi-metal_albedo.png', function (bitmap) {
                 floorMaterial.albedo = bitmap;
+            });
+
+            loadBitmap('/Assets/Images/red-scifi-metal-unity/red-scifi-metal_normal-ogl.png', function (bitmap) {
+                floorMaterial.normal = bitmap;
+            });
+
+            loadBitmap('/Assets/Images/red-scifi-metal-unity/red-scifi-metal_ao.png', function (bitmap) {
+                floorMaterial.ambientOcclusion = bitmap;
+            });
+
+            loadBitmap('/Assets/Images/red-scifi-metal-unity/red-scifi-metal_height.png', function (bitmap) {
+                floorMaterial.heightMap = bitmap;
             });
 
             loadBitmap('/Assets/Images/D3025 OW DAB SONOMA.jpg', function (bitmap) {
@@ -116,7 +132,7 @@ window.addEventListener('load', async function (event) {
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
             directionalLightGameObject.transform.position = new Vector3(0, 15, 0);
-            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-60, 0, 0);
+            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-75, 0, 0);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');

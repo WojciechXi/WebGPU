@@ -1,55 +1,124 @@
+fn encodeVector(n: vec3f) -> vec3f {
+  return n * 0.5 + vec3f(0.5);
+}
+
+fn mat3_from_mat4(m: mat4x4f) -> mat3x3f {
+    return mat3x3f(
+        m[0].xyz,
+        m[1].xyz,
+        m[2].xyz
+    );
+}
+
+fn transpose3(m: mat3x3f) -> mat3x3f {
+    return mat3x3f(
+        vec3f(m[0][0], m[1][0], m[2][0]),
+        vec3f(m[0][1], m[1][1], m[2][1]),
+        vec3f(m[0][2], m[1][2], m[2][2])
+    );
+}
+
+fn inverse3(m: mat3x3f) -> mat3x3f {
+    let a = m[0][0]; let b = m[0][1]; let c = m[0][2];
+    let d = m[1][0]; let e = m[1][1]; let f = m[1][2];
+    let g = m[2][0]; let h = m[2][1]; let i = m[2][2];
+
+    let A =  (e*i - f*h);
+    let B = -(d*i - f*g);
+    let C =  (d*h - e*g);
+    let D = -(b*i - c*h);
+    let E =  (a*i - c*g);
+    let F = -(a*h - b*g);
+    let G =  (b*f - c*e);
+    let H = -(a*f - c*d);
+    let I =  (a*e - b*d);
+
+    let det = a*A + b*B + c*C;
+    let invDet = 1.0 / det;
+
+    return mat3x3f(
+        vec3f(A, D, G) * invDet,
+        vec3f(B, E, H) * invDet,
+        vec3f(C, F, I) * invDet
+    );
+}
+
 struct Uniforms {
-    ambientLightColor : vec4<f32>,
-    lightColor : vec4<f32>,
-    lightDirection : vec3<f32>,
+    viewMatrix : mat4x4f,
+    projectionMatrix : mat4x4f,
+    lightViewMatrix : mat4x4f,
+    lightProjectionMatrix : mat4x4f,
+    ambientLightColor : vec4f,
+    lightColor : vec4f,
 };
 
 @group(0) @binding(0) var<uniform> uni : Uniforms;
-@group(0) @binding(1) var shadowTexture : texture_2d<f32>;
-@group(0) @binding(2) var positionTexure : texture_2d<f32>;
-@group(0) @binding(3) var normalTexture : texture_2d<f32>;
-@group(0) @binding(4) var colorTexture : texture_2d<f32>;
-@group(0) @binding(5) var pbrTexture : texture_2d<f32>;
+@group(0) @binding(1) var screenSampler : sampler;
+@group(0) @binding(2) var shadowTexture : texture_2d<f32>;
+@group(0) @binding(3) var positionTexure : texture_2d<f32>;
+@group(0) @binding(4) var screenNormalTexture : texture_2d<f32>;
+@group(0) @binding(5) var colorTexture : texture_2d<f32>;
+@group(0) @binding(6) var normalTexture : texture_2d<f32>;
+@group(0) @binding(7) var pbrTexture : texture_2d<f32>;
+
+struct VSOut {
+  @builtin(position) pos : vec4f,
+  @location(0) uv : vec2f,
+};
 
 @vertex
-fn vs(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4<f32> {
-    var pos = array<vec2<f32>, 6>(
-        vec2<f32>(-1.0, -1.0),
-        vec2<f32>( 1.0, -1.0),
-        vec2<f32>(-1.0,  1.0),
-        vec2<f32>(-1.0,  1.0),
-        vec2<f32>( 1.0, -1.0),
-        vec2<f32>( 1.0,  1.0)
-    );
-
-    return vec4<f32>(pos[VertexIndex], 0.0, 1.0);
+fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
+  var vsOut: VSOut;
+  let pos = array<vec2f,6>(
+    vec2f(-1.0,-1.0), vec2f( 1.0,-1.0), vec2f(-1.0, 1.0),
+    vec2f(-1.0, 1.0), vec2f( 1.0,-1.0), vec2f( 1.0, 1.0)
+  );
+  vsOut.uv = (pos[vid] + vec2f(1.0)) * 0.5;
+  vsOut.pos = vec4f(pos[vid].x, -pos[vid].y, 0.0, 1.0);
+  return vsOut;
 }
 
 @fragment
-fn fs(@builtin(position) fragCoord : vec4<f32>) -> @location(0) vec4<f32> {
+fn fs(vsOut: VSOut) -> @location(0) vec4f {
     // Odczyt z G-buffer
-    let shadow = textureLoad(shadowTexture, vec2<i32>(fragCoord.xy), 0);
-    let albedo = textureLoad(colorTexture, vec2<i32>(fragCoord.xy), 0).rgb;
-    let normal = textureLoad(normalTexture, vec2<i32>(fragCoord.xy), 0).xyz;
-    let pos_view = textureLoad(positionTexure, vec2<i32>(fragCoord.xy), 0).xyz;
-    let pbr = textureLoad(pbrTexture, vec2<i32>(fragCoord.xy), 0).rgb;
-
-    let N = normalize(normal);
-    let L = normalize(-uni.lightDirection);
-    let V = normalize(-pos_view);
-    let H = normalize(L + V);
-
-    let NdotL = max(dot(N, L), 0.0);
-    let diffuse  = albedo * NdotL;
-    
-    let roughness = clamp(pbr.g, 0.05, 1.0);
-    let shininess = 1.0 / (roughness * roughness);
-    let specular  = pow(max(dot(N, H), 0.0), shininess);
+    let shadow = textureSample(shadowTexture, screenSampler, vsOut.uv);
+    let albedo = textureSample(colorTexture, screenSampler, vsOut.uv).rgb;
+    let screenNormal = textureSample(screenNormalTexture, screenSampler, vsOut.uv).xyz;
+    let n_tagnent = textureSample(normalTexture, screenSampler, vsOut.uv).xyz;
+    let pos_view = textureSample(positionTexure, screenSampler, vsOut.uv).xyz;
+    let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv).rgb;
 
     let ambientLightColor = uni.ambientLightColor.rgb * uni.ambientLightColor.a;
     let lightColor = uni.lightColor.rgb * uni.lightColor.a;
 
-    let color = (diffuse + specular) * (lightColor) + albedo * ambientLightColor;
+    let smoothness = clamp(pbr.r, 0.0, 1.0);
+    let metallic = clamp(pbr.g, 0.0, 1.0);
+    let ambientOcclusion = clamp(pbr.b, 0.0, 1.0);
 
-    return vec4<f32>(color, 1.0);
+    var viewMatrix = uni.viewMatrix;
+    viewMatrix[3] = vec4f(0.0, 0.0, 0.0, 1.0);
+
+    let lightDirection = normalize( (viewMatrix * uni.lightViewMatrix * vec4f(0.0, 0.0, 1.0, 0.0)).xyz);
+
+    let N = normalize(screenNormal);
+    let L = normalize(-lightDirection);
+    let V = normalize(-pos_view);
+    let H = normalize(L + V);
+
+    let NdotL = max(dot(N, L), 0.0);
+
+    var diffuse  = albedo * NdotL * ambientOcclusion * (1.0 - metallic);
+
+    let roughness = 1.0 - smoothness;
+    let shininess = 1.0 / (roughness * roughness);
+
+    let F0 = mix(vec3f(0.04), albedo, metallic);
+    let specularStrength = pow(max(dot(N, H), 0.0), shininess) * NdotL;
+    let specular = F0 * specularStrength;
+
+    let ambient = albedo * ambientLightColor * ambientOcclusion;
+
+    let color = (diffuse + specular) * lightColor + ambient;
+
+    return vec4f(color, 1.0);
 }

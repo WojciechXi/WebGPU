@@ -60,7 +60,10 @@ struct Vertex {
 
 @group(0) @binding(0) var<uniform> uni : Uniforms;
 @group(0) @binding(1) var textureSampler : sampler;
-@group(0) @binding(2) var albedo : texture_2d<f32>;
+@group(0) @binding(2) var albedoTexture : texture_2d<f32>;
+@group(0) @binding(3) var normalTexture : texture_2d<f32>;
+@group(0) @binding(4) var ambientOcclusionTexture : texture_2d<f32>;
+@group(0) @binding(5) var heightTexture : texture_2d<f32>;
 
 struct VSOut {
   @builtin(position) clipPosition : vec4f,
@@ -104,7 +107,10 @@ fn shadowRenderPass(vsOut: VSOut) -> ShadowRenderPass {
   var shadowRenderPass: ShadowRenderPass;
 
   let color = uni.color;
-  let albedo = textureSample(albedo, textureSampler, vsOut.uv);
+  let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
+  let normal = textureSample(normalTexture, textureSampler, vsOut.uv);
+  let ambientOcclusion = textureSample(ambientOcclusionTexture, textureSampler, vsOut.uv);
+  let height = textureSample(heightTexture, textureSampler, vsOut.uv);
 
   shadowRenderPass.depthOut = vec4f(vsOut.viewPosition.z, 0.0, 0.0, 1.0);
 
@@ -131,16 +137,21 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   var gBufferRenderPass: GBufferRenderPass;
 
   let color = uni.color;
-  let albedo = textureSample(albedo, textureSampler, vsOut.uv);
+  let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
+  let normal = textureSample(normalTexture, textureSampler, vsOut.uv);
+  let ambientOcclusion = textureSample(ambientOcclusionTexture, textureSampler, vsOut.uv);
+  let height = textureSample(heightTexture, textureSampler, vsOut.uv);
+
+  let targetColor = albedo.rgb * color.rgb;
 
   gBufferRenderPass.screenPositionOut = vec4f(vsOut.viewPosition, 1.0);
   gBufferRenderPass.screenNormalOut = vec4f(vsOut.normal, 0.0);
   gBufferRenderPass.screenTangentOut = vec4f(1.0, 0.5, 0.0, 1.0);
 
-  gBufferRenderPass.colorOut = vec4f(albedo.rgb * color.rgb, 1.0);
-  gBufferRenderPass.normalOut = vec4f(0.0, 1.0, 0.0, 1.0);
+  gBufferRenderPass.colorOut = vec4f(targetColor, 1.0);
+  gBufferRenderPass.normalOut = vec4f(normalize(normal.rgb * 2.0 - 1.0), 1.0);
   gBufferRenderPass.emissionOut = vec4f(0.0, 0.0, 0.0, 1.0);
-  gBufferRenderPass.pbrOut = vec4f(0.0, 0.0, 0.0, 1.0);
+  gBufferRenderPass.pbrOut = vec4f(0.5, 0.5, ambientOcclusion.r, 1.0);
 
   gBufferRenderPass.depthOut = vec4f(vsOut.viewPosition.z, 0.0, 0.0, 1.0);
 
