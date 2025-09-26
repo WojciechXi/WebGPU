@@ -141,15 +141,15 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Test);
 
             Importer.GLTF('/Assets/Models', 'Cubes.gltf', function (meshes) {
-                console.log(meshes);
+                let index = 0;
                 for (const mesh of meshes) {
                     const gameObject = new GameObject(mesh.name);
+                    gameObject.transform.position = new Vector3(0, index++, 0);
                     const meshRenderer = gameObject.AddComponent(MeshRenderer);
                     // meshRenderer.transform.rotation = Quaternion.FromEuler(0, 0, 0);
                     meshRenderer.mesh = mesh;
                     meshRenderer.material = Object(materials).hasOwnProperty(mesh.name) ? materials[mesh.name] : whiteMaterial;
                     if (Object.keys(materials).indexOf(mesh.name) === -1) console.log(mesh.name);
-                    return;
                 }
             });
         });

@@ -101,7 +101,7 @@ class Graphics {
     static Render(engine) {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-        this.clearRenderPass.Render(engine, commandEncoder);
+        // this.clearRenderPass.Render(engine, commandEncoder);
         // this.shadowRenderPass.Render(engine, commandEncoder);
 
         this.gBufferRenderPass.Render(engine, commandEncoder);

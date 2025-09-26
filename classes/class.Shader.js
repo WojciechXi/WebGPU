@@ -43,13 +43,13 @@ class Shader {
                     entryPoint: "vs",
                     buffers: [
                         {
-                            arrayStride: (3 + 3 + 4 + 4 + 2) * 4, // position + normal + tangent + color + uv
+                            arrayStride: (4 + 4 + 4 + 4 + 4) * 4, // position + normal + tangent + color + uv
                             attributes: [
                                 { shaderLocation: 0, offset: 0 * 4, format: 'float32x3' }, // position
-                                { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' }, // normal
-                                { shaderLocation: 2, offset: 6 * 4, format: 'float32x4' }, // tangent
-                                { shaderLocation: 3, offset: 10 * 4, format: 'float32x4' }, // color
-                                { shaderLocation: 4, offset: 14 * 4, format: 'float32x2' }, // uv
+                                { shaderLocation: 1, offset: 4 * 4, format: 'float32x3' }, // normal
+                                { shaderLocation: 2, offset: 8 * 4, format: 'float32x4' }, // tangent
+                                { shaderLocation: 3, offset: 12 * 4, format: 'float32x4' }, // color
+                                { shaderLocation: 4, offset: 16 * 4, format: 'float32x2' }, // uv
                             ],
                         },
                     ],
@@ -76,13 +76,13 @@ class Shader {
                     entryPoint: "vs",
                     buffers: [
                         {
-                            arrayStride: (3 + 3 + 4 + 4 + 2) * 4, // position + normal + tangent + color + uv
+                            arrayStride: (4 + 4 + 4 + 4 + 4) * 4, // position + normal + tangent + color + uv
                             attributes: [
                                 { shaderLocation: 0, offset: 0 * 4, format: 'float32x3' }, // position
-                                { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' }, // normal
-                                { shaderLocation: 2, offset: 6 * 4, format: 'float32x4' }, // tangent
-                                { shaderLocation: 3, offset: 10 * 4, format: 'float32x4' }, // color
-                                { shaderLocation: 4, offset: 14 * 4, format: 'float32x2' }, // uv
+                                { shaderLocation: 1, offset: 4 * 4, format: 'float32x3' }, // normal
+                                { shaderLocation: 2, offset: 8 * 4, format: 'float32x4' }, // tangent
+                                { shaderLocation: 3, offset: 12 * 4, format: 'float32x4' }, // color
+                                { shaderLocation: 4, offset: 16 * 4, format: 'float32x2' }, // uv
                             ],
                         },
                     ],

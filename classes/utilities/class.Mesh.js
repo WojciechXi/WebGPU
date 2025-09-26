@@ -32,7 +32,7 @@ class SubMesh {
         this.tangents = data.tangents ?? [];
         this.colors = data.colors ?? [];
         this.uvs = data.uvs ?? [];
-        this.triangles = data.triangles ?? new Uint32Array(0);
+        this.triangles = data.triangles ?? new Uint16Array(0);
 
         this.indexBuffer = GPU.CreateBuffer({
             size: 0,
@@ -46,9 +46,9 @@ class SubMesh {
     }
 
     Render(renderPass) {
-        renderPass.SetIndexBuffer(this.indexBuffer);
+        renderPass.SetIndexBuffer(this.indexBuffer, 'uint16');
         renderPass.SetVertexBuffer(0, this.vertexBuffer);
-        renderPass.Draw(this.triangles.length);
+        renderPass.DrawIndexed(this.triangles.length);
     }
 
     Clear() {
@@ -57,7 +57,7 @@ class SubMesh {
         this.tangents = [];
         this.colors = [];
         this.uvs = [];
-        this.triangles = new Uint32Array(0);
+        this.triangles = new Uint16Array(0);
         if (this.indexBuffer) this.indexBuffer.destroy();
         this.indexBuffer = GPU.CreateBuffer({
             size: 0,
@@ -72,15 +72,7 @@ class SubMesh {
     }
 
     Update() {
-        if (this.indexBuffer) this.indexBuffer.destroy();
-        this.indexBuffer = GPU.CreateBuffer({
-            size: this.triangles.byteLength,
-            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
-        });
-
-        GPU.Queue.writeBuffer(this.indexBuffer, 0, this.triangles);
-
-        let offset = 3 + 3 + 4 + 4 + 2; // position + normal + tangent + color + uv
+        let offset = 4 + 4 + 4 + 4 + 4; // position + normal + tangent + color + uv
         let data = new Float32Array(this.vertices.length * offset);
 
         for (let i = 0; i < this.vertices.length; i++) {
@@ -91,11 +83,11 @@ class SubMesh {
             let uv = this.uvs[i] ?? new Vector2(0, 0);
 
             data.set([
-                vertex.x, vertex.y, vertex.z,
-                normal.x, normal.y, normal.z,
+                vertex.x, vertex.y, vertex.z, 0,
+                normal.x, normal.y, normal.z, 0,
                 tangent.x, tangent.y, tangent.z, tangent.w,
                 color.r, color.g, color.b, color.a,
-                uv.x, uv.y
+                uv.x, uv.y, 0, 0
             ], i * offset);
         }
 
@@ -106,6 +98,14 @@ class SubMesh {
         });
 
         GPU.Queue.writeBuffer(this.vertexBuffer, 0, data);
+
+        if (this.indexBuffer) this.indexBuffer.destroy();
+        this.indexBuffer = GPU.CreateBuffer({
+            size: this.triangles.byteLength,
+            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
+        });
+
+        GPU.Queue.writeBuffer(this.indexBuffer, 0, this.triangles);
     }
 
 }

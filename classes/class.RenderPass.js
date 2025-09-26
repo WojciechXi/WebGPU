@@ -31,16 +31,20 @@ class RenderPass {
         this.renderPass.setPipeline(renderPipeline);
     }
 
-    SetVertexBuffer(slot, buffer, offset = 0, size = 0) {
-        this.renderPass.setVertexBuffer(slot, buffer, offset, size ? size : buffer.size);
+    SetVertexBuffer(slot, buffer) {
+        this.renderPass.setVertexBuffer(slot, buffer);
     }
 
-    SetIndexBuffer(buffer, format = 'uint16', offset = 0, size = 0) {
-        this.renderPass.setIndexBuffer(buffer, format, offset, size ? size : buffer.size);
+    SetIndexBuffer(buffer, format = 'uint16') {
+        this.renderPass.setIndexBuffer(buffer, format);
     }
 
     Draw(count) {
         this.renderPass.draw(count);
+    }
+
+    DrawIndexed(count) {
+        this.renderPass.drawIndexed(count);
     }
 
 }
