@@ -47,8 +47,8 @@ class LightingRenderPass extends RenderPass {
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
                 { binding: 1, resource: this.sampler },
                 { binding: 2, resource: shadowRenderPass.depthTextureView },
-                { binding: 3, resource: gBufferRenderPass.screenPositionTextureView },
-                { binding: 4, resource: gBufferRenderPass.screenNormalTextureView },
+                { binding: 3, resource: gBufferRenderPass.viewPositionTextureView },
+                { binding: 4, resource: gBufferRenderPass.viewNormalTextureView },
                 { binding: 5, resource: gBufferRenderPass.colorTextureView },
                 { binding: 6, resource: gBufferRenderPass.normalTextureView },
                 { binding: 7, resource: gBufferRenderPass.pbrTextureView },
@@ -64,6 +64,8 @@ class LightingRenderPass extends RenderPass {
         this.uniformValues.set(Graphics.ambientLightColor, 64);
         this.uniformValues.set(Graphics.lightColor, 68);
 
+        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
+
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 { view: this.lightingTextureView, loadOp: "clear", storeOp: "store" }
@@ -72,8 +74,6 @@ class LightingRenderPass extends RenderPass {
 
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, this.bindGroup);
-
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
 
         renderPass.draw(6);
 

@@ -89,9 +89,8 @@ class Shader {
                     module: _this.shaderModule,
                     entryPoint: "gBufferRenderPass",
                     targets: [
-                        { format: "rgba16float" }, // screenPositionTexture
-                        { format: "rgba16float" }, // screenNormalTexture
-                        { format: "rgba16float" }, // screenTangentTexture
+                        { format: "rgba16float" }, // viewPositionTexture
+                        { format: "rgba16float" }, // viewNormalTexture
 
                         { format: "rgba16float" }, // colorTexture
                         { format: "rgba16float" }, // normalTexture

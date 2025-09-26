@@ -71,8 +71,8 @@ class SSAORenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: gBufferRenderPass.screenPositionTextureView },
-                { binding: 2, resource: gBufferRenderPass.screenNormalTextureView },
+                { binding: 1, resource: gBufferRenderPass.viewPositionTextureView },
+                { binding: 2, resource: gBufferRenderPass.viewNormalTextureView },
                 { binding: 3, resource: this.sampler },
                 { binding: 4, resource: this.noiseTextureView },
                 { binding: 5, resource: this.noiseSampler },

@@ -3,26 +3,19 @@ class GBufferRenderPass extends RenderPass {
     Init(data) {
         const canvas = data.canvas;
 
-        this.screenPositionTexture = GPU.CreateTexture({
+        this.viewPositionTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
             format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
-        this.screenPositionTextureView = this.screenPositionTexture.createView();
+        this.viewPositionTextureView = this.viewPositionTexture.createView();
 
-        this.screenNormalTexture = GPU.CreateTexture({
+        this.viewNormalTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
             format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
-        this.screenNormalTextureView = this.screenNormalTexture.createView();
-
-        this.screenTangentTexture = GPU.CreateTexture({
-            size: [canvas.width, canvas.height],
-            format: "rgba16float",
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-        });
-        this.screenTangentTextureView = this.screenTangentTexture.createView();
+        this.viewNormalTextureView = this.viewNormalTexture.createView();
 
         this.colorTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
@@ -70,9 +63,8 @@ class GBufferRenderPass extends RenderPass {
     Render(engine, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                { view: this.screenPositionTextureView, loadOp: "clear", storeOp: "store" },
-                { view: this.screenNormalTextureView, loadOp: "clear", storeOp: "store" },
-                { view: this.screenTangentTextureView, loadOp: "clear", storeOp: "store" },
+                { view: this.viewPositionTextureView, loadOp: "clear", storeOp: "store" },
+                { view: this.viewNormalTextureView, loadOp: "clear", storeOp: "store" },
 
                 { view: this.colorTextureView, loadOp: "clear", storeOp: "store" },
                 { view: this.normalTextureView, loadOp: "clear", storeOp: "store" },
