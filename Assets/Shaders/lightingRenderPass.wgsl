@@ -80,18 +80,22 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
 @fragment
 fn fs(vsOut: VSOut) -> @location(0) vec4f {
     // Odczyt z G-buffer
+    let color = textureSample(colorTexture, screenSampler, vsOut.uv);
+    let albedo = color.rgb;
+    let emission = albedo * color.a;
+
+    let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv);
+    let smoothness = clamp(pbr.r, 0.0, 1.0);
+    let metallic = clamp(pbr.g, 0.0, 1.0);
+    let ao = clamp(pbr.b, 0.0, 1.0);
+    // let ao = clamp(pbr.a, 0.0, 1.0);
+
     let shadow = textureSample(shadowTexture, screenSampler, vsOut.uv);
-    let albedo = textureSample(colorTexture, screenSampler, vsOut.uv).rgb;
     let normalTexture = textureSample(normalTexture, screenSampler, vsOut.uv).xyz;
     let pos_view = textureSample(positionTexure, screenSampler, vsOut.uv).xyz;
-    let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv).rgb;
 
     let ambientLightColor = uni.ambientLightColor.rgb * uni.ambientLightColor.a;
     let lightColor = uni.lightColor.rgb * uni.lightColor.a;
-
-    let smoothness = clamp(pbr.r, 0.0, 1.0);
-    let metallic = clamp(pbr.g, 0.0, 1.0);
-    let ambientOcclusion = clamp(pbr.b, 0.0, 1.0);
 
     var viewMatrix = uni.viewMatrix;
     viewMatrix[3] = vec4f(0.0, 0.0, 0.0, 1.0);
@@ -105,7 +109,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
 
     let NdotL = max(dot(N, L), 0.0);
 
-    var diffuse  = albedo * NdotL * ambientOcclusion * (1.0 - metallic);
+    var diffuse  = albedo * NdotL * ao * (1.0 - metallic);
 
     let roughness = 1.0 - smoothness;
     let shininess = 1.0 / (roughness * roughness);
@@ -114,9 +118,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let specularStrength = pow(max(dot(N, H), 0.0), shininess) * NdotL;
     let specular = F0 * specularStrength;
 
-    let ambient = albedo * ambientLightColor * ambientOcclusion;
+    let ambient = albedo * ambientLightColor * ao;
 
-    let color = (diffuse + specular) * lightColor + ambient;
-
-    return vec4f(color, 1.0);
+    return vec4f((diffuse + specular) * lightColor + ambient + emission, 1.0);
 }

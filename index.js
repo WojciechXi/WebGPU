@@ -41,6 +41,16 @@ window.addEventListener('load', async function (event) {
             const sonomaMaterial = new Material(unlitShader);
             const unlit2Material = new Material(unlitShader);
 
+            loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_albedo.png', function (bitmap) {
+                floorMaterial.albedo = bitmap;
+                loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_normal.png', function (bitmap) {
+                    floorMaterial.normal = bitmap;
+                    loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_ao.png', function (bitmap) {
+                        floorMaterial.ambientOcclusion = bitmap;
+                    });
+                });
+            });
+
             loadBitmap('/Assets/Images/Stack of Bricks/Albedo.jpg', function (bitmap) {
                 stackOfBricksMaterial.albedo = bitmap;
                 loadBitmap('/Assets/Images/Stack of Bricks/Normal.jpg', function (bitmap) {
@@ -57,10 +67,6 @@ window.addEventListener('load', async function (event) {
 
             loadBitmap('/Assets/Images/D1038 BS BETON MILLENIUM.jpg', function (bitmap) {
                 concreteMaterial.albedo = bitmap;
-            });
-
-            loadBitmap('/Assets/Images/WoodFloor057_1K-JPG_Color.jpg', function (bitmap) {
-                floorMaterial.albedo = bitmap;
             });
 
             loadBitmap('/Assets/Images/D3025 OW DAB SONOMA.jpg', function (bitmap) {
@@ -124,7 +130,7 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.GLTF('/Assets/Models', 'Stack of Bricks.gltf', function (meshes) {
+            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes) {
                 let index = 0;
                 for (const mesh of meshes) {
                     const gameObject = new GameObject(mesh.name);
@@ -132,9 +138,10 @@ window.addEventListener('load', async function (event) {
                     meshRenderer.transform.position = new Vector3(0, index, 0);
                     meshRenderer.transform.rotation = Quaternion.FromEuler(0, 0, 0);
                     meshRenderer.mesh = mesh;
-                    meshRenderer.material = Object(materials).hasOwnProperty(mesh.name) ? materials[mesh.name] : stackOfBricksMaterial;
+                    meshRenderer.material = Object(materials).hasOwnProperty(mesh.name) ? materials[mesh.name] : whiteMaterial;
                     if (Object.keys(materials).indexOf(mesh.name) === -1) console.log(mesh.name);
                     index++;
+                    return;
                 }
             });
         });

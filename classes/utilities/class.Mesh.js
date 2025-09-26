@@ -32,7 +32,7 @@ class SubMesh {
         this.tangents = data.tangents ?? [];
         this.colors = data.colors ?? [];
         this.uvs = data.uvs ?? [];
-        this.triangles = data.triangles ?? new Uint16Array(0);
+        this.triangles = new Uint32Array(data.triangles ?? 0);
 
         this.indexBuffer = GPU.CreateBuffer({
             size: 0,
@@ -46,7 +46,7 @@ class SubMesh {
     }
 
     Render(renderPass) {
-        renderPass.SetIndexBuffer(this.indexBuffer, 'uint16');
+        renderPass.SetIndexBuffer(this.indexBuffer, 'uint32');
         renderPass.SetVertexBuffer(0, this.vertexBuffer);
         renderPass.DrawIndexed(this.triangles.length);
     }
@@ -57,7 +57,8 @@ class SubMesh {
         this.tangents = [];
         this.colors = [];
         this.uvs = [];
-        this.triangles = new Uint16Array(0);
+        this.triangles = new Uint32Array(0);
+
         if (this.indexBuffer) this.indexBuffer.destroy();
         this.indexBuffer = GPU.CreateBuffer({
             size: 0,

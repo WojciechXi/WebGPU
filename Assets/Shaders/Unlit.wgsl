@@ -126,11 +126,10 @@ struct GBufferRenderPass {
   @location(0) viewPositionOut : vec4f,
   @location(1) viewNormalOut : vec4f,
   
-  @location(2) colorOut : vec4f,
-  @location(3) emissionOut : vec4f,
-  @location(4) pbrOut : vec4f, // Metallic/ Roughness / Smoothness / Occlusion
+  @location(2) colorOut : vec4f, // Color / Emission
+  @location(3) pbrOut : vec4f, // Smoothness / Metallic / Ambient Occlusion
   
-  @location(5) depthOut : vec4f,
+  @location(4) depthOut : vec4f,
 }
 
 @fragment
@@ -158,9 +157,8 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   gBufferRenderPass.viewPositionOut = vec4f(vsOut.viewPosition, 1.0);
   gBufferRenderPass.viewNormalOut = vec4f(normalView, 0.0);
 
-  gBufferRenderPass.colorOut = vec4f(targetColor, 1.0);
-  gBufferRenderPass.emissionOut = vec4f(0.0, 0.0, 0.0, 1.0);
-  gBufferRenderPass.pbrOut = vec4f(0.5, 0.5, ambientOcclusion.r, 1.0);
+  gBufferRenderPass.colorOut = vec4f(targetColor, 0.0);
+  gBufferRenderPass.pbrOut = vec4f(0.5, 0.5, ambientOcclusion.r, 0.0);
 
   gBufferRenderPass.depthOut = vec4f(vsOut.viewPosition.z, 0.0, 0.0, 1.0);
 

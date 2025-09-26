@@ -95,7 +95,6 @@ class Shader {
                         { format: "rgba16float" }, // viewNormalTexture
 
                         { format: "rgba16float" }, // colorTexture
-                        { format: "rgba16float" }, // emisssionTexture
                         { format: "rgba16float" }, // pbrTexture
 
                         { format: "rgba16float" }, // depthTexture
