@@ -24,13 +24,6 @@ class GBufferRenderPass extends RenderPass {
         });
         this.colorTextureView = this.colorTexture.createView();
 
-        this.normalTexture = GPU.CreateTexture({
-            size: [canvas.width, canvas.height],
-            format: "rgba16float",
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-        });
-        this.normalTextureView = this.normalTexture.createView();
-
         this.emissionTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
             format: "rgba16float",
@@ -67,7 +60,6 @@ class GBufferRenderPass extends RenderPass {
                 { view: this.viewNormalTextureView, loadOp: "clear", storeOp: "store" },
 
                 { view: this.colorTextureView, loadOp: "clear", storeOp: "store" },
-                { view: this.normalTextureView, loadOp: "clear", storeOp: "store" },
                 { view: this.emissionTextureView, loadOp: "clear", storeOp: "store" },
                 { view: this.pbrTextureView, loadOp: "clear", storeOp: "store" },
 

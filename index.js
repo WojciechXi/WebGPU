@@ -21,12 +21,6 @@ window.addEventListener('load', async function (event) {
             const unlitShader = new Shader(assets.shaders['Unlit.wgsl']);
             unlitShader.Compile();
 
-            const glassShader = new Shader(assets.shaders['Glass.wgsl']);
-            glassShader.Compile();
-
-            const glassMaterial = new Material(glassShader);
-            glassMaterial.color.Set(0, 0, 0, 0.5);
-
             const stackOfBricksMaterial = new Material(unlitShader);
 
             const whiteMaterial = new Material(unlitShader);
@@ -49,6 +43,12 @@ window.addEventListener('load', async function (event) {
 
             loadBitmap('/Assets/Images/Stack of Bricks/Albedo.jpg', function (bitmap) {
                 stackOfBricksMaterial.albedo = bitmap;
+                loadBitmap('/Assets/Images/Stack of Bricks/Normal.jpg', function (bitmap) {
+                    stackOfBricksMaterial.normal = bitmap;
+                    loadBitmap('/Assets/Images/Stack of Bricks/Occlusion.jpg', function (bitmap) {
+                        stackOfBricksMaterial.ambientOcclusion = bitmap;
+                    });
+                });
             });
 
             loadBitmap('/Assets/Images/U702 PMST9.jpg', function (bitmap) {
@@ -60,23 +60,7 @@ window.addEventListener('load', async function (event) {
             });
 
             loadBitmap('/Assets/Images/WoodFloor057_1K-JPG_Color.jpg', function (bitmap) {
-                // floorMaterial.albedo = bitmap;
-            });
-
-            loadBitmap('/Assets/Images/red-scifi-metal-unity/red-scifi-metal_albedo.png', function (bitmap) {
                 floorMaterial.albedo = bitmap;
-            });
-
-            loadBitmap('/Assets/Images/red-scifi-metal-unity/red-scifi-metal_normal-ogl.png', function (bitmap) {
-                floorMaterial.normal = bitmap;
-            });
-
-            loadBitmap('/Assets/Images/red-scifi-metal-unity/red-scifi-metal_ao.png', function (bitmap) {
-                floorMaterial.ambientOcclusion = bitmap;
-            });
-
-            loadBitmap('/Assets/Images/red-scifi-metal-unity/red-scifi-metal_height.png', function (bitmap) {
-                floorMaterial.heightMap = bitmap;
             });
 
             loadBitmap('/Assets/Images/D3025 OW DAB SONOMA.jpg', function (bitmap) {
@@ -132,7 +116,7 @@ window.addEventListener('load', async function (event) {
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
             directionalLightGameObject.transform.position = new Vector3(0, 15, 0);
-            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-75, 0, 0);
+            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-90, 0, 0);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
@@ -140,16 +124,17 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.GLTF('/Assets/Models', 'Cubes.gltf', function (meshes) {
+            Importer.GLTF('/Assets/Models', 'Stack of Bricks.gltf', function (meshes) {
                 let index = 0;
                 for (const mesh of meshes) {
                     const gameObject = new GameObject(mesh.name);
-                    gameObject.transform.position = new Vector3(0, index++, 0);
                     const meshRenderer = gameObject.AddComponent(MeshRenderer);
-                    // meshRenderer.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+                    meshRenderer.transform.position = new Vector3(0, index, 0);
+                    meshRenderer.transform.rotation = Quaternion.FromEuler(0, 0, 0);
                     meshRenderer.mesh = mesh;
-                    meshRenderer.material = Object(materials).hasOwnProperty(mesh.name) ? materials[mesh.name] : whiteMaterial;
+                    meshRenderer.material = Object(materials).hasOwnProperty(mesh.name) ? materials[mesh.name] : stackOfBricksMaterial;
                     if (Object.keys(materials).indexOf(mesh.name) === -1) console.log(mesh.name);
+                    index++;
                 }
             });
         });

@@ -71,7 +71,7 @@ struct VSOut {
   @location(0) worldPosition : vec3f,
   @location(2) viewPosition : vec3f,
   @location(3) normal  : vec3f,
-  @location(4) modelSpaceNormal  : vec3f,
+  @location(4) tangent  : vec4f,
   @location(5) uv : vec2f,
 };
 
@@ -93,6 +93,7 @@ fn vs(vert: Vertex) -> VSOut {
 
   let normalMatrix = transpose3(inverse3(mat3_from_mat4(viewMatrix * modelMatrix)));
   vsOut.normal = normalize(normalMatrix * vert.normal);
+  vsOut.tangent = vert.tangent;
   vsOut.uv = vert.uv;
 
   return vsOut;
@@ -126,11 +127,10 @@ struct GBufferRenderPass {
   @location(1) viewNormalOut : vec4f,
   
   @location(2) colorOut : vec4f,
-  @location(3) normalOut : vec4f,
-  @location(4) emissionOut : vec4f,
-  @location(5) pbrOut : vec4f, // Metallic/ Roughness / Smoothness / Occlusion
+  @location(3) emissionOut : vec4f,
+  @location(4) pbrOut : vec4f, // Metallic/ Roughness / Smoothness / Occlusion
   
-  @location(6) depthOut : vec4f,
+  @location(5) depthOut : vec4f,
 }
 
 @fragment
@@ -140,8 +140,15 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   let color = uni.color;
   let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
 
-  let normal = uni.viewMatrix * uni.modelMatrix * textureSample(normalTexture, textureSampler, vsOut.uv);
-  let bump = normalize(normal.rgb * 2.0 - 1.0);
+  let normalMap = textureSample(normalTexture, textureSampler, vsOut.uv);
+  let normalTangent = normalize(normalMap.rgb * 2.0 - 1.0);
+
+  let T = normalize(vsOut.tangent.xyz);
+  let N = normalize(vsOut.normal);
+  let B = cross(N, T) * vsOut.tangent.w;
+
+  let TBN = mat3x3f(T, B, N);
+  let normalView = normalize(TBN * normalTangent);
 
   let ambientOcclusion = textureSample(ambientOcclusionTexture, textureSampler, vsOut.uv);
   let height = textureSample(heightTexture, textureSampler, vsOut.uv);
@@ -149,10 +156,9 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   let targetColor = albedo.rgb * color.rgb;
 
   gBufferRenderPass.viewPositionOut = vec4f(vsOut.viewPosition, 1.0);
-  gBufferRenderPass.viewNormalOut = vec4f(vsOut.normal + bump, 0.0);
+  gBufferRenderPass.viewNormalOut = vec4f(normalView, 0.0);
 
   gBufferRenderPass.colorOut = vec4f(targetColor, 1.0);
-  gBufferRenderPass.normalOut = vec4f(bump, 1.0);
   gBufferRenderPass.emissionOut = vec4f(0.0, 0.0, 0.0, 1.0);
   gBufferRenderPass.pbrOut = vec4f(0.5, 0.5, ambientOcclusion.r, 1.0);
 

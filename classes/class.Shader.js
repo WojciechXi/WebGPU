@@ -62,7 +62,7 @@ class Shader {
                     ]
                 },
                 primitive: {
-                    cullMode: 'none',
+                    cullMode: 'back',
                     frontFace: 'ccw',
                 },
             });
@@ -95,7 +95,6 @@ class Shader {
                         { format: "rgba16float" }, // viewNormalTexture
 
                         { format: "rgba16float" }, // colorTexture
-                        { format: "rgba16float" }, // normalTexture
                         { format: "rgba16float" }, // emisssionTexture
                         { format: "rgba16float" }, // pbrTexture
 
@@ -108,7 +107,7 @@ class Shader {
                     depthCompare: "less"
                 },
                 primitive: {
-                    cullMode: 'none',
+                    cullMode: 'back',
                     frontFace: 'ccw',
                 },
             });

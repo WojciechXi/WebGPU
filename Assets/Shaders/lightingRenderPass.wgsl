@@ -56,10 +56,9 @@ struct Uniforms {
 @group(0) @binding(1) var screenSampler : sampler;
 @group(0) @binding(2) var shadowTexture : texture_2d<f32>;
 @group(0) @binding(3) var positionTexure : texture_2d<f32>;
-@group(0) @binding(4) var screenNormalTexture : texture_2d<f32>;
+@group(0) @binding(4) var normalTexture : texture_2d<f32>;
 @group(0) @binding(5) var colorTexture : texture_2d<f32>;
-@group(0) @binding(6) var normalTexture : texture_2d<f32>;
-@group(0) @binding(7) var pbrTexture : texture_2d<f32>;
+@group(0) @binding(6) var pbrTexture : texture_2d<f32>;
 
 struct VSOut {
   @builtin(position) pos : vec4f,
@@ -83,8 +82,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     // Odczyt z G-buffer
     let shadow = textureSample(shadowTexture, screenSampler, vsOut.uv);
     let albedo = textureSample(colorTexture, screenSampler, vsOut.uv).rgb;
-    let screenNormal = textureSample(screenNormalTexture, screenSampler, vsOut.uv).xyz;
-    let n_tagnent = textureSample(normalTexture, screenSampler, vsOut.uv).xyz;
+    let normalTexture = textureSample(normalTexture, screenSampler, vsOut.uv).xyz;
     let pos_view = textureSample(positionTexure, screenSampler, vsOut.uv).xyz;
     let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv).rgb;
 
@@ -100,7 +98,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
 
     let lightDirection = normalize( (viewMatrix * uni.lightViewMatrix * vec4f(0.0, 0.0, 1.0, 0.0)).xyz);
 
-    let N = normalize(screenNormal);
+    let N = normalize(normalTexture);
     let L = normalize(-lightDirection);
     let V = normalize(-pos_view);
     let H = normalize(L + V);
