@@ -7,73 +7,11 @@ function loadBitmap(src, callback) {
     };
 }
 
-async function loadGLTF(path, file) {
-    // 1. Pobieramy plik JSON glTF
-    const res = await fetch(`${path}/${file}`);
-    const gltf = await res.json();
-    console.log('Cały glTF JSON:', gltf);
-
-    // 2. Zakładamy, że pierwszy buffer jest binarny
-    const bufferUri = gltf.buffers[0].uri;
-    const bufferRes = await fetch(`${path}/${bufferUri}`);
-    const arrayBuffer = await bufferRes.arrayBuffer();
-
-    // 3. Funkcja do odczytu danych według accessorów
-    function getAccessorData(accessor) {
-        const bufferView = gltf.bufferViews[accessor.bufferView];
-        const byteOffset = (bufferView.byteOffset || 0) + (accessor.byteOffset || 0);
-        const count = accessor.count;
-        let TypedArrayConstructor;
-
-        switch (accessor.componentType) {
-            case 5126: // FLOAT
-                TypedArrayConstructor = Float32Array;
-                break;
-            case 5123: // UNSIGNED SHORT
-                TypedArrayConstructor = Uint16Array;
-                break;
-            case 5125: // UNSIGNED INT
-                TypedArrayConstructor = Uint32Array;
-                break;
-            default:
-                throw new Error('Nieobsługiwany typ komponentu: ' + accessor.componentType);
-        }
-
-        return new TypedArrayConstructor(arrayBuffer, byteOffset, count * numComponents(accessor.type));
-    }
-
-    // Pomocnicza funkcja do liczby komponentów w accessorze
-    function numComponents(type) {
-        switch (type) {
-            case 'SCALAR': return 1;
-            case 'VEC2': return 2;
-            case 'VEC3': return 3;
-            case 'VEC4': return 4;
-            case 'MAT4': return 16;
-            default: throw new Error('Nieobsługiwany typ: ' + type);
-        }
-    }
-
-    // 4. Przykład: odczyt wierzchołków z pierwszej siatki
-    const mesh = gltf.meshes[0];
-    const primitive = mesh.primitives[0];
-
-    const positions = getAccessorData(gltf.accessors[primitive.attributes.POSITION]);
-    const normals = getAccessorData(gltf.accessors[primitive.attributes.NORMAL]);
-    const tangents = getAccessorData(gltf.accessors[primitive.attributes.TANGENT]);
-    const uvs = getAccessorData(gltf.accessors[primitive.attributes.TEXCOORD_0]);
-
-    console.log('Wierzchołki:', positions);
-    console.log('Normalne:', normals);
-    console.log('Normtangentsalne:', tangents);
-    console.log('uvs:', uvs);
-}
-
 window.addEventListener('load', async function (event) {
     // console.clear();
 
     // Wywołanie funkcji
-    loadGLTF('/Assets/Models', 'Krakow.gltf');
+    Importer.GLTF('/Assets/Models', 'Cubes.gltf');
 
     return;
 
