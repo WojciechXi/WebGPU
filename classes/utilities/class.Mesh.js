@@ -33,6 +33,7 @@ class SubMesh {
         this.colors = data.colors ?? [];
         this.uvs = data.uvs ?? [];
         this.triangles = new Uint32Array(data.triangles ?? 0);
+        this.material = data.material ?? null;
 
         this.indexBuffer = GPU.CreateBuffer({
             size: 0,

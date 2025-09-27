@@ -109,13 +109,12 @@ struct ShadowRenderPass {
 fn shadowRenderPass(vsOut: VSOut) -> ShadowRenderPass {
   var shadowRenderPass: ShadowRenderPass;
 
-  let color = uni.color;
   let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
   let normal = textureSample(normalTexture, textureSampler, vsOut.uv);
   let ambientOcclusion = textureSample(ambientOcclusionTexture, textureSampler, vsOut.uv);
   let height = textureSample(heightTexture, textureSampler, vsOut.uv);
 
-  shadowRenderPass.depthOut = vec4f(vsOut.viewPosition.z, 0.0, 0.0, 1.0);
+  shadowRenderPass.depthOut = vec4f(vsOut.clipPosition.z, 0, 0, 1.0);
 
   return shadowRenderPass;
 }
@@ -158,7 +157,7 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   gBufferRenderPass.viewNormalOut = vec4f(normalView, 0.0);
 
   gBufferRenderPass.colorOut = vec4f(targetColor, 0.0);
-  gBufferRenderPass.pbrOut = vec4f(0.5, 0.5, ambientOcclusion.r, 0.0);
+  gBufferRenderPass.pbrOut = vec4f(0.0, 0.0, ambientOcclusion.r, 0.0);
 
   gBufferRenderPass.depthOut = vec4f(vsOut.viewPosition.z, 0.0, 0.0, 1.0);
 

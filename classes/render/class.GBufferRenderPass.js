@@ -62,7 +62,7 @@ class GBufferRenderPass extends RenderPass {
                 { view: this.colorTextureView, loadOp: "clear", storeOp: "store" },
                 { view: this.pbrTextureView, loadOp: "clear", storeOp: "store" },
 
-                { view: this.depthTextureView, clearValue: { r: 1.0, g: 0, b: 0, a: 1 }, loadOp: "clear", storeOp: "store", }
+                { view: this.depthTextureView, loadOp: "clear", storeOp: "store", }
             ],
             depthStencilAttachment: {
                 view: this.depthStencilTextureView,

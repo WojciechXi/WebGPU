@@ -88,7 +88,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        this.debugRenderPass.textureView = this.ssaoRenderPass.ssaoTextureView;
+        this.debugRenderPass.textureView = this.shadowRenderPass.depthTextureView;
 
         callback();
     }
@@ -101,7 +101,6 @@ class Graphics {
     static Render(engine) {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-        this.clearRenderPass.Render(engine, commandEncoder);
         this.shadowRenderPass.Render(engine, commandEncoder);
 
         this.gBufferRenderPass.Render(engine, commandEncoder);

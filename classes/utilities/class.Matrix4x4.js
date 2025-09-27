@@ -33,34 +33,6 @@ class Matrix4x4 extends Float32Array {
         return dst;
     }
 
-    static PerspectiveLeftHanded(fieldOfViewYInRadians, aspect, zNear, zFar, dst) {
-        dst = dst || new Matrix4x4();
-
-        const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
-
-        dst[0] = f / aspect;
-        dst[1] = 0;
-        dst[2] = 0;
-        dst[3] = 0;
-
-        dst[4] = 0;
-        dst[5] = f;
-        dst[6] = 0;
-        dst[7] = 0;
-
-        dst[8] = 0;
-        dst[9] = 0;
-        dst[10] = zFar / (zFar - zNear);
-        dst[11] = 1;
-
-        dst[12] = 0;
-        dst[13] = 0;
-        dst[14] = (-zNear * zFar) / (zFar - zNear);
-        dst[15] = 0;
-
-        return dst;
-    }
-
     static Ortho(left, right, bottom, top, near, far, dst) {
         dst = dst || new Matrix4x4();
 

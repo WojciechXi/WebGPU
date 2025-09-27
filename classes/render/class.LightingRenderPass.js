@@ -12,7 +12,7 @@ class LightingRenderPass extends RenderPass {
         });
         this.lightingTextureView = this.lightingTexture.createView();
 
-        this.uniformValues = new Float32Array(16 + 16 + 16 + 16 + 4 + 4); //ambientLightColor, lightColor, lightViewMatrix, lightProjectionMatrix
+        this.uniformValues = new Float32Array(16 + 16 + 16 + 16 + 16 + 4 + 4 + 4); //ambientLightColor, lightColor, lightViewMatrix, lightProjectionMatrix
         this.uniformBuffer = GPU.CreateBuffer({
             size: this.uniformValues.length * 4,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
@@ -57,11 +57,13 @@ class LightingRenderPass extends RenderPass {
 
     Render(engine, commandEncoder) {
         this.uniformValues.set(Camera.main.viewMatrix, 0);
-        this.uniformValues.set(Camera.main.projectionMatrix, 16);
-        this.uniformValues.set(DirectionalLight.main.viewMatrix, 32);
-        this.uniformValues.set(DirectionalLight.main.projectionMatrix, 48);
-        this.uniformValues.set(Graphics.ambientLightColor, 64);
-        this.uniformValues.set(Graphics.lightColor, 68);
+        this.uniformValues.set(Camera.main.inverseViewMatrix, 16);
+        this.uniformValues.set(Camera.main.projectionMatrix, 32);
+        this.uniformValues.set(DirectionalLight.main.viewMatrix, 48);
+        this.uniformValues.set(DirectionalLight.main.projectionMatrix, 64);
+        this.uniformValues.set(DirectionalLight.main.color, 80);
+        this.uniformValues.set(DirectionalLight.main.shadowColor, 84);
+        this.uniformValues.set(AmbientLight.main.color, 88);
 
         GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
 

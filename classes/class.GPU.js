@@ -6,8 +6,55 @@ class GPU {
     }
 
     static async Request() {
-        this.adapter = await navigator.gpu?.requestAdapter();
-        this.device = await this.adapter?.requestDevice();
+        const adapter = this.adapter = await navigator.gpu?.requestAdapter();
+        const device = this.device = await this.adapter?.requestDevice();
+        const limits = this.limits = device.limits;
+
+        console.log("🔍 Limity GPU:", limits);
+
+        // === Wrapper na createBuffer ===
+        const originalCreateBuffer = device.createBuffer.bind(device);
+        device.createBuffer = (desc) => {
+            if (desc.size > limits.maxBufferSize) {
+                console.warn(
+                    `⚠️ Próba stworzenia bufora ${desc.size} bajtów > maxBufferSize ${limits.maxBufferSize}`
+                );
+            }
+            if (
+                desc.usage & GPUBufferUsage.STORAGE &&
+                desc.size > limits.maxStorageBufferBindingSize
+            ) {
+                console.warn(
+                    `⚠️ Storage buffer za duży: ${desc.size} bajtów > ${limits.maxStorageBufferBindingSize}`
+                );
+            }
+            if (
+                desc.usage & GPUBufferUsage.UNIFORM &&
+                desc.size > limits.maxUniformBufferBindingSize
+            ) {
+                console.warn(
+                    `⚠️ Uniform buffer za duży: ${desc.size} bajtów > ${limits.maxUniformBufferBindingSize}`
+                );
+            }
+            return originalCreateBuffer(desc);
+        };
+
+        // === Wrapper na createTexture ===
+        const originalCreateTexture = device.createTexture.bind(device);
+        device.createTexture = (desc) => {
+            const { width, height, depthOrArrayLayers = 1 } = desc.size;
+            if (width > limits.maxTextureDimension2D || height > limits.maxTextureDimension2D) {
+                console.warn(
+                    `⚠️ Tekstura ${width}x${height} przekracza maxTextureDimension2D ${limits.maxTextureDimension2D}`
+                );
+            }
+            if (depthOrArrayLayers > limits.maxTextureArrayLayers) {
+                console.warn(
+                    `⚠️ Za dużo warstw w teksturze: ${depthOrArrayLayers} > ${limits.maxTextureArrayLayers}`
+                );
+            }
+            return originalCreateTexture(desc);
+        };
 
         return this.device;
     }

@@ -4,7 +4,7 @@ class ShadowRenderPass extends RenderPass {
         const canvas = data.canvas;
 
         this.depthTexture = GPU.CreateTexture({
-            size: [256, 256],
+            size: [512, 512],
             format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });

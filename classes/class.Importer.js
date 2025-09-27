@@ -159,6 +159,7 @@ class Importer {
                     tangents: tangents,
                     uvs: uvs,
                     triangles: _indices,
+                    material: gltf.materials[primitive.material].name,
                 });
 
                 mesh.subMeshes.push(subMesh);
@@ -168,7 +169,7 @@ class Importer {
             meshes.push(mesh);
         });
 
-        if (callback) callback(meshes);
+        if (callback) callback(meshes, gltf.materials);
     }
 
 }

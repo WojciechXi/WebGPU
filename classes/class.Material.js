@@ -4,21 +4,22 @@ class Material {
         console.log('Material class loaded');
     }
 
-    constructor(shader) {
-        this.shader = shader;
-        this.color = Color.white;
+    constructor(data = {}) {
+        this.name = data.name ?? 'Material';
+        this.shader = data.shader ?? '';
+        this.color = data.color ?? Color.white;
 
         this.smoothness = 0;
         this.metallic = 0;
         this.ambientOcclusion = 0;
 
+        this.albedo = null;
+        this.normal = null;
+        this.ambientOcclusion = null;
+        this.heightMap = null;
+
         const uniformSize = 16 + 16 + 16 + 4 + 4; // modelMatrix, viewMatrix, projectionMatrix, color, pbr
         this.uniformValues = new Float32Array(uniformSize);
-        this.uniformBuffer = GPU.CreateBuffer({
-            label: 'uniform buffer',
-            size: this.uniformValues.length * 4,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
 
         this.sampler = GPU.CreateSampler({
             addressModeU: 'repeat',
@@ -28,34 +29,60 @@ class Material {
             mipmapFilter: 'linear',
         });
 
-        this.albedo = null;
-        this.normal = null;
-        this.ambientOcclusion = null;
-        this.heightMap = null;
+        this.bindGroups = {};
+        this.uniformBuffers = {};
+    }
+
+    Update() {
+        this.bindGroups = {};
+        this.uniformBuffers = {};
+    }
+
+    GetUniformBuffer(renderPass, renderPipeline) {
+        if (!renderPipeline) return null;
+        if (this.uniformBuffers[renderPass.name]) return this.uniformBuffers[renderPass.name];
+        return this.uniformBuffers[renderPass.name] = GPU.CreateBuffer({
+            label: 'uniform buffer',
+            size: this.uniformValues.length * 4,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+    }
+
+    GetBindGroup(renderPass, renderPipeline, uniformBuffer) {
+        if (!renderPipeline) return null;
+        if (this.bindGroups[renderPass.name]) return this.bindGroups[renderPass.name];
+        return this.bindGroups[renderPass.name] = GPU.CreateBindGroup({
+            layout: renderPipeline.getBindGroupLayout(0),
+            entries: [
+                { binding: 0, resource: { buffer: uniformBuffer } },
+                { binding: 1, resource: this.sampler },
+                { binding: 2, resource: this.albedo.createView() },
+                { binding: 3, resource: this.normal.createView() },
+                { binding: 4, resource: this.ambientOcclusion.createView() },
+                { binding: 5, resource: this.heightMap.createView() },
+            ],
+        });
     }
 
     Use(renderPass, modelMatrix, viewMatrix, projectionMatrix) {
         let renderPipeline = this.shader.Use(renderPass);
         if (renderPipeline) {
-            renderPass.SetBindGroup(0, GPU.CreateBindGroup({
-                layout: renderPipeline.getBindGroupLayout(0),
-                entries: [
-                    { binding: 0, resource: { buffer: this.uniformBuffer } },
-                    { binding: 1, resource: this.sampler },
-                    { binding: 2, resource: this.albedo.createView() },
-                    { binding: 3, resource: this.normal.createView() },
-                    { binding: 4, resource: this.ambientOcclusion.createView() },
-                    { binding: 5, resource: this.heightMap.createView() },
-                ],
-            }));
+            let uniformBuffer = this.GetUniformBuffer(renderPass, renderPipeline);
+            if (uniformBuffer) {
+                let bindGroup = this.GetBindGroup(renderPass, renderPipeline, uniformBuffer);
+                if (bindGroup) {
+                    this.uniformValues.set(modelMatrix, 0);
+                    this.uniformValues.set(viewMatrix, 16);
+                    this.uniformValues.set(projectionMatrix, 32);
+                    this.uniformValues.set(this.color, 48);
+                    this.uniformValues.set([this.smoothness, this.metallic, this.ambientOcclusion], 52);
 
-            this.uniformValues.set(modelMatrix, 0);
-            this.uniformValues.set(viewMatrix, 16);
-            this.uniformValues.set(projectionMatrix, 32);
-            this.uniformValues.set(this.color, 48);
-            this.uniformValues.set([this.smoothness, this.metallic, this.ambientOcclusion], 52);
+                    GPU.Queue.writeBuffer(uniformBuffer, 0, this.uniformValues);
 
-            GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
+                    renderPass.SetBindGroup(0, bindGroup);
+                }
+            }
+
             return true;
         }
 
@@ -175,7 +202,7 @@ class Material {
         } else {
             GPU.Queue.writeTexture(
                 { texture: this._heightMap },
-                new Uint8Array([0, 0, 0, 255]),
+                new Uint8Array([255, 255, 255, 255]),
                 { bytesPerRow: width * 4 },
                 { width, height, depthOrArrayLayers: 1 }
             );

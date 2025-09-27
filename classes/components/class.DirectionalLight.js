@@ -4,6 +4,15 @@ class DirectionalLight extends Component {
         if (DirectionalLight.main == null) DirectionalLight.main = this;
 
         this.color = Color.white;
+        this.shadowColor = new Color(0.5, 0.5, 0.5, 1);
+
+        this.aspect = 1;
+        this.nearClipPlane = 0.1;
+        this.farClipPlane = 100;
+        this.fieldOfView = 60;
+
+        this.orthographic = false;
+        this.orthographicSize = 25;
 
         this.viewMatrix = Matrix4x4.Identity();
         this.projectionMatrix = Matrix4x4.Identity();
@@ -12,12 +21,9 @@ class DirectionalLight extends Component {
     }
 
     Update() {
-        Graphics.lightDirection = this.transform.forward;
-        Graphics.lightColor = this.color;
-
         Matrix4x4.Inverse(this.transform.matrix4x4, this.viewMatrix);
-        Matrix4x4.Ortho(-16, 16, -16, 16, 0.1, 100, this.projectionMatrix);
-        Matrix4x4.Multiply(this.viewMatrix, this.projectionMatrix, this.viewProjectionMatrix);
+        Matrix4x4.Ortho(-this.orthographicSize / 2, this.orthographicSize / 2, -this.orthographicSize / 2, this.orthographicSize / 2, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
+        Matrix4x4.Multiply(this.projectionMatrix, this.viewMatrix, this.viewProjectionMatrix);
         Matrix4x4.Inverse(this.viewProjectionMatrix, this.inverseViewProjectionMatrix);
     }
 

@@ -28,9 +28,6 @@
 			"doubleSided":true,
 			"name":"Cube",
 			"pbrMetallicRoughness":{
-				"baseColorTexture":{
-					"index":0
-				},
 				"metallicFactor":0,
 				"roughnessFactor":0.5
 			}
@@ -76,23 +73,10 @@
 						"TEXCOORD_0":7,
 						"TANGENT":8
 					},
-					"indices":4,
+					"indices":9,
 					"material":1
 				}
 			]
-		}
-	],
-	"textures":[
-		{
-			"sampler":0,
-			"source":0
-		}
-	],
-	"images":[
-		{
-			"mimeType":"image/jpeg",
-			"name":"Albedo",
-			"uri":"Albedo.jpg"
 		}
 	],
 	"accessors":[
@@ -139,36 +123,42 @@
 		{
 			"bufferView":5,
 			"componentType":5126,
-			"count":24,
+			"count":48,
 			"max":[
-				0.5,
+				5,
 				1.5,
-				0.5
+				5
 			],
 			"min":[
-				-0.5,
-				0.5,
-				-0.5
+				-5,
+				-5.5,
+				-5
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":6,
 			"componentType":5126,
-			"count":24,
+			"count":48,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":7,
 			"componentType":5126,
-			"count":24,
+			"count":48,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":8,
 			"componentType":5126,
-			"count":24,
+			"count":48,
 			"type":"VEC4"
+		},
+		{
+			"bufferView":9,
+			"componentType":5123,
+			"count":72,
+			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
@@ -204,38 +194,38 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":288,
+			"byteLength":576,
 			"byteOffset":1224,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":288,
-			"byteOffset":1512,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":192,
+			"byteLength":576,
 			"byteOffset":1800,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":384,
-			"byteOffset":1992,
+			"byteOffset":2376,
 			"target":34962
-		}
-	],
-	"samplers":[
+		},
 		{
-			"magFilter":9729,
-			"minFilter":9987
+			"buffer":0,
+			"byteLength":768,
+			"byteOffset":2760,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":144,
+			"byteOffset":3528,
+			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":2376,
+			"byteLength":3672,
 			"uri":"Cubes.bin"
 		}
 	]

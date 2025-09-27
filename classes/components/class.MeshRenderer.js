@@ -22,7 +22,7 @@ class MeshRenderer extends Component {
         if (renderPass.name === 'shadowRenderPass') {
             if (this.castShadows) {
                 for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
-                    if (this.material.Use(renderPass, this.transform.matrix4x4, Camera.main.viewMatrix, Camera.main.projectionMatrix)) {
+                    if (this.material.Use(renderPass, this.transform.matrix4x4, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix)) {
                         this.mesh.subMeshes[i].Render(renderPass);
                     }
                 }
