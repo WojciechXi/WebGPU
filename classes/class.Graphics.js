@@ -58,13 +58,13 @@ class Graphics {
             code: assets.shaders['ssaoRenderPass.wgsl'],
             gBufferRenderPass: gBufferRenderPass,
             canvas: canvas,
-            radius: 0.25,
-            bias: 0.025,
+            radius: 0.125,
+            bias: 0.0125,
         });
 
         const ssaoBlurRenderPass = this.ssaoBlurRenderPass = new SSAOBlurRenderPass({
             radius: 4,
-            sigmaDepth: 0.25,
+            sigmaDepth: 0.2,
             name: 'ssaoBlurRenderPass',
             code: assets.shaders['ssaoBlurRenderPass.wgsl'],
             ssaoRenderPass: ssaoRenderPass,
@@ -82,13 +82,20 @@ class Graphics {
             canvas: canvas,
         });
 
+        const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
+            name: 'tonemappingRenderPass',
+            code: assets.shaders['tonemappingRenderPass.wgsl'],
+            finalRenderPass: finalRenderPass,
+            canvas: canvas,
+        });
+
         const debugRenderPass = this.debugRenderPass = new DebugRenderPass({
             name: 'debugRenderPass',
             code: assets.shaders['debugRenderPass.wgsl'],
             canvas: canvas,
         });
 
-        this.debugRenderPass.textureView = this.lightingRenderPass.lightingTextureView;
+        this.debugRenderPass.textureView = this.ssaoRenderPass.ssaoTextureView;
 
         callback();
     }
@@ -110,8 +117,9 @@ class Graphics {
         this.ssaoBlurRenderPass.Render(engine, commandEncoder);
 
         this.lightingRenderPass.Render(engine, commandEncoder);
-        this.forwardRenderPass.Render(engine, commandEncoder);
+        // this.forwardRenderPass.Render(engine, commandEncoder);
         this.finalRenderPass.Render(engine, commandEncoder);
+        this.tonemappingRenderPass.Render(engine, commandEncoder);
 
         // this.debugRenderPass.Render(engine, commandEncoder);
 

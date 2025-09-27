@@ -15,6 +15,7 @@ class Material {
 
         this.albedo = null;
         this.normal = null;
+        this.mask = null;
         this.ambientOcclusion = null;
         this.heightMap = null;
 
@@ -58,8 +59,7 @@ class Material {
                 { binding: 1, resource: this.sampler },
                 { binding: 2, resource: this.albedo.createView() },
                 { binding: 3, resource: this.normal.createView() },
-                { binding: 4, resource: this.ambientOcclusion.createView() },
-                { binding: 5, resource: this.heightMap.createView() },
+                { binding: 4, resource: this.mask.createView() },
             ],
         });
     }
@@ -143,6 +143,36 @@ class Material {
             GPU.Queue.writeTexture(
                 { texture: this._normal },
                 new Uint8Array([0, 0, 255, 255]),
+                { bytesPerRow: width * 4 },
+                { width, height, depthOrArrayLayers: 1 }
+            );
+        }
+    }
+
+    get mask() {
+        return this._mask;
+    }
+
+    set mask(mask) {
+        const width = mask ? mask.width : 1;
+        const height = mask ? mask.height : 1;
+
+        this._mask = GPU.CreateTexture({
+            size: [width, height, 1],
+            format: 'rgba8unorm',
+            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+        });
+
+        if (mask) {
+            GPU.Queue.copyExternalImageToTexture(
+                { source: mask },
+                { texture: this._mask },
+                [width, height, 1]
+            );
+        } else {
+            GPU.Queue.writeTexture(
+                { texture: this._mask },
+                new Uint8Array([0, 0, 0, 0]),
                 { bytesPerRow: width * 4 },
                 { width, height, depthOrArrayLayers: 1 }
             );

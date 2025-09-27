@@ -1,17 +1,23 @@
 class FinalRenderPass extends RenderPass {
 
     Init(data) {
-        const clearRenderPass = data.clearRenderPass;
-        const gBufferRenderPass = data.gBufferRenderPass;
-        const lightingRenderPass = data.lightingRenderPass;
-        const forwardRenderPass = data.forwardRenderPass;
-        const ssaoRenderPass = data.ssaoRenderPass;
-        const canvas = data.canvas;
+        const clearRenderPass = this.clearRenderPass = data.clearRenderPass;
 
-        const format = navigator.gpu.getPreferredCanvasFormat();
+        this.gBufferRenderPass = data.gBufferRenderPass;
+        this.lightingRenderPass = data.lightingRenderPass;
+        this.forwardRenderPass = data.forwardRenderPass;
+        this.ssaoRenderPass = data.ssaoRenderPass;
+        this.canvas = data.canvas;
 
         this.uniformValues = new Float32Array(4);
-        this.uniformValues.set([canvas.width, canvas.height]); //radius / bias / screen size
+        this.uniformValues.set([this.canvas.width, this.canvas.height]); //radius / bias / screen size
+
+        this.sceneTexture = GPU.CreateTexture({
+            size: [this.canvas.width, this.canvas.height],
+            format: "rgba16float",
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        });
+        this.sceneTextureView = this.sceneTexture.createView();
 
         this.uniformBuffer = GPU.CreateBuffer({
             size: this.uniformValues.length * 4,
@@ -27,7 +33,9 @@ class FinalRenderPass extends RenderPass {
             fragment: {
                 module: this.shaderModule,
                 entryPoint: "fs",
-                targets: [{ format }]
+                targets: [
+                    { format: 'rgba16float', }
+                ],
             }
         });
 
@@ -43,12 +51,12 @@ class FinalRenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: clearRenderPass.colorTextureView },
-                { binding: 2, resource: lightingRenderPass.lightingTextureView },
-                { binding: 3, resource: gBufferRenderPass.depthTextureView },
-                { binding: 4, resource: forwardRenderPass.colorTextureView },
-                { binding: 5, resource: forwardRenderPass.depthTextureView },
-                { binding: 6, resource: ssaoRenderPass.ssaoTextureView },
+                { binding: 1, resource: this.clearRenderPass.colorTextureView },
+                { binding: 2, resource: this.lightingRenderPass.lightingTextureView },
+                { binding: 3, resource: this.gBufferRenderPass.depthTextureView },
+                { binding: 4, resource: this.forwardRenderPass.colorTextureView },
+                { binding: 5, resource: this.forwardRenderPass.depthTextureView },
+                { binding: 6, resource: this.ssaoRenderPass.ssaoTextureView },
                 { binding: 7, resource: this.sampler },
             ],
         });
@@ -58,7 +66,7 @@ class FinalRenderPass extends RenderPass {
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 {
-                    view: Graphics.context.getCurrentTexture().createView(), // wyświetlamy na ekranie
+                    view: this.sceneTextureView, // wyświetlamy na ekranie
                     loadOp: "clear",
                     storeOp: "store"
                 }

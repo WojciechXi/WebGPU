@@ -38,6 +38,7 @@
     <script src="./classes/render/class.SSAORenderPass.js"></script>
     <script src="./classes/render/class.SSAOBlurRenderPass.js"></script>
     <script src="./classes/render/class.FinalRenderPass.js"></script>
+    <script src="./classes/render/class.TonemappingRenderPass.js"></script>
     <script src="./classes/render/class.DebugRenderPass.js"></script>
 
     <script src="./classes/class.Object.js"></script>

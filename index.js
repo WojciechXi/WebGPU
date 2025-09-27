@@ -50,10 +50,6 @@ window.addEventListener('load', async function (event) {
                 name: 'Concrete',
                 shader: unlitShader,
             });
-            const floorMaterial = new Material({
-                name: 'Floor',
-                shader: unlitShader,
-            });
             const u702pmst9Material = new Material({
                 name: 'U702PMST9',
                 shader: unlitShader,
@@ -72,6 +68,10 @@ window.addEventListener('load', async function (event) {
                 shader: unlitShader,
             });
 
+            const floorMaterial = new Material({
+                name: 'Floor',
+                shader: unlitShader,
+            });
             loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_albedo.png', function (albedo) {
                 loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_normal.png', function (normal) {
                     loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_ao.png', function (ambientOcclusion) {
@@ -79,6 +79,37 @@ window.addEventListener('load', async function (event) {
                         floorMaterial.normal = normal;
                         floorMaterial.ambientOcclusion = ambientOcclusion;
                         floorMaterial.Update();
+                    });
+                });
+            });
+
+            const stackOfBricksMaterial = new Material({
+                name: 'Stack of bricks',
+                shader: unlitShader,
+            });
+            loadBitmap('/Assets/Images/Stack of Bricks/Albedo.jpg', function (albedo) {
+                loadBitmap('/Assets/Images/Stack of Bricks/Normal.jpg', function (normal) {
+                    loadBitmap('/Assets/Images/Stack of Bricks/Occlusion.jpg', function (ambientOcclusion) {
+                        stackOfBricksMaterial.albedo = albedo;
+                        stackOfBricksMaterial.normal = normal;
+                        stackOfBricksMaterial.ambientOcclusion = ambientOcclusion;
+                        stackOfBricksMaterial.Update();
+                    });
+                });
+            });
+
+            const pbrShpereMaterial = new Material({
+                name: 'PBR',
+                shader: unlitShader,
+            });
+            loadBitmap('/Assets/Images/pbr_sphere/sphere_baseColor.jpeg', function (albedo) {
+                loadBitmap('/Assets/Images/pbr_sphere/sphere_normal.png', function (normal) {
+                    loadBitmap('/Assets/Images/pbr_sphere/sphere_metallicRoughness.png', function (mask) {
+                        pbrShpereMaterial.albedo = albedo;
+                        pbrShpereMaterial.normal = normal;
+                        pbrShpereMaterial.mask = mask;
+                        // pbrShpereMaterial.ambientOcclusion = ambientOcclusion;
+                        pbrShpereMaterial.Update();
                     });
                 });
             });
@@ -105,6 +136,8 @@ window.addEventListener('load', async function (event) {
 
             const materials = {
                 Glass: null,
+                sphere: pbrShpereMaterial,
+                'Stack of Bricks': stackOfBricksMaterial,
 
                 Light: goldMaterial,
                 Plastic: whiteMaterial,
@@ -142,22 +175,22 @@ window.addEventListener('load', async function (event) {
             };
 
             const ambientLight = engine.scene.AddComponent(AmbientLight);
-            ambientLight.color.Set(0.95, 0.975, 1, 1);
+            ambientLight.color.Set(0.9, 0.95, 1, 0.2);
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
-            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-60, 0, -30);
+            // directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-60, 0, -30);
             directionalLightGameObject.transform.position = directionalLightGameObject.transform.back.Multiply(50);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
-            cameraGameObject.transform.position = new Vector3(-1, 1, 5);
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+            Importer.GLTF('/Assets/Models', 'scene.gltf', function (meshes, gltfMaterials) {
                 for (const mesh of meshes) {
                     const gameObject = new GameObject(mesh.name);
-                    gameObject.transform.position = new Vector3(0, 0, -5);
+                    gameObject.transform.position = new Vector3(0, 0, -2);
+                    gameObject.transform.rotation = Quaternion.FromEuler(0, 0, -90);
                     const meshRenderer = gameObject.AddComponent(MeshRenderer);
                     meshRenderer.mesh = mesh;
 
@@ -166,6 +199,7 @@ window.addEventListener('load', async function (event) {
                         if (materials.hasOwnProperty(subMesh.material)) {
                             meshRenderer.materials.push(materials[subMesh.material]);
                         } else {
+                            console.log(subMesh.material);
                             meshRenderer.materials.push(whiteMaterial);
                         }
                     });

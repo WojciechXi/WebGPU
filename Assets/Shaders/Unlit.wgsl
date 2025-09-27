@@ -63,8 +63,7 @@ struct Vertex {
 @group(0) @binding(1) var textureSampler : sampler;
 @group(0) @binding(2) var albedoTexture : texture_2d<f32>;
 @group(0) @binding(3) var normalTexture : texture_2d<f32>;
-@group(0) @binding(4) var ambientOcclusionTexture : texture_2d<f32>;
-@group(0) @binding(5) var heightTexture : texture_2d<f32>;
+@group(0) @binding(4) var maskTexture : texture_2d<f32>;
 
 struct VSOut {
   @builtin(position) clipPosition : vec4f,
@@ -111,8 +110,7 @@ fn shadowRenderPass(vsOut: VSOut) -> ShadowRenderPass {
 
   let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
   let normal = textureSample(normalTexture, textureSampler, vsOut.uv);
-  let ambientOcclusion = textureSample(ambientOcclusionTexture, textureSampler, vsOut.uv);
-  let height = textureSample(heightTexture, textureSampler, vsOut.uv);
+  let mask = textureSample(maskTexture, textureSampler, vsOut.uv);
 
   let clipPosition = vsOut.clipPosition;
   let ndc = (clipPosition.xyz / clipPosition.w);
@@ -152,8 +150,7 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   let TBN = mat3x3f(T, B, N);
   let normalView = normalize(TBN * normalTangent);
 
-  let ambientOcclusion = textureSample(ambientOcclusionTexture, textureSampler, vsOut.uv);
-  let height = textureSample(heightTexture, textureSampler, vsOut.uv);
+  let mask = textureSample(maskTexture, textureSampler, vsOut.uv);
 
   let targetColor = albedo.rgb * color.rgb;
 
@@ -161,7 +158,7 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   gBufferRenderPass.viewNormalOut = vec4f(normalView, 0.0);
 
   gBufferRenderPass.colorOut = vec4f(targetColor, 0.0);
-  gBufferRenderPass.pbrOut = vec4f(0.0, 0.0, ambientOcclusion.r, 0.0);
+  gBufferRenderPass.pbrOut = vec4f(mask.g, mask.b, mask.r, 0.0);
 
   gBufferRenderPass.depthOut = vec4f(vsOut.viewPosition.z, 0.0, 0.0, 1.0);
 

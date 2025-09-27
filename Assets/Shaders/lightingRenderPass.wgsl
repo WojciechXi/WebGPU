@@ -36,6 +36,7 @@ fn inverse3(m: mat3x3f) -> mat3x3f {
     let det = a*A + b*B + c*C;
     let invDet = 1.0 / det;
 
+    // mat3 constructor is column-major: supply columns
     return mat3x3f(
         vec3f(A, D, G) * invDet,
         vec3f(B, E, H) * invDet,
@@ -63,12 +64,14 @@ fn inverse4(m : mat4x4f) -> mat4x4f {
     let b11 = a22 * a33 - a23 * a32;
 
     let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+    let invDet = 1.0 / det;
 
+    // each vec4(...) / det to produce columns (column-major)
     return mat4x4f(
-        vec4f( a11 * b11 - a12 * b10 + a13 * b09,  a02 * b10 - a01 * b11 - a03 * b09,  a31 * b05 - a32 * b04 + a33 * b03,  a22 * b04 - a21 * b05 - a23 * b03) / det,
-        vec4f( a12 * b08 - a10 * b11 - a13 * b07,  a00 * b11 - a02 * b08 + a03 * b07,  a32 * b02 - a30 * b05 - a33 * b01,  a20 * b05 - a22 * b02 + a23 * b01) / det,
-        vec4f( a10 * b10 - a11 * b08 + a13 * b06,  a01 * b08 - a00 * b10 - a03 * b06,  a30 * b04 - a31 * b02 + a33 * b00,  a21 * b02 - a20 * b04 - a23 * b00) / det,
-        vec4f( a11 * b07 - a10 * b09 - a12 * b06,  a00 * b09 - a01 * b07 + a02 * b06,  a31 * b01 - a30 * b03 - a32 * b00,  a20 * b03 - a21 * b01 + a22 * b00) / det
+        vec4f( a11 * b11 - a12 * b10 + a13 * b09,  a02 * b10 - a01 * b11 - a03 * b09,  a31 * b05 - a32 * b04 + a33 * b03,  a22 * b04 - a21 * b05 - a23 * b03) * invDet,
+        vec4f( a12 * b08 - a10 * b11 - a13 * b07,  a00 * b11 - a02 * b08 + a03 * b07,  a32 * b02 - a30 * b05 - a33 * b01,  a20 * b05 - a22 * b02 + a23 * b01) * invDet,
+        vec4f( a10 * b10 - a11 * b08 + a13 * b06,  a01 * b08 - a00 * b10 - a03 * b06,  a30 * b04 - a31 * b02 + a33 * b00,  a21 * b02 - a20 * b04 - a23 * b00) * invDet,
+        vec4f( a11 * b07 - a10 * b09 - a12 * b06,  a00 * b09 - a01 * b07 + a02 * b06,  a31 * b01 - a30 * b03 - a32 * b00,  a20 * b03 - a21 * b01 + a22 * b00) * invDet
     );
 }
 
@@ -86,27 +89,35 @@ struct Uniforms {
 @group(0) @binding(0) var<uniform> uni : Uniforms;
 @group(0) @binding(1) var screenSampler : sampler;
 @group(0) @binding(2) var shadowTexture : texture_2d<f32>;
-@group(0) @binding(3) var positionTexure : texture_2d<f32>;
+@group(0) @binding(3) var positionTexture : texture_2d<f32>;
 @group(0) @binding(4) var normalTexture : texture_2d<f32>;
 @group(0) @binding(5) var colorTexture : texture_2d<f32>;
 @group(0) @binding(6) var pbrTexture : texture_2d<f32>;
 
+// 3x3 PCF shadow sample
 fn sampleShadow(shadowUV: vec2f, depth: f32) -> f32 {
-    let texelSize = 1.0 / vec2f(textureDimensions(shadowTexture, 0));
+    // textureDimensions returns integer vec2; rzutujemy na float
+    let dims_i = textureDimensions(shadowTexture, 0);
+    let dims = vec2f(f32(dims_i.x), f32(dims_i.y));
+    let texelSize = vec2f(1.0, 1.0) / dims;
+
     var shadow: f32 = 0.0;
 
     // 3x3 PCF kernel
-    for (var x = -1; x <= 1; x = x + 1) {
-        for (var y = -1; y <= 1; y = y + 1) {
-            let offset = vec2f(f32(x), f32(y)) * texelSize;
-            let depthSample = textureSample(shadowTexture, screenSampler, shadowUV + offset).r;
-            if (depth - 0.001 < depthSample) {
-                shadow += 1.0;
+    for (var ox: i32 = -1; ox <= 1; ox = ox + 1) {
+        for (var oy: i32 = -1; oy <= 1; oy = oy + 1) {
+            let offset = vec2f(f32(ox), f32(oy)) * texelSize;
+            // clamp UV to avoid sampling outside
+            let sampleUV = clamp(shadowUV + offset, vec2f(0.0), vec2f(1.0));
+            let depthSample = textureSample(shadowTexture, screenSampler, sampleUV).r;
+            // simple depth compare with small bias
+            if (depth - 0.001 <= depthSample) {
+                shadow = shadow + 1.0;
             }
         }
     }
 
-    return shadow / 9.0; // uśrednienie
+    return shadow / 9.0;
 }
 
 struct VSOut {
@@ -130,56 +141,69 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
 
 @fragment
 fn fs(vsOut: VSOut) -> @location(0) vec4f {
-    // Odczyt z G-buffer
-    let color = textureSample(colorTexture, screenSampler, vsOut.uv);
-    let albedo = color.rgb;
-    let emission = albedo * color.a;
+    // --- odczyty tekstur (lokalne nazwy, by nie kolidowały z bindingami) ---
+    let normalSample = textureSample(normalTexture, screenSampler, vsOut.uv).xyz;
+    var viewPos4 = textureSample(positionTexture, screenSampler, vsOut.uv);
+    // Bezpiecznie znormalizuj / podziel przez w jeśli jest to vec4 z w != 1
+    var viewPos: vec3f = viewPos4.xyz;
+    if (abs(viewPos4.w) > 1e-6) {
+        viewPos = viewPos4.xyz / viewPos4.w;
+    }
 
-    let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv);
-    let smoothness = clamp(pbr.r, 0.0, 1.0);
-    let metallic = clamp(pbr.g, 0.0, 1.0);
-    let ao = clamp(pbr.b, 0.0, 1.0);
-    // let ao = clamp(pbr.a, 0.0, 1.0);
-    
-    var viewMatrix = uni.viewMatrix;
-    viewMatrix[3] = vec4f(0.0, 0.0, 0.0, 1.0);
-    let lightDirection = normalize( (viewMatrix * uni.lightViewMatrix * vec4f(0.0, 0.0, 1.0, 0.0)).xyz);
+    // world position (do shadow mapping)
+    let worldPos4 = uni.inverseViewMatrix * vec4f(viewPos, 1.0);
+    let worldPos3 = worldPos4.xyz / worldPos4.w;
 
-    let normalTexture = textureSample(normalTexture, screenSampler, vsOut.uv).xyz;
-    let viewPosition = textureSample(positionTexure, screenSampler, vsOut.uv);
-    let worldPosition4 = uni.inverseViewMatrix * viewPosition;
-    let worldPosition3 = worldPosition4.xyz / worldPosition4.w;
+    // light direction: obliczamy direction w world space z macierzy widoku światła
+    let lightWorldDirection = normalize((inverse4(uni.lightViewMatrix) * vec4f(0.0, 0.0, -1.0, 0.0)).xyz);
+    // konwertujemy do view space kamery (bo normale masz w view space)
+    let lightViewDirection = normalize((uni.viewMatrix * vec4f(lightWorldDirection, 0.0)).xyz);
 
-    let lightClip = uni.lightProjectionMatrix * uni.lightViewMatrix * vec4f(worldPosition3, 1.0);
-    var lightNDC = (lightClip.xyz / lightClip.w);
-    let lightDepth = lightNDC.z; // [0,1]
+    // shadow coords (zwróć uwagę na flip Y jeśli potrzeba)
+    let lightClip = uni.lightProjectionMatrix * uni.lightViewMatrix * vec4f(worldPos3, 1.0);
+    let lightNDC = lightClip.xyz / lightClip.w;
+    let lightDepth = lightNDC.z; // w zależności od projektu może wymagać remap do [0,1]
+    let shadowUV = lightNDC.xy * 0.5 + vec2f(0.5, 0.5);
+    let shadowSampleVal = sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth);
 
-    let shadowUV = lightNDC.xy * 0.5 + 0.5;
-    let shadowSample = sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth);
-
+    // światła / ambient
     let ambientLightColor = uni.ambientLightColor.rgb * uni.ambientLightColor.a;
     let lightColor = uni.lightColor.rgb * uni.lightColor.a;
 
-    let N = normalize(normalTexture);
-    let L = normalize(-lightDirection);
-    let V = normalize(-viewPosition.xyz);
+    // --- normala w view space ---
+    // jeśli normalSample jest w [0,1], przemapuj do [-1,1]
+    let N = normalize(normalSample);
+
+    // L, V, H (wszystko w view space)
+    let L = normalize(-lightViewDirection); // negacja jeśli potrzebujesz kierunku od fragmentu do źródła
+    let V = normalize(-viewPos); // kamera w (0,0,0) w view space
     let H = normalize(L + V);
 
     let NdotL = max(dot(N, L), 0.0);
 
-    var diffuse  = albedo * NdotL * ao * (1.0 - metallic);
+    // --- kolory i PBR kanały (konwencja: R = roughness, G = metallic, B = ao) ---
+    let colorSample = textureSample(colorTexture, screenSampler, vsOut.uv);
+    let albedo = colorSample.rgb;
+    let emission = albedo * colorSample.a;
 
-    let roughness = 1.0 - smoothness;
+    let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv).rgb;
+    let roughness = clamp(pbr.r, 0.001, 1.0); // R = roughness
+    let metallic = clamp(pbr.g, 0.0, 1.0);    // G = metallic
+    let ao = clamp(pbr.b, 0.0, 1.0);          // B = AO
+
+    // --- prosty PBR (upraszczony Cook-Torrance można wstawić tutaj) ---
+    // tutaj zostawiam Twoje istniejące podejście, ale z poprawionymi wartościami
+    var diffuse = albedo * NdotL * ao * (1.0 - metallic);
+
     let shininess = 1.0 / (roughness * roughness);
 
     let F0 = mix(vec3f(0.04), albedo, metallic);
     let specularStrength = pow(max(dot(N, H), 0.0), shininess) * NdotL;
-    let specular = F0 * specularStrength;
+    let specular = F0 * specularStrength * 5;
 
     let ambient = albedo * ambientLightColor * ao;
-
-    let lightDiffuse = diffuse * lightColor * shadowSample;
-    let lightSpecular = specular * shadowSample;
+    let lightDiffuse = diffuse * lightColor * shadowSampleVal;
+    let lightSpecular = specular * (lightColor + ambientLightColor) * shadowSampleVal;
 
     return vec4f(lightDiffuse + lightSpecular + ambient + emission, 1.0);
 }
