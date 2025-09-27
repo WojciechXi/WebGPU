@@ -91,6 +91,24 @@ struct Uniforms {
 @group(0) @binding(5) var colorTexture : texture_2d<f32>;
 @group(0) @binding(6) var pbrTexture : texture_2d<f32>;
 
+fn sampleShadow(shadowUV: vec2f, depth: f32) -> f32 {
+    let texelSize = 1.0 / vec2f(textureDimensions(shadowTexture, 0));
+    var shadow: f32 = 0.0;
+
+    // 3x3 PCF kernel
+    for (var x = -1; x <= 1; x = x + 1) {
+        for (var y = -1; y <= 1; y = y + 1) {
+            let offset = vec2f(f32(x), f32(y)) * texelSize;
+            let depthSample = textureSample(shadowTexture, screenSampler, shadowUV + offset).r;
+            if (depth - 0.001 < depthSample) {
+                shadow += 1.0;
+            }
+        }
+    }
+
+    return shadow / 9.0; // uśrednienie
+}
+
 struct VSOut {
   @builtin(position) pos : vec4f,
   @location(0) uv : vec2f,
@@ -133,18 +151,11 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let worldPosition3 = worldPosition4.xyz / worldPosition4.w;
 
     let lightClip = uni.lightProjectionMatrix * uni.lightViewMatrix * vec4f(worldPosition3, 1.0);
-    var lightNDC = (lightClip.xyz / lightClip.w) ;
-    let shadowUV = vec2(lightNDC.x * 0.5 + 0.5, 1.0 - (lightNDC.y * 0.5 + 0.5));
-    let depthSample = textureSample(shadowTexture, screenSampler, shadowUV).r;
+    var lightNDC = (lightClip.xyz / lightClip.w);
+    let lightDepth = lightNDC.z; // [0,1]
 
-    let fragmentDepth = lightClip.z; // [-1,1]
-    let fragmentDepth01 = fragmentDepth * 0.5 + 0.5; // [0,1]
-
-    let inShadow = fragmentDepth + 0.001 > depthSample;
-
-    if(inShadow) {
-        return vec4f(depthSample, depthSample, depthSample, 1);
-    }
+    let shadowUV = lightNDC.xy * 0.5 + 0.5;
+    let shadowSample = sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth);
 
     let ambientLightColor = uni.ambientLightColor.rgb * uni.ambientLightColor.a;
     let lightColor = uni.lightColor.rgb * uni.lightColor.a;
@@ -167,5 +178,8 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
 
     let ambient = albedo * ambientLightColor * ao;
 
-    return vec4f((diffuse + specular) * lightColor + ambient + emission, 1.0);
+    let lightDiffuse = diffuse * lightColor * shadowSample;
+    let lightSpecular = specular * shadowSample;
+
+    return vec4f(lightDiffuse + lightSpecular + ambient + emission, 1.0);
 }

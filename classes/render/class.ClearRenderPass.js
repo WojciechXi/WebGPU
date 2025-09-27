@@ -41,7 +41,7 @@ class ClearRenderPass extends RenderPass {
     }
 
     Render(engine, commandEncoder) {
-        this.uniformValues.set(Graphics.ambientLightColor, 0);
+        this.uniformValues.set(AmbientLight.main.color, 0);
 
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [

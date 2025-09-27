@@ -145,8 +145,8 @@ window.addEventListener('load', async function (event) {
             ambientLight.color.Set(0.95, 0.975, 1, 1);
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
-            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-75, 0, 0);
-            directionalLightGameObject.transform.position = directionalLightGameObject.transform.back.Multiply(5);
+            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-60, 0, -30);
+            directionalLightGameObject.transform.position = directionalLightGameObject.transform.back.Multiply(50);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
@@ -167,7 +167,6 @@ window.addEventListener('load', async function (event) {
                             meshRenderer.materials.push(materials[subMesh.material]);
                         } else {
                             meshRenderer.materials.push(whiteMaterial);
-                            console.log(subMesh.material);
                         }
                     });
                 }

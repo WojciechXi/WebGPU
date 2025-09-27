@@ -61,6 +61,11 @@ class Shader {
                         { format: "rgba16float" }, // depthTexture
                     ]
                 },
+                depthStencil: {
+                    format: "depth24plus",
+                    depthWriteEnabled: true,
+                    depthCompare: "less"
+                },
                 primitive: {
                     cullMode: 'back',
                     frontFace: 'ccw',

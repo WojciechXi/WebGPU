@@ -114,7 +114,11 @@ fn shadowRenderPass(vsOut: VSOut) -> ShadowRenderPass {
   let ambientOcclusion = textureSample(ambientOcclusionTexture, textureSampler, vsOut.uv);
   let height = textureSample(heightTexture, textureSampler, vsOut.uv);
 
-  shadowRenderPass.depthOut = vec4f(vsOut.clipPosition.z, 0, 0, 1.0);
+  let clipPosition = vsOut.clipPosition;
+  let ndc = (clipPosition.xyz / clipPosition.w);
+  let depth = ndc.z;
+
+  shadowRenderPass.depthOut = vec4f(depth, 0, 0, 1.0);
 
   return shadowRenderPass;
 }
