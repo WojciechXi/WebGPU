@@ -172,16 +172,18 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let lightNDC = lightClip.xyz / lightClip.w;
     let lightDepth = lightNDC.z; // w zależności od projektu może wymagać remap do [0,1]
     let shadowUV = lightNDC.xy * 0.5 + vec2f(0.5, 0.5);
-    let shadowSampleVal = (sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, 3) + 0.25) / 1.25;
+    let shadowSampleVal = (sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, 3) + 0.1) / 1.1;
 
     // --- kolory i PBR kanały (konwencja: R = roughness, G = metallic, B = ao) ---
     let color = textureSample(colorTexture, screenSampler, vsOut.uv);
-    let emission = color.rgb * color.a;
 
-    let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv).rgb;
-    let roughness = clamp(pbr.r, 0.01, 0.9); // R = roughness
-    let metallic = clamp(pbr.g, 0.0, 1.0);    // G = metallic
-    let occlusion = clamp(pbr.b, 0.0, 1.0);          // B = AO
+    let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv);
+    let roughness = clamp(pbr.r, 0.01, 0.8); 
+    let metallic = clamp(pbr.g, 0.0, 1.0);   
+    let occlusion = clamp(pbr.b, 0.0, 1.0);
+    let emission = clamp(pbr.a, 0.0, 1.0); 
+    
+    let emissionColor = color.rgb * emission;
 
     // światła / ambient
     let lightColor = uni.lightColor.rgb * uni.lightColor.a;
@@ -202,5 +204,5 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
 
     let ambient = ambientColor * color.rgb * occlusion;
 
-    return vec4f( ambient + specular + emission + diffuse, 1);
+    return vec4f( ambient + specular + emissionColor + diffuse, 1);
 }

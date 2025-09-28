@@ -15,7 +15,14 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
   return out;
 }
 
-// Funkcja ACES tonemap
+// Bindings
+@group(0) @binding(0) var sceneTexture : texture_2d<f32>;  // world-space depth / z
+@group(0) @binding(1) var screenSampler : sampler;
+
+struct FSOut {
+  @location(0) colorOut : vec4f,
+};
+
 fn acesTonemap(color: vec3<f32>) -> vec3<f32> {
     let a: f32 = 2.51;
     let b: f32 = 0.03;
@@ -24,14 +31,6 @@ fn acesTonemap(color: vec3<f32>) -> vec3<f32> {
     let e: f32 = 0.14;
     return clamp((color * (a * color + b)) / (color * (c * color + d) + e), vec3<f32>(0.0), vec3<f32>(1.0));
 }
-
-// Bindings
-@group(0) @binding(0) var sceneTexture : texture_2d<f32>;  // world-space depth / z
-@group(0) @binding(1) var screenSampler : sampler;
-
-struct FSOut {
-  @location(0) colorOut : vec4f,
-};
 
 @fragment
 fn fs(vsOut: VSOut) -> FSOut {

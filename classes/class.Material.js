@@ -9,6 +9,11 @@ class Material {
         this.shader = data.shader ?? '';
         this.color = data.color ?? Color.white;
 
+        this.roughness = data.roughness ?? 1;
+        this.metallic = data.metallic ?? 1;
+        this.occlusion = data.occlusion ?? 1;
+        this.alphaCutoff = data.alphaCutoff ?? 0.5;
+
         this.textures = {};
         this.SetTexture('albedo', data.albedo ?? Color.white);
         this.SetTexture('normal', data.normal ?? new Color(0.5, 0.5, 1, 1));
@@ -114,7 +119,7 @@ class Material {
                     this.uniformValues.set(viewMatrix, 16);
                     this.uniformValues.set(projectionMatrix, 32);
                     this.uniformValues.set(this.color, 48);
-                    this.uniformValues.set([this.smoothness, this.metallic, this.ambientOcclusion], 52);
+                    this.uniformValues.set([this.roughness, this.metallic, this.occlusion, this.alphaCutoff], 52);
 
                     GPU.Queue.writeBuffer(uniformBuffer, 0, this.uniformValues);
 

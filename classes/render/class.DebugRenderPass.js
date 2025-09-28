@@ -7,8 +7,33 @@ class DebugRenderPass extends RenderPass {
 
         const format = navigator.gpu.getPreferredCanvasFormat();
 
+        const bindGroupLayout = GPU.device.createBindGroupLayout({
+            entries: [
+                {
+                    binding: 0,
+                    visibility: GPUShaderStage.FRAGMENT,
+                    texture: {
+                        sampleType: 'unfilterable-float',
+                        viewDimension: '2d',
+                        multisampled: false,
+                    },
+                },
+                {
+                    binding: 1,
+                    visibility: GPUShaderStage.FRAGMENT,
+                    sampler: {
+                        type: 'non-filtering',
+                    },
+                },
+            ],
+        });
+
+        const pipelineLayout = GPU.device.createPipelineLayout({
+            bindGroupLayouts: [bindGroupLayout],
+        });
+
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: "auto",
+            layout: pipelineLayout,
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs",
@@ -25,9 +50,8 @@ class DebugRenderPass extends RenderPass {
         });
 
         this.sampler = GPU.CreateSampler({
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
+            magFilter: 'nearest',
+            minFilter: 'nearest',
         });
 
         this.bindGroup = null;
@@ -43,8 +67,8 @@ class DebugRenderPass extends RenderPass {
         this.bindGroup = this._textureView ? GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this._textureView },
-                { binding: 1, resource: this.sampler },
+                { binding: 0, resource: this._textureView, },
+                { binding: 1, resource: this.sampler, },
             ],
         }) : null;
     }

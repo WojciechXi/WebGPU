@@ -21,6 +21,14 @@ class Graphics {
         const format = navigator.gpu.getPreferredCanvasFormat();
         context.configure({ device, format });
 
+        const sceneTexture = this.sceneTexture = GPU.CreateTexture({
+            size: [this.canvas.width, this.canvas.height],
+            format: 'rgba32float',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        });
+
+        this.sceneTextureView = this.sceneTexture.createView();
+
         const clearRenderPass = this.clearRenderPass = new ClearRenderPass({
             name: 'clearRenderPass',
             code: assets.shaders['clearRenderPass.wgsl'],
@@ -53,24 +61,6 @@ class Graphics {
             canvas: canvas,
         });
 
-        const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
-            name: 'ssaoRenderPass',
-            code: assets.shaders['ssaoRenderPass.wgsl'],
-            gBufferRenderPass: gBufferRenderPass,
-            canvas: canvas,
-            radius: 0.125,
-            bias: 0.0125,
-        });
-
-        const ssaoBlurRenderPass = this.ssaoBlurRenderPass = new SSAOBlurRenderPass({
-            radius: 4,
-            sigmaDepth: 0.2,
-            name: 'ssaoBlurRenderPass',
-            code: assets.shaders['ssaoBlurRenderPass.wgsl'],
-            ssaoRenderPass: ssaoRenderPass,
-            canvas: canvas,
-        });
-
         const finalRenderPass = this.finalRenderPass = new FinalRenderPass({
             name: 'finalRenderPass',
             code: assets.shaders['finalRenderPass.wgsl'],
@@ -78,22 +68,48 @@ class Graphics {
             gBufferRenderPass: gBufferRenderPass,
             lightingRenderPass: lightingRenderPass,
             forwardRenderPass: forwardRenderPass,
-            ssaoRenderPass: ssaoRenderPass,
+            sceneTextureView: this.sceneTextureView,
             canvas: canvas,
         });
 
-        const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
-            name: 'tonemappingRenderPass',
-            code: assets.shaders['tonemappingRenderPass.wgsl'],
-            finalRenderPass: finalRenderPass,
+        // const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
+        //     name: 'ssaoRenderPass',
+        //     code: assets.shaders['ssaoRenderPass.wgsl'],
+        //     gBufferRenderPass: gBufferRenderPass,
+        //     canvas: canvas,
+        //     radius: 0.25,
+        //     bias: 0.025,
+        // });
+
+        // const ssaoBlurRenderPass = this.ssaoBlurRenderPass = new SSAOBlurRenderPass({
+        //     radius: 4,
+        //     sigmaDepth: 0.2,
+        //     name: 'ssaoBlurRenderPass',
+        //     code: assets.shaders['ssaoBlurRenderPass.wgsl'],
+        //     ssaoRenderPass: ssaoRenderPass,
+        //     canvas: canvas,
+        // });
+
+        const bloomRenderPass = this.bloomRenderPass = new BloomRenderPass({
+            name: 'bloomRenderPass',
+            code: assets.shaders['bloomRenderPass.wgsl'],
+            inputTextureView: this.sceneTextureView,
             canvas: canvas,
         });
+
+        // const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
+        //     name: 'tonemappingRenderPass',
+        //     code: assets.shaders['tonemappingRenderPass.wgsl'],
+        //     canvas: canvas,
+        // });
 
         const debugRenderPass = this.debugRenderPass = new DebugRenderPass({
             name: 'debugRenderPass',
             code: assets.shaders['debugRenderPass.wgsl'],
             canvas: canvas,
         });
+
+        debugRenderPass.textureView = bloomRenderPass.bloomTextureView;
 
         callback();
     }
@@ -106,19 +122,20 @@ class Graphics {
     static Render(engine) {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-        // this.clearRenderPass.Render(engine, commandEncoder);
+        this.clearRenderPass.Render(engine, commandEncoder);
         this.shadowRenderPass.Render(engine, commandEncoder);
 
         this.gBufferRenderPass.Render(engine, commandEncoder);
-
-        this.ssaoRenderPass.Render(engine, commandEncoder);
-        this.ssaoBlurRenderPass.Render(engine, commandEncoder);
 
         this.lightingRenderPass.Render(engine, commandEncoder);
         this.forwardRenderPass.Render(engine, commandEncoder);
         this.finalRenderPass.Render(engine, commandEncoder);
 
-        this.tonemappingRenderPass.Render(engine, commandEncoder);
+        // this.ssaoRenderPass.Render(engine, commandEncoder);
+        // this.ssaoBlurRenderPass.Render(engine, commandEncoder);
+
+        this.bloomRenderPass.Render(engine, commandEncoder);
+        // this.tonemappingRenderPass.Render(engine, commandEncoder);
 
         this.debugRenderPass.Render(engine, commandEncoder);
 

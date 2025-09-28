@@ -58,7 +58,7 @@ class Shader {
                     module: _this.shaderModule,
                     entryPoint: "shadowRenderPass",
                     targets: [
-                        { format: "rgba16float" }, // depthTexture
+                        { format: "rgba32float" }, // depthTexture
                     ]
                 },
                 depthStencil: {
@@ -67,7 +67,7 @@ class Shader {
                     depthCompare: "less"
                 },
                 primitive: {
-                    cullMode: 'back',
+                    cullMode: 'none',
                     frontFace: 'ccw',
                 },
             });
@@ -96,13 +96,13 @@ class Shader {
                     module: _this.shaderModule,
                     entryPoint: "gBufferRenderPass",
                     targets: [
-                        { format: "rgba16float" }, // viewPositionTexture
-                        { format: "rgba16float" }, // viewNormalTexture
+                        { format: "rgba32float" }, // viewPositionTexture
+                        { format: "rgba32float" }, // viewNormalTexture
 
-                        { format: "rgba16float" }, // colorTexture
-                        { format: "rgba16float" }, // pbrTexture
+                        { format: "rgba32float" }, // colorTexture
+                        { format: "rgba32float" }, // pbrTexture
 
-                        { format: "rgba16float" }, // depthTexture
+                        { format: "rgba32float" }, // depthTexture
                     ]
                 },
                 depthStencil: {
@@ -111,7 +111,7 @@ class Shader {
                     depthCompare: "less"
                 },
                 primitive: {
-                    cullMode: 'back',
+                    cullMode: 'none',
                     frontFace: 'ccw',
                 },
             });

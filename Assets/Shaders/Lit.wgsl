@@ -142,19 +142,30 @@ struct GBufferRenderPass {
 fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   var gBufferRenderPass: GBufferRenderPass;
 
-  let TBN = mat3x3f(vsOut.worldTangent, vsOut.worldBitangent, vsOut.worldNormal);
+  let _alphaCutoff = uni.pbr.a;
 
   let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
+  let color = albedo * uni.color;
+  if(color.a < _alphaCutoff) {
+    discard;
+  }
+  
+  let _roughness = uni.pbr.r;
+  let _metallic = uni.pbr.g;
+  let _occlusion = uni.pbr.b;
+
   let normal = textureSample(normalTexture, textureSampler, vsOut.uv).xyz * 2.0 - 1.0;
   let roughness = textureSample(roughnessTexture, textureSampler, vsOut.uv);
   let metallic = textureSample(metallicTexture, textureSampler, vsOut.uv);
   let occlusion = textureSample(occlusionTexture, textureSampler, vsOut.uv);
 
   gBufferRenderPass.worldPositionOut = vec4f(vsOut.worldPosition, 1.0);
+
+  let TBN = mat3x3f(vsOut.worldTangent, vsOut.worldBitangent, vsOut.worldNormal);
   gBufferRenderPass.worldNormalOut = vec4f(normalize(TBN * normal), 0.0);
 
-  gBufferRenderPass.colorOut = vec4f(albedo.rgb * uni.color.rgb, 0.0);
-  gBufferRenderPass.pbrOut = vec4f(roughness.r, metallic.r, occlusion.r, 0.0);
+  gBufferRenderPass.colorOut = albedo * uni.color;
+  gBufferRenderPass.pbrOut = vec4f(roughness.r * _roughness, metallic.r * _metallic, occlusion.r * _occlusion, 1);
 
   gBufferRenderPass.depthOut = vec4f(vsOut.clipPosition.z / vsOut.clipPosition.w, 0.0, 0.0, 1.0);
 

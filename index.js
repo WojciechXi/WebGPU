@@ -18,69 +18,103 @@ window.addEventListener('load', async function (event) {
 
         const engine = new Engine(assets);
         engine.Init(function (engine) {
-            const unlitShader = new Shader(assets.shaders['Unlit.wgsl']);
-            unlitShader.Compile();
+            const litShader = new Shader(assets.shaders['Lit.wgsl']);
+            litShader.Compile();
+
+            const foliageShader = new Shader(assets.shaders['Foliage.wgsl']);
+            foliageShader.Compile();
+
+            const grassMaterial = new Material({
+                name: 'White',
+                shader: foliageShader,
+            });
+            loadBitmap('/Assets/Images/Grass.png', function (albedo) {
+                grassMaterial.SetTexture('albedo', albedo);
+                grassMaterial.Update();
+            });
 
             const whiteMaterial = new Material({
                 name: 'White',
-                shader: unlitShader,
+                shader: litShader,
             });
             const blackMaterial = new Material({
                 name: 'Black',
-                shader: unlitShader,
+                shader: litShader,
                 color: Color.black,
             });
             const goldMaterial = new Material({
                 name: 'Gold',
-                shader: unlitShader,
+                shader: litShader,
                 color: new Color(1, 0.5, 0, 1),
             });
             const beigeMaterial = new Material({
                 name: 'Beige',
-                shader: unlitShader,
+                shader: litShader,
                 color: new Color(223 / 255, 212 / 255, 200 / 255, 1),
-            });
-            const oliveMaterial = new Material({
-                name: 'Olive',
-                shader: unlitShader,
-                color: new Color(167 / 255, 169 / 255, 148 / 255, 1),
             });
 
             const concreteMaterial = new Material({
                 name: 'Concrete',
-                shader: unlitShader,
+                shader: litShader,
             });
             const u702pmst9Material = new Material({
                 name: 'U702PMST9',
-                shader: unlitShader,
+                shader: litShader,
             });
             const u702st9Material = new Material({
                 name: 'U702ST9',
-                shader: unlitShader,
+                shader: litShader,
             });
 
             const sonomaMaterial = new Material({
                 name: 'Sonoma',
-                shader: unlitShader,
+                shader: litShader,
             });
-            const unlit2Material = new Material({
-                name: 'Unlit2',
-                shader: unlitShader,
+            loadBitmap('/Assets/Images/D3025 OW DAB SONOMA/Albedo.jpg', function (albedo) {
+                loadBitmap('/Assets/Images/D3025 OW DAB SONOMA/NormalMap.png', function (normal) {
+                    loadBitmap('/Assets/Images/D3025 OW DAB SONOMA/SpecularMap.png', function (metallic) {
+                        loadBitmap('/Assets/Images/D3025 OW DAB SONOMA/AmbientOcclusionMap.png', function (occlusion) {
+                            sonomaMaterial.SetTexture('albedo', albedo);
+                            sonomaMaterial.SetTexture('normal', normal);
+                            sonomaMaterial.SetTexture('metallic', metallic);
+                            sonomaMaterial.SetTexture('occlusion', occlusion);
+                            sonomaMaterial.Update();
+                        });
+                    });
+                });
             });
 
-            const wallPaintMaterial = new Material({
-                name: 'Wall paint',
-                shader: unlitShader,
+            const unlit2Material = new Material({
+                name: 'Lit2',
+                shader: litShader,
             });
-            loadBitmap('/Assets/Images/WhiteStuccoWall01_MR_1K/WhiteStuccoWall01_1K_BaseColor.png', function (albedo) {
-                loadBitmap('/Assets/Images/WhiteStuccoWall01_MR_1K/WhiteStuccoWall01_1K_Normal.png', function (normal) {
-                    loadBitmap('/Assets/Images/WhiteStuccoWall01_MR_1K/WhiteStuccoWall01_1K_Roughness.png', function (roughness) {
-                        loadBitmap('/Assets/Images/WhiteStuccoWall01_MR_1K/WhiteStuccoWall01_1K_AO.png', function (occlusion) {
-                            wallPaintMaterial.SetTexture('albedo', albedo);
-                            wallPaintMaterial.SetTexture('normal', normal);
-                            wallPaintMaterial.SetTexture('roughness', roughness);
-                            wallPaintMaterial.SetTexture('occlusion', occlusion);
-                            wallPaintMaterial.Update();
+
+            const whitePaintMaterial = new Material({
+                name: 'Wall paint',
+                shader: litShader,
+            });
+
+            const olivePaintMaterial = new Material({
+                name: 'Wall paint',
+                shader: litShader,
+                color: new Color(167 / 255, 169 / 255, 148 / 255, 1),
+            });
+
+            loadBitmap('/Assets/Images/Poliigon_PlasterPainted_7664/Poliigon_PlasterPainted_7664_BaseColor.jpg', function (albedo) {
+                loadBitmap('/Assets/Images/Poliigon_PlasterPainted_7664/Poliigon_PlasterPainted_7664_Normal.png', function (normal) {
+                    loadBitmap('/Assets/Images/Poliigon_PlasterPainted_7664/Poliigon_PlasterPainted_7664_Roughness.jpg', function (roughness) {
+                        loadBitmap('/Assets/Images/Poliigon_PlasterPainted_7664/Poliigon_PlasterPainted_7664_Metallic.jpg', function (metallic) {
+                            whitePaintMaterial.SetTexture('albedo', albedo);
+                            whitePaintMaterial.SetTexture('normal', normal);
+                            whitePaintMaterial.SetTexture('roughness', roughness);
+                            whitePaintMaterial.SetTexture('metallic', metallic);
+                            whitePaintMaterial.Update();
+
+                            olivePaintMaterial.SetTexture('albedo', albedo);
+                            olivePaintMaterial.SetTexture('normal', normal);
+                            olivePaintMaterial.SetTexture('roughness', roughness);
+                            olivePaintMaterial.SetTexture('metallic', metallic);
+                            olivePaintMaterial.Update();
                         });
                     });
                 });
@@ -88,7 +122,7 @@ window.addEventListener('load', async function (event) {
 
             const floorMaterial = new Material({
                 name: 'Floor',
-                shader: unlitShader,
+                shader: litShader,
             });
             loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_albedo.png', function (albedo) {
                 loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_normal.png', function (normal) {
@@ -103,7 +137,7 @@ window.addEventListener('load', async function (event) {
 
             const stackOfBricksMaterial = new Material({
                 name: 'Stack of bricks',
-                shader: unlitShader,
+                shader: litShader,
             });
             loadBitmap('/Assets/Images/Stack of Bricks/Albedo.jpg', function (albedo) {
                 loadBitmap('/Assets/Images/Stack of Bricks/Normal.jpg', function (normal) {
@@ -118,7 +152,7 @@ window.addEventListener('load', async function (event) {
 
             const pbrShpereMaterial = new Material({
                 name: 'PBR',
-                shader: unlitShader,
+                shader: litShader,
             });
             loadBitmap('/Assets/Images/pbr_sphere/sphere_Base_Color.png', function (albedo) {
                 loadBitmap('/Assets/Images/pbr_sphere/sphere_Normal.png', function (normal) {
@@ -147,11 +181,6 @@ window.addEventListener('load', async function (event) {
                 concreteMaterial.Update();
             });
 
-            loadBitmap('/Assets/Images/D3025 OW DAB SONOMA.jpg', function (albedo) {
-                sonomaMaterial.SetTexture('albedo', albedo);
-                sonomaMaterial.Update();
-            });
-
             loadBitmap('/Assets/Images/D4428_OV_Dąb_naturalny.jpg', function (albedo) {
                 unlit2Material.SetTexture('albedo', albedo);
                 unlit2Material.Update();
@@ -159,12 +188,18 @@ window.addEventListener('load', async function (event) {
 
             const materials = {
                 Glass: null,
+                Grass: grassMaterial,
                 'sphere.001': pbrShpereMaterial,
                 'Stack of Bricks': stackOfBricksMaterial,
 
                 Light: goldMaterial,
                 Plastic: whiteMaterial,
-                White: wallPaintMaterial,
+
+                White: whitePaintMaterial,
+                Ceil: whitePaintMaterial,
+                Wall: whitePaintMaterial,
+                Elevation: whitePaintMaterial,
+
                 Beige: beigeMaterial,
                 Gold: goldMaterial,
                 Black: blackMaterial,
@@ -178,44 +213,42 @@ window.addEventListener('load', async function (event) {
                 'U702-PM': u702pmst9Material,
                 'U702-ST9': u702pmst9Material,
 
-                Bedroom_S: oliveMaterial,
-                Bedroom_E: oliveMaterial,
-                Bedroom_N: oliveMaterial,
-                Bedroom_W: oliveMaterial,
+                'Bedroom S': olivePaintMaterial,
+                'Bedroom E': olivePaintMaterial,
+                'Bedroom N': olivePaintMaterial,
+                'Bedroom W': olivePaintMaterial,
 
-                Wall_S: oliveMaterial,
-                Wall_E: oliveMaterial,
-                Wall_N: oliveMaterial,
-                Wall_W: oliveMaterial,
+                'Wall S': olivePaintMaterial,
+                'Wall E': olivePaintMaterial,
+                'Wall N': olivePaintMaterial,
+                'Wall W': olivePaintMaterial,
 
-                Wall_K_S: oliveMaterial,
-                Wall_K_S_2: oliveMaterial,
-                Wall_K_S_3: oliveMaterial,
-                Wall_K_S_4: oliveMaterial,
-                Wall_K_W: oliveMaterial,
-                Wall_K: oliveMaterial,
-                Wall_K_2: oliveMaterial,
+                'Wall K S': olivePaintMaterial,
+                'Wall K S 2': olivePaintMaterial,
+                'Wall K S 3': olivePaintMaterial,
+                'Wall K S 4': olivePaintMaterial,
+                'Wall K W': olivePaintMaterial,
+                'Wall K': olivePaintMaterial,
+                'Wall K 2': olivePaintMaterial,
             };
 
             const ambientLight = engine.scene.AddComponent(AmbientLight);
             ambientLight.color.Set(0.9, 0.95, 1, 0.2);
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
-            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-60, 0, 30);
+            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-30, 0, -30);
             directionalLightGameObject.transform.position = directionalLightGameObject.transform.back.Multiply(25);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
-            cameraGameObject.transform.position = new Vector3(0, 1, 5);
+            cameraGameObject.transform.position = new Vector3(0, 0, 2);
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            // Graphics.debugRenderPass.textureView = Graphics.lightingRenderPass.lightingTextureView;
-
-            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+            Importer.GLTF('/Assets/Models', 'SunstanceSphere.gltf', function (meshes, gltfMaterials) {
                 for (const mesh of meshes) {
                     const gameObject = new GameObject(mesh.name);
-                    // gameObject.transform.position = new Vector3(4, 0, 0);
+                    gameObject.transform.position = new Vector3(0, 0, 0);
                     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
                     const meshRenderer = gameObject.AddComponent(MeshRenderer);
                     meshRenderer.mesh = mesh;
