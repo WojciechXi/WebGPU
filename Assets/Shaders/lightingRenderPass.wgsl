@@ -98,8 +98,8 @@ fn sampleShadow(shadowUV: vec2f, depth: f32) -> f32 {
 }
 
 struct Uniforms {
+    cameraMatrix : mat4x4f,
     viewMatrix : mat4x4f,
-    inverseViewMatrix : mat4x4f,
     projectionMatrix : mat4x4f,
     lightViewMatrix : mat4x4f,
     lightProjectionMatrix : mat4x4f,
@@ -110,11 +110,11 @@ struct Uniforms {
 
 @group(0) @binding(0) var<uniform> uni : Uniforms;
 @group(0) @binding(1) var screenSampler : sampler;
-@group(0) @binding(2) var shadowTexture : texture_2d<f32>;
-@group(0) @binding(3) var worldPositionTexture : texture_2d<f32>;
-@group(0) @binding(4) var worldNormalTexture : texture_2d<f32>;
-@group(0) @binding(5) var colorTexture : texture_2d<f32>;
-@group(0) @binding(6) var pbrTexture : texture_2d<f32>;
+@group(0) @binding(2) var worldPositionTexture : texture_2d<f32>;
+@group(0) @binding(3) var worldNormalTexture : texture_2d<f32>;
+@group(0) @binding(4) var colorTexture : texture_2d<f32>;
+@group(0) @binding(5) var pbrTexture : texture_2d<f32>;
+@group(0) @binding(6) var shadowTexture : texture_2d<f32>;
 
 struct VSOut {
   @builtin(position) pos : vec4f,
@@ -143,14 +143,14 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let lightViewMatrix = uni.lightViewMatrix;
     let lightProjectionMatrix = uni.lightProjectionMatrix;
     
-    let normalMatrix = getNormalMatrix(viewMatrix);
+    let viewNormalMatrix = getNormalMatrix(viewMatrix);
     let lightNormalMatrix = getNormalMatrix(lightViewMatrix);
 
     let worldPosition = textureSample(worldPositionTexture, screenSampler, vsOut.uv);
-    let worldNormal = textureSample(worldNormalTexture, screenSampler, vsOut.uv).xyz;
+    let worldNormal = normalize(textureSample(worldNormalTexture, screenSampler, vsOut.uv).xyz);
 
     var viewPosition = viewMatrix * worldPosition;
-    let viewNormal = normalize(normalMatrix * worldNormal);
+    let viewNormal = normalize(viewNormalMatrix * worldNormal);
     
     // Bezpiecznie znormalizuj / podziel przez w jeśli jest to vec4 z w != 1
     var viewPos: vec3f = viewPosition.xyz;
@@ -162,8 +162,8 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let worldPos3 = worldPosition.xyz / worldPosition.w;
 
     // light direction: obliczamy direction w world space z macierzy widoku światła
-    let lightWorldDirection = normalize((inverse4(lightViewMatrix) * vec4f(0.0, 0.0, 1.0, 0.0)).xyz);
-    let lightViewDirection = normalize(normalMatrix * lightWorldDirection);
+    let lightWorldDirection = normalize((inverse4(lightViewMatrix) * vec4f(0.0, 0.0, -1.0, 0.0)).xyz);
+    let lightViewDirection = normalize(viewNormalMatrix * lightWorldDirection);
 
     // shadow coords (zwróć uwagę na flip Y jeśli potrzeba)
     let lightClip = lightProjectionMatrix * lightViewMatrix * vec4f(worldPosition.xyz, 1.0);
@@ -177,7 +177,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let emission = color.rgb * color.a;
 
     let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv).rgb;
-    let roughness = clamp(pbr.r, 0.001, 1.0); // R = roughness
+    let roughness = clamp(pbr.r, 0.01, 0.9); // R = roughness
     let metallic = clamp(pbr.g, 0.0, 1.0);    // G = metallic
     let occlusion = clamp(pbr.b, 0.0, 1.0);          // B = AO
 
@@ -185,26 +185,20 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let lightColor = uni.lightColor.rgb * uni.lightColor.a;
     let ambientColor = uni.ambientLightColor.rgb * uni.ambientLightColor.a;
 
-    let diff = max(dot(viewNormal, lightViewDirection), 0.0);
-    let diffuse = lightColor * diff;
+    let diff = max(dot(viewNormal, -lightViewDirection), 0.0);
+    let diffuse = lightColor * color.rgb * diff * shadowSampleVal;
 
-    let specularStrength = 0.5;
-    let cameraPosition = -(transpose3(mat3x3f(
-        viewMatrix[0].xyz,
-        viewMatrix[1].xyz,
-        viewMatrix[2].xyz
-    )) * viewMatrix[3].xyz);
-    
-    let viewDir = normalize(cameraPosition - worldPosition.xyz);
-    let reflectDir = reflect(-lightWorldDirection, worldNormal);
-    let viewReflectDot = max(dot(viewDir, reflectDir), 0.0);
+    let cameraPosition = uni.cameraMatrix[3].xyz;
+    let specularStrength = 2.0;
 
-    let shiness = pow(viewReflectDot, 1.0 / roughness); 
+    let viewDirection = normalize(cameraPosition - worldPosition.xyz);
+    let reflectDirection = reflect(lightWorldDirection, worldNormal);
+    let spec = pow(max(dot(viewDirection, reflectDirection), 0.0), 32);
 
     let F0 = mix(color.rgb * lightColor, lightColor, metallic);
-    let specular = F0 * shiness * specularStrength; // non-metal vs metal
+    let specular = F0 * spec * specularStrength * (1.0 - roughness) * shadowSampleVal; // non-metal vs metal
 
     let ambient = ambientColor * color.rgb * occlusion;
 
-    return vec4f( ambient + specular + emission + diffuse * color.rgb, 1);
+    return vec4f( ambient + specular + emission + diffuse, 1);
 }

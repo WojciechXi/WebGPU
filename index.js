@@ -77,7 +77,7 @@ window.addEventListener('load', async function (event) {
                     loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_ao.png', function (occlusion) {
                         loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_height.png', function (height) {
                             floorMaterial.SetTexture('albedo', albedo);
-                            floorMaterial.SetTexture('normal', albedo);
+                            floorMaterial.SetTexture('normal', normal);
                             // floorMaterial.SetTexture('roughness', height);
                             // floorMaterial.SetTexture('metallic', height);
                             floorMaterial.SetTexture('occlusion', occlusion);
@@ -187,20 +187,21 @@ window.addEventListener('load', async function (event) {
             ambientLight.color.Set(0.9, 0.95, 1, 0.2);
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
-            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-75, 0, 0);
-            directionalLightGameObject.transform.position = directionalLightGameObject.transform.back.Multiply(50);
+            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-60, 0, 30);
+            directionalLightGameObject.transform.position = directionalLightGameObject.transform.back.Multiply(25);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
+            cameraGameObject.transform.position = new Vector3(0, 1, 5);
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Graphics.debugRenderPass.textureView = Graphics.gBufferRenderPass.normalTextureView;
+            // Graphics.debugRenderPass.textureView = Graphics.lightingRenderPass.lightingTextureView;
 
             Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
                 for (const mesh of meshes) {
                     const gameObject = new GameObject(mesh.name);
-                    gameObject.transform.position = new Vector3(0, 0, -2);
+                    // gameObject.transform.position = new Vector3(4, 0, 0);
                     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
                     const meshRenderer = gameObject.AddComponent(MeshRenderer);
                     meshRenderer.mesh = mesh;

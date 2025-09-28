@@ -3,6 +3,8 @@ class FinalRenderPass extends RenderPass {
     Init(data) {
         const clearRenderPass = this.clearRenderPass = data.clearRenderPass;
 
+        const format = 'rgba16float'; //navigator.gpu.getPreferredCanvasFormat();
+
         this.gBufferRenderPass = data.gBufferRenderPass;
         this.lightingRenderPass = data.lightingRenderPass;
         this.forwardRenderPass = data.forwardRenderPass;
@@ -14,7 +16,7 @@ class FinalRenderPass extends RenderPass {
 
         this.sceneTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
-            format: "rgba16float",
+            format: format,
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.sceneTextureView = this.sceneTexture.createView();
@@ -34,7 +36,7 @@ class FinalRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: 'rgba16float', }
+                    { format: format, }
                 ],
             }
         });

@@ -12,7 +12,7 @@ class LightingRenderPass extends RenderPass {
         });
         this.lightingTextureView = this.lightingTexture.createView();
 
-        this.uniformValues = new Float32Array(16 + 16 + 16 + 16 + 16 + 4 + 4 + 4); //ambientLightColor, lightColor, lightViewMatrix, lightProjectionMatrix
+        this.uniformValues = new Float32Array(16 + 16 + 16 + 16 + 16 + 16 + 4 + 4 + 4);
         this.uniformBuffer = GPU.CreateBuffer({
             size: this.uniformValues.length * 4,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
@@ -46,18 +46,18 @@ class LightingRenderPass extends RenderPass {
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
                 { binding: 1, resource: this.sampler },
-                { binding: 2, resource: shadowRenderPass.depthTextureView },
-                { binding: 3, resource: gBufferRenderPass.positionTextureView },
-                { binding: 4, resource: gBufferRenderPass.normalTextureView },
-                { binding: 5, resource: gBufferRenderPass.colorTextureView },
-                { binding: 6, resource: gBufferRenderPass.pbrTextureView },
+                { binding: 2, resource: gBufferRenderPass.positionTextureView },
+                { binding: 3, resource: gBufferRenderPass.normalTextureView },
+                { binding: 4, resource: gBufferRenderPass.colorTextureView },
+                { binding: 5, resource: gBufferRenderPass.pbrTextureView },
+                { binding: 6, resource: shadowRenderPass.depthTextureView },
             ],
         });
     }
 
     Render(engine, commandEncoder) {
-        this.uniformValues.set(Camera.main.viewMatrix, 0);
-        this.uniformValues.set(Camera.main.inverseViewMatrix, 16);
+        this.uniformValues.set(Camera.main.transform.matrix4x4, 0);
+        this.uniformValues.set(Camera.main.viewMatrix, 16);
         this.uniformValues.set(Camera.main.projectionMatrix, 32);
         this.uniformValues.set(DirectionalLight.main.viewMatrix, 48);
         this.uniformValues.set(DirectionalLight.main.projectionMatrix, 64);
