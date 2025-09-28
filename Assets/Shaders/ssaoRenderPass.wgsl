@@ -41,12 +41,14 @@ fn getNormalMatrix(modelMatrix: mat4x4f) -> mat3x3f {
 }
 
 struct SSAOUniforms {
-  radius  : f32,
-  bias    : f32,
-  screenSize : vec2f,
+  samples : array<vec4f, 32>,
   viewMatrix : mat4x4f,
   projectionMatrix : mat4x4f,
-  samples : array<vec4f, 64>,
+  screenSize : vec2f,
+  radius : f32,
+  bias : f32,
+  blurRadius : i32,
+  sigmaDepth : f32,
 };
 
 struct VSOut {
@@ -67,29 +69,31 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
 }
 
 // Bindings
-@group(0) @binding(0) var<uniform> uni : SSAOUniforms;
-@group(0) @binding(1) var worldPositionTexture : texture_2d<f32>;  // world-space depth / z
-@group(0) @binding(2) var worldNormalTexture : texture_2d<f32>; // world-space normal
-@group(0) @binding(3) var screenSampler : sampler;
-@group(0) @binding(4) var noiseTexture : texture_2d<f32>;
-@group(0) @binding(5) var noiseSampler : sampler;
+@group(0) @binding(0) var<uniform> uniforms : SSAOUniforms;
+@group(0) @binding(1) var screenSampler : sampler;
+@group(0) @binding(2) var noiseSampler : sampler;
+@group(0) @binding(3) var worldPositionTexture : texture_2d<f32>;  // world-space depth / z
+@group(0) @binding(4) var worldNormalTexture : texture_2d<f32>; // world-space normal
+@group(0) @binding(5) var noiseTexture : texture_2d<f32>;
+@group(0) @binding(6) var ssaoTexture : texture_2d<f32>;
+@group(0) @binding(7) var sceneTexture : texture_2d<f32>;
 
 struct FSOut {
-  @location(0) aoOut : vec4f,
+  @location(0) colorOut : vec4f,
 };
 
 @fragment
-fn fs(vsOut: VSOut) -> FSOut {
+fn ssaoRenderPass(vsOut: VSOut) -> FSOut {
   var fsOut: FSOut;
   let uv = vsOut.uv;
 
-  let normalMatrix = getNormalMatrix(uni.viewMatrix);
+  let normalMatrix = getNormalMatrix(uniforms.viewMatrix);
 
   let worldPoition = textureSample(worldPositionTexture, screenSampler, uv);
-  let viewPosition4 = uni.viewMatrix * vec4f(worldPoition.xyz, 1.0);
+  let viewPosition4 = uniforms.viewMatrix * vec4f(worldPoition.xyz, 1.0);
   let viewPosition = viewPosition4.xyz;
 
-  let noiseScale = uni.screenSize / 4;
+  let noiseScale = uniforms.screenSize / 4;
   let noiseUV = fract(uv * noiseScale);
 
   let worldNormal = normalize(textureSample(worldNormalTexture, screenSampler, uv).rgb);
@@ -103,27 +107,100 @@ fn fs(vsOut: VSOut) -> FSOut {
   let TBN = mat3x3f(tangent, bitangent, viewNormal);
 
   var occlusion : f32 = 0.0;
-  for (var i = 0u; i < 64u; i++) {
+  for (var i = 0u; i < 32u; i++) {
     // Kernel sample w view space
-    var sample = TBN * uni.samples[i].xyz;
-    sample = viewPosition + sample * uni.radius;
+    var sample = TBN * uniforms.samples[i].xyz;
+    sample = viewPosition + sample * uniforms.radius;
 
     // Przekształcenie do UV (proj. matrix)
-    var offset = uni.projectionMatrix * vec4f(sample, 1.0);
+    var offset = uniforms.projectionMatrix * vec4f(sample, 1.0);
     var offsetNDC = offset.xyz / offset.w;
     var offsetUV = offsetNDC.xy * 0.5 + 0.5;
     offsetUV.y = -offsetUV.y;
 
     // Pobieramy depth w view space (G-buffer musi mieć view-space Z)
     let sampleViewPos = textureSample(worldPositionTexture, screenSampler, offsetUV).xyz;
-    let sampleDepth = (uni.viewMatrix * vec4f(sampleViewPos, 1.0)).z;
+    let sampleDepth = (uniforms.viewMatrix * vec4f(sampleViewPos, 1.0)).z;
 
-    let rangeCheck = smoothstep(0.0, 1.0, uni.radius / abs(viewPosition.z - sampleDepth));
-    occlusion += select(0.0, 1.0, sampleDepth >= sample.z + uni.bias) * rangeCheck;
+    let rangeCheck = smoothstep(0.0, 1.0, uniforms.radius / abs(viewPosition.z - sampleDepth));
+    occlusion += select(0.0, 1.0, sampleDepth >= sample.z + uniforms.bias) * rangeCheck;
   }
 
-  occlusion = 1.0 - (occlusion / 64.0);
-  fsOut.aoOut = vec4f(occlusion, occlusion, occlusion, 1.0);
+  occlusion = 1.0 - (occlusion / 32.0);
+  fsOut.colorOut = vec4f(occlusion, occlusion, occlusion, 1.0);
 
   return fsOut;
+}
+
+@fragment
+fn blurHorizontalRenderPass(vsOut: VSOut) -> FSOut {
+    var fsOut: FSOut;
+
+    let radius = uniforms.radius;
+    let sigmaDepth = uniforms.sigmaDepth;
+
+    let uvOffset = vec2f(1.0) / uniforms.screenSize;
+    let centerDepth = textureSample(ssaoTexture, screenSampler, vsOut.uv).r;
+
+    var weight: f32 = 0.0;
+    var weightSum: f32 = 0.0;
+    for (var i = -radius; i <= radius; i += 1) {
+        let offset = vec2f(f32(i), 0.0);
+        
+        let sampleUV = vsOut.uv + offset * uvOffset;
+        let sample = textureSample(ssaoTexture, screenSampler, sampleUV).r;
+        
+        // waga bilateralna
+        let w = exp(-pow(sample - centerDepth, 2.0) / (2.0 * sigmaDepth * sigmaDepth));
+        
+        weight += sample * w;
+        weightSum += w;
+    }
+    let blur = weight / weightSum;
+    fsOut.colorOut = vec4f(blur, blur, blur, 1.0);
+
+    return fsOut;
+}
+
+
+@fragment
+fn blurVerticalRenderPass(vsOut: VSOut) -> FSOut {
+    var fsOut: FSOut;
+
+    let radius = uniforms.radius;
+    let sigmaDepth = uniforms.sigmaDepth;
+
+    let uvOffset = vec2f(1.0) / uniforms.screenSize;
+    let centerDepth = textureSample(ssaoTexture, screenSampler, vsOut.uv).r;
+
+    var weight: f32 = 0.0;
+    var weightSum: f32 = 0.0;
+    for (var i = -radius; i <= radius; i += 1) {
+        let offset = vec2f(0.0, f32(i));
+        
+        let sampleUV = vsOut.uv + offset * uvOffset;
+        let sample = textureSample(ssaoTexture, screenSampler, sampleUV).r;
+        
+        // waga bilateralna
+        let w = exp(-pow(sample - centerDepth, 2.0) / (2.0 * sigmaDepth * sigmaDepth));
+        
+        weight += sample * w;
+        weightSum += w;
+    }
+    let blur = weight / weightSum;
+    fsOut.colorOut = vec4f(blur, blur, blur, 1.0);
+
+    return fsOut;
+}
+
+@fragment
+fn sceneRenderPass(vsOut: VSOut) -> FSOut {
+    var fsOut: FSOut;
+    
+    let ssao = textureSample(ssaoTexture, screenSampler, vsOut.uv);
+    let scene = textureSample(sceneTexture, screenSampler, vsOut.uv);
+
+    fsOut.colorOut = vec4f(scene.rgb * ssao.r, 1);
+
+    return fsOut;
 }

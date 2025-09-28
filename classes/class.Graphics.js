@@ -72,36 +72,31 @@ class Graphics {
             canvas: canvas,
         });
 
-        // const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
-        //     name: 'ssaoRenderPass',
-        //     code: assets.shaders['ssaoRenderPass.wgsl'],
-        //     gBufferRenderPass: gBufferRenderPass,
-        //     canvas: canvas,
-        //     radius: 0.25,
-        //     bias: 0.025,
-        // });
-
-        // const ssaoBlurRenderPass = this.ssaoBlurRenderPass = new SSAOBlurRenderPass({
-        //     radius: 4,
-        //     sigmaDepth: 0.2,
-        //     name: 'ssaoBlurRenderPass',
-        //     code: assets.shaders['ssaoBlurRenderPass.wgsl'],
-        //     ssaoRenderPass: ssaoRenderPass,
-        //     canvas: canvas,
-        // });
+        const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
+            name: 'ssaoRenderPass',
+            code: assets.shaders['ssaoRenderPass.wgsl'],
+            gBufferRenderPass: gBufferRenderPass,
+            inputTextureView: this.sceneTextureView,
+            canvas: canvas,
+            radius: 0.25,
+            bias: 0.025,
+            radius: 4,
+            sigmaDepth: 0.2,
+        });
 
         const bloomRenderPass = this.bloomRenderPass = new BloomRenderPass({
             name: 'bloomRenderPass',
             code: assets.shaders['bloomRenderPass.wgsl'],
-            inputTextureView: this.sceneTextureView,
+            inputTextureView: ssaoRenderPass.sceneTextureView,
             canvas: canvas,
         });
 
-        // const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
-        //     name: 'tonemappingRenderPass',
-        //     code: assets.shaders['tonemappingRenderPass.wgsl'],
-        //     canvas: canvas,
-        // });
+        const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
+            name: 'tonemappingRenderPass',
+            code: assets.shaders['tonemappingRenderPass.wgsl'],
+            inputTextureView: bloomRenderPass.sceneTextureView,
+            canvas: canvas,
+        });
 
         const debugRenderPass = this.debugRenderPass = new DebugRenderPass({
             name: 'debugRenderPass',
@@ -109,7 +104,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        debugRenderPass.textureView = bloomRenderPass.bloomTextureView;
+        debugRenderPass.textureView = tonemappingRenderPass.sceneTextureView;
 
         callback();
     }
@@ -122,22 +117,22 @@ class Graphics {
     static Render(engine) {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-        this.clearRenderPass.Render(engine, commandEncoder);
-        this.shadowRenderPass.Render(engine, commandEncoder);
+        if (this.clearRenderPass) this.clearRenderPass.Render(engine, commandEncoder);
+        if (this.shadowRenderPass) this.shadowRenderPass.Render(engine, commandEncoder);
 
-        this.gBufferRenderPass.Render(engine, commandEncoder);
+        if (this.gBufferRenderPass) this.gBufferRenderPass.Render(engine, commandEncoder);
 
-        this.lightingRenderPass.Render(engine, commandEncoder);
-        this.forwardRenderPass.Render(engine, commandEncoder);
-        this.finalRenderPass.Render(engine, commandEncoder);
+        if (this.lightingRenderPass) this.lightingRenderPass.Render(engine, commandEncoder);
+        if (this.forwardRenderPass) this.forwardRenderPass.Render(engine, commandEncoder);
+        if (this.finalRenderPass) this.finalRenderPass.Render(engine, commandEncoder);
 
-        // this.ssaoRenderPass.Render(engine, commandEncoder);
-        // this.ssaoBlurRenderPass.Render(engine, commandEncoder);
+        if (this.ssaoRenderPass) this.ssaoRenderPass.Render(engine, commandEncoder);
+        if (this.ssaoBlurRenderPass) this.ssaoBlurRenderPass.Render(engine, commandEncoder);
 
-        this.bloomRenderPass.Render(engine, commandEncoder);
-        // this.tonemappingRenderPass.Render(engine, commandEncoder);
+        if (this.bloomRenderPass) this.bloomRenderPass.Render(engine, commandEncoder);
+        if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(engine, commandEncoder);
 
-        this.debugRenderPass.Render(engine, commandEncoder);
+        if (this.debugRenderPass) this.debugRenderPass.Render(engine, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);
     }

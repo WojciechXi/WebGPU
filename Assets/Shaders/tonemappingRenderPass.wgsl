@@ -16,8 +16,8 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
 }
 
 // Bindings
-@group(0) @binding(0) var sceneTexture : texture_2d<f32>;  // world-space depth / z
-@group(0) @binding(1) var screenSampler : sampler;
+@group(0) @binding(0) var screenSampler : sampler;
+@group(0) @binding(1) var sceneTexture : texture_2d<f32>;  // world-space depth / z
 
 struct FSOut {
   @location(0) colorOut : vec4f,
@@ -36,7 +36,7 @@ fn acesTonemap(color: vec3<f32>) -> vec3<f32> {
 fn fs(vsOut: VSOut) -> FSOut {
   var fsOut: FSOut;
     
-  let gamma = 1.0 / 2.3;
+  let gamma = 1.0 / 2.2;
   let hdrColor = textureSample(sceneTexture, screenSampler, vsOut.uv).rgb;
   let ldrColor = acesTonemap(hdrColor);
   fsOut.colorOut = vec4f(pow(ldrColor, vec3<f32>(gamma)), 1.0);

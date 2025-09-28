@@ -22,7 +22,8 @@ struct Uniforms {
 // Bindings
 @group(0) @binding(0) var<uniform> uniforms : Uniforms;
 @group(0) @binding(1) var screenSampler : sampler;
-@group(0) @binding(2) var sceneTexture : texture_2d<f32>;
+@group(0) @binding(2) var bloomTexture : texture_2d<f32>;
+@group(0) @binding(3) var sceneTexture : texture_2d<f32>;
 
 struct FSOut {
   @location(0) colorOut : vec4f,
@@ -38,7 +39,7 @@ fn brightRenderPass(vsOut: VSOut) -> FSOut {
     var fsOut: FSOut;
 
     let texSize = uniforms.screenSize;
-    let hdrColor = textureSample(sceneTexture, screenSampler, vsOut.uv).rgb;
+    let hdrColor = textureSample(bloomTexture, screenSampler, vsOut.uv).rgb;
     let bright = getBright(hdrColor);
 
     fsOut.colorOut = vec4f(bright, 1.0);
@@ -52,12 +53,12 @@ fn blurRenderPass(vsOut: VSOut) -> FSOut {
     let texSize = uniforms.screenSize;
     var sum: vec3f = vec3f(0.0);
 
-    let offsets = array<f32,5>(-50.0, -25.0, 0.0, 25.0, 50.0);
-    let weights = array<f32,5>(0.125, 0.25, 0.5, 0.25, 0.125);
+    let offsets = array<f32,5>(-100.0, -50.0, 0.0, 50.0, 100.0);
+    let weights = array<f32,5>(0.0615, 0.125, 0.25, 0.125, 0.0615);
 
     for(var i = 0u; i < 5u; i = i + 1u) {
-        let uv = clamp(vsOut.uv + vec2f(offsets[i]/texSize.x, 0.0), vec2f(0.0), vec2f(1.0));
-        sum += textureSample(sceneTexture, screenSampler, uv).rgb * weights[i];
+        let uv = clamp(vsOut.uv + vec2f(offsets[i] / texSize.x, 0.0), vec2f(0.0), vec2f(1.0));
+        sum += textureSample(bloomTexture, screenSampler, uv).rgb * weights[i];
     }
 
     fsOut.colorOut = vec4f(sum, 1.0);
@@ -70,14 +71,26 @@ fn bloomRenderPass(vsOut: VSOut) -> FSOut {
     let texSize = uniforms.screenSize;
     var sum: vec3f = vec3f(0.0);
 
-    let offsets = array<f32,5>(-50.0, -25.0, 0.0, 25.0, 50.0);
-    let weights = array<f32,5>(0.125, 0.25, 0.5, 0.25, 0.125);
+    let offsets = array<f32,5>(-100.0, -50.0, 0.0, 50.0, 100.0);
+    let weights = array<f32,5>(0.0615, 0.125, 0.25, 0.125, 0.0615);
 
     for(var i = 0u; i < 5u; i = i + 1u) {
-        let uv = clamp(vsOut.uv + vec2f(0.0, offsets[i]/texSize.y), vec2f(0.0), vec2f(1.0));
-        sum += textureSample(sceneTexture, screenSampler, uv).rgb * weights[i];
+        let uv = clamp(vsOut.uv + vec2f(0.0, offsets[i] / texSize.y), vec2f(0.0), vec2f(1.0));
+        sum += textureSample(bloomTexture, screenSampler, uv).rgb * weights[i];
     }
 
     fsOut.colorOut = vec4f(sum, 1.0);
+    return fsOut;
+}
+
+@fragment
+fn sceneRenderPass(vsOut: VSOut) -> FSOut {
+    var fsOut: FSOut;
+    
+    let bloom = textureSample(bloomTexture, screenSampler, vsOut.uv);
+    let scene = textureSample(sceneTexture, screenSampler, vsOut.uv);
+
+    fsOut.colorOut = vec4f(scene.rgb + bloom.rgb, 1);
+
     return fsOut;
 }

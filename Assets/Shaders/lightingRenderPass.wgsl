@@ -204,5 +204,6 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
 
     let ambient = ambientColor * color.rgb * occlusion;
 
+    return vec4f( ambient + specular + diffuse, 1);
     return vec4f( ambient + specular + emissionColor + diffuse, 1);
 }

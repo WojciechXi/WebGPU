@@ -1,13 +1,27 @@
 class TonemappingRenderPass extends RenderPass {
 
     Init(data) {
-        this.finalRenderPass = data.finalRenderPass;
+        this.inputTextureView = data.inputTextureView;
         this.canvas = data.canvas;
 
-        const format = navigator.gpu.getPreferredCanvasFormat();
+        this.sceneTexture = GPU.CreateTexture({
+            size: [this.canvas.width, this.canvas.height],
+            format: 'rgba32float',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        });
+        this.sceneTextureView = this.sceneTexture.createView();
 
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: "auto",
+            layout: GPU.device.createPipelineLayout({
+                bindGroupLayouts: [
+                    GPU.device.createBindGroupLayout({
+                        entries: [
+                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
+                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                        ],
+                    })
+                ],
+            }),
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -16,7 +30,7 @@ class TonemappingRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: format, }
+                    { format: 'rgba32float', }
                 ]
             }
         });
@@ -24,16 +38,16 @@ class TonemappingRenderPass extends RenderPass {
         this.sampler = GPU.CreateSampler({
             addressModeU: 'repeat',
             addressModeV: 'repeat',
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
+            magFilter: 'nearest',
+            minFilter: 'nearest',
+            mipmapFilter: 'nearest',
         });
 
         const bindGroup = this.bindGroup = GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this.finalRenderPass.sceneTextureView },
-                { binding: 1, resource: this.sampler },
+                { binding: 0, resource: this.sampler },
+                { binding: 1, resource: this.inputTextureView },
             ],
         });
     }
@@ -42,7 +56,7 @@ class TonemappingRenderPass extends RenderPass {
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 {
-                    view: Graphics.context.getCurrentTexture().createView(), // wyświetlamy na ekranie
+                    view: this.sceneTextureView, // wyświetlamy na ekranie
                     loadOp: "clear",
                     storeOp: "store"
                 }

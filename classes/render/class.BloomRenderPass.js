@@ -25,6 +25,13 @@ class BloomRenderPass extends RenderPass {
         });
         this.bloomTextureView = this.bloomTexture.createView();
 
+        this.sceneTexture = GPU.CreateTexture({
+            size: [this.canvas.width, this.canvas.height],
+            format: 'rgba32float',
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        });
+        this.sceneTextureView = this.sceneTexture.createView();
+
         this.brightRenderPipeline = GPU.CreateRenderPipeline({
             layout: GPU.device.createPipelineLayout({
                 bindGroupLayouts: [
@@ -100,6 +107,32 @@ class BloomRenderPass extends RenderPass {
             }
         });
 
+        this.sceneRenderPipeline = GPU.CreateRenderPipeline({
+            layout: GPU.device.createPipelineLayout({
+                bindGroupLayouts: [
+                    GPU.device.createBindGroupLayout({
+                        entries: [
+                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
+                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
+                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                            { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                        ],
+                    })
+                ],
+            }),
+            vertex: {
+                module: this.shaderModule,
+                entryPoint: "vs"
+            },
+            fragment: {
+                module: this.shaderModule,
+                entryPoint: "sceneRenderPass",
+                targets: [
+                    { format: 'rgba32float', }
+                ]
+            }
+        });
+
         this.uniformValues = new Float32Array(4);
         this.uniformValues.set([this.canvas.width, this.canvas.height]); //screen size
         this.uniformBuffer = GPU.CreateBuffer({
@@ -138,7 +171,17 @@ class BloomRenderPass extends RenderPass {
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
                 { binding: 1, resource: this.sampler },
-                { binding: 2, resource: this.brightTextureView },
+                { binding: 2, resource: this.blurTextureView },
+            ],
+        });
+
+        const sceneBindGroup = this.sceneBindGroup = GPU.CreateBindGroup({
+            layout: this.sceneRenderPipeline.getBindGroupLayout(0),
+            entries: [
+                { binding: 0, resource: { buffer: this.uniformBuffer } },
+                { binding: 1, resource: this.sampler },
+                { binding: 2, resource: this.bloomTextureView },
+                { binding: 3, resource: this.inputTextureView },
             ],
         });
     }
@@ -202,6 +245,25 @@ class BloomRenderPass extends RenderPass {
 
         bloomRenderPass.draw(6);
         bloomRenderPass.end();
+
+        //sceneRenderPass
+        const sceneRenderPass = commandEncoder.beginRenderPass({
+            colorAttachments: [
+                {
+                    view: this.sceneTextureView, // wyświetlamy na ekranie
+                    loadOp: "clear",
+                    storeOp: "store"
+                }
+            ],
+        });
+
+        sceneRenderPass.setPipeline(this.sceneRenderPipeline);
+        sceneRenderPass.setBindGroup(0, this.sceneBindGroup);
+
+        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
+
+        sceneRenderPass.draw(6);
+        sceneRenderPass.end();
     }
 
 }
