@@ -68,6 +68,24 @@ window.addEventListener('load', async function (event) {
                 shader: unlitShader,
             });
 
+            const wallPaintMaterial = new Material({
+                name: 'Wall paint',
+                shader: unlitShader,
+            });
+            loadBitmap('/Assets/Images/WhiteStuccoWall01_MR_1K/WhiteStuccoWall01_1K_BaseColor.png', function (albedo) {
+                loadBitmap('/Assets/Images/WhiteStuccoWall01_MR_1K/WhiteStuccoWall01_1K_Normal.png', function (normal) {
+                    loadBitmap('/Assets/Images/WhiteStuccoWall01_MR_1K/WhiteStuccoWall01_1K_Roughness.png', function (roughness) {
+                        loadBitmap('/Assets/Images/WhiteStuccoWall01_MR_1K/WhiteStuccoWall01_1K_AO.png', function (occlusion) {
+                            wallPaintMaterial.SetTexture('albedo', albedo);
+                            wallPaintMaterial.SetTexture('normal', normal);
+                            wallPaintMaterial.SetTexture('roughness', roughness);
+                            wallPaintMaterial.SetTexture('occlusion', occlusion);
+                            wallPaintMaterial.Update();
+                        });
+                    });
+                });
+            });
+
             const floorMaterial = new Material({
                 name: 'Floor',
                 shader: unlitShader,
@@ -75,14 +93,10 @@ window.addEventListener('load', async function (event) {
             loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_albedo.png', function (albedo) {
                 loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_normal.png', function (normal) {
                     loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_ao.png', function (occlusion) {
-                        loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_height.png', function (height) {
-                            floorMaterial.SetTexture('albedo', albedo);
-                            floorMaterial.SetTexture('normal', normal);
-                            // floorMaterial.SetTexture('roughness', height);
-                            // floorMaterial.SetTexture('metallic', height);
-                            floorMaterial.SetTexture('occlusion', occlusion);
-                            floorMaterial.Update();
-                        });
+                        floorMaterial.SetTexture('albedo', albedo);
+                        floorMaterial.SetTexture('normal', normal);
+                        floorMaterial.SetTexture('occlusion', occlusion);
+                        floorMaterial.Update();
                     });
                 });
             });
@@ -150,7 +164,7 @@ window.addEventListener('load', async function (event) {
 
                 Light: goldMaterial,
                 Plastic: whiteMaterial,
-                White: whiteMaterial,
+                White: wallPaintMaterial,
                 Beige: beigeMaterial,
                 Gold: goldMaterial,
                 Black: blackMaterial,

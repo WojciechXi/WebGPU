@@ -72,17 +72,18 @@ fn inverse4(m : mat4x4f) -> mat4x4f {
 }
 
 // 3x3 PCF shadow sample
-fn sampleShadow(shadowUV: vec2f, depth: f32) -> f32 {
+fn sampleShadow(shadowUV: vec2f, depth: f32, radius: i32) -> f32 {
     // textureDimensions returns integer vec2; rzutujemy na float
     let dims_i = textureDimensions(shadowTexture, 0);
     let dims = vec2f(f32(dims_i.x), f32(dims_i.y));
     let texelSize = vec2f(1.0, 1.0) / dims;
 
     var shadow: f32 = 0.0;
+    var total: f32 = 0.0;
 
     // 3x3 PCF kernel
-    for (var ox: i32 = -1; ox <= 1; ox = ox + 1) {
-        for (var oy: i32 = -1; oy <= 1; oy = oy + 1) {
+    for (var ox: i32 = -radius; ox <= radius; ox = ox + 1) {
+        for (var oy: i32 = -radius; oy <= radius; oy = oy + 1) {
             let offset = vec2f(f32(ox), f32(oy)) * texelSize;
             // clamp UV to avoid sampling outside
             let sampleUV = clamp(shadowUV + offset, vec2f(0.0), vec2f(1.0));
@@ -91,10 +92,11 @@ fn sampleShadow(shadowUV: vec2f, depth: f32) -> f32 {
             if (depth - 0.001 <= depthSample) {
                 shadow = shadow + 1.0;
             }
+            total += 1.0;
         }
     }
 
-    return shadow / 9.0;
+    return shadow / total;
 }
 
 struct Uniforms {
@@ -170,7 +172,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let lightNDC = lightClip.xyz / lightClip.w;
     let lightDepth = lightNDC.z; // w zależności od projektu może wymagać remap do [0,1]
     let shadowUV = lightNDC.xy * 0.5 + vec2f(0.5, 0.5);
-    let shadowSampleVal = sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth);
+    let shadowSampleVal = (sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, 3) + 0.25) / 1.25;
 
     // --- kolory i PBR kanały (konwencja: R = roughness, G = metallic, B = ao) ---
     let color = textureSample(colorTexture, screenSampler, vsOut.uv);
