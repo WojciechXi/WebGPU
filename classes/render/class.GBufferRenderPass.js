@@ -3,19 +3,19 @@ class GBufferRenderPass extends RenderPass {
     Init(data) {
         this.canvas = data.canvas;
 
-        this.viewPositionTexture = GPU.CreateTexture({
+        this.positionTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
             format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
-        this.viewPositionTextureView = this.viewPositionTexture.createView();
+        this.positionTextureView = this.positionTexture.createView();
 
-        this.viewNormalTexture = GPU.CreateTexture({
+        this.normalTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
             format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
-        this.viewNormalTextureView = this.viewNormalTexture.createView();
+        this.normalTextureView = this.normalTexture.createView();
 
         this.colorTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
@@ -56,8 +56,8 @@ class GBufferRenderPass extends RenderPass {
     Render(engine, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                { view: this.viewPositionTextureView, loadOp: "clear", storeOp: "store" },
-                { view: this.viewNormalTextureView, loadOp: "clear", storeOp: "store" },
+                { view: this.positionTextureView, loadOp: "clear", storeOp: "store" },
+                { view: this.normalTextureView, loadOp: "clear", storeOp: "store" },
 
                 { view: this.colorTextureView, loadOp: "clear", storeOp: "store" },
                 { view: this.pbrTextureView, loadOp: "clear", storeOp: "store" },

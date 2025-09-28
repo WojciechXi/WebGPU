@@ -1,15 +1,3 @@
-fn encodeVector(n: vec3f) -> vec3f {
-  return n * 0.5 + vec3f(0.5);
-}
-
-fn mat3_from_mat4(m: mat4x4f) -> mat3x3f {
-    return mat3x3f(
-        m[0].xyz,
-        m[1].xyz,
-        m[2].xyz
-    );
-}
-
 fn transpose3(m: mat3x3f) -> mat3x3f {
     return mat3x3f(
         vec3f(m[0][0], m[1][0], m[2][0]),
@@ -36,12 +24,20 @@ fn inverse3(m: mat3x3f) -> mat3x3f {
     let det = a*A + b*B + c*C;
     let invDet = 1.0 / det;
 
-    // mat3 constructor is column-major: supply columns
     return mat3x3f(
         vec3f(A, D, G) * invDet,
         vec3f(B, E, H) * invDet,
         vec3f(C, F, I) * invDet
     );
+}
+
+fn getNormalMatrix(modelMatrix: mat4x4f) -> mat3x3f {
+    let m3 = mat3x3f(
+        modelMatrix[0].xyz,
+        modelMatrix[1].xyz,
+        modelMatrix[2].xyz
+    );
+    return transpose3(inverse3(m3));
 }
 
 fn inverse4(m : mat4x4f) -> mat4x4f {
@@ -75,25 +71,6 @@ fn inverse4(m : mat4x4f) -> mat4x4f {
     );
 }
 
-struct Uniforms {
-    viewMatrix : mat4x4f,
-    inverseViewMatrix : mat4x4f,
-    projectionMatrix : mat4x4f,
-    lightViewMatrix : mat4x4f,
-    lightProjectionMatrix : mat4x4f,
-    lightColor : vec4f,
-    shadowColor : vec4f,
-    ambientLightColor : vec4f,
-};
-
-@group(0) @binding(0) var<uniform> uni : Uniforms;
-@group(0) @binding(1) var screenSampler : sampler;
-@group(0) @binding(2) var shadowTexture : texture_2d<f32>;
-@group(0) @binding(3) var positionTexture : texture_2d<f32>;
-@group(0) @binding(4) var normalTexture : texture_2d<f32>;
-@group(0) @binding(5) var colorTexture : texture_2d<f32>;
-@group(0) @binding(6) var pbrTexture : texture_2d<f32>;
-
 // 3x3 PCF shadow sample
 fn sampleShadow(shadowUV: vec2f, depth: f32) -> f32 {
     // textureDimensions returns integer vec2; rzutujemy na float
@@ -120,6 +97,25 @@ fn sampleShadow(shadowUV: vec2f, depth: f32) -> f32 {
     return shadow / 9.0;
 }
 
+struct Uniforms {
+    viewMatrix : mat4x4f,
+    inverseViewMatrix : mat4x4f,
+    projectionMatrix : mat4x4f,
+    lightViewMatrix : mat4x4f,
+    lightProjectionMatrix : mat4x4f,
+    lightColor : vec4f,
+    shadowColor : vec4f,
+    ambientLightColor : vec4f,
+};
+
+@group(0) @binding(0) var<uniform> uni : Uniforms;
+@group(0) @binding(1) var screenSampler : sampler;
+@group(0) @binding(2) var shadowTexture : texture_2d<f32>;
+@group(0) @binding(3) var worldPositionTexture : texture_2d<f32>;
+@group(0) @binding(4) var worldNormalTexture : texture_2d<f32>;
+@group(0) @binding(5) var colorTexture : texture_2d<f32>;
+@group(0) @binding(6) var pbrTexture : texture_2d<f32>;
+
 struct VSOut {
   @builtin(position) pos : vec4f,
   @location(0) uv : vec2f,
@@ -141,69 +137,74 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
 
 @fragment
 fn fs(vsOut: VSOut) -> @location(0) vec4f {
-    // --- odczyty tekstur (lokalne nazwy, by nie kolidowały z bindingami) ---
-    let normalSample = textureSample(normalTexture, screenSampler, vsOut.uv).xyz;
-    var viewPos4 = textureSample(positionTexture, screenSampler, vsOut.uv);
+    let viewMatrix = uni.viewMatrix;
+    let projectionMatrix = uni.projectionMatrix;
+
+    let lightViewMatrix = uni.lightViewMatrix;
+    let lightProjectionMatrix = uni.lightProjectionMatrix;
+    
+    let normalMatrix = getNormalMatrix(viewMatrix);
+    let lightNormalMatrix = getNormalMatrix(lightViewMatrix);
+
+    let worldPosition = textureSample(worldPositionTexture, screenSampler, vsOut.uv);
+    let worldNormal = textureSample(worldNormalTexture, screenSampler, vsOut.uv).xyz;
+
+    var viewPosition = viewMatrix * worldPosition;
+    let viewNormal = normalize(normalMatrix * worldNormal);
+    
     // Bezpiecznie znormalizuj / podziel przez w jeśli jest to vec4 z w != 1
-    var viewPos: vec3f = viewPos4.xyz;
-    if (abs(viewPos4.w) > 1e-6) {
-        viewPos = viewPos4.xyz / viewPos4.w;
+    var viewPos: vec3f = viewPosition.xyz;
+    if (abs(viewPosition.w) > 1e-6) {
+        viewPos = viewPosition.xyz / viewPosition.w;
     }
 
     // world position (do shadow mapping)
-    let worldPos4 = uni.inverseViewMatrix * vec4f(viewPos, 1.0);
-    let worldPos3 = worldPos4.xyz / worldPos4.w;
+    let worldPos3 = worldPosition.xyz / worldPosition.w;
 
     // light direction: obliczamy direction w world space z macierzy widoku światła
-    let lightWorldDirection = normalize((inverse4(uni.lightViewMatrix) * vec4f(0.0, 0.0, -1.0, 0.0)).xyz);
-    // konwertujemy do view space kamery (bo normale masz w view space)
-    let lightViewDirection = normalize((uni.viewMatrix * vec4f(lightWorldDirection, 0.0)).xyz);
+    let lightWorldDirection = normalize((inverse4(lightViewMatrix) * vec4f(0.0, 0.0, 1.0, 0.0)).xyz);
+    let lightViewDirection = normalize(normalMatrix * lightWorldDirection);
 
     // shadow coords (zwróć uwagę na flip Y jeśli potrzeba)
-    let lightClip = uni.lightProjectionMatrix * uni.lightViewMatrix * vec4f(worldPos3, 1.0);
+    let lightClip = lightProjectionMatrix * lightViewMatrix * vec4f(worldPosition.xyz, 1.0);
     let lightNDC = lightClip.xyz / lightClip.w;
     let lightDepth = lightNDC.z; // w zależności od projektu może wymagać remap do [0,1]
     let shadowUV = lightNDC.xy * 0.5 + vec2f(0.5, 0.5);
     let shadowSampleVal = sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth);
 
-    // światła / ambient
-    let ambientLightColor = uni.ambientLightColor.rgb * uni.ambientLightColor.a;
-    let lightColor = uni.lightColor.rgb * uni.lightColor.a;
-
-    // --- normala w view space ---
-    // jeśli normalSample jest w [0,1], przemapuj do [-1,1]
-    let N = normalize(normalSample);
-
-    // L, V, H (wszystko w view space)
-    let L = normalize(-lightViewDirection); // negacja jeśli potrzebujesz kierunku od fragmentu do źródła
-    let V = normalize(-viewPos); // kamera w (0,0,0) w view space
-    let H = normalize(L + V);
-
-    let NdotL = max(dot(N, L), 0.0);
-
     // --- kolory i PBR kanały (konwencja: R = roughness, G = metallic, B = ao) ---
-    let colorSample = textureSample(colorTexture, screenSampler, vsOut.uv);
-    let albedo = colorSample.rgb;
-    let emission = albedo * colorSample.a;
+    let color = textureSample(colorTexture, screenSampler, vsOut.uv);
+    let emission = color.rgb * color.a;
 
     let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv).rgb;
     let roughness = clamp(pbr.r, 0.001, 1.0); // R = roughness
     let metallic = clamp(pbr.g, 0.0, 1.0);    // G = metallic
-    let ao = clamp(pbr.b, 0.0, 1.0);          // B = AO
+    let occlusion = clamp(pbr.b, 0.0, 1.0);          // B = AO
 
-    // --- prosty PBR (upraszczony Cook-Torrance można wstawić tutaj) ---
-    // tutaj zostawiam Twoje istniejące podejście, ale z poprawionymi wartościami
-    var diffuse = albedo * NdotL * ao * (1.0 - metallic);
+    // światła / ambient
+    let lightColor = uni.lightColor.rgb * uni.lightColor.a;
+    let ambientColor = uni.ambientLightColor.rgb * uni.ambientLightColor.a;
 
-    let shininess = 1.0 / (roughness * roughness);
+    let diff = max(dot(viewNormal, lightViewDirection), 0.0);
+    let diffuse = lightColor * diff;
 
-    let F0 = mix(vec3f(0.04), albedo, metallic);
-    let specularStrength = pow(max(dot(N, H), 0.0), shininess) * NdotL;
-    let specular = F0 * specularStrength * 5;
+    let specularStrength = 0.5;
+    let cameraPosition = -(transpose3(mat3x3f(
+        viewMatrix[0].xyz,
+        viewMatrix[1].xyz,
+        viewMatrix[2].xyz
+    )) * viewMatrix[3].xyz);
+    
+    let viewDir = normalize(cameraPosition - worldPosition.xyz);
+    let reflectDir = reflect(-lightWorldDirection, worldNormal);
+    let viewReflectDot = max(dot(viewDir, reflectDir), 0.0);
 
-    let ambient = albedo * ambientLightColor * ao;
-    let lightDiffuse = diffuse * lightColor * shadowSampleVal;
-    let lightSpecular = specular * (lightColor + ambientLightColor) * shadowSampleVal;
+    let shiness = pow(viewReflectDot, 1.0 / roughness); 
 
-    return vec4f(lightDiffuse + lightSpecular + ambient + emission, 1.0);
+    let F0 = mix(color.rgb * lightColor, lightColor, metallic);
+    let specular = F0 * shiness * specularStrength; // non-metal vs metal
+
+    let ambient = ambientColor * color.rgb * occlusion;
+
+    return vec4f( ambient + specular + emission + diffuse * color.rgb, 1);
 }

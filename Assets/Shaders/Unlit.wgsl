@@ -1,15 +1,3 @@
-fn encodeVector(n: vec3f) -> vec3f {
-  return n * 0.5 + vec3f(0.5);
-}
-
-fn mat3_from_mat4(m: mat4x4f) -> mat3x3f {
-    return mat3x3f(
-        m[0].xyz,
-        m[1].xyz,
-        m[2].xyz
-    );
-}
-
 fn transpose3(m: mat3x3f) -> mat3x3f {
     return mat3x3f(
         vec3f(m[0][0], m[1][0], m[2][0]),
@@ -43,6 +31,15 @@ fn inverse3(m: mat3x3f) -> mat3x3f {
     );
 }
 
+fn getNormalMatrix(modelMatrix: mat4x4f) -> mat3x3f {
+    let m3 = mat3x3f(
+        modelMatrix[0].xyz,
+        modelMatrix[1].xyz,
+        modelMatrix[2].xyz
+    );
+    return transpose3(inverse3(m3));
+}
+
 struct Uniforms {
     modelMatrix : mat4x4f,
     viewMatrix : mat4x4f,
@@ -63,15 +60,17 @@ struct Vertex {
 @group(0) @binding(1) var textureSampler : sampler;
 @group(0) @binding(2) var albedoTexture : texture_2d<f32>;
 @group(0) @binding(3) var normalTexture : texture_2d<f32>;
-@group(0) @binding(4) var maskTexture : texture_2d<f32>;
+@group(0) @binding(4) var roughnessTexture : texture_2d<f32>;
+@group(0) @binding(5) var metallicTexture : texture_2d<f32>;
+@group(0) @binding(6) var occlusionTexture : texture_2d<f32>;
 
 struct VSOut {
   @builtin(position) clipPosition : vec4f,
   @location(0) worldPosition : vec3f,
-  @location(2) viewPosition : vec3f,
-  @location(3) normal  : vec3f,
-  @location(4) tangent  : vec4f,
-  @location(5) uv : vec2f,
+  @location(1) worldTangent  : vec3f,
+  @location(2) worldBitangent  : vec3f,
+  @location(3) worldNormal  : vec3f,
+  @location(4) uv : vec2f,
 };
 
 @vertex
@@ -82,19 +81,24 @@ fn vs(vert: Vertex) -> VSOut {
   let viewMatrix = uni.viewMatrix;
   let projectionMatrix = uni.projectionMatrix;
 
+  let normalMatrix = getNormalMatrix(modelMatrix);
+
   let worldPosition = (modelMatrix * vec4f(vert.position, 1.0)).xyz;
   let viewPosition = (viewMatrix * vec4f(worldPosition, 1.0)).xyz;
   let clipPosition = projectionMatrix * viewMatrix * vec4f(worldPosition, 1.0);
 
   vsOut.clipPosition = clipPosition;
   vsOut.worldPosition = worldPosition;
-  vsOut.viewPosition = viewPosition;
+  
+  let T = normalize(normalMatrix * vert.tangent.xyz);
+  let N = normalize(normalMatrix * vert.normal);  
+  let B = normalize(cross(N, T) * vert.tangent.w);
 
-  let normalMatrix = transpose3(inverse3(mat3_from_mat4(viewMatrix * modelMatrix)));
-  vsOut.normal = normalize(normalMatrix * vert.normal);
-  vsOut.tangent = vert.tangent;
-  vsOut.uv = vert.uv;
-
+  vsOut.worldTangent = T;
+  vsOut.worldBitangent = B;
+  vsOut.worldNormal = N;
+  vsOut.uv = vert.uv; 
+  
   return vsOut;
 }
 
@@ -110,7 +114,9 @@ fn shadowRenderPass(vsOut: VSOut) -> ShadowRenderPass {
 
   let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
   let normal = textureSample(normalTexture, textureSampler, vsOut.uv);
-  let mask = textureSample(maskTexture, textureSampler, vsOut.uv);
+  let roughness = textureSample(roughnessTexture, textureSampler, vsOut.uv);
+  let metallic = textureSample(metallicTexture, textureSampler, vsOut.uv);
+  let occlusion = textureSample(occlusionTexture, textureSampler, vsOut.uv);
 
   let clipPosition = vsOut.clipPosition;
   let ndc = (clipPosition.xyz / clipPosition.w);
@@ -124,8 +130,8 @@ fn shadowRenderPass(vsOut: VSOut) -> ShadowRenderPass {
 //gBufferRenderPass
 
 struct GBufferRenderPass {
-  @location(0) viewPositionOut : vec4f,
-  @location(1) viewNormalOut : vec4f,
+  @location(0) worldPositionOut : vec4f,
+  @location(1) worldNormalOut : vec4f,
   
   @location(2) colorOut : vec4f, // Color / Emission
   @location(3) pbrOut : vec4f, // Smoothness / Metallic / Ambient Occlusion
@@ -137,30 +143,21 @@ struct GBufferRenderPass {
 fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   var gBufferRenderPass: GBufferRenderPass;
 
-  let color = uni.color;
+  let TBN = mat3x3f(vsOut.worldTangent, vsOut.worldBitangent, vsOut.worldNormal);
+
   let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
+  let normal = normalize(textureSample(normalTexture, textureSampler, vsOut.uv).xyz * 2.0 - 1.0);
+  let roughness = textureSample(roughnessTexture, textureSampler, vsOut.uv);
+  let metallic = textureSample(metallicTexture, textureSampler, vsOut.uv);
+  let occlusion = textureSample(occlusionTexture, textureSampler, vsOut.uv);
+  
+  gBufferRenderPass.worldPositionOut = vec4f(vsOut.worldPosition, 1.0);
+  gBufferRenderPass.worldNormalOut = vec4f(TBN * normal, 0.0);
 
-  let normalMap = textureSample(normalTexture, textureSampler, vsOut.uv);
-  let normalTangent = normalize(normalMap.rgb * 2.0 - 1.0);
+  gBufferRenderPass.colorOut = vec4f(albedo.rgb * uni.color.rgb, 0.0);
+  gBufferRenderPass.pbrOut = vec4f(roughness.r, metallic.r, occlusion.r, 0.0);
 
-  let T = normalize(vsOut.tangent.xyz);
-  let N = normalize(vsOut.normal);
-  let B = cross(N, T) * vsOut.tangent.w;
-
-  let TBN = mat3x3f(T, B, N);
-  let normalView = normalize(TBN * normalTangent);
-
-  let mask = textureSample(maskTexture, textureSampler, vsOut.uv);
-
-  let targetColor = albedo.rgb * color.rgb;
-
-  gBufferRenderPass.viewPositionOut = vec4f(vsOut.viewPosition, 1.0);
-  gBufferRenderPass.viewNormalOut = vec4f(normalView, 0.0);
-
-  gBufferRenderPass.colorOut = vec4f(targetColor, 0.0);
-  gBufferRenderPass.pbrOut = vec4f(mask.g, mask.b, mask.r, 0.0);
-
-  gBufferRenderPass.depthOut = vec4f(vsOut.viewPosition.z, 0.0, 0.0, 1.0);
+  gBufferRenderPass.depthOut = vec4f(vsOut.clipPosition.z / vsOut.clipPosition.w, 0.0, 0.0, 1.0);
 
   return gBufferRenderPass;
 }

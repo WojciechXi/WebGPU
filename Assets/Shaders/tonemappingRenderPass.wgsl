@@ -37,7 +37,7 @@ struct FSOut {
 fn fs(vsOut: VSOut) -> FSOut {
   var fsOut: FSOut;
     
-  let gamma = 1.0 / 2.2;
+  let gamma = 1.0 / 2.3;
   let hdrColor = textureSample(sceneTexture, screenSampler, vsOut.uv).rgb;
   let ldrColor = acesTonemap(hdrColor);
   fsOut.colorOut = vec4f(pow(ldrColor, vec3<f32>(gamma)), 1.0);

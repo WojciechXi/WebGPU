@@ -95,8 +95,6 @@ class Graphics {
             canvas: canvas,
         });
 
-        this.debugRenderPass.textureView = this.ssaoRenderPass.ssaoTextureView;
-
         callback();
     }
 
@@ -108,20 +106,21 @@ class Graphics {
     static Render(engine) {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-        this.clearRenderPass.Render(engine, commandEncoder);
+        // this.clearRenderPass.Render(engine, commandEncoder);
         this.shadowRenderPass.Render(engine, commandEncoder);
 
         this.gBufferRenderPass.Render(engine, commandEncoder);
 
         this.ssaoRenderPass.Render(engine, commandEncoder);
-        this.ssaoBlurRenderPass.Render(engine, commandEncoder);
+        // this.ssaoBlurRenderPass.Render(engine, commandEncoder);
 
         this.lightingRenderPass.Render(engine, commandEncoder);
         // this.forwardRenderPass.Render(engine, commandEncoder);
         this.finalRenderPass.Render(engine, commandEncoder);
+
         this.tonemappingRenderPass.Render(engine, commandEncoder);
 
-        // this.debugRenderPass.Render(engine, commandEncoder);
+        this.debugRenderPass.Render(engine, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);
     }

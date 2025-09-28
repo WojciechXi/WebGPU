@@ -74,11 +74,15 @@ window.addEventListener('load', async function (event) {
             });
             loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_albedo.png', function (albedo) {
                 loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_normal.png', function (normal) {
-                    loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_ao.png', function (ambientOcclusion) {
-                        floorMaterial.albedo = albedo;
-                        floorMaterial.normal = normal;
-                        floorMaterial.ambientOcclusion = ambientOcclusion;
-                        floorMaterial.Update();
+                    loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_ao.png', function (occlusion) {
+                        loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_height.png', function (height) {
+                            floorMaterial.SetTexture('albedo', albedo);
+                            floorMaterial.SetTexture('normal', albedo);
+                            // floorMaterial.SetTexture('roughness', height);
+                            // floorMaterial.SetTexture('metallic', height);
+                            floorMaterial.SetTexture('occlusion', occlusion);
+                            floorMaterial.Update();
+                        });
                     });
                 });
             });
@@ -102,41 +106,46 @@ window.addEventListener('load', async function (event) {
                 name: 'PBR',
                 shader: unlitShader,
             });
-            loadBitmap('/Assets/Images/pbr_sphere/sphere_baseColor.jpeg', function (albedo) {
-                loadBitmap('/Assets/Images/pbr_sphere/sphere_normal.png', function (normal) {
-                    loadBitmap('/Assets/Images/pbr_sphere/sphere_metallicRoughness.png', function (mask) {
-                        pbrShpereMaterial.albedo = albedo;
-                        pbrShpereMaterial.normal = normal;
-                        pbrShpereMaterial.mask = mask;
-                        // pbrShpereMaterial.ambientOcclusion = ambientOcclusion;
-                        pbrShpereMaterial.Update();
+            loadBitmap('/Assets/Images/pbr_sphere/sphere_Base_Color.png', function (albedo) {
+                loadBitmap('/Assets/Images/pbr_sphere/sphere_Normal.png', function (normal) {
+                    loadBitmap('/Assets/Images/pbr_sphere/sphere_Roughness.png', function (roughness) {
+                        loadBitmap('/Assets/Images/pbr_sphere/sphere_Metallic.png', function (metallic) {
+                            loadBitmap('/Assets/Images/pbr_sphere/sphere_Mixed_AO.png', function (occlusion) {
+                                pbrShpereMaterial.SetTexture('albedo', albedo);
+                                pbrShpereMaterial.SetTexture('normal', albedo);
+                                pbrShpereMaterial.SetTexture('roughness', roughness);
+                                pbrShpereMaterial.SetTexture('metallic', metallic);
+                                pbrShpereMaterial.SetTexture('occlusion', occlusion);
+                                pbrShpereMaterial.Update();
+                            });
+                        });
                     });
                 });
             });
 
-            loadBitmap('/Assets/Images/U702 PMST9.jpg', function (bitmap) {
-                u702pmst9Material.albedo = bitmap;
+            loadBitmap('/Assets/Images/U702 PMST9.jpg', function (albedo) {
+                u702pmst9Material.SetTexture('albedo', albedo);
                 u702pmst9Material.Update();
             });
 
-            loadBitmap('/Assets/Images/D1038 BS BETON MILLENIUM.jpg', function (bitmap) {
-                concreteMaterial.albedo = bitmap;
+            loadBitmap('/Assets/Images/D1038 BS BETON MILLENIUM.jpg', function (albedo) {
+                concreteMaterial.SetTexture('albedo', albedo);
                 concreteMaterial.Update();
             });
 
-            loadBitmap('/Assets/Images/D3025 OW DAB SONOMA.jpg', function (bitmap) {
-                sonomaMaterial.albedo = bitmap;
+            loadBitmap('/Assets/Images/D3025 OW DAB SONOMA.jpg', function (albedo) {
+                sonomaMaterial.SetTexture('albedo', albedo);
                 sonomaMaterial.Update();
             });
 
-            loadBitmap('/Assets/Images/D4428_OV_Dąb_naturalny.jpg', function (bitmap) {
-                unlit2Material.albedo = bitmap;
+            loadBitmap('/Assets/Images/D4428_OV_Dąb_naturalny.jpg', function (albedo) {
+                unlit2Material.SetTexture('albedo', albedo);
                 unlit2Material.Update();
             });
 
             const materials = {
                 Glass: null,
-                sphere: pbrShpereMaterial,
+                'sphere.001': pbrShpereMaterial,
                 'Stack of Bricks': stackOfBricksMaterial,
 
                 Light: goldMaterial,
@@ -178,7 +187,7 @@ window.addEventListener('load', async function (event) {
             ambientLight.color.Set(0.9, 0.95, 1, 0.2);
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
-            // directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-60, 0, -30);
+            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-75, 0, 0);
             directionalLightGameObject.transform.position = directionalLightGameObject.transform.back.Multiply(50);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
@@ -186,11 +195,13 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.GLTF('/Assets/Models', 'scene.gltf', function (meshes, gltfMaterials) {
+            Graphics.debugRenderPass.textureView = Graphics.gBufferRenderPass.normalTextureView;
+
+            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
                 for (const mesh of meshes) {
                     const gameObject = new GameObject(mesh.name);
                     gameObject.transform.position = new Vector3(0, 0, -2);
-                    gameObject.transform.rotation = Quaternion.FromEuler(0, 0, -90);
+                    gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
                     const meshRenderer = gameObject.AddComponent(MeshRenderer);
                     meshRenderer.mesh = mesh;
 

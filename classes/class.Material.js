@@ -9,15 +9,12 @@ class Material {
         this.shader = data.shader ?? '';
         this.color = data.color ?? Color.white;
 
-        this.smoothness = 0;
-        this.metallic = 0;
-        this.ambientOcclusion = 0;
-
-        this.albedo = null;
-        this.normal = null;
-        this.mask = null;
-        this.ambientOcclusion = null;
-        this.heightMap = null;
+        this.textures = {};
+        this.SetTexture('albedo', data.albedo ?? Color.white);
+        this.SetTexture('normal', data.normal ?? new Color(0.5, 0.5, 1, 1));
+        this.SetTexture('roughness', data.roughness ?? Color.white);
+        this.SetTexture('metallic', data.metallic ?? Color.black);
+        this.SetTexture('occlusion', data.occlusion ?? Color.white);
 
         const uniformSize = 16 + 16 + 16 + 4 + 4; // modelMatrix, viewMatrix, projectionMatrix, color, pbr
         this.uniformValues = new Float32Array(uniformSize);
@@ -32,6 +29,41 @@ class Material {
 
         this.bindGroups = {};
         this.uniformBuffers = {};
+    }
+
+    SetTexture(name, texture) {
+        if (texture instanceof Color) {
+            const width = 1;
+            const height = 1;
+
+            this.textures[name] = GPU.CreateTexture({
+                size: [width, height, 1],
+                format: 'rgba8unorm',
+                usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+            });
+
+            GPU.Queue.writeTexture(
+                { texture: this.textures[name] },
+                new Uint8Array([texture.r * 255, texture.g * 255, texture.b * 255, texture.a * 255]),
+                { bytesPerRow: 4 * 4 },
+                { width, height, depthOrArrayLayers: 1 }
+            );
+        } else {
+            const width = texture.width;
+            const height = texture.height;
+
+            this.textures[name] = GPU.CreateTexture({
+                size: [width, height, 1],
+                format: 'rgba8unorm',
+                usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+            });
+
+            GPU.Queue.copyExternalImageToTexture(
+                { source: texture },
+                { texture: this.textures[name] },
+                [width, height, 1]
+            );
+        }
     }
 
     Update() {
@@ -50,17 +82,24 @@ class Material {
     }
 
     GetBindGroup(renderPass, renderPipeline, uniformBuffer) {
+        const _this = this;
+
         if (!renderPipeline) return null;
-        if (this.bindGroups[renderPass.name]) return this.bindGroups[renderPass.name];
-        return this.bindGroups[renderPass.name] = GPU.CreateBindGroup({
+        if (_this.bindGroups[renderPass.name]) return _this.bindGroups[renderPass.name];
+
+        let entries = [
+            { binding: 0, resource: { buffer: uniformBuffer } },
+            { binding: 1, resource: _this.sampler }
+        ];
+
+        Object.keys(_this.textures).forEach(function (key, index) {
+            let entry = { binding: 2 + index, resource: _this.textures[key].createView() };
+            entries.push(entry);
+        });
+
+        return _this.bindGroups[renderPass.name] = GPU.CreateBindGroup({
             layout: renderPipeline.getBindGroupLayout(0),
-            entries: [
-                { binding: 0, resource: { buffer: uniformBuffer } },
-                { binding: 1, resource: this.sampler },
-                { binding: 2, resource: this.albedo.createView() },
-                { binding: 3, resource: this.normal.createView() },
-                { binding: 4, resource: this.mask.createView() },
-            ],
+            entries: entries,
         });
     }
 
@@ -87,156 +126,6 @@ class Material {
         }
 
         return false;
-    }
-
-    get albedo() {
-        return this._albedo;
-    }
-
-    set albedo(albedo) {
-        const width = albedo ? albedo.width : 1;
-        const height = albedo ? albedo.height : 1;
-
-        this._albedo = GPU.CreateTexture({
-            size: [width, height, 1],
-            format: 'rgba8unorm',
-            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-        });
-
-        if (albedo) {
-            GPU.Queue.copyExternalImageToTexture(
-                { source: albedo },
-                { texture: this._albedo },
-                [width, height, 1]
-            );
-        } else {
-            GPU.Queue.writeTexture(
-                { texture: this._albedo },
-                new Uint8Array([255, 255, 255, 255]),
-                { bytesPerRow: width * 4 },
-                { width, height, depthOrArrayLayers: 1 }
-            );
-        }
-    }
-
-    get normal() {
-        return this._normal;
-    }
-
-    set normal(normal) {
-        const width = normal ? normal.width : 1;
-        const height = normal ? normal.height : 1;
-
-        this._normal = GPU.CreateTexture({
-            size: [width, height, 1],
-            format: 'rgba8unorm',
-            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-        });
-
-        if (normal) {
-            GPU.Queue.copyExternalImageToTexture(
-                { source: normal },
-                { texture: this._normal },
-                [width, height, 1]
-            );
-        } else {
-            GPU.Queue.writeTexture(
-                { texture: this._normal },
-                new Uint8Array([0, 0, 255, 255]),
-                { bytesPerRow: width * 4 },
-                { width, height, depthOrArrayLayers: 1 }
-            );
-        }
-    }
-
-    get mask() {
-        return this._mask;
-    }
-
-    set mask(mask) {
-        const width = mask ? mask.width : 1;
-        const height = mask ? mask.height : 1;
-
-        this._mask = GPU.CreateTexture({
-            size: [width, height, 1],
-            format: 'rgba8unorm',
-            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-        });
-
-        if (mask) {
-            GPU.Queue.copyExternalImageToTexture(
-                { source: mask },
-                { texture: this._mask },
-                [width, height, 1]
-            );
-        } else {
-            GPU.Queue.writeTexture(
-                { texture: this._mask },
-                new Uint8Array([0, 0, 0, 0]),
-                { bytesPerRow: width * 4 },
-                { width, height, depthOrArrayLayers: 1 }
-            );
-        }
-    }
-
-    get ambientOcclusion() {
-        return this._ambientOcclusion;
-    }
-
-    set ambientOcclusion(ambientOcclusion) {
-        const width = ambientOcclusion ? ambientOcclusion.width : 1;
-        const height = ambientOcclusion ? ambientOcclusion.height : 1;
-
-        this._ambientOcclusion = GPU.CreateTexture({
-            size: [width, height, 1],
-            format: 'rgba8unorm',
-            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-        });
-
-        if (ambientOcclusion) {
-            GPU.Queue.copyExternalImageToTexture(
-                { source: ambientOcclusion },
-                { texture: this._ambientOcclusion },
-                [width, height, 1]
-            );
-        } else {
-            GPU.Queue.writeTexture(
-                { texture: this._ambientOcclusion },
-                new Uint8Array([255, 255, 255, 255]),
-                { bytesPerRow: width * 4 },
-                { width, height, depthOrArrayLayers: 1 }
-            );
-        }
-    }
-
-    get heightMap() {
-        return this._heightMap;
-    }
-
-    set heightMap(heightMap) {
-        const width = heightMap ? heightMap.width : 1;
-        const height = heightMap ? heightMap.height : 1;
-
-        this._heightMap = GPU.CreateTexture({
-            size: [width, height, 1],
-            format: 'rgba8unorm',
-            usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
-        });
-
-        if (heightMap) {
-            GPU.Queue.copyExternalImageToTexture(
-                { source: heightMap },
-                { texture: this._heightMap },
-                [width, height, 1]
-            );
-        } else {
-            GPU.Queue.writeTexture(
-                { texture: this._heightMap },
-                new Uint8Array([255, 255, 255, 255]),
-                { bytesPerRow: width * 4 },
-                { width, height, depthOrArrayLayers: 1 }
-            );
-        }
     }
 
 }
