@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="./index.css">
 
     <script src="./classes/utilities/class.Math.js"></script>
-    <script src="./classes/utilities/class.Bonuds.js"></script>
+    <script src="./classes/utilities/class.Bounds.js"></script>
     <script src="./classes/utilities/class.Quaternion.js"></script>
     <script src="./classes/utilities/class.Vector2.js"></script>
     <script src="./classes/utilities/class.Vector3.js"></script>

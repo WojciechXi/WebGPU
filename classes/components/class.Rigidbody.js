@@ -13,6 +13,7 @@ class Rigidbody extends Component {
     Update() {
         if (!Physics.simulate) return;
         if (!this.collider) return;
+        if (Time.deltaTime > 0.3) return;
 
         // --- 1. Grawitacja ---
         if (this.useGravity) {

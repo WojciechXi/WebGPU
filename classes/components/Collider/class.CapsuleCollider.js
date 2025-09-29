@@ -14,13 +14,17 @@ class CapsuleCollider extends Collider {
         this.height = 2.0; // odległość między końcami kapsuły
     }
 
+    get bounds() {
+        return new Bounds(this.worldCenter, new Vector3(this.radius * 2, this.height, this.radius * 2));
+    }
+
     // Punkty końcowe kapsuły w world space
     GetTop() {
-        return Vector3.Add(this.transform.position, new Vector3(0, this.height * 0.5, 0));
+        return Vector3.Add(this.worldCenter, new Vector3(0, this.height * 0.5, 0));
     }
 
     GetBottom() {
-        return Vector3.Add(this.transform.position, new Vector3(0, -this.height * 0.5, 0));
+        return Vector3.Add(this.worldCenter, new Vector3(0, -this.height * 0.5, 0));
     }
 
     Intersects(other) {
@@ -45,8 +49,8 @@ class CapsuleCollider extends Collider {
 
             const delta = Vector3.Subtract(closestA, closestB);
             return delta.SqrMagnitude() <= (this.radius + other.radius) ** 2;
-        } else if (other instanceof BoxCollider || other instanceof SphereCollider) {
-            return other.Intersects(this);
+        } else if (other instanceof BoxCollider) {
+
         }
         return false;
     }

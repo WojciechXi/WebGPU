@@ -5,26 +5,13 @@ class BoxCollider extends Collider {
         this.size = Vector3.one; // rozmiar boxa w lokalnej skali
     }
 
-    // AABB w world space
-    GetMin() {
-        return Vector3.Subtract(this.transform.position, Vector3.Multiply(this.size, 0.5));
-    }
-
-    GetMax() {
-        return Vector3.Add(this.transform.position, Vector3.Multiply(this.size, 0.5));
+    get bounds() {
+        return new Bounds(Vector3.Add(this.transform.position, this.center), this.size);
     }
 
     Intersects(other) {
         if (other instanceof BoxCollider) {
-            const aMin = this.GetMin();
-            const aMax = this.GetMax();
-
-            const bMin = other.GetMin();
-            const bMax = other.GetMax();
-
-            return (aMin.x <= bMax.x && aMax.x >= bMin.x) &&
-                (aMin.y <= bMax.y && aMax.y >= bMin.y) &&
-                (aMin.z <= bMax.z && aMax.z >= bMin.z);
+            return this.bounds.Intersects(other.bounds);
         } else if (other instanceof SphereCollider || other instanceof CapsuleCollider) {
             return other.Intersects(this);
         }
@@ -33,11 +20,14 @@ class BoxCollider extends Collider {
 
     ComputePenetration(other) {
         if (other instanceof BoxCollider) {
-            const aMin = this.GetMin();
-            const aMax = this.GetMax();
+            let bounds = this.bounds;
+            let otherBounds = other.bounds;
 
-            const bMin = other.GetMin();
-            const bMax = other.GetMax()
+            const aMin = bounds.min;
+            const aMax = bounds.max;
+
+            const bMin = otherBounds.min;
+            const bMax = otherBounds.max;
 
             // overlap po osiach
             const dx = Math.min(aMax.x, bMax.x) - Math.max(aMin.x, bMin.x);
@@ -54,6 +44,8 @@ class BoxCollider extends Collider {
                     return new Vector3(0, 0, aMax.z > bMax.z ? dz : -dz);
                 }
             }
+        } else if (other instanceof SphereCollider) {
+            return other.ComputePenetration(this);
         }
 
         return null;

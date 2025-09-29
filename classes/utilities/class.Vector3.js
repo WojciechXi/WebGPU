@@ -115,6 +115,10 @@ class Vector3 extends Float32Array {
         return Vector3.SqrMagnitude(this);
     }
 
+    Magnitude() {
+        return Vector3.Magnitude(this);
+    }
+
     Normalize() {
         Vector3.Normalize(this, this);
         return this;
