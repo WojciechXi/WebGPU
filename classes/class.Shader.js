@@ -67,7 +67,7 @@ class Shader {
                     depthCompare: "less"
                 },
                 primitive: {
-                    cullMode: 'none',
+                    cullMode: 'back',
                     frontFace: 'ccw',
                 },
             });
@@ -111,7 +111,7 @@ class Shader {
                     depthCompare: "less"
                 },
                 primitive: {
-                    cullMode: 'none',
+                    cullMode: 'back',
                     frontFace: 'ccw',
                 },
             });

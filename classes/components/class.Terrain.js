@@ -80,15 +80,15 @@ class Terrain extends Component {
                 triangles.push(indexRight);
                 triangles.push(indexForward);
 
+                triangles.push(indexForwardRight);
                 triangles.push(indexForward);
                 triangles.push(indexRight);
-                triangles.push(indexForwardRight);
             }
         }
         this.mesh.SetTriangles(triangles, lod);
 
         this.mesh.RecalculateNormals();
-        // this.mesh.RecalculateTangents();
+        this.mesh.RecalculateTangents();
         this.mesh.RecalculateBounds();
         this.mesh.Update();
     }
