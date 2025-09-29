@@ -89,7 +89,7 @@ fn sampleShadow(shadowUV: vec2f, depth: f32, radius: i32) -> f32 {
             let sampleUV = clamp(shadowUV + offset, vec2f(0.0), vec2f(1.0));
             let depthSample = textureSample(shadowTexture, screenSampler, sampleUV).r;
             // simple depth compare with small bias
-            if (depth - 0.001 <= depthSample) {
+            if (depth - 0.002 <= depthSample) {
                 shadow = shadow + 1.0;
             }
             total += 1.0;

@@ -47,7 +47,7 @@ struct SSAOUniforms {
   screenSize : vec2f,
   radius : f32,
   bias : f32,
-  blurRadius : i32,
+  blurRadius : f32,
   sigmaDepth : f32,
 };
 
@@ -87,13 +87,15 @@ fn ssaoRenderPass(vsOut: VSOut) -> FSOut {
   var fsOut: FSOut;
   let uv = vsOut.uv;
 
+  let screenSize = vec2f(textureDimensions(worldPositionTexture));
+
   let normalMatrix = getNormalMatrix(uniforms.viewMatrix);
 
   let worldPoition = textureSample(worldPositionTexture, screenSampler, uv);
   let viewPosition4 = uniforms.viewMatrix * vec4f(worldPoition.xyz, 1.0);
   let viewPosition = viewPosition4.xyz;
 
-  let noiseScale = uniforms.screenSize / 4;
+  let noiseScale = screenSize / 4;
   let noiseUV = fract(uv * noiseScale);
 
   let worldNormal = normalize(textureSample(worldNormalTexture, screenSampler, uv).rgb);
@@ -127,7 +129,7 @@ fn ssaoRenderPass(vsOut: VSOut) -> FSOut {
   }
 
   occlusion = 1.0 - (occlusion / 32.0);
-  fsOut.colorOut = vec4f(occlusion, occlusion, occlusion, 1.0);
+  fsOut.colorOut = vec4f(occlusion);
 
   return fsOut;
 }
@@ -136,10 +138,12 @@ fn ssaoRenderPass(vsOut: VSOut) -> FSOut {
 fn blurHorizontalRenderPass(vsOut: VSOut) -> FSOut {
     var fsOut: FSOut;
 
-    let radius = uniforms.radius;
+    let screenSize = vec2f(textureDimensions(ssaoTexture));
+
+    let radius = uniforms.blurRadius;
     let sigmaDepth = uniforms.sigmaDepth;
 
-    let uvOffset = vec2f(1.0) / uniforms.screenSize;
+    let uvOffset = vec2f(1.0 / screenSize.x, 1.0 / screenSize.y);
     let centerDepth = textureSample(ssaoTexture, screenSampler, vsOut.uv).r;
 
     var weight: f32 = 0.0;
@@ -157,7 +161,7 @@ fn blurHorizontalRenderPass(vsOut: VSOut) -> FSOut {
         weightSum += w;
     }
     let blur = weight / weightSum;
-    fsOut.colorOut = vec4f(blur, blur, blur, 1.0);
+    fsOut.colorOut = vec4f(blur);
 
     return fsOut;
 }
@@ -167,10 +171,12 @@ fn blurHorizontalRenderPass(vsOut: VSOut) -> FSOut {
 fn blurVerticalRenderPass(vsOut: VSOut) -> FSOut {
     var fsOut: FSOut;
 
-    let radius = uniforms.radius;
+    let screenSize = vec2f(textureDimensions(ssaoTexture));
+
+    let radius = uniforms.blurRadius;
     let sigmaDepth = uniforms.sigmaDepth;
 
-    let uvOffset = vec2f(1.0) / uniforms.screenSize;
+    let uvOffset = vec2f(1.0 / screenSize.x, 1.0 / screenSize.y);
     let centerDepth = textureSample(ssaoTexture, screenSampler, vsOut.uv).r;
 
     var weight: f32 = 0.0;
@@ -188,7 +194,7 @@ fn blurVerticalRenderPass(vsOut: VSOut) -> FSOut {
         weightSum += w;
     }
     let blur = weight / weightSum;
-    fsOut.colorOut = vec4f(blur, blur, blur, 1.0);
+    fsOut.colorOut = vec4f(blur);
 
     return fsOut;
 }

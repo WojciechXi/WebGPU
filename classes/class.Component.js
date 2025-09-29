@@ -12,4 +12,8 @@ class Component extends Obj {
 
     }
 
+    GetComponent(type) {
+        return this.gameObject.GetComponent(type);
+    }
+
 }

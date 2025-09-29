@@ -5,42 +5,42 @@ class GBufferRenderPass extends RenderPass {
 
         this.positionTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
-            format: "rgba32float",
+            format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.positionTextureView = this.positionTexture.createView();
 
         this.normalTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
-            format: "rgba32float",
+            format: "rgba8unorm",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.normalTextureView = this.normalTexture.createView();
 
         this.colorTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
-            format: "rgba32float",
+            format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.colorTextureView = this.colorTexture.createView();
 
         this.emissionTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
-            format: "rgba32float",
+            format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.emissionTextureView = this.emissionTexture.createView();
 
         this.pbrTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
-            format: "rgba32float",
+            format: "rgba8unorm",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.pbrTextureView = this.pbrTexture.createView();
 
         this.depthTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
-            format: "rgba32float",
+            format: "r32float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.depthTextureView = this.depthTexture.createView();

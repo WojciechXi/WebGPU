@@ -43,7 +43,7 @@ class FinalRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: 'rgba32float', }
+                    { format: 'rgba16float', }
                 ],
             }
         });

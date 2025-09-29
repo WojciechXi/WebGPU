@@ -241,29 +241,52 @@ window.addEventListener('load', async function (event) {
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
-            cameraGameObject.transform.position = new Vector3(0, 0, 2);
+            cameraGameObject.transform.position = new Vector3(0, 1, 5);
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.GLTF('/Assets/Models', 'SunstanceSphere.gltf', function (meshes, gltfMaterials) {
+            Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
                 for (const mesh of meshes) {
                     const gameObject = new GameObject(mesh.name);
                     gameObject.transform.position = new Vector3(0, 0, 0);
                     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+                    const boxCollider = gameObject.AddComponent(BoxCollider);
                     const meshRenderer = gameObject.AddComponent(MeshRenderer);
                     meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [whiteMaterial];
+                }
 
-                    meshRenderer.materials = [];
-                    mesh.subMeshes.forEach(function (subMesh) {
-                        if (materials.hasOwnProperty(subMesh.material)) {
-                            meshRenderer.materials.push(materials[subMesh.material]);
-                        } else {
-                            console.log(subMesh.material);
-                            meshRenderer.materials.push(whiteMaterial);
-                        }
-                    });
+                for (const mesh of meshes) {
+                    const gameObject = new GameObject(mesh.name);
+                    gameObject.transform.position = new Vector3(0, 1.1, 0);
+                    gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+                    const boxCollider = gameObject.AddComponent(BoxCollider);
+                    const rigidbody = gameObject.AddComponent(Rigidbody);
+                    const meshRenderer = gameObject.AddComponent(MeshRenderer);
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [goldMaterial];
                 }
             });
+
+            // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+            //     for (const mesh of meshes) {
+            //         const gameObject = new GameObject(mesh.name);
+            //         gameObject.transform.position = new Vector3(0, 0, 0);
+            //         gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+            //         const meshRenderer = gameObject.AddComponent(MeshRenderer);
+            //         meshRenderer.mesh = mesh;
+
+            //         meshRenderer.materials = [];
+            //         mesh.subMeshes.forEach(function (subMesh) {
+            //             if (materials.hasOwnProperty(subMesh.material)) {
+            //                 meshRenderer.materials.push(materials[subMesh.material]);
+            //             } else {
+            //                 console.log(subMesh.material);
+            //                 meshRenderer.materials.push(whiteMaterial);
+            //             }
+            //         });
+            //     }
+            // });
         });
     });
 });

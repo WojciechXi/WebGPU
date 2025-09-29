@@ -35,9 +35,9 @@
     <script src="./classes/render/class.ShadowRenderPass.js"></script>
     <script src="./classes/render/class.LightingRenderPass.js"></script>
     <script src="./classes/render/class.ForwardRenderPass.js"></script>
-    <script src="./classes/render/class.SSAORenderPass.js"></script>
-    <script src="./classes/render/class.SSAOBlurRenderPass.js"></script>
     <script src="./classes/render/class.FinalRenderPass.js"></script>
+    <script src="./classes/render/class.SSAORenderPass.js"></script>
+    <script src="./classes/render/class.ScreenSpaceReflectionRenderPass.js"></script>
     <script src="./classes/render/class.BloomRenderPass.js"></script>
     <script src="./classes/render/class.TonemappingRenderPass.js"></script>
     <script src="./classes/render/class.DebugRenderPass.js"></script>
@@ -52,6 +52,13 @@
     <script src="./classes/components/class.MeshRenderer.js"></script>
     <script src="./classes/components/class.AmbientLight.js"></script>
     <script src="./classes/components/class.DirectionalLight.js"></script>
+    <script src="./classes/components/class.Rigidbody.js"></script>
+    <script src="./classes/components/class.Collider.js"></script>
+
+    <script src="./classes/components/Collider/class.BoxCollider.js"></script>
+    <script src="./classes/components/Collider/class.SphereCollider.js"></script>
+    <script src="./classes/components/Collider/class.CapsuleCollider.js"></script>
+
     <script src="./classes/components/class.Terrain.js"></script>
 
     <script src="./classes/components/class.Test.js"></script>

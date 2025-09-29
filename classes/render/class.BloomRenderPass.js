@@ -5,45 +5,35 @@ class BloomRenderPass extends RenderPass {
         this.inputTextureView = data.inputTextureView;
 
         this.brightTexture = GPU.CreateTexture({
-            size: [this.canvas.width, this.canvas.height],
-            format: 'rgba32float',
+            size: [this.canvas.width / 2, this.canvas.height / 2],
+            format: 'rgba16float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.brightTextureView = this.brightTexture.createView();
 
         this.blurTexture = GPU.CreateTexture({
-            size: [this.canvas.width, this.canvas.height],
-            format: 'rgba32float',
+            size: [this.canvas.width / 2, this.canvas.height / 2],
+            format: 'rgba16float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.blurTextureView = this.blurTexture.createView();
 
         this.bloomTexture = GPU.CreateTexture({
-            size: [this.canvas.width, this.canvas.height],
-            format: 'rgba32float',
+            size: [this.canvas.width / 2, this.canvas.height / 2],
+            format: 'rgba16float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.bloomTextureView = this.bloomTexture.createView();
 
         this.sceneTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
-            format: 'rgba32float',
+            format: 'rgba16float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.sceneTextureView = this.sceneTexture.createView();
 
         this.brightRenderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
-                bindGroupLayouts: [
-                    GPU.device.createBindGroupLayout({
-                        entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        ],
-                    })
-                ],
-            }),
+            layout: 'auto',
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -52,23 +42,13 @@ class BloomRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "brightRenderPass",
                 targets: [
-                    { format: 'rgba32float', }
+                    { format: 'rgba16float', }
                 ]
             }
         });
 
         this.blurRenderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
-                bindGroupLayouts: [
-                    GPU.device.createBindGroupLayout({
-                        entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        ],
-                    })
-                ],
-            }),
+            layout: 'auto',
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -77,23 +57,13 @@ class BloomRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "blurRenderPass",
                 targets: [
-                    { format: 'rgba32float', }
+                    { format: 'rgba16float', }
                 ]
             }
         });
 
         this.bloomRenderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
-                bindGroupLayouts: [
-                    GPU.device.createBindGroupLayout({
-                        entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        ],
-                    })
-                ],
-            }),
+            layout: 'auto',
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -102,24 +72,13 @@ class BloomRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "bloomRenderPass",
                 targets: [
-                    { format: 'rgba32float', }
+                    { format: 'rgba16float', }
                 ]
             }
         });
 
         this.sceneRenderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
-                bindGroupLayouts: [
-                    GPU.device.createBindGroupLayout({
-                        entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                            { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        ],
-                    })
-                ],
-            }),
+            layout: 'auto',
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -128,7 +87,7 @@ class BloomRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "sceneRenderPass",
                 targets: [
-                    { format: 'rgba32float', }
+                    { format: 'rgba16float', }
                 ]
             }
         });
@@ -141,47 +100,41 @@ class BloomRenderPass extends RenderPass {
         });
 
         this.sampler = GPU.CreateSampler({
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
-            magFilter: 'nearest',
-            minFilter: 'nearest',
-            mipmapFilter: 'nearest',
+            magFilter: 'linear',
+            minFilter: 'linear',
+            mipmapFilter: 'linear',
         });
 
         const brightBindGroup = this.brightBindGroup = GPU.CreateBindGroup({
             layout: this.brightRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: this.sampler },
-                { binding: 2, resource: this.inputTextureView },
+                { binding: 0, resource: this.sampler },
+                { binding: 1, resource: this.inputTextureView },
             ],
         });
 
         const blurBindGroup = this.blurBindGroup = GPU.CreateBindGroup({
             layout: this.blurRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: this.sampler },
-                { binding: 2, resource: this.brightTextureView },
+                { binding: 0, resource: this.sampler },
+                { binding: 1, resource: this.brightTextureView },
             ],
         });
 
         const bloomBindGroup = this.bloomBindGroup = GPU.CreateBindGroup({
             layout: this.bloomRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: this.sampler },
-                { binding: 2, resource: this.blurTextureView },
+                { binding: 0, resource: this.sampler },
+                { binding: 1, resource: this.blurTextureView },
             ],
         });
 
         const sceneBindGroup = this.sceneBindGroup = GPU.CreateBindGroup({
             layout: this.sceneRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: this.sampler },
-                { binding: 2, resource: this.bloomTextureView },
-                { binding: 3, resource: this.inputTextureView },
+                { binding: 0, resource: this.sampler },
+                { binding: 1, resource: this.bloomTextureView },
+                { binding: 2, resource: this.inputTextureView },
             ],
         });
     }

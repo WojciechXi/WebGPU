@@ -1,7 +1,8 @@
-class TonemappingRenderPass extends RenderPass {
+class ScreenSpaceReflectionRenderPass extends RenderPass {
 
     Init(data) {
         this.inputTextureView = data.inputTextureView;
+        const gBufferRenderPass = this.gBufferRenderPass = data.gBufferRenderPass;
         this.canvas = data.canvas;
 
         const format = navigator.gpu.getPreferredCanvasFormat();
@@ -13,17 +14,14 @@ class TonemappingRenderPass extends RenderPass {
         });
         this.sceneTextureView = this.sceneTexture.createView();
 
+        this.uniformValues = new Float32Array(8);
+        this.uniformBuffer = GPU.CreateBuffer({
+            size: this.uniformValues.length * 4,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
-                bindGroupLayouts: [
-                    GPU.device.createBindGroupLayout({
-                        entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        ],
-                    })
-                ],
-            }),
+            layout: 'auto',
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -38,8 +36,6 @@ class TonemappingRenderPass extends RenderPass {
         });
 
         this.sampler = GPU.CreateSampler({
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
             magFilter: 'nearest',
             minFilter: 'nearest',
             mipmapFilter: 'nearest',
@@ -48,13 +44,18 @@ class TonemappingRenderPass extends RenderPass {
         const bindGroup = this.bindGroup = GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this.sampler },
-                { binding: 1, resource: this.inputTextureView },
+                { binding: 0, resource: { buffer: this.uniformBuffer } },
+                { binding: 1, resource: this.gBufferRenderPass.positionTextureView },
+                { binding: 2, resource: this.gBufferRenderPass.normalTextureView },
+                { binding: 3, resource: this.inputTextureView },
+                { binding: 4, resource: this.sampler },
             ],
         });
     }
 
     Render(engine, commandEncoder) {
+        this.uniformValues.set(Camera.main.transform.position, 0);
+
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 {
@@ -67,6 +68,8 @@ class TonemappingRenderPass extends RenderPass {
 
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, this.bindGroup);
+
+        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
 
         renderPass.draw(6);
         renderPass.end();

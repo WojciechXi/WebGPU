@@ -5,7 +5,7 @@ class ClearRenderPass extends RenderPass {
 
         this.colorTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
-            format: "rgba32float",
+            format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.colorTextureView = this.colorTexture.createView();
@@ -26,7 +26,7 @@ class ClearRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: "rgba32float" }
+                    { format: "rgba16float" }
                 ]
             },
             primitive: { topology: "triangle-list" },

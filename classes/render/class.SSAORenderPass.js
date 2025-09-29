@@ -12,28 +12,28 @@ class SSAORenderPass extends RenderPass {
 
         this.ssaoTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
-            format: "rgba32float",
+            format: "r16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.ssaoTextureView = this.ssaoTexture.createView();
 
         this.blurHorizontalTexture = GPU.CreateTexture({
-            size: [canvas.width, canvas.height],
-            format: "rgba32float",
+            size: [canvas.width / 2, canvas.height / 2],
+            format: "r16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.blurHorizontalTextureView = this.blurHorizontalTexture.createView();
 
         this.blurVerticalTexture = GPU.CreateTexture({
-            size: [canvas.width, canvas.height],
-            format: "rgba32float",
+            size: [canvas.width / 2, canvas.height / 2],
+            format: "r16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.blurVerticalTextureView = this.blurVerticalTexture.createView();
 
         this.sceneTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
-            format: "rgba32float",
+            format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.sceneTextureView = this.sceneTexture.createView();
@@ -47,7 +47,7 @@ class SSAORenderPass extends RenderPass {
         }
         this.noiseTexture = GPU.CreateTexture({
             size: [4, 4, 1],
-            format: "rgba32float",
+            format: "r16float",
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
         });
         this.noiseTextureView = this.noiseTexture.createView();
@@ -78,20 +78,7 @@ class SSAORenderPass extends RenderPass {
         });
 
         this.ssaoRenderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
-                bindGroupLayouts: [
-                    GPU.device.createBindGroupLayout({
-                        entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                            { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                            { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        ],
-                    })
-                ],
-            }),
+            layout: 'auto',
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -100,23 +87,13 @@ class SSAORenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "ssaoRenderPass",
                 targets: [
-                    { format: "rgba32float" }
+                    { format: "r16float" }
                 ]
             },
         });
 
         this.blurHorizontalRenderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
-                bindGroupLayouts: [
-                    GPU.device.createBindGroupLayout({
-                        entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 6, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        ],
-                    })
-                ],
-            }),
+            layout: 'auto',
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -125,23 +102,13 @@ class SSAORenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "blurHorizontalRenderPass",
                 targets: [
-                    { format: "rgba32float" }
+                    { format: "r16float" }
                 ]
             },
         });
 
         this.blurVerticalRenderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
-                bindGroupLayouts: [
-                    GPU.device.createBindGroupLayout({
-                        entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 6, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        ],
-                    })
-                ],
-            }),
+            layout: 'auto',
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -150,24 +117,13 @@ class SSAORenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "blurVerticalRenderPass",
                 targets: [
-                    { format: "rgba32float" }
+                    { format: "r16float" }
                 ]
             },
         });
 
         this.sceneRenderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
-                bindGroupLayouts: [
-                    GPU.device.createBindGroupLayout({
-                        entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 6, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                            { binding: 7, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        ],
-                    })
-                ],
-            }),
+            layout: 'auto',
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -176,7 +132,7 @@ class SSAORenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "sceneRenderPass",
                 targets: [
-                    { format: "rgba32float" }
+                    { format: "rgba16float" }
                 ]
             },
         });
@@ -214,7 +170,6 @@ class SSAORenderPass extends RenderPass {
         this.sceneBindGroup = GPU.CreateBindGroup({
             layout: this.sceneRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
                 { binding: 1, resource: this.sampler },
                 { binding: 6, resource: this.blurVerticalTextureView },
                 { binding: 7, resource: this.inputTextureView },

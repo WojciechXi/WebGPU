@@ -13,7 +13,7 @@ class Vector3 extends Float32Array {
     }
 
     static Cross(a, b, dst) {
-        dst = dst || new Float32Array(3);
+        dst = dst || new Vector3();
 
         const t0 = a[1] * b[2] - a[2] * b[1];
         const t1 = a[2] * b[0] - a[0] * b[2];
@@ -27,7 +27,7 @@ class Vector3 extends Float32Array {
     }
 
     static Add(a, b, dst) {
-        dst = dst || new Float32Array(3);
+        dst = dst || new Vector3();
 
         dst[0] = a[0] + b[0];
         dst[1] = a[1] + b[1];
@@ -37,7 +37,7 @@ class Vector3 extends Float32Array {
     }
 
     static Subtract(a, b, dst) {
-        dst = dst || new Float32Array(3);
+        dst = dst || new Vector3();
 
         dst[0] = a[0] - b[0];
         dst[1] = a[1] - b[1];
@@ -47,7 +47,7 @@ class Vector3 extends Float32Array {
     }
 
     static Multiply(a, b, dst) {
-        dst = dst || new Float32Array(3);
+        dst = dst || new Vector3();
 
         a[0] *= b;
         a[1] *= b;
@@ -57,7 +57,7 @@ class Vector3 extends Float32Array {
     }
 
     static Scale(a, b, dst) {
-        dst = dst || new Float32Array(3);
+        dst = dst || new Vector3();
 
         if (b instanceof Vector3 || b instanceof Vector4) {
             a[0] *= b[0];
@@ -72,7 +72,7 @@ class Vector3 extends Float32Array {
     }
 
     static Normalize(v, dst) {
-        dst = dst || new Float32Array(3);
+        dst = dst || new Vector3();
 
         const length = this.Length(v);
         // make sure we don't divide by 0.
@@ -107,6 +107,10 @@ class Vector3 extends Float32Array {
     Normalize() {
         Vector3.Normalize(this, this);
         return this;
+    }
+
+    Dot(other) {
+        return this[0] * other[0] + this[1] * other[1] + this[2] * other[2];
     }
 
     Add(v) {

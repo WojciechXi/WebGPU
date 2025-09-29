@@ -5,7 +5,7 @@ class ForwardRenderPass extends RenderPass {
 
         this.colorTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
-            format: "rgba32float",
+            format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.colorTextureView = this.colorTexture.createView();

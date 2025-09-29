@@ -7,7 +7,7 @@ class LightingRenderPass extends RenderPass {
 
         this.sceneTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
-            format: "rgba32float",
+            format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.sceneTextureView = this.sceneTexture.createView();
@@ -44,7 +44,7 @@ class LightingRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: "rgba32float" }
+                    { format: "rgba16float" }
                 ]
             },
         });

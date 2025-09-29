@@ -6,7 +6,7 @@ class ShadowRenderPass extends RenderPass {
 
         this.depthTexture = GPU.CreateTexture({
             size: [this.resolution, this.resolution],
-            format: "rgba32float",
+            format: "r32float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.depthTextureView = this.depthTexture.createView();

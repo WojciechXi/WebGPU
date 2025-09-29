@@ -23,7 +23,7 @@ class Graphics {
 
         const sceneTexture = this.sceneTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
-            format: 'rgba32float',
+            format: 'rgba16float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
 
@@ -78,11 +78,19 @@ class Graphics {
             gBufferRenderPass: gBufferRenderPass,
             inputTextureView: this.sceneTextureView,
             canvas: canvas,
-            radius: 0.25,
-            bias: 0.025,
-            radius: 4,
-            sigmaDepth: 0.2,
+            radius: 0.125,
+            bias: 0.1,
+            blurRadius: 2,
+            sigmaDepth: 0.3,
         });
+
+        // const screenSpaceReflectionRenderPass = this.screenSpaceReflectionRenderPass = new ScreenSpaceReflectionRenderPass({
+        //     name: 'screenSpaceReflectionRenderPass',
+        //     code: assets.shaders['screenSpaceReflectionRenderPass.wgsl'],
+        //     gBufferRenderPass: gBufferRenderPass,
+        //     inputTextureView: ssaoRenderPass.sceneTextureView,
+        //     canvas: canvas,
+        // });
 
         const bloomRenderPass = this.bloomRenderPass = new BloomRenderPass({
             name: 'bloomRenderPass',
@@ -127,8 +135,7 @@ class Graphics {
         if (this.finalRenderPass) this.finalRenderPass.Render(engine, commandEncoder);
 
         if (this.ssaoRenderPass) this.ssaoRenderPass.Render(engine, commandEncoder);
-        if (this.ssaoBlurRenderPass) this.ssaoBlurRenderPass.Render(engine, commandEncoder);
-
+        if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(engine, commandEncoder);
         if (this.bloomRenderPass) this.bloomRenderPass.Render(engine, commandEncoder);
         if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(engine, commandEncoder);
 

@@ -58,7 +58,7 @@ class Shader {
                     module: _this.shaderModule,
                     entryPoint: "shadowRenderPass",
                     targets: [
-                        { format: "rgba32float" }, // depthTexture
+                        { format: "r32float" }, // depthTexture
                     ]
                 },
                 depthStencil: {
@@ -96,13 +96,13 @@ class Shader {
                     module: _this.shaderModule,
                     entryPoint: "gBufferRenderPass",
                     targets: [
-                        { format: "rgba32float" }, // viewPositionTexture
-                        { format: "rgba32float" }, // viewNormalTexture
+                        { format: "rgba16float" }, // viewPositionTexture
+                        { format: "rgba8unorm" }, // viewNormalTexture
 
-                        { format: "rgba32float" }, // colorTexture
-                        { format: "rgba32float" }, // pbrTexture
+                        { format: "rgba16float" }, // colorTexture
+                        { format: "rgba8unorm" }, // pbrTexture
 
-                        { format: "rgba32float" }, // depthTexture
+                        { format: "r32float" }, // depthTexture
                     ]
                 },
                 depthStencil: {
