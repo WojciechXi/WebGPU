@@ -1,55 +1,31 @@
 class Mesh {
 
-    constructor(name = 'Mesh') {
-        this.name = name;
-        this.subMeshes = [];
-    }
-
-    Clear() {
-        for (let subMesh of this.subMeshes) subMesh.Clear();
-        this.subMeshes = [];
-        this.Update();
-    }
-
-    Update() {
-        for (let subMesh of this.subMeshes) subMesh.Update();
-    }
-
-    Render(renderPass) {
-        for (let subMesh of this.subMeshes) {
-            subMesh.Render(renderPass);
-            return;
-        }
-    }
-
-}
-
-class SubMesh {
-
     constructor(data = {}) {
+        this.name = data.name ?? 'Mesh';
+
+        this.bounds = new Bounds(Vector3.zero, Vector3.zero);
+
         this.vertices = data.vertices ?? [];
         this.normals = data.normals ?? [];
         this.tangents = data.tangents ?? [];
         this.colors = data.colors ?? [];
         this.uvs = data.uvs ?? [];
-        this.triangles = new Uint32Array(data.triangles ?? 0);
-        this.material = data.material ?? null;
 
-        this.indexBuffer = GPU.CreateBuffer({
-            size: 0,
-            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
-        });
+        this.subMeshes = data.subMeshes ?? [];
 
-        this.vertexBuffer = GPU.CreateBuffer({
-            size: 0,
-            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-        });
+        this.Update();
     }
 
-    Render(renderPass) {
-        renderPass.SetIndexBuffer(this.indexBuffer, 'uint32');
-        renderPass.SetVertexBuffer(0, this.vertexBuffer);
-        renderPass.DrawIndexed(this.triangles.length);
+    get subMeshCount() {
+        return this.subMeshes.length;
+    }
+
+    get vertexCount() {
+        return this.vertices.length;
+    }
+
+    SetTriangles(triangles, subMeshIndex) {
+        this.subMeshes[subMeshIndex].triangles = new Uint32Array(triangles);
     }
 
     Clear() {
@@ -58,19 +34,15 @@ class SubMesh {
         this.tangents = [];
         this.colors = [];
         this.uvs = [];
-        this.triangles = new Uint32Array(0);
-
-        if (this.indexBuffer) this.indexBuffer.destroy();
-        this.indexBuffer = GPU.CreateBuffer({
-            size: 0,
-            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
-        });
 
         if (this.vertexBuffer) this.vertexBuffer.destroy();
         this.vertexBuffer = GPU.CreateBuffer({
             size: 0,
             usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
         });
+
+        for (let subMesh of this.subMeshes) subMesh.Clear();
+        this.subMeshes = [];
     }
 
     Update() {
@@ -101,13 +73,175 @@ class SubMesh {
 
         GPU.Queue.writeBuffer(this.vertexBuffer, 0, data);
 
+        for (let subMesh of this.subMeshes) subMesh.Update();
+    }
+
+    Render(renderPass, subMeshIndex) {
+        renderPass.SetVertexBuffer(0, this.vertexBuffer);
+        this.subMeshes[subMeshIndex].Render(renderPass);
+    }
+
+    RecalculateNormals() {
+        this.normals = Array(this.vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
+
+        for (let subMesh of this.subMeshes) {
+            let tris = subMesh.triangles;
+            for (let i = 0; i < tris.length; i += 3) {
+                let i0 = tris[i], i1 = tris[i + 1], i2 = tris[i + 2];
+                let v0 = this.vertices[i0];
+                let v1 = this.vertices[i1];
+                let v2 = this.vertices[i2];
+
+                let e1 = Vector3.Subtract(v1, v0);
+                let e2 = Vector3.Subtract(v2, v0);
+                let n = e1.Cross(e2).normalized;
+
+                this.normals[i0] = Vector3.Add(this.normals[i0], n);
+                this.normals[i1] = Vector3.Add(this.normals[i1], n);
+                this.normals[i2] = Vector3.Add(this.normals[i2], n);
+            }
+        }
+
+        for (let i = 0; i < this.normals.length; i++) {
+            this.normals[i] = this.normals[i].normalized;
+        }
+    }
+
+    RecalculateTangents() {
+        this.tangents = Array(this.vertices.length).fill(0).map(() => new Vector4(0, 0, 0, 1));
+        let tan1 = Array(this.vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
+        let tan2 = Array(this.vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
+
+        for (let subMesh of this.subMeshes) {
+            let tris = subMesh.triangles;
+            for (let i = 0; i < tris.length; i += 3) {
+                let i0 = tris[i], i1 = tris[i + 1], i2 = tris[i + 2];
+
+                let v0 = this.vertices[i0];
+                let v1 = this.vertices[i1];
+                let v2 = this.vertices[i2];
+
+                let uv0 = this.uvs[i0];
+                let uv1 = this.uvs[i1];
+                let uv2 = this.uvs[i2];
+
+                let e1 = Vector3.Subtract(v1, v0);
+                let e2 = Vector3.Subtract(v2, v0);
+
+                let duv1 = Vector2.Subtract(uv1, uv0);
+                let duv2 = Vector2.Subtract(uv2, uv0);
+
+                let r = 1.0 / (duv1.x * duv2.y - duv1.y * duv2.x);
+
+                let t = new Vector3(
+                    (e1.x * duv2.y - e2.x * duv1.y) * r,
+                    (e1.y * duv2.y - e2.y * duv1.y) * r,
+                    (e1.z * duv2.y - e2.z * duv1.y) * r
+                );
+
+                let b = new Vector3(
+                    (e2.x * duv1.x - e1.x * duv2.x) * r,
+                    (e2.y * duv1.x - e1.y * duv2.x) * r,
+                    (e2.z * duv1.x - e1.z * duv2.x) * r
+                );
+
+                tan1[i0] = Vector3.Add(tan1[i0], t);
+                tan1[i1] = Vector3.Add(tan1[i1], t);
+                tan1[i2] = Vector3.Add(tan1[i2], t);
+                tan2[i0] = Vector3.Add(tan2[i0], b);
+                tan2[i1] = Vector3.Add(tan2[i1], b);
+                tan2[i2] = Vector3.Add(tan2[i2], b);
+            }
+        }
+
+        for (let i = 0; i < this.vertices.length; i++) {
+            let n = this.normals[i];
+            let t = tan1[i];
+
+            let tangent = (Vector3.Subtract(t, Vector3.Multiply(n, n.Dot(t)))).normalized;
+
+            let handedness = (n.Cross(t).Dot(tan2[i]) < 0.0) ? -1.0 : 1.0;
+
+            this.tangents[i] = new Vector4(tangent.x, tangent.y, tangent.z, handedness);
+        }
+    }
+
+
+    RecalculateBounds() {
+        if (this.vertices.length === 0) {
+            this.bounds.Set(Vector3.zero, Vector3.zero);
+            return;
+        }
+
+        let min = new Vector3(
+            Number.POSITIVE_INFINITY,
+            Number.POSITIVE_INFINITY,
+            Number.POSITIVE_INFINITY
+        );
+
+        let max = new Vector3(
+            Number.NEGATIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+            Number.NEGATIVE_INFINITY
+        );
+
+        for (let v of this.vertices) {
+            min = new Vector3(
+                Math.min(min.x, v.x),
+                Math.min(min.y, v.y),
+                Math.min(min.z, v.z)
+            );
+
+            max = new Vector3(
+                Math.max(max.x, v.x),
+                Math.max(max.y, v.y),
+                Math.max(max.z, v.z)
+            );
+        }
+
+        let center = Vector3.Multiply(Vector3.Add(min, max), 0.5);
+        let size = Vector3.Subtract(max, min);
+
+        this.bounds = new Bounds(center, size);
+    }
+
+}
+
+class SubMesh {
+
+    constructor(data = {}) {
+        this.triangles = new Uint32Array(data.triangles ?? 0);
+        this.material = data.material ?? null;
+
+        this.indexBuffer = GPU.CreateBuffer({
+            size: 0,
+            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
+        });
+    }
+
+    Clear() {
+        this.triangles = new Uint32Array(0);
+
         if (this.indexBuffer) this.indexBuffer.destroy();
         this.indexBuffer = GPU.CreateBuffer({
-            size: this.triangles.byteLength,
+            size: 0,
+            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
+        });
+    }
+
+    Update() {
+        if (this.indexBuffer) this.indexBuffer.destroy();
+        this.indexBuffer = GPU.CreateBuffer({
+            size: this.triangles.length * 4,
             usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
         });
 
         GPU.Queue.writeBuffer(this.indexBuffer, 0, this.triangles);
+    }
+
+    Render(renderPass) {
+        renderPass.SetIndexBuffer(this.indexBuffer, 'uint32');
+        renderPass.DrawIndexed(this.triangles.length);
     }
 
 }

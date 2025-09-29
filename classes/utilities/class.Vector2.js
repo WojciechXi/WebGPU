@@ -26,6 +26,7 @@ class Vector2 extends Float32Array {
 
         return dst;
     }
+    static Sub(a, b, dst = null) { return this.Subtract(a, b, dst); }
 
     static Multiply(a, b, dst = null) {
         dst = dst || new Vector2();
@@ -35,6 +36,7 @@ class Vector2 extends Float32Array {
 
         return dst;
     }
+    static Mul(a, b, dst = null) { return this.Multiply(a, b, dst); }
 
     static Divide(a, b, dst = null) {
         dst = dst || new Vector2();
@@ -44,6 +46,7 @@ class Vector2 extends Float32Array {
 
         return dst;
     }
+    static Div(a, b, dst = null) { return this.Divide(a, b, dst); }
 
     static Scale(a, b, dst = null) {
         dst = dst || new Vector2();

@@ -17,6 +17,7 @@
     <script src="./classes/utilities/class.Rect.js"></script>
     <script src="./classes/utilities/class.Matrix4x4.js"></script>
     <script src="./classes/utilities/class.Mesh.js"></script>
+    <script src="./classes/utilities/class.PerlinNoise.js"></script>
 
     <script src="./classes/class.Ajax.js"></script>
     <script src="./classes/class.Importer.js"></script>

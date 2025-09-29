@@ -23,20 +23,6 @@ class Vector3 extends Float32Array {
         return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     }
 
-    static Cross(a, b, dst = null) {
-        dst = dst || new Vector3();
-
-        const t0 = a[1] * b[2] - a[2] * b[1];
-        const t1 = a[2] * b[0] - a[0] * b[2];
-        const t2 = a[0] * b[1] - a[1] * b[0];
-
-        dst[0] = t0;
-        dst[1] = t1;
-        dst[2] = t2;
-
-        return dst;
-    }
-
     static Add(a, b, dst = null) {
         dst = dst || new Vector3();
 
@@ -56,6 +42,7 @@ class Vector3 extends Float32Array {
 
         return dst;
     }
+    static Sub(a, b, dst = null) { return this.Subtract(a, b, dst); }
 
     static Multiply(a, b, dst = null) {
         dst = dst || new Vector3();
@@ -66,6 +53,7 @@ class Vector3 extends Float32Array {
 
         return dst;
     }
+    static Mul(a, b, dst = null) { return this.Multiply(a, b, dst); }
 
     static Divide(a, b, dst = null) {
         dst = dst || new Vector3();
@@ -76,6 +64,7 @@ class Vector3 extends Float32Array {
 
         return dst;
     }
+    static Div(a, b, dst = null) { return this.Divide(a, b, dst); }
 
     static Scale(a, b, dst = null) {
         dst = dst || new Vector3();
@@ -125,9 +114,9 @@ class Vector3 extends Float32Array {
     }
 
     get normalized() {
-        const dst = new Vector2();
+        const dst = new Vector3();
 
-        const magnitude = v.magnitude;
+        const magnitude = this.magnitude;
         if (magnitude > 0.00001) {
             dst[0] = this[0] / magnitude;
             dst[1] = this[1] / magnitude;
@@ -152,6 +141,20 @@ class Vector3 extends Float32Array {
     Normalize() {
         Vector3.Normalize(this, this);
         return this;
+    }
+
+    Cross(other, dst = null) {
+        dst = dst || new Vector3();
+
+        const t0 = this[1] * other[2] - this[2] * other[1];
+        const t1 = this[2] * other[0] - this[0] * other[2];
+        const t2 = this[0] * other[1] - this[1] * other[0];
+
+        dst[0] = t0;
+        dst[1] = t1;
+        dst[2] = t2;
+
+        return dst;
     }
 
     Dot(other) {

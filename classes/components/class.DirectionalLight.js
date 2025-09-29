@@ -8,11 +8,11 @@ class DirectionalLight extends Component {
 
         this.aspect = 1;
         this.nearClipPlane = 0.1;
-        this.farClipPlane = 100;
+        this.farClipPlane = 500;
         this.fieldOfView = 5;
 
         this.orthographic = false;
-        this.orthographicSize = 25;
+        this.orthographicSize = 100;
 
         this.viewMatrix = Matrix4x4.Identity();
         this.projectionMatrix = Matrix4x4.Identity();

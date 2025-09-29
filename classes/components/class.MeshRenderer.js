@@ -19,28 +19,15 @@ class MeshRenderer extends Component {
     Render(renderPass) {
         if (!this.mesh || !this.material) return;
 
-        if (renderPass.name === 'rayTracingRenderPass') {
-            for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
-                if (!this.materials[i]) continue;
-                if (this.materials[i].Use(renderPass, this.transform.matrix4x4, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix)) {
-                    this.mesh.subMeshes[i].Render(renderPass);
-                }
-            }
-        } else if (renderPass.name === 'shadowRenderPass') {
+        if (renderPass.name === 'shadowRenderPass') {
             if (this.castShadows) {
                 for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
-                    if (!this.materials[i]) continue;
-                    if (this.materials[i].Use(renderPass, this.transform.matrix4x4, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix)) {
-                        this.mesh.subMeshes[i].Render(renderPass);
-                    }
+                    Graphics.DrawMesh(renderPass, this.mesh, this.transform.matrix4x4, this.materials[i], i, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix);
                 }
             }
         } else {
             for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
-                if (!this.materials[i]) continue;
-                if (this.materials[i].Use(renderPass, this.transform.matrix4x4, Camera.main.viewMatrix, Camera.main.projectionMatrix)) {
-                    this.mesh.subMeshes[i].Render(renderPass);
-                }
+                Graphics.DrawMesh(renderPass, this.mesh, this.transform.matrix4x4, this.materials[i], i, Camera.main.viewMatrix, Camera.main.projectionMatrix);
             }
         }
     }

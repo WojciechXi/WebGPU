@@ -144,4 +144,11 @@ class Graphics {
         GPU.Queue.submit([commandEncoder.finish()]);
     }
 
+    static DrawMesh(renderPass, mesh, matrix, material, subMeshIndex, viewMatrix, projectionMatrix) {
+        if (!mesh) return;
+        if (!material) return;
+        if (!material.Use(renderPass, matrix, viewMatrix, projectionMatrix)) return;
+        mesh.Render(renderPass, subMeshIndex);
+    }
+
 }
