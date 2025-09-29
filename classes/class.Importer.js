@@ -134,9 +134,9 @@ class Importer {
 
         let meshes = [];
         gltf.meshes.forEach((_mesh) => {
-            let mesh = new Mesh(_mesh.name);
-
             _mesh.primitives.forEach((primitive) => {
+                let mesh = new Mesh(_mesh.name);
+
                 const _positions = getAccessorData(gltf, primitive.attributes.POSITION);
                 const _normals = getAccessorData(gltf, primitive.attributes.NORMAL);
                 const _tangents = getAccessorData(gltf, primitive.attributes.TANGENT);
@@ -153,20 +153,24 @@ class Importer {
                 for (let i = 0; i < _tangents.length; i += 4) tangents.push(new Vector4(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
                 for (let i = 0; i < _uvs.length; i += 2) uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
 
+                mesh.vertices = vertices;
+                mesh.normals = normals;
+                mesh.tangents = tangents;
+                mesh.uvs = uvs;
+
                 let subMesh = new SubMesh({
-                    vertices: vertices,
-                    normals: normals,
-                    tangents: tangents,
-                    uvs: uvs,
                     triangles: _indices,
                     material: gltf.materials[primitive.material].name,
                 });
 
                 mesh.subMeshes.push(subMesh);
-            });
 
-            mesh.Update();
-            meshes.push(mesh);
+                mesh.RecalculateNormals();
+                mesh.RecalculateTangents();
+                mesh.RecalculateBounds();
+                mesh.Update();
+                meshes.push(mesh);
+            });
         });
 
         if (callback) callback(meshes, gltf.materials);

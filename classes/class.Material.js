@@ -16,10 +16,10 @@ class Material {
 
         this.textures = {};
         this.SetTexture('albedo', data.albedo ?? Color.white);
-        this.SetTexture('normal', data.normal ?? new Color(0.5, 0.5, 1, 1));
-        this.SetTexture('roughness', data.roughness ?? Color.white);
-        this.SetTexture('metallic', data.metallic ?? Color.black);
-        this.SetTexture('occlusion', data.occlusion ?? Color.white);
+        this.SetTexture('normal', new Color(0.5, 0.5, 1, 1));
+        this.SetTexture('roughness', Color.white);
+        this.SetTexture('metallic', Color.black);
+        this.SetTexture('occlusion', Color.white);
 
         const uniformSize = 16 + 16 + 16 + 4 + 4; // modelMatrix, viewMatrix, projectionMatrix, color, pbr
         this.uniformValues = new Float32Array(uniformSize);

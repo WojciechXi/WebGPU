@@ -96,7 +96,7 @@ class Transform extends Component {
 
     get matrix4x4() {
         // 1. macierz lokalna
-        const m = Matrix4x4.FromTRS(this.localPosition, this.localRotation, this.localScale);
+        const m = Matrix4x4.TRS(this.localPosition, this.localRotation, this.localScale);
 
         // 2. jeśli jest rodzic, pomnóż przez jego macierz
         if (this.parent) {

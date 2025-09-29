@@ -17,24 +17,23 @@ class FinalRenderPass extends RenderPass {
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
-        const bindGroupLayout = GPU.device.createBindGroupLayout({
-            entries: [
-                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                { binding: 6, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-            ],
-        });
-
-        const pipelineLayout = GPU.device.createPipelineLayout({
-            bindGroupLayouts: [bindGroupLayout],
-        });
-
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: pipelineLayout,
+            layout: GPU.device.createPipelineLayout({
+                bindGroupLayouts: [
+                    GPU.device.createBindGroupLayout({
+                        entries: [
+                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: {}, },
+                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: {}, },
+                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
+                            { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                            { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                            { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                            { binding: 6, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                            { binding: 7, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                        ],
+                    })
+                ],
+            }),
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -51,6 +50,14 @@ class FinalRenderPass extends RenderPass {
         this.sampler = GPU.CreateSampler({
             addressModeU: 'repeat',
             addressModeV: 'repeat',
+            magFilter: 'linear',
+            minFilter: 'linear',
+            mipmapFilter: 'linear',
+        });
+
+        this.depthSampler = GPU.CreateSampler({
+            addressModeU: 'repeat',
+            addressModeV: 'repeat',
             magFilter: 'nearest',
             minFilter: 'nearest',
             mipmapFilter: 'nearest',
@@ -61,11 +68,12 @@ class FinalRenderPass extends RenderPass {
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
                 { binding: 1, resource: this.sampler },
-                { binding: 2, resource: this.clearRenderPass.colorTextureView },
-                { binding: 3, resource: this.lightingRenderPass.sceneTextureView },
-                { binding: 4, resource: this.gBufferRenderPass.depthTextureView },
-                { binding: 5, resource: this.forwardRenderPass.colorTextureView },
-                { binding: 6, resource: this.forwardRenderPass.depthTextureView },
+                { binding: 2, resource: this.depthSampler },
+                { binding: 3, resource: this.clearRenderPass.colorTextureView },
+                { binding: 4, resource: this.lightingRenderPass.sceneTextureView },
+                { binding: 5, resource: this.gBufferRenderPass.depthTextureView },
+                { binding: 6, resource: this.forwardRenderPass.colorTextureView },
+                { binding: 7, resource: this.forwardRenderPass.depthTextureView },
             ],
         });
     }

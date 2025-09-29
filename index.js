@@ -105,13 +105,13 @@ window.addEventListener('load', async function (event) {
                     loadBitmap('/Assets/Images/Poliigon_PlasterPainted_7664/Poliigon_PlasterPainted_7664_Roughness.jpg', function (roughness) {
                         loadBitmap('/Assets/Images/Poliigon_PlasterPainted_7664/Poliigon_PlasterPainted_7664_Metallic.jpg', function (metallic) {
                             whitePaintMaterial.SetTexture('albedo', albedo);
-                            whitePaintMaterial.SetTexture('normal', normal);
+                            // whitePaintMaterial.SetTexture('normal', normal);
                             whitePaintMaterial.SetTexture('roughness', roughness);
                             whitePaintMaterial.SetTexture('metallic', metallic);
                             whitePaintMaterial.Update();
 
                             olivePaintMaterial.SetTexture('albedo', albedo);
-                            olivePaintMaterial.SetTexture('normal', normal);
+                            // olivePaintMaterial.SetTexture('normal', normal);
                             olivePaintMaterial.SetTexture('roughness', roughness);
                             olivePaintMaterial.SetTexture('metallic', metallic);
                             olivePaintMaterial.Update();
@@ -124,6 +124,12 @@ window.addEventListener('load', async function (event) {
                 name: 'Floor',
                 shader: litShader,
             });
+
+            const terrainMaterial = new Material({
+                name: 'Terrain',
+                shader: litShader,
+            });
+
             loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_albedo.png', function (albedo) {
                 loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_normal.png', function (normal) {
                     loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_ao.png', function (occlusion) {
@@ -131,6 +137,11 @@ window.addEventListener('load', async function (event) {
                         floorMaterial.SetTexture('normal', normal);
                         floorMaterial.SetTexture('occlusion', occlusion);
                         floorMaterial.Update();
+
+                        terrainMaterial.SetTexture('albedo', albedo);
+                        terrainMaterial.SetTexture('normal', normal);
+                        terrainMaterial.SetTexture('occlusion', occlusion);
+                        terrainMaterial.Update();
                     });
                 });
             });
@@ -233,7 +244,7 @@ window.addEventListener('load', async function (event) {
             };
 
             const ambientLight = engine.scene.AddComponent(AmbientLight);
-            ambientLight.color.Set(0.9, 0.95, 1, 0.2);
+            ambientLight.color.Set(0.5, 0.75, 1, 0.2);
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
             directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-30, 0, -30);
@@ -247,7 +258,8 @@ window.addEventListener('load', async function (event) {
 
             const terrainGameObject = new GameObject('Terrain');
             let terrain = terrainGameObject.AddComponent(Terrain);
-            terrain.material = floorMaterial;
+            let terrainCollider = terrainGameObject.AddComponent(TerrainCollider);
+            terrain.material = terrainMaterial;
 
             window.terrain = terrain;
 
@@ -255,49 +267,51 @@ window.addEventListener('load', async function (event) {
                 Physics.simulate = true;
             }, 1000);
 
-            Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
-                for (const mesh of meshes) {
-                    const gameObject = new GameObject(mesh.name);
-                    gameObject.transform.position = new Vector3(0, 0, 0);
-                    gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-                    const boxCollider = gameObject.AddComponent(BoxCollider);
-                    const meshRenderer = gameObject.AddComponent(MeshRenderer);
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [whiteMaterial];
-                }
-
-                for (const mesh of meshes) {
-                    const gameObject = new GameObject(mesh.name);
-                    gameObject.transform.position = new Vector3(0, 2, 0);
-                    gameObject.transform.rotation = Quaternion.FromEuler(0, 45, 0);
-                    const boxCollider = gameObject.AddComponent(SphereCollider);
-                    const rigidbody = gameObject.AddComponent(Rigidbody);
-                    const meshRenderer = gameObject.AddComponent(MeshRenderer);
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [goldMaterial];
-                }
-            });
-
-            // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+            // Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
             //     for (const mesh of meshes) {
-            //         console.log(mesh);
             //         const gameObject = new GameObject(mesh.name);
             //         gameObject.transform.position = new Vector3(0, 0, 0);
             //         gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+            //         const boxCollider = gameObject.AddComponent(BoxCollider);
             //         const meshRenderer = gameObject.AddComponent(MeshRenderer);
             //         meshRenderer.mesh = mesh;
+            //         meshRenderer.materials = [whiteMaterial];
+            //     }
 
-            //         meshRenderer.materials = [];
-            //         mesh.subMeshes.forEach(function (subMesh) {
-            //             if (materials.hasOwnProperty(subMesh.material)) {
-            //                 meshRenderer.materials.push(materials[subMesh.material]);
-            //             } else {
-            //                 console.log(subMesh.material);
-            //                 meshRenderer.materials.push(whiteMaterial);
-            //             }
-            //         });
+            //     for (const mesh of meshes) {
+            //         const gameObject = new GameObject(mesh.name);
+            //         gameObject.transform.position = new Vector3(0, 2, 0);
+            //         gameObject.transform.rotation = Quaternion.FromEuler(0, 45, 0);
+            //         const boxCollider = gameObject.AddComponent(SphereCollider);
+            //         const rigidbody = gameObject.AddComponent(Rigidbody);
+            //         const meshRenderer = gameObject.AddComponent(MeshRenderer);
+            //         meshRenderer.mesh = mesh;
+            //         meshRenderer.materials = [goldMaterial];
             //     }
             // });
+
+            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+                const gameObject = new GameObject('Krakow');
+                gameObject.transform.position = new Vector3(0, 0, 0);
+                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+
+                for (const mesh of meshes) {
+                    const meshGameObject = new GameObject(mesh.name);
+                    meshGameObject.transform.SetParent(gameObject.transform);
+                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [];
+                    mesh.subMeshes.forEach(function (subMesh) {
+                        if (materials.hasOwnProperty(subMesh.material)) {
+                            meshRenderer.materials.push(materials[subMesh.material]);
+                        } else {
+                            console.log(subMesh.material);
+                            meshRenderer.materials.push(whiteMaterial);
+                        }
+                    });
+                }
+            });
         });
     });
 });

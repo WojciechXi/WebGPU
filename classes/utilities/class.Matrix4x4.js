@@ -304,7 +304,7 @@ class Matrix4x4 extends Float32Array {
     }
 
     /** Z translacji, rotacji (quaternion) i skali */
-    static FromTRS(position, rotation, scale, dst) {
+    static TRS(position, rotation, scale, dst) {
         dst = dst || new Matrix4x4();
         Matrix4x4.Identity(dst);
 

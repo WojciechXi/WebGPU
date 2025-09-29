@@ -20,6 +20,5 @@ fn vs(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4f {
 
 @fragment
 fn fs(@builtin(position) fragCoord : vec4f) -> @location(0) vec4f {
-    let ambientLightColor = uni.ambientLightColor;
-    return vec4f(ambientLightColor.rgb, 1.0);
+    return vec4f(uni.ambientLightColor.rgb, 1.0);
 }

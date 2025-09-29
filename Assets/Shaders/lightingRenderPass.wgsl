@@ -73,6 +73,8 @@ fn inverse4(m : mat4x4f) -> mat4x4f {
 
 // 3x3 PCF shadow sample
 fn sampleShadow(shadowUV: vec2f, depth: f32, radius: i32) -> f32 {
+    if(shadowUV.x < 0 || shadowUV.y < 0 || shadowUV.x > 1 || shadowUV.y > 1) { return 1; }
+
     // textureDimensions returns integer vec2; rzutujemy na float
     let dims_i = textureDimensions(shadowTexture, 0);
     let dims = vec2f(f32(dims_i.x), f32(dims_i.y));
@@ -160,8 +162,13 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
         viewPos = viewPosition.xyz / viewPosition.w;
     }
 
+    let cameraWorldMatrix = inverse4(viewMatrix);
+    let cameraWorldPosition = cameraWorldMatrix[3].xyz;
+
     // world position (do shadow mapping)
-    let worldPos3 = worldPosition.xyz / worldPosition.w;
+    let worldPosition3 = worldPosition.xyz / worldPosition.w;
+    let distanceToCamera = length(worldPosition.xyz - cameraWorldPosition);
+    let shadowAttenuation = clamp(distanceToCamera / 25, 0.0, 1.0);
 
     // light direction: obliczamy direction w world space z macierzy widoku światła
     let lightWorldDirection = normalize((inverse4(lightViewMatrix) * vec4f(0.0, 0.0, -1.0, 0.0)).xyz);
@@ -172,7 +179,14 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let lightNDC = lightClip.xyz / lightClip.w;
     let lightDepth = lightNDC.z; // w zależności od projektu może wymagać remap do [0,1]
     let shadowUV = lightNDC.xy * 0.5 + vec2f(0.5, 0.5);
-    let shadowSampleVal = (sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, 3) + 0.1) / 1.1;
+    
+    var shadowSampleVal = 1.0;
+    if(shadowAttenuation < 1.0){
+        shadowSampleVal = ((sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, 3) + 0.1) / 1.1) * shadowAttenuation;
+        if(shadowSampleVal > 0.9) {
+            shadowSampleVal = 1.0;
+        }
+    } 
 
     // --- kolory i PBR kanały (konwencja: R = roughness, G = metallic, B = ao) ---
     let color = textureSample(colorTexture, screenSampler, vsOut.uv);

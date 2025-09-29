@@ -62,6 +62,7 @@
     <script src="./classes/components/Collider/class.CapsuleCollider.js"></script>
 
     <script src="./classes/components/class.Terrain.js"></script>
+    <script src="./classes/components/Collider/class.TerrainCollider.js"></script>
 
     <script src="./classes/components/class.Test.js"></script>
 

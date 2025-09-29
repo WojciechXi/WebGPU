@@ -29,6 +29,15 @@ class Terrain extends Component {
         this.SetHeights(0, 0, this.resolution, this.resolution, heights);
     }
 
+    GetHeight(xLinear, zLinear) {
+        let x = Math.floor(this.resolution * xLinear);
+        let z = Math.floor(this.resolution * zLinear);
+
+        let index = (x) + (z) * this.resolution;
+
+        return this.heights[index];
+    }
+
     SetHeights(x, z, width, height, heights) {
         for (let _x = 0; _x < width; _x++) {
             for (let _z = 0; _z < height; _z++) {
