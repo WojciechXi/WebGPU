@@ -1,5 +1,8 @@
 class Vector4 extends Float32Array {
 
+    static get negativeInfinity() { return new Vector4(-Infinity, -Infinity, -Infinity, -Infinity); }
+    static get one() { return new Vector4(1, 1, 1, 1); }
+    static get positiveInfinity() { return new Vector4(Infinity, Infinity, Infinity, Infinity); }
     static get zero() { return new Vector4(0, 0, 0, 0); }
 
     constructor(x = 0, y = 0, z = 0, w = 0) {

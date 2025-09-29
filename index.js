@@ -259,7 +259,7 @@ window.addEventListener('load', async function (event) {
                 for (const mesh of meshes) {
                     const gameObject = new GameObject(mesh.name);
                     gameObject.transform.position = new Vector3(0, 2, 0);
-                    gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+                    gameObject.transform.rotation = Quaternion.FromEuler(0, 45, 0);
                     const boxCollider = gameObject.AddComponent(SphereCollider);
                     const rigidbody = gameObject.AddComponent(Rigidbody);
                     const meshRenderer = gameObject.AddComponent(MeshRenderer);

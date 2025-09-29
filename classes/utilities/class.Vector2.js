@@ -1,11 +1,15 @@
 class Vector2 extends Float32Array {
 
-    static get zero() { return new Vector2(0, 0); }
-    static get one() { return new Vector2(1, 1); }
-
     static get down() { return new Vector2(0, -1); }
+    static get left() { return new Vector2(-1, 0); }
+    static get negativeInfinity() { return new Vector2(-Infinity, -Infinity); }
+    static get one() { return new Vector2(1, 1); }
+    static get positiveInfinity() { return new Vector2(Infinity, Infinity); }
+    static get right() { return new Vector2(1, 0); }
+    static get up() { return new Vector2(0, 1); }
+    static get zero() { return new Vector2(0, 0); }
 
-    static Add(a, b, dst) {
+    static Add(a, b, dst = null) {
         dst = dst || new Vector2();
 
         dst[0] = a[0] + b[0];
@@ -14,7 +18,7 @@ class Vector2 extends Float32Array {
         return dst;
     }
 
-    static Subtract(a, b, dst) {
+    static Subtract(a, b, dst = null) {
         dst = dst || new Vector2();
 
         dst[0] = a[0] - b[0];
@@ -23,18 +27,29 @@ class Vector2 extends Float32Array {
         return dst;
     }
 
-    static Normalize(v, dst) {
+    static Multiply(a, b, dst = null) {
         dst = dst || new Vector2();
 
-        const length = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
-        // make sure we don't divide by 0.
-        if (length > 0.00001) {
-            dst[0] = v[0] / length;
-            dst[1] = v[1] / length;
-        } else {
-            dst[0] = 0;
-            dst[1] = 0;
-        }
+        dst[0] = a[0] * b;
+        dst[1] = a[1] * b;
+
+        return dst;
+    }
+
+    static Divide(a, b, dst = null) {
+        dst = dst || new Vector2();
+
+        dst[0] = a[0] / b;
+        dst[1] = a[1] / b;
+
+        return dst;
+    }
+
+    static Scale(a, b, dst = null) {
+        dst = dst || new Vector2();
+
+        a[0] *= b[0];
+        a[1] *= b[1];
 
         return dst;
     }
@@ -47,6 +62,29 @@ class Vector2 extends Float32Array {
 
     get x() { return this[0]; } set x(f) { return this[0] = f; }
     get y() { return this[1]; } set y(f) { return this[1] = f; }
+
+    get sqrMagnitude() {
+        return this[0] * this[0] + this[1] * this[1];
+    }
+
+    get magnitude() {
+        return Math.sqrt(this.sqrMagnitude);
+    }
+
+    get normalized() {
+        const dst = new Vector2();
+
+        const magnitude = v.magnitude;
+        if (magnitude > 0.00001) {
+            dst[0] = this[0] / magnitude;
+            dst[1] = this[1] / magnitude;
+        } else {
+            dst[0] = 0;
+            dst[1] = 0;
+        }
+
+        return dst;
+    }
 
     Add(v) {
         Vector2.Add(this, v, this);

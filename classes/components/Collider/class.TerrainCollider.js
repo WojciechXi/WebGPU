@@ -1,0 +1,5 @@
+class TerrainCollider extends Collider {
+
+
+
+}

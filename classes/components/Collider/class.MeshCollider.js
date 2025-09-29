@@ -1,0 +1,5 @@
+class MeshCollider extends Collider {
+
+
+
+}

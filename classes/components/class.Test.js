@@ -7,7 +7,7 @@ class Test extends Component {
 
     Update() {
         if (Input.GetKey(0))
-            this.look.Add(Input.mouseMove.Multiply(Time.deltaTime * 2));
+            this.look = Vector2.Add(this.look, Input.mouseMove.Multiply(Time.deltaTime * 2));
 
         this.move.x = Input.GetAxis('Horizontal');
         this.move.y = Input.GetAxis('Up');

@@ -10,12 +10,12 @@ class Transform extends Component {
         );
     }
 
-    static InverseTransformPoint(parent, worldPos) {
+    static InverseTransformPoint(parent, position) {
         const pScale = parent.lossyScale;
         return new Vector3(
-            (worldPos.x - parent.position.x) / pScale.x,
-            (worldPos.y - parent.position.y) / pScale.y,
-            (worldPos.z - parent.position.z) / pScale.z
+            (position.x - parent.position.x) / pScale.x,
+            (position.y - parent.position.y) / pScale.y,
+            (position.z - parent.position.z) / pScale.z
         );
     }
 
@@ -27,6 +27,8 @@ class Transform extends Component {
         this.parent = null;
         this.children = [];
     }
+
+    get childCount() { return this.children.length; }
 
     // ---------- Hierarchia ----------
     SetParent(newParent) {
@@ -41,14 +43,22 @@ class Transform extends Component {
     ClearParent() { this.SetParent(null); }
 
     // ---------- World Gettery / Settery ----------
+
+    get localEulerAngles() {
+        return Quaternion.ToEuler(this.localRotation);
+    }
+    set localEulerAngles(localEulerAngles) {
+        this.localRotation = Quaternion.FromEuler(localEulerAngles);
+    }
+
     get position() {
         if (!this.parent) return this.localPosition.Clone();
         // uproszczone mnożenie przez rodzica
         return Transform.TransformPoint(this.parent, this.localPosition);
     }
-    set position(worldPos) {
-        if (!this.parent) this.localPosition = worldPos.Clone();
-        else this.localPosition = Transform.InverseTransformPoint(this.parent, worldPos);
+    set position(position) {
+        if (!this.parent) this.localPosition = position.Clone();
+        else this.localPosition = Transform.InverseTransformPoint(this.parent, position);
     }
 
     get rotation() {
@@ -60,6 +70,17 @@ class Transform extends Component {
         else {
             const invParent = Quaternion.Inverse(this.parent.rotation);
             this.localRotation = Quaternion.Multiply(invParent, worldRot);
+        }
+    }
+
+    get eulerAngles() {
+        if (!this.parent) return Quaternion.ToEuler(this.localRotation);
+        return Quaternion.Multiply(this.parent.eulerAngles, this.localRotation);
+    }
+    set eulerAngles(eulerAngles) {
+        if (!this.parent) this.localRotation = Quaternion.FromEuler(eulerAngles);
+        else {
+
         }
     }
 

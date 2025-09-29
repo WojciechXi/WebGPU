@@ -1,12 +1,15 @@
 class Vector3 extends Float32Array {
 
-    static get zero() { return new Vector3(0, 0, 0); }
-    static get one() { return new Vector3(1, 1, 1); }
-
+    static get back() { return new Vector3(0, 0, -1); }
+    static get down() { return new Vector3(0, -1, 0); }
+    static get forward() { return new Vector3(0, 0, 1); }
     static get left() { return new Vector3(-1, 0, 0); }
+    static get negativeInfinity() { return new Vector3(-Infinity, -Infinity, -Infinity); }
+    static get one() { return new Vector3(1, 1, 1); }
+    static get positiveInfinity() { return new Vector3(Infinity, Infinity, Infinity); }
     static get right() { return new Vector3(1, 0, 0); }
     static get up() { return new Vector3(0, 1, 0); }
-    static get down() { return new Vector3(0, -1, 0); }
+    static get zero() { return new Vector3(0, 0, 0); }
 
     static FromVector3(vector3) {
         return new Vector3(vector3.x, vector3.y, vector3.z);
@@ -64,6 +67,16 @@ class Vector3 extends Float32Array {
         return dst;
     }
 
+    static Divide(a, b, dst = null) {
+        dst = dst || new Vector3();
+
+        dst[0] = a[0] / b;
+        dst[1] = a[1] / b;
+        dst[2] = a[2] / b;
+
+        return dst;
+    }
+
     static Scale(a, b, dst = null) {
         dst = dst || new Vector3();
 
@@ -103,12 +116,29 @@ class Vector3 extends Float32Array {
     get y() { return this[1]; } set y(f) { return this[1] = f; }
     get z() { return this[2]; } set z(f) { return this[2] = f; }
 
-    get sqrtMagnitude() {
-        return Vector3.SqrMagnitude(this);
+    get sqrMagnitude() {
+        return this[0] * this[0] + this[1] * this[1] + this[2] * this[2];
     }
 
     get magnitude() {
-        return Vector3.Magnitude(this);
+        return Math.sqrt(this.sqrMagnitude);
+    }
+
+    get normalized() {
+        const dst = new Vector2();
+
+        const magnitude = v.magnitude;
+        if (magnitude > 0.00001) {
+            dst[0] = this[0] / magnitude;
+            dst[1] = this[1] / magnitude;
+            dst[2] = this[2] / magnitude;
+        } else {
+            dst[0] = 0;
+            dst[1] = 0;
+            dst[2] = 0;
+        }
+
+        return dst;
     }
 
     SqrMagnitude() {

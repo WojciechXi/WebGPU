@@ -1,5 +1,7 @@
 class Rect extends Float32Array {
 
+    static get zero() { return new Rect(0, 0, 0, 0); }
+
     constructor(x = 0, y = 0, width = 1, height = 1) {
         super(4);
         this.x = x;
