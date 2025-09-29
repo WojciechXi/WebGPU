@@ -7,27 +7,49 @@ class SphereCollider extends Collider {
 
     Intersects(other) {
         if (other instanceof SphereCollider) {
-            const posA = this.transform.position;
-            const posB = other.transform.position;
-            const distSqr = posA.Subtract(posB).LengthSquared();
+            const position = this.transform.position;
+            const otherPosition = other.transform.position;
+
+            const distSqr = Vector3.Subtract(position, otherPosition).SqrMagnitude();
             const rSum = this.radius + other.radius;
+
             return distSqr <= rSum * rSum;
         } else if (other instanceof BoxCollider) {
-            const spherePos = this.transform.position;
+            const position = this.transform.position;
+
             const boxMin = other.GetMin();
             const boxMax = other.GetMax();
 
-            const x = Math.max(boxMin.x, Math.min(spherePos.x, boxMax.x));
-            const y = Math.max(boxMin.y, Math.min(spherePos.y, boxMax.y));
-            const z = Math.max(boxMin.z, Math.min(spherePos.z, boxMax.z));
+            const x = Math.max(boxMin.x, Math.min(position.x, boxMax.x));
+            const y = Math.max(boxMin.y, Math.min(position.y, boxMax.y));
+            const z = Math.max(boxMin.z, Math.min(position.z, boxMax.z));
 
             const closest = new Vector3(x, y, z);
-            const delta = spherePos.Subtract(closest);
-            return delta.LengthSquared() <= this.radius * this.radius;
+            const delta = Vector3.Subtract(position, closest);
+
+            return delta.SqrMagnitude() <= this.radius * this.radius;
         } else if (other instanceof CapsuleCollider) {
             return other.Intersects(this);
         }
         return false;
     }
+
+    ComputePenetration(other) {
+        if (other instanceof SphereCollider) {
+            const position = this.transform.position;
+            const delta = Vector3.Subtract(position, other.transform.position);
+            const dist = delta.Magnitude();
+            const minDist = this.radius + other.radius;
+
+            if (dist < minDist) {
+                const normal = dist > 0 ? delta.Normalize() : new Vector3(1, 0, 0);
+                const depth = minDist - dist;
+                return Vector3.Multiply(normal, depth);
+            }
+        }
+
+        return null;
+    }
+
 
 }

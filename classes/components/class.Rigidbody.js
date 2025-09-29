@@ -11,23 +11,24 @@ class Rigidbody extends Component {
     }
 
     Update() {
+        if (!Physics.simulate) return;
         if (!this.collider) return;
 
         // --- 1. Grawitacja ---
         if (this.useGravity) {
-            this.acceleration.Add(this.gravity);
+            this.acceleration = Vector3.Add(this.acceleration, this.gravity);
         }
 
         // --- 2. Aktualizacja prędkości ---
-        this.velocity.Add(Vector3.Multiply(this.acceleration, Time.deltaTime));
+        this.velocity = Vector3.Add(this.velocity, Vector3.Multiply(this.acceleration, Time.deltaTime));
 
         // --- 3. Drag ---
         if (this.drag > 0.0) {
-            this.velocity.Multiply(1.0 - this.drag * Time.deltaTime);
+            this.velocity = Vector3.Multiply(this.velocity, 1.0 - this.drag * Time.deltaTime);
         }
 
         // --- 4. Nowa pozycja ---
-        let newPos = this.transform.position.Add(Vector3.Multiply(this.velocity, Time.deltaTime));
+        let newPos = Vector3.Add(this.transform.position, Vector3.Multiply(this.velocity, Time.deltaTime));
 
         // --- 5. Sprawdzenie kolizji ---
         for (const other of Collider.colliders) {
@@ -37,22 +38,26 @@ class Rigidbody extends Component {
             this.transform.position = newPos;
 
             if (this.collider.Intersects(other)) {
-                // --- Reakcja fizyczna ---
-                const contactNormal = this.ComputeContactNormal(other);
+                const mtv = this.collider.ComputePenetration(other); // wektor wypchnięcia
+                if (mtv) {
+                    newPos = Vector3.Add(newPos, mtv);
 
-                // odbicie prędkości wzdłuż normalnej
-                const vDotN = this.velocity.Dot(contactNormal);
-                this.velocity.Subtract(contactNormal.Multiply(vDotN * (1 + this.bounce)));
+                    // normalna = znormalizowany mtv
+                    const contactNormal = mtv.Normalize();
 
-                // przesunięcie obiektu poza kolizję
-                newPos.Add(contactNormal.Multiply(0.01));
+                    // odbicie prędkości wzdłuż normalnej
+                    const vDotN = this.velocity.Dot(contactNormal);
+                    if (vDotN < 0) { // tylko jeśli się zbliża
+                        this.velocity = Vector3.Subtract(this.velocity, Vector3.Multiply(contactNormal, vDotN * (1 + this.bounce)));
+                    }
 
-                // Eventy
-                if (!this.collider._collidingWith.has(other)) {
-                    this.collider.OnCollisionEnter(other);
-                    this.collider._collidingWith.add(other);
-                } else {
-                    this.collider.OnCollisionStay(other);
+                    // Eventy
+                    if (!this.collider._collidingWith.has(other)) {
+                        this.collider.OnCollisionEnter(other);
+                        this.collider._collidingWith.add(other);
+                    } else {
+                        this.collider.OnCollisionStay(other);
+                    }
                 }
             } else {
                 if (this.collider._collidingWith.has(other)) {
@@ -68,18 +73,18 @@ class Rigidbody extends Component {
         this.transform.position = newPos;
 
         // --- 7. Reset przyspieszenia ---
-        this.acceleration = Vector3.zero;
+        this.acceleration.Set(0, 0, 0);
     }
 
     AddForce(force) {
         const a = force.Multiply(1.0 / this.mass);
-        this.acceleration = this.acceleration.Add(a);
+        this.acceleration = Vector3.Add(this.acceleration, a);
     }
 
     // Prosta normalna kontaktu dla odbicia
     ComputeContactNormal(other) {
         const myPos = this.transform.position;
         const otherPos = other.transform.position;
-        return myPos.Subtract(otherPos).Normalize();
+        return Vector3.Subtract(myPos, otherPos).Normalize();
     }
 }

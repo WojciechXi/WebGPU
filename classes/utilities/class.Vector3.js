@@ -8,11 +8,19 @@ class Vector3 extends Float32Array {
     static get up() { return new Vector3(0, 1, 0); }
     static get down() { return new Vector3(0, -1, 0); }
 
-    static Length(v) {
+    static FromVector3(vector3) {
+        return new Vector3(vector3.x, vector3.y, vector3.z);
+    }
+
+    static SqrMagnitude(v) {
+        return v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+    }
+
+    static Magnitude(v) {
         return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     }
 
-    static Cross(a, b, dst) {
+    static Cross(a, b, dst = null) {
         dst = dst || new Vector3();
 
         const t0 = a[1] * b[2] - a[2] * b[1];
@@ -26,7 +34,7 @@ class Vector3 extends Float32Array {
         return dst;
     }
 
-    static Add(a, b, dst) {
+    static Add(a, b, dst = null) {
         dst = dst || new Vector3();
 
         dst[0] = a[0] + b[0];
@@ -36,7 +44,7 @@ class Vector3 extends Float32Array {
         return dst;
     }
 
-    static Subtract(a, b, dst) {
+    static Subtract(a, b, dst = null) {
         dst = dst || new Vector3();
 
         dst[0] = a[0] - b[0];
@@ -46,40 +54,35 @@ class Vector3 extends Float32Array {
         return dst;
     }
 
-    static Multiply(a, b, dst) {
+    static Multiply(a, b, dst = null) {
         dst = dst || new Vector3();
 
-        a[0] *= b;
-        a[1] *= b;
-        a[2] *= b;
+        dst[0] = a[0] * b;
+        dst[1] = a[1] * b;
+        dst[2] = a[2] * b;
 
         return dst;
     }
 
-    static Scale(a, b, dst) {
+    static Scale(a, b, dst = null) {
         dst = dst || new Vector3();
 
-        if (b instanceof Vector3 || b instanceof Vector4) {
-            a[0] *= b[0];
-            a[1] *= b[1];
-            a[2] *= b[2];
-        } else if (b instanceof Vector2) {
-            a[0] *= b[0];
-            a[1] *= b[1];
-        }
+        a[0] *= b[0];
+        a[1] *= b[1];
+        a[2] *= b[2];
 
         return dst;
     }
 
-    static Normalize(v, dst) {
+    static Normalize(v, dst = null) {
         dst = dst || new Vector3();
 
-        const length = this.Length(v);
+        const magnitude = v.magnitude;
         // make sure we don't divide by 0.
-        if (length > 0.00001) {
-            dst[0] = v[0] / length;
-            dst[1] = v[1] / length;
-            dst[2] = v[2] / length;
+        if (magnitude > 0.00001) {
+            dst[0] = v[0] / magnitude;
+            dst[1] = v[1] / magnitude;
+            dst[2] = v[2] / magnitude;
         } else {
             dst[0] = 0;
             dst[1] = 0;
@@ -100,8 +103,16 @@ class Vector3 extends Float32Array {
     get y() { return this[1]; } set y(f) { return this[1] = f; }
     get z() { return this[2]; } set z(f) { return this[2] = f; }
 
-    get length() {
-        return Vector3.Length(this);
+    get sqrtMagnitude() {
+        return Vector3.SqrMagnitude(this);
+    }
+
+    get magnitude() {
+        return Vector3.Magnitude(this);
+    }
+
+    SqrMagnitude() {
+        return Vector3.SqrMagnitude(this);
     }
 
     Normalize() {
@@ -111,26 +122,6 @@ class Vector3 extends Float32Array {
 
     Dot(other) {
         return this[0] * other[0] + this[1] * other[1] + this[2] * other[2];
-    }
-
-    Add(v) {
-        Vector3.Add(this, v, this);
-        return this;
-    }
-
-    Subtract(v) {
-        Vector3.Subtract(this, v, this);
-        return this;
-    }
-
-    Multiply(v) {
-        Vector3.Multiply(this, v, this);
-        return this;
-    }
-
-    Scale(v) {
-        Vector3.Scale(this, v, this);
-        return this;
     }
 
     Set(value) {

@@ -92,7 +92,7 @@ class Transform extends Component {
         return v.Normalize();
     }
 
-    get back() { return this.forward.Multiply(-1); }
+    get back() { return Vector3.Multiply(this.forward, -1); }
 
     get right() {
         const m = this.matrix4x4;
@@ -100,7 +100,7 @@ class Transform extends Component {
         return v.Normalize();
     }
 
-    get left() { return this.right.Multiply(-1); }
+    get left() { return Vector3.Multiply(this.right, -1); }
 
     get up() {
         const m = this.matrix4x4;
@@ -108,6 +108,6 @@ class Transform extends Component {
         return v.Normalize();
     }
 
-    get down() { return this.up.Multiply(-1); }
+    get down() { return Vector3.Multiply(this.up, -1); }
 
 }

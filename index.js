@@ -237,7 +237,7 @@ window.addEventListener('load', async function (event) {
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
             directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-30, 0, -30);
-            directionalLightGameObject.transform.position = directionalLightGameObject.transform.back.Multiply(25);
+            directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
@@ -258,15 +258,19 @@ window.addEventListener('load', async function (event) {
 
                 for (const mesh of meshes) {
                     const gameObject = new GameObject(mesh.name);
-                    gameObject.transform.position = new Vector3(0, 1.1, 0);
+                    gameObject.transform.position = new Vector3(0, 2, 0);
                     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-                    const boxCollider = gameObject.AddComponent(BoxCollider);
+                    const boxCollider = gameObject.AddComponent(SphereCollider);
                     const rigidbody = gameObject.AddComponent(Rigidbody);
                     const meshRenderer = gameObject.AddComponent(MeshRenderer);
                     meshRenderer.mesh = mesh;
                     meshRenderer.materials = [goldMaterial];
                 }
             });
+
+            setTimeout(function () {
+                Physics.simulate = true;
+            }, 1000);
 
             // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
             //     for (const mesh of meshes) {

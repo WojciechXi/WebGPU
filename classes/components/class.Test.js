@@ -16,9 +16,9 @@ class Test extends Component {
         this.transform.rotation = Quaternion.FromEuler(this.look.y, 0, this.look.x);
 
         let position = this.transform.position;
-        position.Add(this.transform.forward.Multiply(this.move.z * Time.deltaTime * 5));
-        position.Add(this.transform.up.Multiply(this.move.y * Time.deltaTime * 5));
-        position.Add(this.transform.right.Multiply(this.move.x * Time.deltaTime * 5));
+        position = Vector3.Add(position, Vector3.Multiply(this.transform.forward, this.move.z * Time.deltaTime * 5));
+        position = Vector3.Add(position, Vector3.Multiply(this.transform.up, this.move.y * Time.deltaTime * 5));
+        position = Vector3.Add(position, Vector3.Multiply(this.transform.right, this.move.x * Time.deltaTime * 5));
         this.transform.position = position;
     }
 

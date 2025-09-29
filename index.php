@@ -22,6 +22,7 @@
     <script src="./classes/class.Importer.js"></script>
     <script src="./classes/class.Time.js"></script>
     <script src="./classes/class.Input.js"></script>
+    <script src="./classes/class.Physics.js"></script>
 
     <script src="./classes/class.GPU.js"></script>
 

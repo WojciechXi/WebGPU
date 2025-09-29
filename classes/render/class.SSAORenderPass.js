@@ -234,7 +234,7 @@ class SSAORenderPass extends RenderPass {
             );
 
             sample.Normalize(sample);
-            sample.Multiply(Math.random());
+            sample = Vector3.Multiply(sample, Math.random());
 
             kernel.push(sample[0], sample[1], sample[2], 0);
         }

@@ -19,6 +19,10 @@ class Collider extends Component {
         return false;
     }
 
+    ComputePenetration(other) {
+        return null;
+    }
+
     UpdateC() {
         const newColliding = new Set();
 
