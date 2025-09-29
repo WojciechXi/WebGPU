@@ -267,51 +267,51 @@ window.addEventListener('load', async function (event) {
                 Physics.simulate = true;
             }, 1000);
 
-            // Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
-            //     for (const mesh of meshes) {
-            //         const gameObject = new GameObject(mesh.name);
-            //         gameObject.transform.position = new Vector3(0, 0, 0);
-            //         gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-            //         const boxCollider = gameObject.AddComponent(BoxCollider);
-            //         const meshRenderer = gameObject.AddComponent(MeshRenderer);
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [whiteMaterial];
-            //     }
-
-            //     for (const mesh of meshes) {
-            //         const gameObject = new GameObject(mesh.name);
-            //         gameObject.transform.position = new Vector3(0, 2, 0);
-            //         gameObject.transform.rotation = Quaternion.FromEuler(0, 45, 0);
-            //         const boxCollider = gameObject.AddComponent(SphereCollider);
-            //         const rigidbody = gameObject.AddComponent(Rigidbody);
-            //         const meshRenderer = gameObject.AddComponent(MeshRenderer);
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [goldMaterial];
-            //     }
-            // });
-
-            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
-                const gameObject = new GameObject('Krakow');
-                gameObject.transform.position = new Vector3(0, 0, 0);
-                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+            Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
+                // for (const mesh of meshes) {
+                //     const gameObject = new GameObject(mesh.name);
+                //     gameObject.transform.position = new Vector3(0, 0, 0);
+                //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+                //     const boxCollider = gameObject.AddComponent(BoxCollider);
+                //     const meshRenderer = gameObject.AddComponent(MeshRenderer);
+                //     meshRenderer.mesh = mesh;
+                //     meshRenderer.materials = [whiteMaterial];
+                // }
 
                 for (const mesh of meshes) {
-                    const meshGameObject = new GameObject(mesh.name);
-                    meshGameObject.transform.SetParent(gameObject.transform);
-                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-
+                    const gameObject = new GameObject(mesh.name);
+                    gameObject.transform.position = new Vector3(0, 2, 0);
+                    gameObject.transform.rotation = Quaternion.FromEuler(0, 45, 0);
+                    const boxCollider = gameObject.AddComponent(SphereCollider);
+                    const rigidbody = gameObject.AddComponent(Rigidbody);
+                    const meshRenderer = gameObject.AddComponent(MeshRenderer);
                     meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [];
-                    mesh.subMeshes.forEach(function (subMesh) {
-                        if (materials.hasOwnProperty(subMesh.material)) {
-                            meshRenderer.materials.push(materials[subMesh.material]);
-                        } else {
-                            console.log(subMesh.material);
-                            meshRenderer.materials.push(whiteMaterial);
-                        }
-                    });
+                    meshRenderer.materials = [goldMaterial];
                 }
             });
+
+            // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+            //     const gameObject = new GameObject('Krakow');
+            //     gameObject.transform.position = new Vector3(0, 0, 0);
+            //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+
+            //     for (const mesh of meshes) {
+            //         const meshGameObject = new GameObject(mesh.name);
+            //         meshGameObject.transform.SetParent(gameObject.transform);
+            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+
+            //         meshRenderer.mesh = mesh;
+            //         meshRenderer.materials = [];
+            //         mesh.subMeshes.forEach(function (subMesh) {
+            //             if (materials.hasOwnProperty(subMesh.material)) {
+            //                 meshRenderer.materials.push(materials[subMesh.material]);
+            //             } else {
+            //                 console.log(subMesh.material);
+            //                 meshRenderer.materials.push(whiteMaterial);
+            //             }
+            //         });
+            //     }
+            // });
         });
     });
 });

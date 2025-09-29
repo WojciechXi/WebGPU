@@ -10,7 +10,9 @@ class SphereCollider extends Collider {
     }
 
     Intersects(other) {
-        if (other instanceof SphereCollider) {
+        if (other instanceof TerrainCollider) {
+            other.Intersects(this);
+        } else if (other instanceof SphereCollider) {
             const worldCenter = this.worldCenter;
             const otherWorldCenter = other.worldCenter;
 
@@ -40,7 +42,9 @@ class SphereCollider extends Collider {
     }
 
     ComputePenetration(other) {
-        if (other instanceof SphereCollider) {
+        if (other instanceof TerrainCollider) {
+            other.ComputePenetration(this);
+        } else if (other instanceof SphereCollider) {
             const worldCenter = this.worldCenter;
             const delta = Vector3.Subtract(worldCenter, other.worldCenter);
             const dist = delta.Magnitude();
@@ -51,10 +55,7 @@ class SphereCollider extends Collider {
                 const depth = minDist - dist;
                 return Vector3.Multiply(normal, depth);
             }
-        }
-
-        // Sphere vs Box
-        if (other instanceof BoxCollider) {
+        } else if (other instanceof BoxCollider) {
             const worldCenter = this.worldCenter;
             const otherBounds = other.bounds;
 

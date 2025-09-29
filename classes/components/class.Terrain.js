@@ -38,6 +38,10 @@ class Terrain extends Component {
         return this.heights[index];
     }
 
+    GetWorldHeight(xLinear, zLinear) {
+        return this.GetHeight(xLinear, zLinear) + this.transform.position.y;
+    }
+
     SetHeights(x, z, width, height, heights) {
         for (let _x = 0; _x < width; _x++) {
             for (let _z = 0; _z < height; _z++) {
