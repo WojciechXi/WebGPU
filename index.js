@@ -124,12 +124,6 @@ window.addEventListener('load', async function (event) {
                 name: 'Floor',
                 shader: litShader,
             });
-
-            const terrainMaterial = new Material({
-                name: 'Terrain',
-                shader: litShader,
-            });
-
             loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_albedo.png', function (albedo) {
                 loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_normal.png', function (normal) {
                     loadBitmap('/Assets/Images/hungarian-point-flooring-unity/hungarian-point-flooring_ao.png', function (occlusion) {
@@ -137,11 +131,24 @@ window.addEventListener('load', async function (event) {
                         floorMaterial.SetTexture('normal', normal);
                         floorMaterial.SetTexture('occlusion', occlusion);
                         floorMaterial.Update();
+                    });
+                });
+            });
 
-                        terrainMaterial.SetTexture('albedo', albedo);
-                        terrainMaterial.SetTexture('normal', normal);
-                        terrainMaterial.SetTexture('occlusion', occlusion);
-                        terrainMaterial.Update();
+            const terrainMaterial = new Material({
+                name: 'Terrain',
+                shader: litShader,
+            });
+            loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_Color.jpg', function (albedo) {
+                loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_Normal.jpg', function (normal) {
+                    loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_AmbientOcclusion.jpg', function (occlusion) {
+                        loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_Roughness.jpg', function (roughness) {
+                            terrainMaterial.SetTexture('albedo', albedo);
+                            terrainMaterial.SetTexture('normal', normal);
+                            terrainMaterial.SetTexture('occlusion', occlusion);
+                            terrainMaterial.SetTexture('roughness', roughness);
+                            terrainMaterial.Update();
+                        });
                     });
                 });
             });
@@ -262,58 +269,74 @@ window.addEventListener('load', async function (event) {
             let terrainCollider = terrainGameObject.AddComponent(TerrainCollider);
             terrain.material = terrainMaterial;
 
+            const perlinNoise = new PerlinNoise();
+            const heights = [];
+            const center = Vector2.Multiply(new Vector2(terrain.resolution, terrain.resolution), 0.5);
+            for (let x = 0; x < terrain.resolution; x++) {
+                for (let z = 0; z < terrain.resolution; z++) {
+                    const pos = new Vector2(x, z);
+                    const distance = Vector2.Distance(center, pos);
+
+                    const lerp = Math.InverseLerp(5, 1, distance);
+
+                    const noise = perlinNoise.NoiseOctave(x * 0.0123, z * 0.0123, 8);
+                    heights.push(Math.Lerp(0, noise, lerp));
+                }
+            }
+            terrain.SetHeights(0, 0, terrain.resolution, terrain.resolution, heights);
+
             window.terrain = terrain;
 
             setTimeout(function () {
                 Physics.simulate = true;
             }, 1000);
 
-            // Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
-            //     for (const mesh of meshes) {
-            //         const gameObject = new GameObject(mesh.name);
-            //         gameObject.transform.position = new Vector3(0, 0, 0);
-            //         gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-            //         gameObject.transform.localScale = new Vector3(10, 1, 5);
-            //         const boxCollider = gameObject.AddComponent(BoxCollider);
-            //         const meshRenderer = gameObject.AddComponent(MeshRenderer);
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [whiteMaterial];
-            //     }
+            Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
+                for (const mesh of meshes) {
+                    const gameObject = new GameObject(mesh.name);
+                    gameObject.transform.position = new Vector3(0, 0, 0);
+                    gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+                    gameObject.transform.localScale = new Vector3(10, 1, 5);
+                    const boxCollider = gameObject.AddComponent(BoxCollider);
+                    const meshRenderer = gameObject.AddComponent(MeshRenderer);
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [whiteMaterial];
+                }
 
-            //     for (const mesh of meshes) {
-            //         const gameObject = new GameObject(mesh.name);
-            //         gameObject.transform.position = new Vector3(0, 2, 0);
-            //         gameObject.transform.rotation = Quaternion.FromEuler(0, 45, 0);
-            //         const boxCollider = gameObject.AddComponent(SphereCollider);
-            //         const rigidbody = gameObject.AddComponent(Rigidbody);
-            //         const meshRenderer = gameObject.AddComponent(MeshRenderer);
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [goldMaterial];
-            //     }
-            // });
+                for (const mesh of meshes) {
+                    const gameObject = new GameObject(mesh.name);
+                    gameObject.transform.position = new Vector3(0, 2, 0);
+                    gameObject.transform.rotation = Quaternion.FromEuler(0, 45, 0);
+                    const boxCollider = gameObject.AddComponent(SphereCollider);
+                    const rigidbody = gameObject.AddComponent(Rigidbody);
+                    const meshRenderer = gameObject.AddComponent(MeshRenderer);
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [goldMaterial];
+                }
+            });
 
-            // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
-            //     const gameObject = new GameObject('Krakow');
-            //     gameObject.transform.position = new Vector3(0, 0, 0);
-            //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+                const gameObject = new GameObject('Krakow');
+                gameObject.transform.position = new Vector3(0, 0, 0);
+                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
 
-            //     for (const mesh of meshes) {
-            //         const meshGameObject = new GameObject(mesh.name);
-            //         meshGameObject.transform.SetParent(gameObject.transform);
-            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+                for (const mesh of meshes) {
+                    const meshGameObject = new GameObject(mesh.name);
+                    meshGameObject.transform.SetParent(gameObject.transform);
+                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
 
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [];
-            //         mesh.subMeshes.forEach(function (subMesh) {
-            //             if (materials.hasOwnProperty(subMesh.material)) {
-            //                 meshRenderer.materials.push(materials[subMesh.material]);
-            //             } else {
-            //                 console.log(subMesh.material);
-            //                 meshRenderer.materials.push(whiteMaterial);
-            //             }
-            //         });
-            //     }
-            // });
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [];
+                    mesh.subMeshes.forEach(function (subMesh) {
+                        if (materials.hasOwnProperty(subMesh.material)) {
+                            meshRenderer.materials.push(materials[subMesh.material]);
+                        } else {
+                            console.log(subMesh.material);
+                            meshRenderer.materials.push(whiteMaterial);
+                        }
+                    });
+                }
+            });
         });
     });
 });

@@ -168,7 +168,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     // world position (do shadow mapping)
     let worldPosition3 = worldPosition.xyz / worldPosition.w;
     let distanceToCamera = length(worldPosition.xyz - cameraWorldPosition);
-    let shadowAttenuation = clamp(distanceToCamera / 25, 0.0, 1.0);
+    let shadowAttenuation = clamp(1.0 - (distanceToCamera / 25), 0.0, 1.0);
 
     // light direction: obliczamy direction w world space z macierzy widoku światła
     let lightWorldDirection = normalize((inverse4(lightViewMatrix) * vec4f(0.0, 0.0, -1.0, 0.0)).xyz);
@@ -181,11 +181,8 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let shadowUV = lightNDC.xy * 0.5 + vec2f(0.5, 0.5);
     
     var shadowSampleVal = 1.0;
-    if(shadowAttenuation < 1.0){
-        shadowSampleVal = ((sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, 3) + 0.1) / 1.1) * shadowAttenuation;
-        if(shadowSampleVal > 0.9) {
-            shadowSampleVal = 1.0;
-        }
+    if(shadowAttenuation > 0.0){
+        shadowSampleVal = clamp(sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, 3) + 0.1, 0, 1);
     } 
 
     // --- kolory i PBR kanały (konwencja: R = roughness, G = metallic, B = ao) ---

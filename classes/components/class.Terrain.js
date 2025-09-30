@@ -19,15 +19,6 @@ class Terrain extends Component {
         });
 
         this.BuildMesh();
-
-        const perlinNoise = new PerlinNoise();
-        const heights = [];
-        for (let x = 0; x < this.resolution; x++) {
-            for (let z = 0; z < this.resolution; z++) {
-                heights.push(perlinNoise.NoiseOctave(x * 0.0123, z * 0.0123, 8));
-            }
-        }
-        this.SetHeights(0, 0, this.resolution, this.resolution, heights);
     }
 
     get bounds() {

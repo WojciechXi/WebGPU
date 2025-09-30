@@ -1,7 +1,7 @@
 class ShadowRenderPass extends RenderPass {
 
     Init(data) {
-        this.resolution = data.resolution ?? 1024;
+        this.resolution = data.resolution ?? 2048;
         this.canvas = data.canvas;
 
         this.depthTexture = GPU.CreateTexture({

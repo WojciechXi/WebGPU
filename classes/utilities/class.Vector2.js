@@ -9,6 +9,10 @@ class Vector2 extends Float32Array {
     static get up() { return new Vector2(0, 1); }
     static get zero() { return new Vector2(0, 0); }
 
+    static Distance(a, b) {
+        return Vector2.Subtract(a, b).magnitude;
+    }
+
     static Add(a, b, dst = null) {
         dst = dst || new Vector2();
 
