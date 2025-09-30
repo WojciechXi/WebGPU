@@ -270,7 +270,7 @@ window.addEventListener('load', async function (event) {
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
-            cameraGameObject.transform.position = new Vector3(0, 1, 5);
+            cameraGameObject.transform.position = new Vector3(0, 5, 5);
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
@@ -282,16 +282,10 @@ window.addEventListener('load', async function (event) {
 
             const perlinNoise = new PerlinNoise();
             const heights = [];
-            const center = Vector2.Multiply(new Vector2(terrain.resolution, terrain.resolution), 0.5);
             for (let x = 0; x < terrain.resolution; x++) {
                 for (let z = 0; z < terrain.resolution; z++) {
-                    const pos = new Vector2(x, z);
-                    const distance = Vector2.Distance(center, pos);
-
-                    const lerp = Math.InverseLerp(5, 1, distance);
-
                     const noise = perlinNoise.NoiseOctave(x * 0.0123, z * 0.0123, 8);
-                    heights.push(Math.Lerp(0, noise, lerp));
+                    heights.push(noise);
                 }
             }
             terrain.SetHeights(0, 0, terrain.resolution, terrain.resolution, heights);

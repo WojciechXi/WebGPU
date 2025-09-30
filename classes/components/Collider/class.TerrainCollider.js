@@ -11,21 +11,15 @@ class TerrainCollider extends Collider {
 
     Intersects(otherCollider) {
         const bounds = this.bounds;
-        const otherWorldCenter = otherCollider.worldCenter;
+        const otherBounds = otherCollider.bounds;
 
-        if (bounds.Contains(otherWorldCenter)) {
-            const boundsMin = bounds.min;
-            const boundsMax = bounds.max;
+        if (bounds.Contains(otherBounds.center)) {
+            const terrainWorldHeight = this.terrain.SampleHeight(otherCollider.worldCenter);
 
-            const boundsDiff = Vector3.Subtract(boundsMax, boundsMin);
-            const terrainSpacePosition = Vector3.Subtract(otherWorldCenter, boundsMin);
+            console.log(terrainWorldHeight);
 
-            const xLinear = terrainSpacePosition.x / boundsDiff.x;
-            const zLinear = terrainSpacePosition.z / boundsDiff.z;
-
-            const terrainWorldHeight = this.terrain.GetWorldHeight(xLinear, zLinear);
-            if (otherWorldCenter.y + 0.5 < terrainWorldHeight) return false;
-            if (otherWorldCenter.y - 0.5 > terrainWorldHeight) return false;
+            if (otherBounds.max.y < terrainWorldHeight) return false;
+            if (otherBounds.min.y > terrainWorldHeight) return false;
 
             return true;
         }
@@ -34,22 +28,9 @@ class TerrainCollider extends Collider {
     }
 
     ComputePenetration(otherCollider) {
-        const bounds = this.bounds;
-        const otherWorldCenter = otherCollider.worldCenter;
+        const terrainWorldHeight = this.terrain.SampleHeight(otherCollider.worldCenter);
 
-        const boundsMin = bounds.min;
-        const boundsMax = bounds.max;
-
-        const boundsDiff = Vector3.Subtract(boundsMax, boundsMin);
-        const terrainSpacePosition = Vector3.Subtract(otherWorldCenter, boundsMin);
-
-        const xLinear = terrainSpacePosition.x / boundsDiff.x;
-        const zLinear = terrainSpacePosition.z / boundsDiff.z;
-
-        const terrainWorldHeight = this.terrain.GetWorldHeight(xLinear, zLinear);
-
-        const worldCenter = this.worldCenter;
-        const dist = worldCenter.y - terrainWorldHeight;
+        const dist = this.worldCenter.y - terrainWorldHeight;
         const minDist = this.radius;
 
         if (dist < minDist) {
