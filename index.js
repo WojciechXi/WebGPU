@@ -301,27 +301,32 @@ window.addEventListener('load', async function (event) {
                 Physics.simulate = true;
             }, 1000);
 
-            const sphereGameObject = new GameObject(window.meshes.sphere.name);
-            sphereGameObject.transform.position = new Vector3(0, 2, 0);
-            sphereGameObject.transform.rotation = Quaternion.FromEuler(0, 45, 0);
-            const boxCollider = sphereGameObject.AddComponent(SphereCollider);
-            const rigidbody = sphereGameObject.AddComponent(Rigidbody);
-            const meshRenderer = sphereGameObject.AddComponent(MeshRenderer);
+            let go = new GameObject(window.meshes.sphere.name);
+            go.transform.position = new Vector3(0, 2, 0);
+            go.transform.rotation = Quaternion.FromEuler(0, 45, 0);
+            let boxCollider = go.AddComponent(SphereCollider);
+            let rigidbody = go.AddComponent(Rigidbody);
+            let meshRenderer = go.AddComponent(MeshRenderer);
             meshRenderer.mesh = window.meshes.sphere;
             meshRenderer.materials = [goldMaterial];
 
-            Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
-                for (const mesh of meshes) {
-                    const gameObject = new GameObject(mesh.name);
-                    gameObject.transform.position = new Vector3(2, 0, 0);
-                    gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-                    gameObject.transform.localScale = new Vector3(4, 1, 4);
-                    const boxCollider = gameObject.AddComponent(BoxCollider);
-                    const meshRenderer = gameObject.AddComponent(MeshRenderer);
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [whiteMaterial];
-                }
-            });
+            go = new GameObject(window.meshes.cube.name);
+            go.transform.position = new Vector3(-1, 0, 0);
+            go.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+            go.transform.localScale = new Vector3(4, 1, 4);
+            boxCollider = go.AddComponent(BoxCollider);
+            meshRenderer = go.AddComponent(MeshRenderer);
+            meshRenderer.mesh = window.meshes.cube;
+            meshRenderer.materials = [whiteMaterial];
+
+            go = new GameObject(window.meshes.capsule.name);
+            go.transform.position = new Vector3(2, 0, 0);
+            go.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+            go.transform.localScale = new Vector3(1, 1, 1);
+            boxCollider = go.AddComponent(CapsuleCollider);
+            meshRenderer = go.AddComponent(MeshRenderer);
+            meshRenderer.mesh = window.meshes.capsule;
+            meshRenderer.materials = [beigeMaterial];
 
             // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
             //     const gameObject = new GameObject('Krakow');

@@ -6,7 +6,9 @@ class BoxCollider extends Collider {
     }
 
     get bounds() {
-        return new Bounds(this.worldCenter, Vector3.Scale(this.size, this.transform.lossyScale));
+        let size = Vector3.Scale(this.size, this.transform.lossyScale);
+
+        return new Bounds(this.worldCenter, size);
     }
 
     Intersects(otherCollider) {
