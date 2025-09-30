@@ -68,7 +68,7 @@ class Terrain extends Component {
                 vertices.push(new Vector3(x / (this.resolution - 1), this.heights[index], z / (this.resolution - 1)));
                 normals.push(Vector3.up);
                 tangents.push(new Vector4(1, 0, 0, 1));
-                uvs.push(new Vector2(x, z));
+                uvs.push(new Vector2(x / 4, z / 4));
             }
         }
 
