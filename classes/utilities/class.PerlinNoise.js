@@ -100,7 +100,7 @@ class PerlinNoise {
         const result = PerlinNoise.lerp(x1, x2, v);
 
         // wynik zwykle w przybliżeniu w [-1,1]. Zwracamy go takim jakim jest.
-        return result;
+        return result * 0.5 + 0.5;
     }
 
     // ---------- Octaves (wielowarstwowy sumator) ----------

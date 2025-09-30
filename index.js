@@ -259,7 +259,7 @@ window.addEventListener('load', async function (event) {
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
-            cameraGameObject.transform.position = new Vector3(0, 1, 5);
+            cameraGameObject.transform.position = new Vector3(0, 5, 5);
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
@@ -271,16 +271,10 @@ window.addEventListener('load', async function (event) {
 
             const perlinNoise = new PerlinNoise();
             const heights = [];
-            const center = Vector2.Multiply(new Vector2(terrain.resolution, terrain.resolution), 0.5);
             for (let x = 0; x < terrain.resolution; x++) {
                 for (let z = 0; z < terrain.resolution; z++) {
-                    const pos = new Vector2(x, z);
-                    const distance = Vector2.Distance(center, pos);
-
-                    const lerp = Math.InverseLerp(5, 1, distance);
-
                     const noise = perlinNoise.NoiseOctave(x * 0.0123, z * 0.0123, 8);
-                    heights.push(Math.Lerp(0, noise, lerp));
+                    heights.push(noise);
                 }
             }
             terrain.SetHeights(0, 0, terrain.resolution, terrain.resolution, heights);
@@ -292,21 +286,20 @@ window.addEventListener('load', async function (event) {
             }, 1000);
 
             Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
-                for (const mesh of meshes) {
-                    const gameObject = new GameObject(mesh.name);
-                    gameObject.transform.position = new Vector3(0, 0, 0);
-                    gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-                    gameObject.transform.localScale = new Vector3(10, 1, 5);
-                    const boxCollider = gameObject.AddComponent(BoxCollider);
-                    const meshRenderer = gameObject.AddComponent(MeshRenderer);
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [whiteMaterial];
-                }
+                // for (const mesh of meshes) {
+                //     const gameObject = new GameObject(mesh.name);
+                //     gameObject.transform.position = new Vector3(0, 0, 0);
+                //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+                //     gameObject.transform.localScale = new Vector3(10, 1, 5);
+                //     const boxCollider = gameObject.AddComponent(BoxCollider);
+                //     const meshRenderer = gameObject.AddComponent(MeshRenderer);
+                //     meshRenderer.mesh = mesh;
+                //     meshRenderer.materials = [whiteMaterial];
+                // }
 
                 for (const mesh of meshes) {
                     const gameObject = new GameObject(mesh.name);
-                    gameObject.transform.position = new Vector3(0, 2, 0);
-                    gameObject.transform.rotation = Quaternion.FromEuler(0, 45, 0);
+                    gameObject.transform.position = new Vector3(0, 5, 0);
                     const boxCollider = gameObject.AddComponent(SphereCollider);
                     const rigidbody = gameObject.AddComponent(Rigidbody);
                     const meshRenderer = gameObject.AddComponent(MeshRenderer);
@@ -315,28 +308,28 @@ window.addEventListener('load', async function (event) {
                 }
             });
 
-            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
-                const gameObject = new GameObject('Krakow');
-                gameObject.transform.position = new Vector3(0, 0, 0);
-                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+            // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+            //     const gameObject = new GameObject('Krakow');
+            //     gameObject.transform.position = new Vector3(0, 0, 0);
+            //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
 
-                for (const mesh of meshes) {
-                    const meshGameObject = new GameObject(mesh.name);
-                    meshGameObject.transform.SetParent(gameObject.transform);
-                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+            //     for (const mesh of meshes) {
+            //         const meshGameObject = new GameObject(mesh.name);
+            //         meshGameObject.transform.SetParent(gameObject.transform);
+            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
 
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [];
-                    mesh.subMeshes.forEach(function (subMesh) {
-                        if (materials.hasOwnProperty(subMesh.material)) {
-                            meshRenderer.materials.push(materials[subMesh.material]);
-                        } else {
-                            console.log(subMesh.material);
-                            meshRenderer.materials.push(whiteMaterial);
-                        }
-                    });
-                }
-            });
+            //         meshRenderer.mesh = mesh;
+            //         meshRenderer.materials = [];
+            //         mesh.subMeshes.forEach(function (subMesh) {
+            //             if (materials.hasOwnProperty(subMesh.material)) {
+            //                 meshRenderer.materials.push(materials[subMesh.material]);
+            //             } else {
+            //                 console.log(subMesh.material);
+            //                 meshRenderer.materials.push(whiteMaterial);
+            //             }
+            //         });
+            //     }
+            // });
         });
     });
 });
