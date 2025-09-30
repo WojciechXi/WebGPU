@@ -22,7 +22,8 @@ class Terrain extends Component {
     }
 
     get bounds() {
-        return new Bounds(this.transform.position, Vector3.Scale(this.transform.lossyScale, this.size));
+        const size = Vector3.Scale(this.transform.lossyScale, this.size);
+        return new Bounds(Vector3.Add(this.transform.position, Vector3.Multiply(size, 0.5)), size);
     }
 
     GetHeight(xLinear, zLinear) {
@@ -112,6 +113,13 @@ class Terrain extends Component {
                 const matrix4x4 = Matrix4x4.TRS(this.transform.position, this.transform.rotation, Vector3.Scale(this.transform.lossyScale, this.size));
                 Graphics.DrawMesh(renderPass, this.mesh, matrix4x4, this.material, 0, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix);
             }
+        } else if (renderPass.name === 'gizmosRenderPass') {
+            const bounds = this.bounds;
+            console.log(bounds);
+            const matrix4x4 = Matrix4x4.TRS(bounds.center, this.transform.rotation, bounds.size);
+            renderPass.SetMatrix(matrix4x4);
+
+            if (window.meshes.cube) window.meshes.cube.Render(renderPass, 0, 'edge');
         } else {
             const matrix4x4 = Matrix4x4.TRS(this.transform.position, this.transform.rotation, Vector3.Scale(this.transform.lossyScale, this.size));
             Graphics.DrawMesh(renderPass, this.mesh, matrix4x4, this.material, 0, Camera.main.viewMatrix, Camera.main.projectionMatrix);

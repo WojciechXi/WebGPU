@@ -25,6 +25,8 @@ class MeshRenderer extends Component {
                     Graphics.DrawMesh(renderPass, this.mesh, this.transform.matrix4x4, this.materials[i], i, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix);
                 }
             }
+        } else if (renderPass.name == 'gizmosRenderPass') {
+
         } else {
             for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
                 Graphics.DrawMesh(renderPass, this.mesh, this.transform.matrix4x4, this.materials[i], i, Camera.main.viewMatrix, Camera.main.projectionMatrix);

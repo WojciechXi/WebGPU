@@ -79,7 +79,7 @@ class DebugRenderPass extends RenderPass {
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 {
-                    view: Graphics.context.getCurrentTexture().createView(), // wyświetlamy na ekranie
+                    view: Graphics.context.getCurrentTexture().createView(),
                     loadOp: "clear",
                     storeOp: "store"
                 }

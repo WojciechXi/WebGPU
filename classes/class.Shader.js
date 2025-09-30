@@ -25,13 +25,6 @@ class Shader {
         const device = GPU.device;
         const context = Graphics.context;
 
-        // Konfiguracja kontekstu
-        context.configure({
-            device,
-            format: navigator.gpu.getPreferredCanvasFormat(),
-            alphaMode: 'premultiplied',
-        });
-
         // Tworzymy shader module
         _this.shaderModule = GPU.CreateShaderModule({ code: _this.code });
 

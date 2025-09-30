@@ -18,8 +18,11 @@ class Graphics {
 
         const context = this.context = canvas.getContext('webgpu');
 
-        const format = navigator.gpu.getPreferredCanvasFormat();
-        context.configure({ device, format });
+        context.configure({
+            device,
+            format: navigator.gpu.getPreferredCanvasFormat(),
+            alphaMode: 'premultiplied',
+        });
 
         const sceneTexture = this.sceneTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
@@ -68,6 +71,13 @@ class Graphics {
             gBufferRenderPass: gBufferRenderPass,
             lightingRenderPass: lightingRenderPass,
             forwardRenderPass: forwardRenderPass,
+            sceneTextureView: this.sceneTextureView,
+            canvas: canvas,
+        });
+
+        const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
+            name: 'gizmosRenderPass',
+            code: assets.shaders['gizmosRenderPass.wgsl'],
             sceneTextureView: this.sceneTextureView,
             canvas: canvas,
         });
@@ -133,6 +143,8 @@ class Graphics {
         if (this.lightingRenderPass) this.lightingRenderPass.Render(engine, commandEncoder);
         if (this.forwardRenderPass) this.forwardRenderPass.Render(engine, commandEncoder);
         if (this.finalRenderPass) this.finalRenderPass.Render(engine, commandEncoder);
+
+        if (this.gizmosRenderPass) this.gizmosRenderPass.Render(engine, commandEncoder);
 
         if (this.ssaoRenderPass) this.ssaoRenderPass.Render(engine, commandEncoder);
         if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(engine, commandEncoder);

@@ -38,6 +38,9 @@
     <script src="./classes/render/class.LightingRenderPass.js"></script>
     <script src="./classes/render/class.ForwardRenderPass.js"></script>
     <script src="./classes/render/class.FinalRenderPass.js"></script>
+
+    <script src="./classes/render/class.GizmosRenderPass.js"></script>
+
     <script src="./classes/render/class.SSAORenderPass.js"></script>
     <script src="./classes/render/class.ScreenSpaceReflectionRenderPass.js"></script>
     <script src="./classes/render/class.BloomRenderPass.js"></script>

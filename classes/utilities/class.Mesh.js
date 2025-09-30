@@ -76,9 +76,9 @@ class Mesh {
         for (let subMesh of this.subMeshes) subMesh.Update();
     }
 
-    Render(renderPass, subMeshIndex) {
+    Render(renderPass, subMeshIndex, mode = 'triangle') {
         renderPass.SetVertexBuffer(0, this.vertexBuffer);
-        this.subMeshes[subMeshIndex].Render(renderPass);
+        this.subMeshes[subMeshIndex].Render(renderPass, mode);
     }
 
     RecalculateNormals() {
@@ -210,10 +210,16 @@ class Mesh {
 class SubMesh {
 
     constructor(data = {}) {
-        this.triangles = new Uint32Array(data.triangles ?? 0);
         this.material = data.material ?? null;
 
-        this.indexBuffer = GPU.CreateBuffer({
+        this.triangles = new Uint32Array(data.triangles ?? 0);
+
+        this.triangleBuffer = GPU.CreateBuffer({
+            size: 0,
+            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
+        });
+
+        this.edgeBuffer = GPU.CreateBuffer({
             size: 0,
             usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
         });
@@ -222,26 +228,54 @@ class SubMesh {
     Clear() {
         this.triangles = new Uint32Array(0);
 
-        if (this.indexBuffer) this.indexBuffer.destroy();
-        this.indexBuffer = GPU.CreateBuffer({
+        if (this.triangleBuffer) this.triangleBuffer.destroy();
+        this.triangleBuffer = GPU.CreateBuffer({
+            size: 0,
+            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
+        });
+
+        if (this.edgeBuffer) this.edgeBuffer.destroy();
+        this.edgeBuffer = GPU.CreateBuffer({
             size: 0,
             usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
         });
     }
 
     Update() {
-        if (this.indexBuffer) this.indexBuffer.destroy();
-        this.indexBuffer = GPU.CreateBuffer({
+        if (this.triangleBuffer) this.triangleBuffer.destroy();
+        this.triangleBuffer = GPU.CreateBuffer({
             size: this.triangles.length * 4,
             usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
         });
 
-        GPU.Queue.writeBuffer(this.indexBuffer, 0, this.triangles);
+        GPU.Queue.writeBuffer(this.triangleBuffer, 0, this.triangles);
+
+        const edges = [];
+        for (let i = 0; i < this.triangles.length; i += 3) {
+            const a = this.triangles[i];
+            const b = this.triangles[i + 1];
+            const c = this.triangles[i + 2];
+            edges.push(a, b, b, c, c, a);
+        }
+        this.edges = new Uint32Array(edges);
+
+        if (this.edgeBuffer) this.edgeBuffer.destroy();
+        this.edgeBuffer = GPU.CreateBuffer({
+            size: this.edges.length * 4,
+            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
+        });
+
+        GPU.Queue.writeBuffer(this.edgeBuffer, 0, this.edges);
     }
 
-    Render(renderPass) {
-        renderPass.SetIndexBuffer(this.indexBuffer, 'uint32');
-        renderPass.DrawIndexed(this.triangles.length);
+    Render(renderPass, mode = 'triangle') {
+        if (mode == 'triangle') {
+            renderPass.SetIndexBuffer(this.triangleBuffer, 'uint32');
+            renderPass.DrawIndexed(this.triangles.length);
+        } else if (mode == 'edge') {
+            renderPass.SetIndexBuffer(this.edgeBuffer, 'uint32');
+            renderPass.DrawIndexed(this.edges.length);
+        }
     }
 
 }
