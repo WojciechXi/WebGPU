@@ -75,13 +75,6 @@ class Graphics {
             canvas: canvas,
         });
 
-        const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
-            name: 'gizmosRenderPass',
-            code: assets.shaders['gizmosRenderPass.wgsl'],
-            sceneTextureView: this.sceneTextureView,
-            canvas: canvas,
-        });
-
         const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
             name: 'ssaoRenderPass',
             code: assets.shaders['ssaoRenderPass.wgsl'],
@@ -124,6 +117,12 @@ class Graphics {
 
         debugRenderPass.textureView = tonemappingRenderPass.sceneTextureView;
 
+        const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
+            name: 'gizmosRenderPass',
+            code: assets.shaders['gizmosRenderPass.wgsl'],
+            canvas: canvas,
+        });
+
         callback();
     }
 
@@ -144,14 +143,14 @@ class Graphics {
         if (this.forwardRenderPass) this.forwardRenderPass.Render(engine, commandEncoder);
         if (this.finalRenderPass) this.finalRenderPass.Render(engine, commandEncoder);
 
-        if (this.gizmosRenderPass) this.gizmosRenderPass.Render(engine, commandEncoder);
-
         if (this.ssaoRenderPass) this.ssaoRenderPass.Render(engine, commandEncoder);
         if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(engine, commandEncoder);
         if (this.bloomRenderPass) this.bloomRenderPass.Render(engine, commandEncoder);
         if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(engine, commandEncoder);
 
         if (this.debugRenderPass) this.debugRenderPass.Render(engine, commandEncoder);
+
+        if (this.gizmosRenderPass) this.gizmosRenderPass.Render(engine, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);
     }

@@ -1,13 +1,12 @@
 class GizmosRenderPass extends RenderPass {
 
     static {
-        this.color = Color.white;
+        this.color = Color.black;
         this.matrix = Matrix4x4.Identity();
     }
 
     Init(data) {
         this.canvas = data.canvas;
-        this.sceneTextureView = data.sceneTextureView;
 
         this.depthTexture = GPU.CreateTexture({
             size: [this.canvas.width, this.canvas.height],
@@ -44,7 +43,7 @@ class GizmosRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: 'rgba16float', }
+                    { format: 'bgra8unorm', }
                 ],
             },
             primitive: { topology: 'line-list' },
@@ -64,13 +63,12 @@ class GizmosRenderPass extends RenderPass {
         this.uniformValues.set(Camera.main.viewMatrix, 16);
         this.uniformValues.set(Camera.main.projectionMatrix, 32);
         this.uniformValues.set(GizmosRenderPass.color, 48);
-
         GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
 
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 {
-                    view: this.sceneTextureView,
+                    view: Graphics.context.getCurrentTexture().createView(),
                     loadOp: "load",
                     storeOp: "store",
                     clearValue: { r: 0, g: 0, b: 0, a: 1 },
@@ -94,6 +92,11 @@ class GizmosRenderPass extends RenderPass {
 
     SetMatrix(matrix4x4) {
         this.uniformValues.set(matrix4x4, 0);
+        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
+    }
+
+    SetColor(color) {
+        this.uniformValues.set(color, 48);
         GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
     }
 
