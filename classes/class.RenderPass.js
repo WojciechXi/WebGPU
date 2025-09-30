@@ -23,12 +23,12 @@ class RenderPass {
 
     }
 
-    SetBindGroup(index, bindGroup) {
-        this.renderPass.setBindGroup(index, bindGroup);
-    }
-
     SetPipeline(renderPipeline) {
         this.renderPass.setPipeline(renderPipeline);
+    }
+
+    SetBindGroup(index, bindGroup) {
+        this.renderPass.setBindGroup(index, bindGroup);
     }
 
     SetVertexBuffer(slot, buffer) {

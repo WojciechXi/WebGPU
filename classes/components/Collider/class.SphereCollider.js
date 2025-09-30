@@ -6,7 +6,7 @@ class SphereCollider extends Collider {
     }
 
     get bounds() {
-        return new Bounds(this.worldCenter, Vector3.Multiply(Vector3.one, this.radius));
+        return new Bounds(this.worldCenter, Vector3.Multiply(this.transform.lossyScale, this.radius));
     }
 
     Intersects(otherCollider) {
@@ -80,6 +80,13 @@ class SphereCollider extends Collider {
         }
 
         return null;
+    }
+
+    Render(renderPass) {
+        if (renderPass.name == 'gizmosRenderPass') {
+            renderPass.SetBindGroup(1, this.gameObject.transformBindGroup);
+            if (window.meshes.sphere) window.meshes.sphere.Render(renderPass, 0, 'edge');
+        }
     }
 
 

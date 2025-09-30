@@ -16,6 +16,28 @@ class Graphics {
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
 
+        this.viewBindGroupLayout = GPU.device.createBindGroupLayout({
+            label: 'ViewBindGroupLayout',
+            entries: [
+                {
+                    binding: 0,
+                    visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+                    buffer: { type: 'uniform' },
+                }
+            ],
+        });
+
+        this.transformBindGroupLayout = GPU.device.createBindGroupLayout({
+            label: 'TransformBindGroupLayout',
+            entries: [
+                {
+                    binding: 0,
+                    visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+                    buffer: { type: 'uniform' },
+                }
+            ],
+        });
+
         const context = this.context = canvas.getContext('webgpu');
 
         context.configure({

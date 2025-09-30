@@ -3,13 +3,13 @@ class Engine {
     constructor(assets) {
         Engine.Instance = this;
         this.assets = assets;
-        this.scene = new Scene();
     }
 
     Init(callback) {
         let object = this;
 
         Graphics.Init(this.assets, function () {
+            object.scene = new Scene();
             callback(object);
             object.Start();
         });

@@ -6,7 +6,7 @@ class BoxCollider extends Collider {
     }
 
     get bounds() {
-        return new Bounds(Vector3.Add(this.transform.position, this.center), this.size);
+        return new Bounds(this.worldCenter, Vector3.Scale(this.size, this.transform.lossyScale));
     }
 
     Intersects(otherCollider) {
@@ -49,6 +49,13 @@ class BoxCollider extends Collider {
         }
 
         return null;
+    }
+
+    Render(renderPass) {
+        if (renderPass.name == 'gizmosRenderPass') {
+            renderPass.SetBindGroup(1, this.gameObject.transformBindGroup);
+            if (window.meshes.cube) window.meshes.cube.Render(renderPass, 0, 'edge');
+        }
     }
 
 

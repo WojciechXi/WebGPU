@@ -83,4 +83,11 @@ class CapsuleCollider extends Collider {
         return null;
     }
 
+    Render(renderPass) {
+        if (renderPass.name == 'gizmosRenderPass') {
+            renderPass.SetBindGroup(1, this.gameObject.transformBindGroup);
+            if (window.meshes.capsule) window.meshes.capsule.Render(renderPass, 0, 'edge');
+        }
+    }
+
 }

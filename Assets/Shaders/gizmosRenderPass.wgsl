@@ -1,8 +1,10 @@
-struct Uniforms {
-    modelMatrix : mat4x4f,
-    viewMatrix : mat4x4f,
-    projectionMatrix : mat4x4f,
-    color : vec4f,
+struct View {
+    matrix : mat4x4f,
+    projection : mat4x4f,
+};
+
+struct Transform {
+    matrix : mat4x4f,
 };
 
 struct Vertex {
@@ -18,15 +20,15 @@ struct VSOut {
     @location(0) color: vec4f,
 };
 
-@group(0) @binding(0)
-var<uniform> uniforms: Uniforms;
+@group(0) @binding(0) var<uniform> view: View;
+@group(1) @binding(0) var<uniform> transform: Transform;
 
 @vertex
 fn vs(vert: Vertex) -> VSOut {
     var vsOut: VSOut;
 
-    vsOut.clipPosition = uniforms.projectionMatrix * uniforms.viewMatrix * uniforms.modelMatrix * vec4f(vert.position, 1.0);
-    vsOut.color = uniforms.color;
+    vsOut.clipPosition = view.projection * view.matrix * transform.matrix * vec4f(vert.position, 1.0);
+    vsOut.color = vec4f(0, 0, 0, 1);
 
     return vsOut;
 }

@@ -1,10 +1,5 @@
 class GizmosRenderPass extends RenderPass {
 
-    static {
-        this.color = Color.black;
-        this.matrix = Matrix4x4.Identity();
-    }
-
     Init(data) {
         this.canvas = data.canvas;
 
@@ -15,14 +10,28 @@ class GizmosRenderPass extends RenderPass {
         });
         this.depthTextureView = this.depthTexture.createView();
 
-        this.uniformValues = new Float32Array(16 + 16 + 16 + 4);
+        this.uniformValues = new Float32Array(16 + 16);
         this.uniformBuffer = GPU.CreateBuffer({
             size: this.uniformValues.length * 4,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
+        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
+
+        this.transformValues = new Float32Array(16);
+        this.transformBuffer = GPU.CreateBuffer({
+            size: this.transformValues.length * 4,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+        GPU.Queue.writeBuffer(this.transformBuffer, 0, this.transformValues);
 
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: 'auto',
+            label: 'GizmosRenderPipeline',
+            layout: GPU.device.createPipelineLayout({
+                bindGroupLayouts: [
+                    Graphics.viewBindGroupLayout,
+                    Graphics.transformBindGroupLayout
+                ],
+            }),
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs",
@@ -50,19 +59,26 @@ class GizmosRenderPass extends RenderPass {
             depthStencil: { format: 'depth24plus', depthWriteEnabled: false, depthCompare: 'always' },
         });
 
-        this.bindGroup = GPU.CreateBindGroup({
-            layout: this.renderPipeline.getBindGroupLayout(0),
+        this.viewBindGroup = GPU.CreateBindGroup({
+            label: 'ViewBindGroup',
+            layout: Graphics.viewBindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
+            ],
+        });
+
+        this.transformBindGroup = GPU.CreateBindGroup({
+            label: 'TransformBindGroup',
+            layout: Graphics.transformBindGroupLayout,
+            entries: [
+                { binding: 0, resource: { buffer: this.transformBuffer } },
             ],
         });
     }
 
     Render(engine, commandEncoder) {
-        this.uniformValues.set(Matrix4x4.Identity(GizmosRenderPass.matrix), 0);
-        this.uniformValues.set(Camera.main.viewMatrix, 16);
-        this.uniformValues.set(Camera.main.projectionMatrix, 32);
-        this.uniformValues.set(GizmosRenderPass.color, 48);
+        this.uniformValues.set(Camera.main.viewMatrix, 0);
+        this.uniformValues.set(Camera.main.projectionMatrix, 16);
         GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
 
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
@@ -83,21 +99,13 @@ class GizmosRenderPass extends RenderPass {
         });
 
         renderPass.setPipeline(this.renderPipeline);
-        renderPass.setBindGroup(0, this.bindGroup);
+
+        renderPass.setBindGroup(0, this.viewBindGroup);
+        renderPass.setBindGroup(1, this.transformBindGroup);
 
         engine.Render(this);
 
         renderPass.end();
-    }
-
-    SetMatrix(matrix4x4) {
-        this.uniformValues.set(matrix4x4, 0);
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
-    }
-
-    SetColor(color) {
-        this.uniformValues.set(color, 48);
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
     }
 
 }
