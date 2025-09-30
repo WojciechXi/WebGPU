@@ -6,26 +6,8 @@ class Bounds {
         return new Bounds(center, size);
     }
 
-    static Contains(bounds, point) {
-        const min = bounds.min;
-        const max = bounds.max;
-
-        return (point.x >= min.x && point.x <= max.x &&
-            point.y >= min.y && point.y <= max.y &&
-            point.z >= min.z && point.z <= max.z);
-    }
-
-    static Intersects(bounds, other) {
-        const aMin = bounds.min, aMax = bounds.max;
-        const bMin = other.min, bMax = other.max;
-
-        return (aMin.x <= bMax.x && aMax.x >= bMin.x) &&
-            (aMin.y <= bMax.y && aMax.y >= bMin.y) &&
-            (aMin.z <= bMax.z && aMax.z >= bMin.z);
-    }
-
     constructor(center, size) {
-        this.center = center.Clone();
+        this.center = new Vector3(center.x, center.y, center.z);
         this.extends = Vector3.Multiply(size, 0.5);
     }
 
@@ -46,31 +28,46 @@ class Bounds {
     }
 
     Contains(point) {
-        return Bounds.Contains(this, point);
+        const min = this.min;
+        const max = this.max;
+
+        return (
+            point.x >= min.x &&
+            point.y >= min.y &&
+            point.z >= min.z &&
+            point.x <= max.x &&
+            point.y <= max.y &&
+            point.z <= max.z
+        );
     }
 
     Encapsulate(point) {
-        return Bounds.Encapsulate(this, point);
+        return null;
     }
 
     Expand(amount) {
-        return Bounds.Expand(this, amount);
+        return null;
     }
 
     IntersectRay(ray) {
-        return Bounds.IntersectRay(this, ray);
+        return null;
     }
 
-    Intersects(bounds) {
-        return Bounds.Intersects(this, bounds);
+    Intersects(otherBounds) {
+        const aMin = this.min, aMax = this.max;
+        const bMin = otherBounds.min, bMax = otherBounds.max;
+
+        return (aMin.x <= bMax.x && aMax.x >= bMin.x) &&
+            (aMin.y <= bMax.y && aMax.y >= bMin.y) &&
+            (aMin.z <= bMax.z && aMax.z >= bMin.z);
     }
 
     SetMinMax(min, max) {
-        return Bounds.SetMinMax(this, min, max);
+        return null;
     }
 
     SqrDistance(point) {
-        return Bounds.SqrDistance(this, point);
+        return null;
     }
 
 

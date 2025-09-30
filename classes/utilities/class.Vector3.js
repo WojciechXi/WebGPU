@@ -69,9 +69,9 @@ class Vector3 extends Float32Array {
     static Scale(a, b, dst = null) {
         dst = dst || new Vector3();
 
-        a[0] *= b[0];
-        a[1] *= b[1];
-        a[2] *= b[2];
+        dst[0] = a[0] * b[0];
+        dst[1] = a[1] * b[1];
+        dst[2] = a[2] * b[2];
 
         return dst;
     }

@@ -9,25 +9,25 @@ class BoxCollider extends Collider {
         return new Bounds(Vector3.Add(this.transform.position, this.center), this.size);
     }
 
-    Intersects(other) {
-        if (other instanceof BoxCollider) {
-            return this.bounds.Intersects(other.bounds);
-        } else if (other instanceof SphereCollider || other instanceof CapsuleCollider) {
-            return other.Intersects(this);
+    Intersects(otherCollider) {
+        if (otherCollider instanceof BoxCollider) {
+            return this.bounds.Intersects(otherCollider.bounds);
+        } else if (otherCollider instanceof SphereCollider || otherCollider instanceof CapsuleCollider) {
+            return otherCollider.Intersects(this);
         }
         return false;
     }
 
-    ComputePenetration(other) {
-        if (other instanceof BoxCollider) {
+    ComputePenetration(otherCollider) {
+        if (otherCollider instanceof BoxCollider) {
             let bounds = this.bounds;
-            let otherBounds = other.bounds;
+            let otherColliderBounds = otherCollider.bounds;
 
             const aMin = bounds.min;
             const aMax = bounds.max;
 
-            const bMin = otherBounds.min;
-            const bMax = otherBounds.max;
+            const bMin = otherColliderBounds.min;
+            const bMax = otherColliderBounds.max;
 
             // overlap po osiach
             const dx = Math.min(aMax.x, bMax.x) - Math.max(aMin.x, bMin.x);
@@ -44,8 +44,8 @@ class BoxCollider extends Collider {
                     return new Vector3(0, 0, aMax.z > bMax.z ? dz : -dz);
                 }
             }
-        } else if (other instanceof SphereCollider) {
-            return other.ComputePenetration(this);
+        } else if (otherCollider instanceof SphereCollider) {
+            return otherCollider.ComputePenetration(this);
         }
 
         return null;

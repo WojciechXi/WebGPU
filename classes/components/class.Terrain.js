@@ -1,6 +1,7 @@
 class Terrain extends Component {
 
     Init() {
+        this.size = new Vector3(100, 10, 100);
         this.resolution = 128;
         this.heights = new Float32Array(this.resolution * this.resolution);
 
@@ -23,10 +24,14 @@ class Terrain extends Component {
         const heights = [];
         for (let x = 0; x < this.resolution; x++) {
             for (let z = 0; z < this.resolution; z++) {
-                heights.push(perlinNoise.NoiseOctave(x * 0.0123, z * 0.0123, 8) * 8);
+                heights.push(perlinNoise.NoiseOctave(x * 0.0123, z * 0.0123, 8));
             }
         }
         this.SetHeights(0, 0, this.resolution, this.resolution, heights);
+    }
+
+    get bounds() {
+        return new Bounds(this.transform.position, Vector3.Scale(this.transform.lossyScale, this.size));
     }
 
     GetHeight(xLinear, zLinear) {
@@ -53,6 +58,9 @@ class Terrain extends Component {
             }
         }
 
+        this.mesh.RecalculateNormals();
+        this.mesh.RecalculateTangents();
+        this.mesh.RecalculateBounds();
         this.mesh.Update();
     }
 
@@ -62,12 +70,11 @@ class Terrain extends Component {
         const tangents = [];
         const uvs = [];
 
-        const halfResolution = this.resolution / 2;
         for (let x = 0; x < this.resolution; x++) {
             for (let z = 0; z < this.resolution; z++) {
                 const index = (x) + (z) * this.resolution;
 
-                vertices.push(new Vector3(x - halfResolution, this.heights[index], z - halfResolution));
+                vertices.push(new Vector3(x / (this.resolution - 1), this.heights[index], z / (this.resolution - 1)));
                 normals.push(Vector3.up);
                 tangents.push(new Vector4(1, 0, 0, 1));
                 uvs.push(new Vector2(x, z));
@@ -111,10 +118,12 @@ class Terrain extends Component {
 
         if (renderPass.name === 'shadowRenderPass') {
             if (this.castShadows) {
-                Graphics.DrawMesh(renderPass, this.mesh, this.transform.matrix4x4, this.material, 0, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix);
+                const matrix4x4 = Matrix4x4.TRS(this.transform.position, this.transform.rotation, Vector3.Scale(this.transform.lossyScale, this.size));
+                Graphics.DrawMesh(renderPass, this.mesh, matrix4x4, this.material, 0, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix);
             }
         } else {
-            Graphics.DrawMesh(renderPass, this.mesh, this.transform.matrix4x4, this.material, 0, Camera.main.viewMatrix, Camera.main.projectionMatrix);
+            const matrix4x4 = Matrix4x4.TRS(this.transform.position, this.transform.rotation, Vector3.Scale(this.transform.lossyScale, this.size));
+            Graphics.DrawMesh(renderPass, this.mesh, matrix4x4, this.material, 0, Camera.main.viewMatrix, Camera.main.projectionMatrix);
         }
     }
 

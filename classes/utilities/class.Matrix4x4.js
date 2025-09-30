@@ -304,34 +304,45 @@ class Matrix4x4 extends Float32Array {
     }
 
     /** Z translacji, rotacji (quaternion) i skali */
-    static TRS(position, rotation, scale, dst) {
+    static TRS(position, rotation, scale, dst = null) {
         dst = dst || new Matrix4x4();
-        Matrix4x4.Identity(dst);
 
-        // skala
-        Matrix4x4.Scale(dst, scale, dst);
-
-        // rotacja
+        // --- ROTACJA Z KWATERNIONU ---
         const [x, y, z, w] = rotation;
         const xx = x * x, yy = y * y, zz = z * z;
         const xy = x * y, xz = x * z, yz = y * z;
         const wx = w * x, wy = w * y, wz = w * z;
 
-        dst[0] = 1 - 2 * (yy + zz);
-        dst[1] = 2 * (xy + wz);
-        dst[2] = 2 * (xz - wy);
+        // macierz rotacji (bez skali)
+        let r00 = 1 - 2 * (yy + zz);
+        let r01 = 2 * (xy + wz);
+        let r02 = 2 * (xz - wy);
+
+        let r10 = 2 * (xy - wz);
+        let r11 = 1 - 2 * (xx + zz);
+        let r12 = 2 * (yz + wx);
+
+        let r20 = 2 * (xz + wy);
+        let r21 = 2 * (yz - wx);
+        let r22 = 1 - 2 * (xx + yy);
+
+        // --- ROTACJA * SKALA ---
+        dst[0] = r00 * scale.x;
+        dst[1] = r01 * scale.x;
+        dst[2] = r02 * scale.x;
         dst[3] = 0;
 
-        dst[4] = 2 * (xy - wz);
-        dst[5] = 1 - 2 * (xx + zz);
-        dst[6] = 2 * (yz + wx);
+        dst[4] = r10 * scale.y;
+        dst[5] = r11 * scale.y;
+        dst[6] = r12 * scale.y;
         dst[7] = 0;
 
-        dst[8] = 2 * (xz + wy);
-        dst[9] = 2 * (yz - wx);
-        dst[10] = 1 - 2 * (xx + yy);
+        dst[8] = r20 * scale.z;
+        dst[9] = r21 * scale.z;
+        dst[10] = r22 * scale.z;
         dst[11] = 0;
 
+        // --- TRANSLACJA ---
         dst[12] = position.x;
         dst[13] = position.y;
         dst[14] = position.z;

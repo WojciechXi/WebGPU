@@ -27,52 +27,52 @@ class CapsuleCollider extends Collider {
         return Vector3.Add(this.worldCenter, new Vector3(0, -this.height * 0.5, 0));
     }
 
-    Intersects(other) {
-        if (other instanceof SphereCollider) {
+    Intersects(otherCollider) {
+        if (otherCollider instanceof SphereCollider) {
             // Najbliższy punkt segmentu kapsuły do sfery
-            const position = other.transform.position;
+            const position = otherCollider.transform.position;
             const top = this.GetTop();
             const bottom = this.GetBottom();
             const closest = CapsuleCollider.ClosestPointOnSegment(bottom, top, position);
             const delta = Vector3.Subtract(position, closest);
 
-            return delta.SqrMagnitude() <= other.radius * other.radius;
-        } else if (other instanceof CapsuleCollider) {
+            return delta.SqrMagnitude() <= otherCollider.radius * otherCollider.radius;
+        } else if (otherCollider instanceof CapsuleCollider) {
             // Prosta kolizja capsule-capsule: dystans między segmentami < sum radius
             const aTop = this.GetTop();
             const aBottom = this.GetBottom();
-            const bTop = other.GetTop();
-            const bBottom = other.GetBottom();
+            const bTop = otherCollider.GetTop();
+            const bBottom = otherCollider.GetBottom();
 
             const closestA = CapsuleCollider.ClosestPointOnSegment(aBottom, aTop, bBottom);
             const closestB = CapsuleCollider.ClosestPointOnSegment(bBottom, bTop, closestA);
 
             const delta = Vector3.Subtract(closestA, closestB);
-            return delta.SqrMagnitude() <= (this.radius + other.radius) ** 2;
-        } else if (other instanceof BoxCollider) {
+            return delta.SqrMagnitude() <= (this.radius + otherCollider.radius) ** 2;
+        } else if (otherCollider instanceof BoxCollider) {
 
         }
         return false;
     }
 
-    ComputePenetration(other) {
-        if (other instanceof CapsuleCollider && this.axis === 'Y' && other.axis === 'Y') {
+    ComputePenetration(otherCollider) {
+        if (otherCollider instanceof CapsuleCollider && this.axis === 'Y' && otherCollider.axis === 'Y') {
             const position = this.transform.position;
-            const otherPosition = other.transform.position;
+            const otherColliderPosition = otherCollider.transform.position;
 
             const p1a = Vector3.Add(position, new Vector3(0, this.height / 2 - this.radius, 0));
             const p2a = Vector3.Subtract(position, new Vector3(0, this.height / 2 - this.radius, 0));
 
-            const p1b = Vector3.Add(otherPosition, new Vector3(0, other.height / 2 - other.radius, 0));
-            const p2b = Vector3.Subtract(otherPosition, new Vector3(0, other.height / 2 - other.radius, 0));
+            const p1b = Vector3.Add(otherColliderPosition, new Vector3(0, otherCollider.height / 2 - otherCollider.radius, 0));
+            const p2b = Vector3.Subtract(otherColliderPosition, new Vector3(0, otherCollider.height / 2 - otherCollider.radius, 0));
 
             // najbliższe punkty między odcinkami
-            const closestA = Vector3.ClosestPointOnSegment(p1a, p2a, otherPosition);
+            const closestA = Vector3.ClosestPointOnSegment(p1a, p2a, otherColliderPosition);
             const closestB = Vector3.ClosestPointOnSegment(p1b, p2b, position);
 
             const delta = Vector3.Subtract(closestA, closestB);
             const dist = delta.Magnitude();
-            const minDist = this.radius + other.radius;
+            const minDist = this.radius + otherCollider.radius;
 
             if (dist < minDist) {
                 const normal = dist > 0 ? delta.Normalize() : new Vector3(1, 0, 0);

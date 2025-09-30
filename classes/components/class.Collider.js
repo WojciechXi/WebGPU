@@ -21,15 +21,15 @@ class Collider extends Component {
         return new Bounds(this.worldCenter, Vector3.zero);
     }
 
-    OnCollisionEnter(other) { }
-    OnCollisionStay(other) { }
-    OnCollisionExit(other) { }
+    OnCollisionEnter(otherCollider) { }
+    OnCollisionStay(otherCollider) { }
+    OnCollisionExit(otherCollider) { }
 
-    Intersects(other) {
+    Intersects(otherCollider) {
         return false;
     }
 
-    ComputePenetration(other) {
+    ComputePenetration(otherCollider) {
         return null;
     }
 
@@ -41,20 +41,20 @@ class Collider extends Component {
     UpdateC() {
         const newColliding = new Set();
 
-        for (const other of Collider.colliders) {
-            if (other === this) continue;
-            if (this.Intersects(other)) newColliding.add(other);
+        for (const otherCollider of Collider.colliders) {
+            if (otherCollider === this) continue;
+            if (this.Intersects(otherCollider)) newColliding.add(otherCollider);
         }
 
         // OnCollisionEnter
-        for (const other of newColliding) {
-            if (!this._collidingWith.has(other)) this.OnCollisionEnter(other);
-            else this.OnCollisionStay(other);
+        for (const otherCollider of newColliding) {
+            if (!this._collidingWith.has(otherCollider)) this.OnCollisionEnter(otherCollider);
+            else this.OnCollisionStay(otherCollider);
         }
 
         // OnCollisionExit
-        for (const other of this._collidingWith) {
-            if (!newColliding.has(other)) this.OnCollisionExit(other);
+        for (const otherCollider of this._collidingWith) {
+            if (!newColliding.has(otherCollider)) this.OnCollisionExit(otherCollider);
         }
 
         this._collidingWith = newColliding;
