@@ -137,7 +137,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        debugRenderPass.textureView = tonemappingRenderPass.sceneTextureView;
+        debugRenderPass.textureView = lightingRenderPass.sceneTextureView;
 
         const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
             name: 'gizmosRenderPass',

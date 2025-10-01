@@ -272,12 +272,12 @@ window.addEventListener('load', async function (event) {
             ambientLight.color.Set(0.5, 0.75, 1, 0.2);
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
-            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(-30, 0, -30);
+            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(30, 0, 0);
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
 
             const cameraGameObject = new GameObject('Camera');
-            cameraGameObject.transform.position = new Vector3(0, 0, 5);
+            cameraGameObject.transform.position = new Vector3(0, 1, -10);
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 

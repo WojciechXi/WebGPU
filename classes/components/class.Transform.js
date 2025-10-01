@@ -108,7 +108,6 @@ class Transform extends Component {
 
     get forward() {
         const m = this.matrix4x4;
-        // Unity forward = -Z
         const v = new Vector3(m[8], m[9], m[10]);
         return v.Normalize();
     }

@@ -4,41 +4,13 @@ class Matrix4x4 extends Float32Array {
         return Matrix4x4.Ortho(0, width, height, 0, depth, -depth, dst);
     }
 
-    static RHPerspective(fieldOfViewYInRadians, aspect, zNear, zFar, dst) {
-        dst = dst || new Matrix4x4();
-
-        const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
-        const rangeInv = 1 / (zNear - zFar);
-
-        dst[0] = f / aspect;
-        dst[1] = 0;
-        dst[2] = 0;
-        dst[3] = 0;
-
-        dst[4] = 0;
-        dst[5] = f;
-        dst[6] = 0;
-        dst[7] = 0;
-
-        dst[8] = 0;
-        dst[9] = 0;
-        dst[10] = zFar * rangeInv;
-        dst[11] = -1;
-
-        dst[12] = 0;
-        dst[13] = 0;
-        dst[14] = zNear * zFar * rangeInv;
-        dst[15] = 0;
-
-        return dst;
-    }
-
     static Perspective(fieldOfViewYInRadians, aspect, zNear, zFar, dst) {
         dst = dst || new Matrix4x4();
 
-        const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
-        const rangeInv = 1 / (zFar - zNear); // uwaga: kolejność odwrotna względem RH
+        const f = 1.0 / Math.tan(fieldOfViewYInRadians / 2.0);
+        const rangeInv = 1 / (zFar - zNear);
 
+        // kolumnowo
         dst[0] = f / aspect;
         dst[1] = 0;
         dst[2] = 0;
@@ -52,37 +24,41 @@ class Matrix4x4 extends Float32Array {
         dst[8] = 0;
         dst[9] = 0;
         dst[10] = zFar * rangeInv;
-        dst[11] = 1; // zamiast -1
+        dst[11] = 1;   // +1 zamiast -1
 
         dst[12] = 0;
         dst[13] = 0;
-        dst[14] = -zNear * zFar * rangeInv; // znak zmieniony
+        dst[14] = -zNear * zFar * rangeInv;
         dst[15] = 0;
 
         return dst;
     }
 
-    static Ortho(left, right, bottom, top, near, far, dst) {
+    static Ortho(left, right, bottom, top, zNear, zFar, dst) {
         dst = dst || new Matrix4x4();
 
-        dst[0] = 2 / (right - left);
+        const rlInv = 1 / (right - left);
+        const tbInv = 1 / (top - bottom);
+        const fnInv = 1 / (zFar - zNear);
+
+        dst[0] = 2 * rlInv;
         dst[1] = 0;
         dst[2] = 0;
         dst[3] = 0;
 
         dst[4] = 0;
-        dst[5] = 2 / (top - bottom);
+        dst[5] = 2 * tbInv;
         dst[6] = 0;
         dst[7] = 0;
 
         dst[8] = 0;
         dst[9] = 0;
-        dst[10] = 1 / (near - far);
+        dst[10] = fnInv;
         dst[11] = 0;
 
-        dst[12] = (right + left) / (left - right);
-        dst[13] = (top + bottom) / (bottom - top);
-        dst[14] = near / (near - far);
+        dst[12] = -(right + left) * rlInv;
+        dst[13] = -(top + bottom) * tbInv;
+        dst[14] = -zNear * fnInv;  // LH -> -zNear
         dst[15] = 1;
 
         return dst;

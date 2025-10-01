@@ -60,6 +60,7 @@ class Shader {
                     depthCompare: "less"
                 },
                 primitive: {
+                    topology: "triangle-list",
                     cullMode: 'back',
                     frontFace: 'ccw',
                 },
@@ -104,6 +105,7 @@ class Shader {
                     depthCompare: "less"
                 },
                 primitive: {
+                    topology: "triangle-list",
                     cullMode: 'back',
                     frontFace: 'ccw',
                 },
