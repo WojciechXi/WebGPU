@@ -7,7 +7,7 @@ class VoxelChunkData {
     }
 
     static Index(x, y, z) {
-        let index = x + y * this.resolution + z * this.area;
+        let index = (this.resolution * this.resolution * z) + (this.resolution * y) + x;
         return index >= 0 && index < this.volume ? index : -1;
     }
 

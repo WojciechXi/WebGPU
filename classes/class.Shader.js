@@ -105,7 +105,7 @@ class Shader {
                 },
                 primitive: {
                     cullMode: 'back',
-                    frontFace: 'ccw',
+                    frontFace: 'cw',
                 },
             });
         }
