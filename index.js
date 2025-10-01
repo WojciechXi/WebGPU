@@ -301,32 +301,12 @@ window.addEventListener('load', async function (event) {
                 Physics.simulate = true;
             }, 1000);
 
-            let go = new GameObject(window.meshes.sphere.name);
-            go.transform.position = new Vector3(0, 2, 0);
-            go.transform.rotation = Quaternion.FromEuler(0, 45, 0);
-            let boxCollider = go.AddComponent(SphereCollider);
-            let rigidbody = go.AddComponent(Rigidbody);
+            let go = new GameObject('Voxel Chunk');
             let meshRenderer = go.AddComponent(MeshRenderer);
-            meshRenderer.mesh = window.meshes.sphere;
             meshRenderer.materials = [goldMaterial];
-
-            go = new GameObject(window.meshes.cube.name);
-            go.transform.position = new Vector3(-1, 0, 0);
-            go.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-            go.transform.localScale = new Vector3(4, 1, 4);
-            boxCollider = go.AddComponent(BoxCollider);
-            meshRenderer = go.AddComponent(MeshRenderer);
-            meshRenderer.mesh = window.meshes.cube;
-            meshRenderer.materials = [whiteMaterial];
-
-            go = new GameObject(window.meshes.capsule.name);
-            go.transform.position = new Vector3(2, 0, 0);
-            go.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-            go.transform.localScale = new Vector3(1, 1, 1);
-            boxCollider = go.AddComponent(CapsuleCollider);
-            meshRenderer = go.AddComponent(MeshRenderer);
-            meshRenderer.mesh = window.meshes.capsule;
-            meshRenderer.materials = [beigeMaterial];
+            let voxelChunk = go.AddComponent(VoxelChunk);
+            voxelChunk.Generate();
+            voxelChunk.BuildMesh();
 
             // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
             //     const gameObject = new GameObject('Krakow');

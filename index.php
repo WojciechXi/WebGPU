@@ -69,6 +69,9 @@
 
     <script src="./classes/components/class.Test.js"></script>
 
+    <script src="./classes/systems/voxel/data/class.VoxelChunkData.js"></script>
+    <script src="./classes/systems/voxel/class.VoxelChunk.js"></script>
+
     <script src="./classes/class.Engine.js"></script>
 
     <script src="./index.js"></script>
