@@ -4,7 +4,7 @@ class Matrix4x4 extends Float32Array {
         return Matrix4x4.Ortho(0, width, height, 0, depth, -depth, dst);
     }
 
-    static Perspective(fieldOfViewYInRadians, aspect, zNear, zFar, dst) {
+    static RHPerspective(fieldOfViewYInRadians, aspect, zNear, zFar, dst) {
         dst = dst || new Matrix4x4();
 
         const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
@@ -28,6 +28,35 @@ class Matrix4x4 extends Float32Array {
         dst[12] = 0;
         dst[13] = 0;
         dst[14] = zNear * zFar * rangeInv;
+        dst[15] = 0;
+
+        return dst;
+    }
+
+    static Perspective(fieldOfViewYInRadians, aspect, zNear, zFar, dst) {
+        dst = dst || new Matrix4x4();
+
+        const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
+        const rangeInv = 1 / (zFar - zNear); // uwaga: kolejność odwrotna względem RH
+
+        dst[0] = f / aspect;
+        dst[1] = 0;
+        dst[2] = 0;
+        dst[3] = 0;
+
+        dst[4] = 0;
+        dst[5] = f;
+        dst[6] = 0;
+        dst[7] = 0;
+
+        dst[8] = 0;
+        dst[9] = 0;
+        dst[10] = zFar * rangeInv;
+        dst[11] = 1; // zamiast -1
+
+        dst[12] = 0;
+        dst[13] = 0;
+        dst[14] = -zNear * zFar * rangeInv; // znak zmieniony
         dst[15] = 0;
 
         return dst;
