@@ -62,7 +62,7 @@ class Shader {
                 primitive: {
                     topology: "triangle-list",
                     cullMode: 'back',
-                    frontFace: 'ccw',
+                    frontFace: 'cw',
                 },
             });
         }
@@ -107,7 +107,7 @@ class Shader {
                 primitive: {
                     topology: "triangle-list",
                     cullMode: 'back',
-                    frontFace: 'ccw',
+                    frontFace: 'cw',
                 },
             });
         }
