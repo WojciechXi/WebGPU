@@ -6,6 +6,11 @@ class VoxelChunkData {
         this.volume = parseInt(Math.pow(this.resolution, 3));
     }
 
+    static Index(x, y, z) {
+        let index = x + y * this.resolution + z * this.area;
+        return index >= 0 && index < this.volume ? index : -1;
+    }
+
     constructor() {
         this.voxels = new Uint16Array(VoxelChunkData.volume);
     }

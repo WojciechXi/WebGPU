@@ -9,6 +9,25 @@ class Quaternion extends Float32Array {
         return dst;
     }
 
+    static MultiplyVector3(q, v, dst = null) {
+        dst = dst || new Vector3();
+
+        const x = v[0], y = v[1], z = v[2];
+        const qx = q[0], qy = q[1], qz = q[2], qw = q[3];
+
+        // t = 2 * cross(q.xyz, v)
+        const tx = 2 * (qy * z - qz * y);
+        const ty = 2 * (qz * x - qx * z);
+        const tz = 2 * (qx * y - qy * x);
+
+        // v' = v + qw * t + cross(q.xyz, t)
+        dst[0] = x + qw * tx + (qy * tz - qz * ty);
+        dst[1] = y + qw * ty + (qz * tx - qx * tz);
+        dst[2] = z + qw * tz + (qx * ty - qy * tx);
+
+        return dst;
+    }
+
     static Inverse(q, dst = null) {
         dst = dst || new Quaternion();
 
