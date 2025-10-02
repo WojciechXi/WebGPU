@@ -39,6 +39,9 @@ window.addEventListener('load', async function (event) {
             const litShader = new Shader(assets.shaders['Lit.wgsl']);
             litShader.Compile();
 
+            const terrainLitShader = new Shader(assets.shaders['TerrainLit.wgsl']);
+            terrainLitShader.Compile();
+
             const foliageShader = new Shader(assets.shaders['Foliage.wgsl']);
             foliageShader.Compile();
 
@@ -155,7 +158,7 @@ window.addEventListener('load', async function (event) {
 
             const terrainMaterial = new Material({
                 name: 'Terrain',
-                shader: litShader,
+                shader: terrainLitShader,
             });
             loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_Color.jpg', function (albedo) {
                 loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_Normal.jpg', function (normal) {
@@ -269,20 +272,21 @@ window.addEventListener('load', async function (event) {
             };
 
             const ambientLight = engine.scene.AddComponent(AmbientLight);
-            ambientLight.color.Set(0.5, 0.75, 1, 0.2);
+            ambientLight.color.Set(0.8, 0.9, 1, 0.25);
 
             const directionalLightGameObject = new GameObject('DirectionalLight');
-            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(45, 0, 0);
+            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(45, 0, 15);
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
+            directionalLight.color.Set(1, 1, 1, 1);
 
             const cameraGameObject = new GameObject('Camera');
-            cameraGameObject.transform.position = new Vector3(0, 1, -10);
+            cameraGameObject.transform.position = new Vector3(0, 1, -5);
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
             // const terrainGameObject = new GameObject('Terrain');
-            // terrainGameObject.transform.position = new Vector3(-50, 0, -50);
+            // terrainGameObject.transform.position = new Vector3(50, 0, -50);
             // let terrain = terrainGameObject.AddComponent(Terrain);
             // let terrainCollider = terrainGameObject.AddComponent(TerrainCollider);
             // terrain.material = terrainMaterial;
@@ -305,6 +309,14 @@ window.addEventListener('load', async function (event) {
             // let meshRenderer = go.AddComponent(MeshRenderer);
             // meshRenderer.materials = [goldMaterial];
             // let voxelChunk = go.AddComponent(VoxelChunk);
+            // voxelChunk.Generate();
+            // voxelChunk.BuildMesh();
+
+            // go = new GameObject('Voxel Chunk');
+            // go.transform.position = new Vector3(VoxelChunkData.resolution, 0, 0);
+            // meshRenderer = go.AddComponent(MeshRenderer);
+            // meshRenderer.materials = [whiteMaterial];
+            // voxelChunk = go.AddComponent(VoxelChunk);
             // voxelChunk.Generate();
             // voxelChunk.BuildMesh();
 

@@ -104,7 +104,7 @@ fn vs(vert: Vertex) -> VSOut {
   vsOut.worldTangent = T;
   vsOut.worldBitangent = B;
   vsOut.worldNormal = N;
-  vsOut.uv = vert.uv; 
+  vsOut.uv = vec2f(worldPosition.x, worldPosition.z); 
   
   return vsOut;
 }

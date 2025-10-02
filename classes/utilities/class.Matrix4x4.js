@@ -4,13 +4,40 @@ class Matrix4x4 extends Float32Array {
         return Matrix4x4.Ortho(0, width, height, 0, depth, -depth, dst);
     }
 
+    static PerspectiveLH(fieldOfViewYInRadians, aspect, zNear, zFar, dst) {
+        dst = dst || new Matrix4x4();
+
+        const f = 1.0 / Math.tan(fieldOfViewYInRadians * 0.5);
+
+        dst[0] = f / aspect;
+        dst[1] = 0;
+        dst[2] = 0;
+        dst[3] = 0;
+
+        dst[4] = 0;
+        dst[5] = f;
+        dst[6] = 0;
+        dst[7] = 0;
+
+        dst[8] = 0;
+        dst[9] = 0;
+        dst[10] = zFar / (zFar - zNear);
+        dst[11] = 1;
+
+        dst[12] = 0;
+        dst[13] = 0;
+        dst[14] = -zNear * zFar / (zFar - zNear);
+        dst[15] = 0;
+
+        return dst;
+    }
+
     static Perspective(fieldOfViewYInRadians, aspect, zNear, zFar, dst) {
         dst = dst || new Matrix4x4();
 
-        const f = 1.0 / Math.tan(fieldOfViewYInRadians / 2.0);
-        const rangeInv = 1 / (zFar - zNear);
+        const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
+        const rangeInv = 1 / (zNear - zFar);
 
-        // kolumnowo
         dst[0] = f / aspect;
         dst[1] = 0;
         dst[2] = 0;
@@ -24,41 +51,63 @@ class Matrix4x4 extends Float32Array {
         dst[8] = 0;
         dst[9] = 0;
         dst[10] = zFar * rangeInv;
-        dst[11] = 1;   // +1 zamiast -1
+        dst[11] = -1;
 
         dst[12] = 0;
         dst[13] = 0;
-        dst[14] = -zNear * zFar * rangeInv;
+        dst[14] = zNear * zFar * rangeInv;
         dst[15] = 0;
 
         return dst;
     }
 
-    static Ortho(left, right, bottom, top, zNear, zFar, dst) {
+    static OrthoLH(left, right, bottom, top, near, far, dst) {
         dst = dst || new Matrix4x4();
 
-        const rlInv = 1 / (right - left);
-        const tbInv = 1 / (top - bottom);
-        const fnInv = 1 / (zFar - zNear);
-
-        dst[0] = 2 * rlInv;
+        dst[0] = 2 / (right - left);
         dst[1] = 0;
         dst[2] = 0;
         dst[3] = 0;
 
         dst[4] = 0;
-        dst[5] = 2 * tbInv;
+        dst[5] = 2 / (top - bottom);
         dst[6] = 0;
         dst[7] = 0;
 
         dst[8] = 0;
         dst[9] = 0;
-        dst[10] = fnInv;
+        dst[10] = 1 / (far - near);    // <-- UWAGA: far - near (a nie near - far)
         dst[11] = 0;
 
-        dst[12] = -(right + left) * rlInv;
-        dst[13] = -(top + bottom) * tbInv;
-        dst[14] = -zNear * fnInv;  // LH -> -zNear
+        dst[12] = (left + right) / (left - right);
+        dst[13] = (top + bottom) / (bottom - top);
+        dst[14] = -near / (far - near); // <-- DirectX LH konwencja
+        dst[15] = 1;
+
+        return dst;
+    }
+
+    static Ortho(left, right, bottom, top, near, far, dst) {
+        dst = dst || new Matrix4x4();
+
+        dst[0] = 2 / (right - left);
+        dst[1] = 0;
+        dst[2] = 0;
+        dst[3] = 0;
+
+        dst[4] = 0;
+        dst[5] = 2 / (top - bottom);
+        dst[6] = 0;
+        dst[7] = 0;
+
+        dst[8] = 0;
+        dst[9] = 0;
+        dst[10] = 1 / (near - far);
+        dst[11] = 0;
+
+        dst[12] = (right + left) / (left - right);
+        dst[13] = (top + bottom) / (bottom - top);
+        dst[14] = near / (near - far);
         dst[15] = 1;
 
         return dst;

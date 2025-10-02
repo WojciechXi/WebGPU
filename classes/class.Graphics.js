@@ -103,10 +103,6 @@ class Graphics {
             gBufferRenderPass: gBufferRenderPass,
             inputTextureView: this.sceneTextureView,
             canvas: canvas,
-            radius: 0.125,
-            bias: 0.1,
-            blurRadius: 2,
-            sigmaDepth: 0.3,
         });
 
         // const screenSpaceReflectionRenderPass = this.screenSpaceReflectionRenderPass = new ScreenSpaceReflectionRenderPass({
@@ -137,7 +133,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        debugRenderPass.textureView = lightingRenderPass.sceneTextureView;
+        debugRenderPass.textureView = tonemappingRenderPass.sceneTextureView;
 
         const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
             name: 'gizmosRenderPass',

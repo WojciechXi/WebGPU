@@ -41,10 +41,10 @@ fn fs(vsOut: VSOut) -> FSOut {
 
     let uv = vsOut.uv;
     let worldPos = textureSample(worldPositionTex, screenSampler, uv).xyz;
-    let normal = normalize(textureSample(worldNormalTex, screenSampler, uv).xyz);
+    let worldNormal = normalize(textureSample(worldNormalTex, screenSampler, uv).xyz * 2.0 - 1.0);
 
     let viewDir = normalize(uniforms.cameraPosition - worldPos);
-    let reflectDir = reflect(-viewDir, normal);
+    let reflectDir = reflect(-viewDir, worldNormal);
 
     // Project initial position to screen space (NDC)
     var screenUV = uv;
@@ -71,7 +71,7 @@ fn fs(vsOut: VSOut) -> FSOut {
     }
 
     // Fresnel / blend factor (optional)
-    let fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 5.0);
+    let fresnel = pow(1.0 - max(dot(worldNormal, viewDir), 0.0), 5.0);
 
     let baseColor = textureSample(sceneTexture, screenSampler, uv).rgb;
     let finalColor = mix(baseColor, reflectionColor, fresnel);

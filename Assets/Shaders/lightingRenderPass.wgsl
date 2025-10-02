@@ -1,3 +1,7 @@
+fn lerp(a:f32, b:f32, t:f32) -> f32 {
+    return a + (b-a) * t;
+}
+
 fn transpose3(m: mat3x3f) -> mat3x3f {
     return mat3x3f(
         vec3f(m[0][0], m[1][0], m[2][0]),
@@ -72,7 +76,7 @@ fn inverse4(m : mat4x4f) -> mat4x4f {
 }
 
 // 3x3 PCF shadow sample
-fn sampleShadow(shadowUV: vec2f, depth: f32, radius: i32) -> f32 {
+fn sampleShadow(shadowUV: vec2f, depth: f32, radius: i32, bias: f32) -> f32 {
     if(shadowUV.x < 0 || shadowUV.y < 0 || shadowUV.x > 1 || shadowUV.y > 1) { return 1; }
 
     // textureDimensions returns integer vec2; rzutujemy na float
@@ -91,7 +95,7 @@ fn sampleShadow(shadowUV: vec2f, depth: f32, radius: i32) -> f32 {
             let sampleUV = clamp(shadowUV + offset, vec2f(0.0), vec2f(1.0));
             let depthSample = textureSample(shadowTexture, screenSampler, sampleUV).r;
             // simple depth compare with small bias
-            if (depth - 0.002 <= depthSample) {
+            if (depth - bias <= depthSample) {
                 shadow = shadow + 1.0;
             }
             total += 1.0;
@@ -143,21 +147,20 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
 fn fs(vsOut: VSOut) -> @location(0) vec4f {
     // --- world space dane z GBuffer ---
     let worldPosition4 = textureSample(worldPositionTexture, screenSampler, vsOut.uv);
-    let worldNormal   = normalize(textureSample(worldNormalTexture, screenSampler, vsOut.uv).xyz);
+    let worldNormal = normalize(textureSample(worldNormalTexture, screenSampler, vsOut.uv).xyz * 2.0 - 1.0);
     let color         = textureSample(colorTexture, screenSampler, vsOut.uv);
 
     let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv);
-    let roughness = clamp(pbr.r, 0.01, 0.8);
+    let roughness = clamp(pbr.r, 0.01, 0.5);
     let metallic  = clamp(pbr.g, 0.0, 1.0);
     let occlusion = clamp(pbr.b, 0.0, 1.0);
     let emission  = clamp(pbr.a, 0.0, 1.0);
-
+    
     // --- konwersja pozycji ---
     let worldPosition = worldPosition4.xyz / max(worldPosition4.w, 1e-6);
 
     // --- kamera ---
-    let cameraWorldPosition = inverse4(uni.viewMatrix)[3].xyz;
-    let viewDirection = normalize(worldPosition - cameraWorldPosition);
+    var cameraWorldPosition = inverse4(uni.viewMatrix)[3].xyz;
 
     // --- shadow mapping ---
     var lightClip = uni.lightProjectionMatrix * uni.lightViewMatrix * vec4f(worldPosition, 1.0);
@@ -166,33 +169,38 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     // --- końcowy kolor ---
 
     // mapowanie do UV
-    var shadowUV = lightNDC.xy * 0.5 + vec2f(0.5);
-    shadowUV.y = 1.0 - shadowUV.y;
+    let shadowUV = lightNDC.xy * 0.5 + vec2f(0.5);
 
     let lightDepth = lightNDC.z;
-
-    // PCF sample
-    var shadowVal = sampleShadow(shadowUV, lightDepth, 1);
+    
+    let cameraDistance = length(cameraWorldPosition - worldPosition);
+    var shadowVal = 1.0;
+    if(cameraDistance < 50){
+        let shadowFalloff = clamp((cameraDistance) / 50, 0, 1);
+        shadowVal = lerp(sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, 5, 0.002), shadowVal, shadowFalloff) + 0.25;
+    }
 
     // --- światło ---
     // kierunek w world space: forward = +Z (LH)
-    let lightDir = normalize((inverse4(uni.lightViewMatrix) * vec4f(0.0, 0.0, 1.0, 0.0)).xyz);
+    var lightDirection = normalize((inverse4(uni.lightViewMatrix) * vec4f(0.0, 0.0, 1.0, 0.0)).xyz);
 
     // --- diffuse ---
     let N = normalize(worldNormal);
-    let L = normalize(-lightDir);       // od powierzchni -> do światła
+    var V = normalize(cameraWorldPosition - worldPosition);
+    let L = normalize(-lightDirection); // od powierzchni -> do światła
     let diff = max(dot(N, L), 0.0);
 
     // --- specular ---
     let R = reflect(-L, N);
-    let spec = pow(max(dot(viewDirection, R), 0.0), 32.0);
+    let H = normalize(V + L);
+    let spec = pow(max(dot(N, H), 0.0), 1.0 / max(0.001, roughness));
     let F0 = mix(color.rgb, vec3f(1.0, 1.0, 1.0), metallic);
 
     // --- światła ---
     let lightColor   = uni.lightColor.rgb * uni.lightColor.a;
     let ambientColor = uni.ambientLightColor.rgb * uni.ambientLightColor.a;
 
-    let diffuse  = lightColor * color.rgb * diff * shadowVal;
+    let diffuse  = color.rgb * lightColor * diff * shadowVal;
     let specular = F0 * spec * (1.0 - roughness) * shadowVal;
     let ambient  = ambientColor * color.rgb * occlusion;
     let emissive = color.rgb * emission;

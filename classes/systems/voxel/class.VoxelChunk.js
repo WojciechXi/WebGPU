@@ -7,9 +7,18 @@ class VoxelChunk extends Component {
     }
 
     Generate() {
-        for (let i = 0; i < VoxelChunkData.volume; i++) {
-            this.voxelChunkData.voxels[i] = Math.random() > 0.5 ? 1 : 0;
-            // this.voxelChunkData.voxels[i] = 1;
+        let worldPosition = this.transform.position;
+        let perlinNoise = new PerlinNoise();
+        let halfResolution = VoxelChunkData.resolution / 2;
+        for (let x = 0; x < VoxelChunkData.resolution; x++) {
+            for (let z = 0; z < VoxelChunkData.resolution; z++) {
+                let noise = perlinNoise.Noise((worldPosition.x + x) / 12.34, (worldPosition.z + z) / 12.34) * halfResolution + halfResolution;
+                for (let y = 0; y < VoxelChunkData.resolution; y++) {
+                    if (y > noise) continue;
+                    let index = VoxelChunkData.Index(x, y, z);
+                    this.voxelChunkData.voxels[index] = 1;
+                }
+            }
         }
     }
 
@@ -48,15 +57,15 @@ class VoxelChunk extends Component {
                     let isForward = indexForward < 0 || this.voxelChunkData.voxels[indexForward];
                     let isBack = indexBack < 0 || this.voxelChunkData.voxels[indexBack];
 
-                    let position = new Vector3(x + 0.5, y + 0.5, -z + 0.5);
+                    let position = new Vector3(-x + 0.5, y + 0.5, z + 0.5);
 
-                    if (!isForward) this.Face(position, Quaternion.identity, vertices, uvs, triangles);
-                    // if (!isRight) this.Face(position, Quaternion.FromEuler(0, 0, 90), vertices, uvs, triangles);
-                    // if (!isBack) this.Face(position, Quaternion.FromEuler(0, 0, 180), vertices, uvs, triangles);
-                    // if (!isLeft) this.Face(position, Quaternion.FromEuler(0, 0, 270), vertices, uvs, triangles);
+                    if (!isBack) this.Face(position, Quaternion.FromEuler(0, 0, 0), vertices, uvs, triangles);
+                    if (!isRight) this.Face(position, Quaternion.FromEuler(0, 0, 90), vertices, uvs, triangles);
+                    if (!isForward) this.Face(position, Quaternion.FromEuler(0, 0, 180), vertices, uvs, triangles);
+                    if (!isLeft) this.Face(position, Quaternion.FromEuler(0, 0, 270), vertices, uvs, triangles);
 
-                    // if (!isUp) this.Face(position, Quaternion.FromEuler(270, 0, 0), vertices, uvs, triangles);
-                    // if (!isDown) this.Face(position, Quaternion.FromEuler(90, 0, 0), vertices, uvs, triangles);
+                    if (!isDown) this.Face(position, Quaternion.FromEuler(270, 0, 0), vertices, uvs, triangles);
+                    if (!isUp) this.Face(position, Quaternion.FromEuler(90, 0, 0), vertices, uvs, triangles);
                 }
             }
         }
@@ -74,27 +83,27 @@ class VoxelChunk extends Component {
     }
 
     Face(position, rotation, vertices, uvs, triangles) {
-        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(-0.5, -0.5, 0.5))));
+        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(-0.5, -0.5, -0.5))));
         uvs.push(Vector2.zero);
         triangles.push(vertices.length - 1);
 
-        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(-0.5, 0.5, 0.5))));
+        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(-0.5, 0.5, -0.5))));
         uvs.push(Vector2.up);
         triangles.push(vertices.length - 1);
 
-        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(0.5, -0.5, 0.5))));
+        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(0.5, -0.5, -0.5))));
         uvs.push(Vector2.right);
         triangles.push(vertices.length - 1);
 
-        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(-0.5, 0.5, 0.5))));
+        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(-0.5, 0.5, -0.5))));
         uvs.push(Vector2.up);
         triangles.push(vertices.length - 1);
 
-        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(0.5, 0.5, 0.5))));
+        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(0.5, 0.5, -0.5))));
         uvs.push(Vector2.one);
         triangles.push(vertices.length - 1);
 
-        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(0.5, -0.5, 0.5))));
+        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(0.5, -0.5, -0.5))));
         uvs.push(Vector2.right);
         triangles.push(vertices.length - 1);
     }

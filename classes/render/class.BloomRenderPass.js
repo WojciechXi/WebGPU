@@ -12,14 +12,14 @@ class BloomRenderPass extends RenderPass {
         this.brightTextureView = this.brightTexture.createView();
 
         this.blurTexture = GPU.CreateTexture({
-            size: [this.canvas.width / 2, this.canvas.height / 2],
+            size: [this.canvas.width / 4, this.canvas.height / 4],
             format: 'rgba16float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
         this.blurTextureView = this.blurTexture.createView();
 
         this.bloomTexture = GPU.CreateTexture({
-            size: [this.canvas.width / 2, this.canvas.height / 2],
+            size: [this.canvas.width / 4, this.canvas.height / 4],
             format: 'rgba16float',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });

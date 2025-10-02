@@ -31,7 +31,7 @@ struct FSOut {
 // Funkcja bright pass
 fn getBright(color: vec3f) -> vec3f {
   let brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-  return select(vec3f(0.0, 0.0, 0.0), color, brightness > 0.5);
+  return select(vec3f(0.0, 0.0, 0.0), color, brightness > 1.0);
 }
 
 @fragment
@@ -41,7 +41,7 @@ fn brightRenderPass(vsOut: VSOut) -> FSOut {
     let hdrColor = textureSample(bloomTexture, screenSampler, vsOut.uv).rgb;
     let bright = getBright(hdrColor);
 
-    fsOut.colorOut = vec4f(bright, 1.0);
+    fsOut.colorOut = vec4f(bright, 2.0);
 
     return fsOut;
 }
@@ -51,7 +51,7 @@ fn blurRenderPass(vsOut: VSOut) -> FSOut {
     var fsOut: FSOut;
 
     let texSize = vec2f(textureDimensions(bloomTexture));
-    let texOffset = vec2f(1.0 / texSize.x, 1.0 / texSize.y);
+    let texOffset = vec2f(1.0 / texSize.x, 1.0 / texSize.y) * 2.0;
 
     let weights = array<f32,7>(0.2, 0.15, 0.1, 0.05, 0.025, 0.0125, 0.00625);
     var result = textureSample(bloomTexture, screenSampler, vsOut.uv).rgb * weights[0];
@@ -70,7 +70,7 @@ fn bloomRenderPass(vsOut: VSOut) -> FSOut {
     var fsOut: FSOut;
 
     let texSize = vec2f(textureDimensions(bloomTexture));
-    let texOffset = vec2f(1.0 / texSize.x, 1.0 / texSize.y);
+    let texOffset = vec2f(1.0 / texSize.x, 1.0 / texSize.y) * 2.0;
 
     let weights = array<f32,7>(0.2, 0.15, 0.1, 0.05, 0.025, 0.0125025, 0.00625);
     var result = textureSample(bloomTexture, screenSampler, vsOut.uv).rgb * weights[0];

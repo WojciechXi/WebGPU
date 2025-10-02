@@ -2,7 +2,7 @@ class Terrain extends Component {
 
     Init() {
         this.size = new Vector3(100, 10, 100);
-        this.resolution = 128;
+        this.resolution = 256;
         this.heights = new Float32Array(this.resolution * this.resolution);
 
         this.receiveShadows = true;

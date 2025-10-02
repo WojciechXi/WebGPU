@@ -25,7 +25,7 @@ class Camera extends Component {
 
         Matrix4x4.Inverse(this.transform.matrix4x4, this.viewMatrix);
         Matrix4x4.Inverse(this.viewMatrix, this.inverseViewMatrix);
-        Matrix4x4.Perspective(Math.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
+        Matrix4x4.PerspectiveLH(Math.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
         Matrix4x4.Multiply(this.projectionMatrix, this.viewMatrix, this.viewProjectionMatrix);
         Matrix4x4.Inverse(this.viewProjectionMatrix, this.inverseViewProjectionMatrix);
     }

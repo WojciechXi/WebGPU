@@ -5,13 +5,14 @@ class SSAORenderPass extends RenderPass {
         const gBufferRenderPass = this.gBufferRenderPass = data.gBufferRenderPass;
         const inputTextureView = this.inputTextureView = data.inputTextureView;
 
-        this.radius = data.radius ?? 0.25;
+        this.radius = data.radius ?? 0.5;
         this.bias = data.bias ?? 0.025;
+        this.strength = data.strength ?? 1;
         this.blurRadius = data.blurRadius ?? 4;
-        this.sigmaDepth = data.sigmaDepth ?? 0.2;
+        this.sigmaDepth = data.sigmaDepth ?? 0.3;
 
         this.ssaoTexture = GPU.CreateTexture({
-            size: [canvas.width, canvas.height],
+            size: [canvas.width / 2, canvas.height / 2],
             format: "r16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
@@ -40,8 +41,8 @@ class SSAORenderPass extends RenderPass {
 
         const noise = new Float32Array(16 * 4);
         for (let i = 0; i < 16; i++) {
-            noise[i * 4 + 0] = Math.random() * 2 - 1;
-            noise[i * 4 + 1] = Math.random() * 2 - 1;
+            noise[i * 4 + 0] = Math.random();
+            noise[i * 4 + 1] = Math.random();
             noise[i * 4 + 2] = 0;
             noise[i * 4 + 3] = 0;
         }
@@ -53,11 +54,11 @@ class SSAORenderPass extends RenderPass {
         this.noiseTextureView = this.noiseTexture.createView();
         GPU.Queue.writeTexture({ texture: this.noiseTexture }, noise, { bytesPerRow: 4 * 16 }, [4, 4, 1]);
 
-        this.ssaoKernel = this.GenerateKernel(32);
+        this.ssaoKernel = this.GenerateKernel(64);
 
         this.uniformValues = new Float32Array(this.ssaoKernel.length + 16 + 16 + 4 + 4);
         this.uniformValues.set(this.ssaoKernel, 0);
-        this.uniformValues.set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth], this.ssaoKernel.length + 32);
+        this.uniformValues.set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength], this.ssaoKernel.length + 32);
 
         this.uniformBuffer = GPU.CreateBuffer({
             size: this.uniformValues.length * 4,
@@ -65,16 +66,14 @@ class SSAORenderPass extends RenderPass {
         });
 
         this.sampler = GPU.CreateSampler({
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
-            magFilter: 'nearest',
-            minFilter: 'nearest',
-            mipmapFilter: 'nearest',
+            magFilter: 'linear',
+            minFilter: 'linear',
+            mipmapFilter: 'linear',
         });
 
         this.noiseSampler = GPU.CreateSampler({
-            magFilter: 'nearest',
-            minFilter: 'nearest',
+            magFilter: 'linear',
+            minFilter: 'linear',
         });
 
         this.ssaoRenderPipeline = GPU.CreateRenderPipeline({
@@ -180,7 +179,7 @@ class SSAORenderPass extends RenderPass {
     Render(engine, commandEncoder) {
         this.uniformValues.set(Camera.main.viewMatrix, this.ssaoKernel.length);
         this.uniformValues.set(Camera.main.projectionMatrix, this.ssaoKernel.length + 16);
-        this.uniformValues.set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth], this.ssaoKernel.length + 32);
+        this.uniformValues.set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength], this.ssaoKernel.length + 32);
 
         //ssaoRenderPass
         const ssaoRenderPass = commandEncoder.beginRenderPass({
@@ -233,7 +232,7 @@ class SSAORenderPass extends RenderPass {
                 Math.random()
             );
 
-            sample.Normalize(sample);
+            sample.Normalize();
             sample = Vector3.Multiply(sample, Math.random());
 
             kernel.push(sample[0], sample[1], sample[2], 0);
