@@ -193,7 +193,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     // --- specular ---
     let R = reflect(-L, N);
     let H = normalize(V + L);
-    let spec = pow(max(dot(N, H), 0.0), 1.0 / max(0.001, roughness));
+    let spec = pow(max(dot(H, N), 0.0), 1.0 / max(0.001, roughness));
     let F0 = mix(color.rgb, vec3f(1.0, 1.0, 1.0), metallic);
 
     // --- światła ---

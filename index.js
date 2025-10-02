@@ -278,7 +278,7 @@ window.addEventListener('load', async function (event) {
             directionalLightGameObject.transform.rotation = Quaternion.FromEuler(45, 0, 15);
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
-            directionalLight.color.Set(1, 1, 1, 1);
+            directionalLight.color.Set(1, 1, 1, 0.75);
 
             const cameraGameObject = new GameObject('Camera');
             cameraGameObject.transform.position = new Vector3(0, 1, -5);
@@ -320,10 +320,33 @@ window.addEventListener('load', async function (event) {
             // voxelChunk.Generate();
             // voxelChunk.BuildMesh();
 
-            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+            // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+            //     const gameObject = new GameObject('Krakow');
+            //     gameObject.transform.position = new Vector3(0, 0, 0);
+            //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+
+            //     for (const mesh of meshes) {
+            //         const meshGameObject = new GameObject(mesh.name);
+            //         meshGameObject.transform.SetParent(gameObject.transform);
+            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+
+            //         meshRenderer.mesh = mesh;
+            //         meshRenderer.materials = [];
+            //         mesh.subMeshes.forEach(function (subMesh) {
+            //             if (materials.hasOwnProperty(subMesh.material)) {
+            //                 meshRenderer.materials.push(materials[subMesh.material]);
+            //             } else {
+            //                 console.log(subMesh.material);
+            //                 meshRenderer.materials.push(whiteMaterial);
+            //             }
+            //         });
+            //     }
+            // });
+
+            Importer.GLTF('/Assets/Models', 'Odlegla.gltf', function (meshes, gltfMaterials) {
                 const gameObject = new GameObject('Krakow');
                 gameObject.transform.position = new Vector3(0, 0, 0);
-                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 180);
 
                 for (const mesh of meshes) {
                     const meshGameObject = new GameObject(mesh.name);
