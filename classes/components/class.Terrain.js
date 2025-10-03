@@ -144,12 +144,12 @@ class Terrain extends Component {
                 const indexForwardRight = (x + offset) + (z + offset) * this.resolution;
 
                 triangles.push(index);
-                triangles.push(indexRight);
                 triangles.push(indexForward);
+                triangles.push(indexRight);
 
-                triangles.push(indexForwardRight);
-                triangles.push(indexForward);
                 triangles.push(indexRight);
+                triangles.push(indexForward);
+                triangles.push(indexForwardRight);
             }
         }
         this.mesh.SetTriangles(triangles, lod);

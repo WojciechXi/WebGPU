@@ -273,7 +273,8 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Test);
 
             // const terrainGameObject = new GameObject('Terrain');
-            // terrainGameObject.transform.position = new Vector3(50, 0, -50);
+            // terrainGameObject.transform.position = new Vector3(-50, 0, -50);
+            // terrainGameObject.transform.localScale = new Vector3(100, 10, 100);
             // let terrain = terrainGameObject.AddComponent(Terrain);
             // let terrainCollider = terrainGameObject.AddComponent(TerrainCollider);
             // terrain.material = terrainMaterial;
@@ -294,7 +295,7 @@ window.addEventListener('load', async function (event) {
 
             // let go = new GameObject('Voxel Chunk');
             // let meshRenderer = go.AddComponent(MeshRenderer);
-            // meshRenderer.materials = [goldMaterial];
+            // meshRenderer.materials = [whiteMaterial];
             // let voxelChunk = go.AddComponent(VoxelChunk);
             // voxelChunk.Generate();
             // voxelChunk.BuildMesh();
