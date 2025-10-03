@@ -40,10 +40,16 @@ fn getNormalMatrix(modelMatrix: mat4x4f) -> mat3x3f {
     return transpose3(inverse3(m3));
 }
 
-struct Uniforms {
-    modelMatrix : mat4x4f,
-    viewMatrix : mat4x4f,
-    projectionMatrix : mat4x4f,
+struct View {
+    matrix : mat4x4f,
+    projection : mat4x4f,
+};
+
+struct Transform {
+    matrix : mat4x4f,
+};
+
+struct Material {
     color : vec4f,
     pbr : vec4f,
 };
@@ -56,13 +62,16 @@ struct Vertex {
     @location(4) uv: vec2f,
 };
 
-@group(0) @binding(0) var<uniform> uni : Uniforms;
+@group(0) @binding(0) var<uniform> view : View;
 @group(0) @binding(1) var textureSampler : sampler;
 @group(0) @binding(2) var albedoTexture : texture_2d<f32>;
 @group(0) @binding(3) var normalTexture : texture_2d<f32>;
 @group(0) @binding(4) var roughnessTexture : texture_2d<f32>;
 @group(0) @binding(5) var metallicTexture : texture_2d<f32>;
 @group(0) @binding(6) var occlusionTexture : texture_2d<f32>;
+
+@group(1) @binding(0) var<uniform> transform : Transform;
+@group(2) @binding(0) var<uniform> material : Material;
 
 struct VSOut {
   @builtin(position) clipPosition : vec4f,
@@ -77,9 +86,9 @@ struct VSOut {
 fn vs(vert: Vertex) -> VSOut {
   var vsOut: VSOut;
 
-  let modelMatrix = uni.modelMatrix;
-  let viewMatrix = uni.viewMatrix;
-  let projectionMatrix = uni.projectionMatrix;
+  let modelMatrix = transform.matrix;
+  let viewMatrix = view.matrix;
+  let projectionMatrix = view.projection;
 
   let worldPosition = (modelMatrix * vec4f(vert.position, 1.0)).xyz;
   let clipPosition = projectionMatrix * viewMatrix * vec4f(worldPosition, 1.0);
@@ -142,17 +151,17 @@ struct GBufferRenderPass {
 fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   var gBufferRenderPass: GBufferRenderPass;
 
-  let _alphaCutoff = uni.pbr.a;
+  let _alphaCutoff = material.pbr.a;
 
   let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
-  let color = albedo * uni.color;
+  let color = albedo * material.color;
   if(color.a < _alphaCutoff) {
     discard;
   }
   
-  let _roughness = uni.pbr.r;
-  let _metallic = uni.pbr.g;
-  let _occlusion = uni.pbr.b;
+  let _roughness = material.pbr.r;
+  let _metallic = material.pbr.g;
+  let _occlusion = material.pbr.b;
 
   let normal = textureSample(normalTexture, textureSampler, vsOut.uv).xyz * 2.0 - 1.0;
   let roughness = textureSample(roughnessTexture, textureSampler, vsOut.uv);
@@ -164,7 +173,7 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   let TBN = mat3x3f(vsOut.worldTangent, vsOut.worldBitangent, vsOut.worldNormal);
   gBufferRenderPass.worldNormalOut = vec4f(normalize(TBN * normal), 0.0);
 
-  gBufferRenderPass.colorOut = albedo * uni.color;
+  gBufferRenderPass.colorOut = albedo * material.color;
   gBufferRenderPass.pbrOut = vec4f(roughness.r * _roughness, metallic.r * _metallic, occlusion.r * _occlusion, 0);
 
   gBufferRenderPass.depthOut = vec4f(vsOut.clipPosition.z / vsOut.clipPosition.w, 0.0, 0.0, 1.0);

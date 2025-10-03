@@ -148,7 +148,7 @@ class Importer {
                 let tangents = [];
                 let uvs = [];
 
-                for (let i = 0; i < _positions.length; i += 3) vertices.push(new Vector3(_positions[i], _positions[i + 1], _positions[i + 2]));
+                for (let i = 0; i < _positions.length; i += 3) vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
                 for (let i = 0; i < _normals.length; i += 3) normals.push(new Vector3(_normals[i], _normals[i + 1], _normals[i + 2]));
                 for (let i = 0; i < _tangents.length; i += 4) tangents.push(new Vector4(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
                 for (let i = 0; i < _uvs.length; i += 2) uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
