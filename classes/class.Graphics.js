@@ -82,61 +82,61 @@ class Graphics {
             canvas: canvas,
         });
 
-        // const lightingRenderPass = this.lightingRenderPass = new LightingRenderPass({
-        //     name: 'lightingRenderPass',
-        //     code: assets.shaders['lightingRenderPass.wgsl'],
-        //     shadowRenderPass: shadowRenderPass,
-        //     gBufferRenderPass: gBufferRenderPass,
-        //     canvas: canvas,
-        // });
+        const lightingRenderPass = this.lightingRenderPass = new LightingRenderPass({
+            name: 'lightingRenderPass',
+            code: assets.shaders['lightingRenderPass.wgsl'],
+            shadowRenderPass: shadowRenderPass,
+            gBufferRenderPass: gBufferRenderPass,
+            canvas: canvas,
+        });
 
-        // const forwardRenderPass = this.forwardRenderPass = new ForwardRenderPass({
-        //     name: 'forwardRenderPass',
-        //     code: assets.shaders['forwardRenderPass.wgsl'],
-        //     lightingRenderPass: lightingRenderPass,
-        //     canvas: canvas,
-        // });
+        const forwardRenderPass = this.forwardRenderPass = new ForwardRenderPass({
+            name: 'forwardRenderPass',
+            code: assets.shaders['forwardRenderPass.wgsl'],
+            lightingRenderPass: lightingRenderPass,
+            canvas: canvas,
+        });
 
-        // const finalRenderPass = this.finalRenderPass = new FinalRenderPass({
-        //     name: 'finalRenderPass',
-        //     code: assets.shaders['finalRenderPass.wgsl'],
-        //     clearRenderPass: clearRenderPass,
-        //     gBufferRenderPass: gBufferRenderPass,
-        //     lightingRenderPass: lightingRenderPass,
-        //     forwardRenderPass: forwardRenderPass,
-        //     sceneTextureView: this.sceneTextureView,
-        //     canvas: canvas,
-        // });
+        const finalRenderPass = this.finalRenderPass = new FinalRenderPass({
+            name: 'finalRenderPass',
+            code: assets.shaders['finalRenderPass.wgsl'],
+            clearRenderPass: clearRenderPass,
+            gBufferRenderPass: gBufferRenderPass,
+            lightingRenderPass: lightingRenderPass,
+            forwardRenderPass: forwardRenderPass,
+            sceneTextureView: this.sceneTextureView,
+            canvas: canvas,
+        });
 
-        // const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
-        //     name: 'ssaoRenderPass',
-        //     code: assets.shaders['ssaoRenderPass.wgsl'],
-        //     gBufferRenderPass: gBufferRenderPass,
-        //     inputTextureView: this.sceneTextureView,
-        //     canvas: canvas,
-        // });
+        const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
+            name: 'ssaoRenderPass',
+            code: assets.shaders['ssaoRenderPass.wgsl'],
+            gBufferRenderPass: gBufferRenderPass,
+            inputTextureView: this.sceneTextureView,
+            canvas: canvas,
+        });
 
-        // const screenSpaceReflectionRenderPass = this.screenSpaceReflectionRenderPass = new ScreenSpaceReflectionRenderPass({
-        //     name: 'screenSpaceReflectionRenderPass',
-        //     code: assets.shaders['screenSpaceReflectionRenderPass.wgsl'],
-        //     gBufferRenderPass: gBufferRenderPass,
-        //     inputTextureView: ssaoRenderPass.sceneTextureView,
-        //     canvas: canvas,
-        // });
+        const screenSpaceReflectionRenderPass = this.screenSpaceReflectionRenderPass = new ScreenSpaceReflectionRenderPass({
+            name: 'screenSpaceReflectionRenderPass',
+            code: assets.shaders['screenSpaceReflectionRenderPass.wgsl'],
+            gBufferRenderPass: gBufferRenderPass,
+            inputTextureView: ssaoRenderPass.sceneTextureView,
+            canvas: canvas,
+        });
 
-        // const bloomRenderPass = this.bloomRenderPass = new BloomRenderPass({
-        //     name: 'bloomRenderPass',
-        //     code: assets.shaders['bloomRenderPass.wgsl'],
-        //     inputTextureView: ssaoRenderPass.sceneTextureView,
-        //     canvas: canvas,
-        // });
+        const bloomRenderPass = this.bloomRenderPass = new BloomRenderPass({
+            name: 'bloomRenderPass',
+            code: assets.shaders['bloomRenderPass.wgsl'],
+            inputTextureView: ssaoRenderPass.sceneTextureView,
+            canvas: canvas,
+        });
 
-        // const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
-        //     name: 'tonemappingRenderPass',
-        //     code: assets.shaders['tonemappingRenderPass.wgsl'],
-        //     inputTextureView: bloomRenderPass.sceneTextureView,
-        //     canvas: canvas,
-        // });
+        const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
+            name: 'tonemappingRenderPass',
+            code: assets.shaders['tonemappingRenderPass.wgsl'],
+            inputTextureView: bloomRenderPass.sceneTextureView,
+            canvas: canvas,
+        });
 
         const debugRenderPass = this.debugRenderPass = new DebugRenderPass({
             name: 'debugRenderPass',
@@ -144,13 +144,13 @@ class Graphics {
             canvas: canvas,
         });
 
-        debugRenderPass.textureView = gBufferRenderPass.normalTextureView;
+        debugRenderPass.textureView = tonemappingRenderPass.sceneTextureView;
 
-        // const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
-        //     name: 'gizmosRenderPass',
-        //     code: assets.shaders['gizmosRenderPass.wgsl'],
-        //     canvas: canvas,
-        // });
+        const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
+            name: 'gizmosRenderPass',
+            code: assets.shaders['gizmosRenderPass.wgsl'],
+            canvas: canvas,
+        });
 
         callback();
     }
@@ -168,18 +168,18 @@ class Graphics {
 
         if (this.gBufferRenderPass) this.gBufferRenderPass.Render(engine, commandEncoder);
 
-        // if (this.lightingRenderPass) this.lightingRenderPass.Render(engine, commandEncoder);
-        // if (this.forwardRenderPass) this.forwardRenderPass.Render(engine, commandEncoder);
-        // if (this.finalRenderPass) this.finalRenderPass.Render(engine, commandEncoder);
+        if (this.lightingRenderPass) this.lightingRenderPass.Render(engine, commandEncoder);
+        if (this.forwardRenderPass) this.forwardRenderPass.Render(engine, commandEncoder);
+        if (this.finalRenderPass) this.finalRenderPass.Render(engine, commandEncoder);
 
-        // if (this.ssaoRenderPass) this.ssaoRenderPass.Render(engine, commandEncoder);
-        // if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(engine, commandEncoder);
-        // if (this.bloomRenderPass) this.bloomRenderPass.Render(engine, commandEncoder);
-        // if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(engine, commandEncoder);
+        if (this.ssaoRenderPass) this.ssaoRenderPass.Render(engine, commandEncoder);
+        if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(engine, commandEncoder);
+        if (this.bloomRenderPass) this.bloomRenderPass.Render(engine, commandEncoder);
+        if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(engine, commandEncoder);
 
         if (this.debugRenderPass) this.debugRenderPass.Render(engine, commandEncoder);
 
-        // if (this.gizmosRenderPass) this.gizmosRenderPass.Render(engine, commandEncoder);
+        if (this.gizmosRenderPass) this.gizmosRenderPass.Render(engine, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);
     }
