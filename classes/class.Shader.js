@@ -30,7 +30,14 @@ class Shader {
 
         if (_this.code.indexOf('fn shadowRenderPass') !== -1) {
             _this.renderPipelines['shadowRenderPass'] = GPU.CreateRenderPipeline({
-                layout: "auto",
+                layout: GPU.device.createPipelineLayout({
+                    bindGroupLayouts: [
+                        Graphics.viewBindGroupLayout,
+                        Graphics.transformBindGroupLayout,
+                        Graphics.materialBindGroupLayout,
+                        Graphics.pbrBindGroupLayout,
+                    ],
+                }),
                 vertex: {
                     module: _this.shaderModule,
                     entryPoint: "vs",
@@ -69,7 +76,14 @@ class Shader {
 
         if (_this.code.indexOf('fn gBufferRenderPass') !== -1) {
             _this.renderPipelines['gBufferRenderPass'] = GPU.CreateRenderPipeline({
-                layout: "auto",
+                layout: GPU.device.createPipelineLayout({
+                    bindGroupLayouts: [
+                        Graphics.viewBindGroupLayout,
+                        Graphics.transformBindGroupLayout,
+                        Graphics.materialBindGroupLayout,
+                        Graphics.pbrBindGroupLayout,
+                    ],
+                }),
                 vertex: {
                     module: _this.shaderModule,
                     entryPoint: "vs",

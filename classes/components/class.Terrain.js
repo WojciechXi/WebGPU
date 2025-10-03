@@ -144,12 +144,12 @@ class Terrain extends Component {
                 const indexForwardRight = (x + offset) + (z + offset) * this.resolution;
 
                 triangles.push(index);
-                triangles.push(indexRight);
                 triangles.push(indexForward);
+                triangles.push(indexRight);
 
-                triangles.push(indexForwardRight);
-                triangles.push(indexForward);
                 triangles.push(indexRight);
+                triangles.push(indexForward);
+                triangles.push(indexForwardRight);
             }
         }
         this.mesh.SetTriangles(triangles, lod);
@@ -166,11 +166,9 @@ class Terrain extends Component {
         if (renderPass.name === 'shadowRenderPass') {
             if (!this.castShadows) return;
 
-            const matrix4x4 = Matrix4x4.TRS(this.transform.position, this.transform.rotation, Vector3.Scale(this.transform.lossyScale, this.size));
-            Graphics.DrawMesh(renderPass, this.mesh, matrix4x4, this.material, 0, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix);
+            Graphics.DrawMesh(renderPass, this.mesh, this.gameObject.transformBindGroup, this.material, 0, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix);
         } else if (renderPass.name === 'gBufferRenderPass') {
-            const matrix4x4 = Matrix4x4.TRS(this.transform.position, this.transform.rotation, Vector3.Scale(this.transform.lossyScale, this.size));
-            Graphics.DrawMesh(renderPass, this.mesh, matrix4x4, this.material, 0, Camera.main.viewMatrix, Camera.main.projectionMatrix);
+            Graphics.DrawMesh(renderPass, this.mesh, this.gameObject.transformBindGroup, this.material, 0, Camera.main.viewMatrix, Camera.main.projectionMatrix);
         } else if (renderPass.name === 'gizmosRenderPass') {
 
         }

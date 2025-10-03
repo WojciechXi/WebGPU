@@ -19,22 +19,33 @@ class Graphics {
         this.viewBindGroupLayout = GPU.device.createBindGroupLayout({
             label: 'ViewBindGroupLayout',
             entries: [
-                {
-                    binding: 0,
-                    visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
-                    buffer: { type: 'uniform' },
-                }
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
 
         this.transformBindGroupLayout = GPU.device.createBindGroupLayout({
             label: 'TransformBindGroupLayout',
             entries: [
-                {
-                    binding: 0,
-                    visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
-                    buffer: { type: 'uniform' },
-                }
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
+            ],
+        });
+
+        this.materialBindGroupLayout = GPU.device.createBindGroupLayout({
+            label: 'TransformBindGroupLayout',
+            entries: [
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
+            ],
+        });
+
+        this.pbrBindGroupLayout = GPU.device.createBindGroupLayout({
+            label: 'ViewBindGroupLayout',
+            entries: [
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: {}, },
+                { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
             ],
         });
 
@@ -105,13 +116,13 @@ class Graphics {
             canvas: canvas,
         });
 
-        // const screenSpaceReflectionRenderPass = this.screenSpaceReflectionRenderPass = new ScreenSpaceReflectionRenderPass({
-        //     name: 'screenSpaceReflectionRenderPass',
-        //     code: assets.shaders['screenSpaceReflectionRenderPass.wgsl'],
-        //     gBufferRenderPass: gBufferRenderPass,
-        //     inputTextureView: ssaoRenderPass.sceneTextureView,
-        //     canvas: canvas,
-        // });
+        const screenSpaceReflectionRenderPass = this.screenSpaceReflectionRenderPass = new ScreenSpaceReflectionRenderPass({
+            name: 'screenSpaceReflectionRenderPass',
+            code: assets.shaders['screenSpaceReflectionRenderPass.wgsl'],
+            gBufferRenderPass: gBufferRenderPass,
+            inputTextureView: ssaoRenderPass.sceneTextureView,
+            canvas: canvas,
+        });
 
         const bloomRenderPass = this.bloomRenderPass = new BloomRenderPass({
             name: 'bloomRenderPass',
@@ -153,7 +164,7 @@ class Graphics {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
         if (this.clearRenderPass) this.clearRenderPass.Render(engine, commandEncoder);
-        if (this.shadowRenderPass) this.shadowRenderPass.Render(engine, commandEncoder);
+        // if (this.shadowRenderPass) this.shadowRenderPass.Render(engine, commandEncoder);
 
         if (this.gBufferRenderPass) this.gBufferRenderPass.Render(engine, commandEncoder);
 
@@ -173,10 +184,10 @@ class Graphics {
         GPU.Queue.submit([commandEncoder.finish()]);
     }
 
-    static DrawMesh(renderPass, mesh, matrix, material, subMeshIndex, viewMatrix, projectionMatrix) {
+    static DrawMesh(renderPass, mesh, transformBindGroup, material, subMeshIndex, viewMatrix, projectionMatrix) {
         if (!mesh) return;
         if (!material) return;
-        if (!material.Use(renderPass, matrix, viewMatrix, projectionMatrix)) return;
+        if (!material.Use(renderPass, transformBindGroup, viewMatrix, projectionMatrix)) return;
         mesh.Render(renderPass, subMeshIndex);
     }
 

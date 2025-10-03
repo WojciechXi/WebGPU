@@ -57,7 +57,7 @@ class VoxelChunk extends Component {
                     let isForward = indexForward < 0 || this.voxelChunkData.voxels[indexForward];
                     let isBack = indexBack < 0 || this.voxelChunkData.voxels[indexBack];
 
-                    let position = new Vector3(-x + 0.5, y + 0.5, z + 0.5);
+                    let position = new Vector3(x + 0.5, y + 0.5, z + 0.5);
 
                     if (!isBack) this.Face(position, Quaternion.FromEuler(0, 0, 0), vertices, uvs, triangles);
                     if (!isRight) this.Face(position, Quaternion.FromEuler(0, 0, 90), vertices, uvs, triangles);
@@ -87,24 +87,24 @@ class VoxelChunk extends Component {
         uvs.push(Vector2.zero);
         triangles.push(vertices.length - 1);
 
-        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(-0.5, 0.5, -0.5))));
-        uvs.push(Vector2.up);
-        triangles.push(vertices.length - 1);
-
         vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(0.5, -0.5, -0.5))));
         uvs.push(Vector2.right);
         triangles.push(vertices.length - 1);
 
         vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(-0.5, 0.5, -0.5))));
         uvs.push(Vector2.up);
+        triangles.push(vertices.length - 1);
+
+        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(-0.5, 0.5, -0.5))));
+        uvs.push(Vector2.up);
+        triangles.push(vertices.length - 1);
+
+        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(0.5, -0.5, -0.5))));
+        uvs.push(Vector2.right);
         triangles.push(vertices.length - 1);
 
         vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(0.5, 0.5, -0.5))));
         uvs.push(Vector2.one);
-        triangles.push(vertices.length - 1);
-
-        vertices.push(Vector3.Add(position, Quaternion.MultiplyVector3(rotation, new Vector3(0.5, -0.5, -0.5))));
-        uvs.push(Vector2.right);
         triangles.push(vertices.length - 1);
     }
 

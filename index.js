@@ -42,18 +42,6 @@ window.addEventListener('load', async function (event) {
             const terrainLitShader = new Shader(assets.shaders['TerrainLit.wgsl']);
             terrainLitShader.Compile();
 
-            const foliageShader = new Shader(assets.shaders['Foliage.wgsl']);
-            foliageShader.Compile();
-
-            const grassMaterial = new Material({
-                name: 'White',
-                shader: foliageShader,
-            });
-            loadBitmap('/Assets/Images/Grass.png', function (albedo) {
-                grassMaterial.SetTexture('albedo', albedo);
-                grassMaterial.Update();
-            });
-
             const whiteMaterial = new Material({
                 name: 'White',
                 shader: litShader,
@@ -227,7 +215,6 @@ window.addEventListener('load', async function (event) {
 
             const materials = {
                 Glass: null,
-                Grass: grassMaterial,
                 'sphere.001': pbrShpereMaterial,
                 'Stack of Bricks': stackOfBricksMaterial,
 
@@ -286,7 +273,8 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Test);
 
             // const terrainGameObject = new GameObject('Terrain');
-            // terrainGameObject.transform.position = new Vector3(50, 0, -50);
+            // terrainGameObject.transform.position = new Vector3(-50, 0, -50);
+            // terrainGameObject.transform.localScale = new Vector3(100, 10, 100);
             // let terrain = terrainGameObject.AddComponent(Terrain);
             // let terrainCollider = terrainGameObject.AddComponent(TerrainCollider);
             // terrain.material = terrainMaterial;
@@ -307,7 +295,7 @@ window.addEventListener('load', async function (event) {
 
             // let go = new GameObject('Voxel Chunk');
             // let meshRenderer = go.AddComponent(MeshRenderer);
-            // meshRenderer.materials = [goldMaterial];
+            // meshRenderer.materials = [whiteMaterial];
             // let voxelChunk = go.AddComponent(VoxelChunk);
             // voxelChunk.Generate();
             // voxelChunk.BuildMesh();
@@ -320,33 +308,10 @@ window.addEventListener('load', async function (event) {
             // voxelChunk.Generate();
             // voxelChunk.BuildMesh();
 
-            // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
-            //     const gameObject = new GameObject('Krakow');
-            //     gameObject.transform.position = new Vector3(0, 0, 0);
-            //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-
-            //     for (const mesh of meshes) {
-            //         const meshGameObject = new GameObject(mesh.name);
-            //         meshGameObject.transform.SetParent(gameObject.transform);
-            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [];
-            //         mesh.subMeshes.forEach(function (subMesh) {
-            //             if (materials.hasOwnProperty(subMesh.material)) {
-            //                 meshRenderer.materials.push(materials[subMesh.material]);
-            //             } else {
-            //                 console.log(subMesh.material);
-            //                 meshRenderer.materials.push(whiteMaterial);
-            //             }
-            //         });
-            //     }
-            // });
-
-            Importer.GLTF('/Assets/Models', 'Odlegla.gltf', function (meshes, gltfMaterials) {
+            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
                 const gameObject = new GameObject('Krakow');
                 gameObject.transform.position = new Vector3(0, 0, 0);
-                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 180);
+                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
 
                 for (const mesh of meshes) {
                     const meshGameObject = new GameObject(mesh.name);

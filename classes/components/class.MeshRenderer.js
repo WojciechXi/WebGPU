@@ -23,11 +23,11 @@ class MeshRenderer extends Component {
             if (!this.castShadows) return;
 
             for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
-                Graphics.DrawMesh(renderPass, this.mesh, this.transform.matrix4x4, this.materials[i], i, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix);
+                Graphics.DrawMesh(renderPass, this.mesh, this.gameObject.transformBindGroup, this.materials[i], i, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix);
             }
         } else if (renderPass.name == 'gBufferRenderPass') {
             for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
-                Graphics.DrawMesh(renderPass, this.mesh, this.transform.matrix4x4, this.materials[i], i, Camera.main.viewMatrix, Camera.main.projectionMatrix);
+                Graphics.DrawMesh(renderPass, this.mesh, this.gameObject.transformBindGroup, this.materials[i], i, Camera.main.viewMatrix, Camera.main.projectionMatrix);
             }
         } else if (renderPass.name == 'gizmosRenderPass') {
 
