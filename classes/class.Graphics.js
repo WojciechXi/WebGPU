@@ -19,33 +19,33 @@ class Graphics {
         this.viewBindGroupLayout = GPU.device.createBindGroupLayout({
             label: 'ViewBindGroupLayout',
             entries: [
-                {
-                    binding: 0,
-                    visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
-                    buffer: { type: 'uniform' },
-                }
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
 
         this.transformBindGroupLayout = GPU.device.createBindGroupLayout({
             label: 'TransformBindGroupLayout',
             entries: [
-                {
-                    binding: 0,
-                    visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
-                    buffer: { type: 'uniform' },
-                }
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
 
         this.materialBindGroupLayout = GPU.device.createBindGroupLayout({
             label: 'TransformBindGroupLayout',
             entries: [
-                {
-                    binding: 0,
-                    visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
-                    buffer: { type: 'uniform' },
-                }
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
+            ],
+        });
+
+        this.pbrBindGroupLayout = GPU.device.createBindGroupLayout({
+            label: 'ViewBindGroupLayout',
+            entries: [
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: {}, },
+                { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
             ],
         });
 
@@ -82,39 +82,39 @@ class Graphics {
             canvas: canvas,
         });
 
-        const lightingRenderPass = this.lightingRenderPass = new LightingRenderPass({
-            name: 'lightingRenderPass',
-            code: assets.shaders['lightingRenderPass.wgsl'],
-            shadowRenderPass: shadowRenderPass,
-            gBufferRenderPass: gBufferRenderPass,
-            canvas: canvas,
-        });
+        // const lightingRenderPass = this.lightingRenderPass = new LightingRenderPass({
+        //     name: 'lightingRenderPass',
+        //     code: assets.shaders['lightingRenderPass.wgsl'],
+        //     shadowRenderPass: shadowRenderPass,
+        //     gBufferRenderPass: gBufferRenderPass,
+        //     canvas: canvas,
+        // });
 
-        const forwardRenderPass = this.forwardRenderPass = new ForwardRenderPass({
-            name: 'forwardRenderPass',
-            code: assets.shaders['forwardRenderPass.wgsl'],
-            lightingRenderPass: lightingRenderPass,
-            canvas: canvas,
-        });
+        // const forwardRenderPass = this.forwardRenderPass = new ForwardRenderPass({
+        //     name: 'forwardRenderPass',
+        //     code: assets.shaders['forwardRenderPass.wgsl'],
+        //     lightingRenderPass: lightingRenderPass,
+        //     canvas: canvas,
+        // });
 
-        const finalRenderPass = this.finalRenderPass = new FinalRenderPass({
-            name: 'finalRenderPass',
-            code: assets.shaders['finalRenderPass.wgsl'],
-            clearRenderPass: clearRenderPass,
-            gBufferRenderPass: gBufferRenderPass,
-            lightingRenderPass: lightingRenderPass,
-            forwardRenderPass: forwardRenderPass,
-            sceneTextureView: this.sceneTextureView,
-            canvas: canvas,
-        });
+        // const finalRenderPass = this.finalRenderPass = new FinalRenderPass({
+        //     name: 'finalRenderPass',
+        //     code: assets.shaders['finalRenderPass.wgsl'],
+        //     clearRenderPass: clearRenderPass,
+        //     gBufferRenderPass: gBufferRenderPass,
+        //     lightingRenderPass: lightingRenderPass,
+        //     forwardRenderPass: forwardRenderPass,
+        //     sceneTextureView: this.sceneTextureView,
+        //     canvas: canvas,
+        // });
 
-        const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
-            name: 'ssaoRenderPass',
-            code: assets.shaders['ssaoRenderPass.wgsl'],
-            gBufferRenderPass: gBufferRenderPass,
-            inputTextureView: this.sceneTextureView,
-            canvas: canvas,
-        });
+        // const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
+        //     name: 'ssaoRenderPass',
+        //     code: assets.shaders['ssaoRenderPass.wgsl'],
+        //     gBufferRenderPass: gBufferRenderPass,
+        //     inputTextureView: this.sceneTextureView,
+        //     canvas: canvas,
+        // });
 
         // const screenSpaceReflectionRenderPass = this.screenSpaceReflectionRenderPass = new ScreenSpaceReflectionRenderPass({
         //     name: 'screenSpaceReflectionRenderPass',
@@ -124,19 +124,19 @@ class Graphics {
         //     canvas: canvas,
         // });
 
-        const bloomRenderPass = this.bloomRenderPass = new BloomRenderPass({
-            name: 'bloomRenderPass',
-            code: assets.shaders['bloomRenderPass.wgsl'],
-            inputTextureView: ssaoRenderPass.sceneTextureView,
-            canvas: canvas,
-        });
+        // const bloomRenderPass = this.bloomRenderPass = new BloomRenderPass({
+        //     name: 'bloomRenderPass',
+        //     code: assets.shaders['bloomRenderPass.wgsl'],
+        //     inputTextureView: ssaoRenderPass.sceneTextureView,
+        //     canvas: canvas,
+        // });
 
-        const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
-            name: 'tonemappingRenderPass',
-            code: assets.shaders['tonemappingRenderPass.wgsl'],
-            inputTextureView: bloomRenderPass.sceneTextureView,
-            canvas: canvas,
-        });
+        // const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
+        //     name: 'tonemappingRenderPass',
+        //     code: assets.shaders['tonemappingRenderPass.wgsl'],
+        //     inputTextureView: bloomRenderPass.sceneTextureView,
+        //     canvas: canvas,
+        // });
 
         const debugRenderPass = this.debugRenderPass = new DebugRenderPass({
             name: 'debugRenderPass',
@@ -144,13 +144,13 @@ class Graphics {
             canvas: canvas,
         });
 
-        debugRenderPass.textureView = tonemappingRenderPass.sceneTextureView;
+        debugRenderPass.textureView = gBufferRenderPass.normalTextureView;
 
-        const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
-            name: 'gizmosRenderPass',
-            code: assets.shaders['gizmosRenderPass.wgsl'],
-            canvas: canvas,
-        });
+        // const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
+        //     name: 'gizmosRenderPass',
+        //     code: assets.shaders['gizmosRenderPass.wgsl'],
+        //     canvas: canvas,
+        // });
 
         callback();
     }
@@ -164,30 +164,30 @@ class Graphics {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
         if (this.clearRenderPass) this.clearRenderPass.Render(engine, commandEncoder);
-        if (this.shadowRenderPass) this.shadowRenderPass.Render(engine, commandEncoder);
+        // if (this.shadowRenderPass) this.shadowRenderPass.Render(engine, commandEncoder);
 
         if (this.gBufferRenderPass) this.gBufferRenderPass.Render(engine, commandEncoder);
 
-        if (this.lightingRenderPass) this.lightingRenderPass.Render(engine, commandEncoder);
-        if (this.forwardRenderPass) this.forwardRenderPass.Render(engine, commandEncoder);
-        if (this.finalRenderPass) this.finalRenderPass.Render(engine, commandEncoder);
+        // if (this.lightingRenderPass) this.lightingRenderPass.Render(engine, commandEncoder);
+        // if (this.forwardRenderPass) this.forwardRenderPass.Render(engine, commandEncoder);
+        // if (this.finalRenderPass) this.finalRenderPass.Render(engine, commandEncoder);
 
-        if (this.ssaoRenderPass) this.ssaoRenderPass.Render(engine, commandEncoder);
-        if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(engine, commandEncoder);
-        if (this.bloomRenderPass) this.bloomRenderPass.Render(engine, commandEncoder);
-        if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(engine, commandEncoder);
+        // if (this.ssaoRenderPass) this.ssaoRenderPass.Render(engine, commandEncoder);
+        // if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(engine, commandEncoder);
+        // if (this.bloomRenderPass) this.bloomRenderPass.Render(engine, commandEncoder);
+        // if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(engine, commandEncoder);
 
         if (this.debugRenderPass) this.debugRenderPass.Render(engine, commandEncoder);
 
-        if (this.gizmosRenderPass) this.gizmosRenderPass.Render(engine, commandEncoder);
+        // if (this.gizmosRenderPass) this.gizmosRenderPass.Render(engine, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);
     }
 
-    static DrawMesh(renderPass, mesh, modelBindGroup, material, subMeshIndex, viewMatrix, projectionMatrix) {
+    static DrawMesh(renderPass, mesh, transformBindGroup, material, subMeshIndex, viewMatrix, projectionMatrix) {
         if (!mesh) return;
         if (!material) return;
-        if (!material.Use(renderPass, modelBindGroup, viewMatrix, projectionMatrix)) return;
+        if (!material.Use(renderPass, transformBindGroup, viewMatrix, projectionMatrix)) return;
         mesh.Render(renderPass, subMeshIndex);
     }
 

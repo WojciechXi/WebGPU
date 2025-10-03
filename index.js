@@ -42,18 +42,6 @@ window.addEventListener('load', async function (event) {
             const terrainLitShader = new Shader(assets.shaders['TerrainLit.wgsl']);
             terrainLitShader.Compile();
 
-            const foliageShader = new Shader(assets.shaders['Foliage.wgsl']);
-            foliageShader.Compile();
-
-            const grassMaterial = new Material({
-                name: 'White',
-                shader: foliageShader,
-            });
-            loadBitmap('/Assets/Images/Grass.png', function (albedo) {
-                grassMaterial.SetTexture('albedo', albedo);
-                grassMaterial.Update();
-            });
-
             const whiteMaterial = new Material({
                 name: 'White',
                 shader: litShader,
@@ -227,7 +215,6 @@ window.addEventListener('load', async function (event) {
 
             const materials = {
                 Glass: null,
-                Grass: grassMaterial,
                 'sphere.001': pbrShpereMaterial,
                 'Stack of Bricks': stackOfBricksMaterial,
 
@@ -281,7 +268,7 @@ window.addEventListener('load', async function (event) {
             directionalLight.color.Set(1, 1, 1, 0.75);
 
             const cameraGameObject = new GameObject('Camera');
-            cameraGameObject.transform.position = new Vector3(0, VoxelChunkData.resolution, -5);
+            cameraGameObject.transform.position = new Vector3(0, 1, -5);
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
@@ -305,66 +292,43 @@ window.addEventListener('load', async function (event) {
                 Physics.simulate = true;
             }, 1000);
 
-            let go = new GameObject('Voxel Chunk');
-            let meshRenderer = go.AddComponent(MeshRenderer);
-            meshRenderer.materials = [goldMaterial];
-            let voxelChunk = go.AddComponent(VoxelChunk);
-            voxelChunk.Generate();
-            voxelChunk.BuildMesh();
+            // let go = new GameObject('Voxel Chunk');
+            // let meshRenderer = go.AddComponent(MeshRenderer);
+            // meshRenderer.materials = [goldMaterial];
+            // let voxelChunk = go.AddComponent(VoxelChunk);
+            // voxelChunk.Generate();
+            // voxelChunk.BuildMesh();
 
-            go = new GameObject('Voxel Chunk');
-            go.transform.position = new Vector3(VoxelChunkData.resolution, 0, 0);
-            meshRenderer = go.AddComponent(MeshRenderer);
-            meshRenderer.materials = [whiteMaterial];
-            voxelChunk = go.AddComponent(VoxelChunk);
-            voxelChunk.Generate();
-            voxelChunk.BuildMesh();
+            // go = new GameObject('Voxel Chunk');
+            // go.transform.position = new Vector3(VoxelChunkData.resolution, 0, 0);
+            // meshRenderer = go.AddComponent(MeshRenderer);
+            // meshRenderer.materials = [whiteMaterial];
+            // voxelChunk = go.AddComponent(VoxelChunk);
+            // voxelChunk.Generate();
+            // voxelChunk.BuildMesh();
 
-            // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
-            //     const gameObject = new GameObject('Krakow');
-            //     gameObject.transform.position = new Vector3(0, 0, 0);
-            //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+                const gameObject = new GameObject('Krakow');
+                gameObject.transform.position = new Vector3(0, 0, 0);
+                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
 
-            //     for (const mesh of meshes) {
-            //         const meshGameObject = new GameObject(mesh.name);
-            //         meshGameObject.transform.SetParent(gameObject.transform);
-            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+                for (const mesh of meshes) {
+                    const meshGameObject = new GameObject(mesh.name);
+                    meshGameObject.transform.SetParent(gameObject.transform);
+                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
 
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [];
-            //         mesh.subMeshes.forEach(function (subMesh) {
-            //             if (materials.hasOwnProperty(subMesh.material)) {
-            //                 meshRenderer.materials.push(materials[subMesh.material]);
-            //             } else {
-            //                 console.log(subMesh.material);
-            //                 meshRenderer.materials.push(whiteMaterial);
-            //             }
-            //         });
-            //     }
-            // });
-
-            // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
-            //     const gameObject = new GameObject('Krakow');
-            //     gameObject.transform.position = new Vector3(0, 0, 0);
-            //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
-
-            //     for (const mesh of meshes) {
-            //         const meshGameObject = new GameObject(mesh.name);
-            //         meshGameObject.transform.SetParent(gameObject.transform);
-            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [];
-            //         mesh.subMeshes.forEach(function (subMesh) {
-            //             if (materials.hasOwnProperty(subMesh.material)) {
-            //                 meshRenderer.materials.push(materials[subMesh.material]);
-            //             } else {
-            //                 console.log(subMesh.material);
-            //                 meshRenderer.materials.push(whiteMaterial);
-            //             }
-            //         });
-            //     }
-            // });
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [];
+                    mesh.subMeshes.forEach(function (subMesh) {
+                        if (materials.hasOwnProperty(subMesh.material)) {
+                            meshRenderer.materials.push(materials[subMesh.material]);
+                        } else {
+                            console.log(subMesh.material);
+                            meshRenderer.materials.push(whiteMaterial);
+                        }
+                    });
+                }
+            });
         });
     });
 });

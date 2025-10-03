@@ -34,6 +34,8 @@ class Shader {
                     bindGroupLayouts: [
                         Graphics.viewBindGroupLayout,
                         Graphics.transformBindGroupLayout,
+                        Graphics.materialBindGroupLayout,
+                        Graphics.pbrBindGroupLayout,
                     ],
                 }),
                 vertex: {
@@ -79,6 +81,7 @@ class Shader {
                         Graphics.viewBindGroupLayout,
                         Graphics.transformBindGroupLayout,
                         Graphics.materialBindGroupLayout,
+                        Graphics.pbrBindGroupLayout,
                     ],
                 }),
                 vertex: {

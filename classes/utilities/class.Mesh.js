@@ -94,7 +94,7 @@ class Mesh {
 
                 let e1 = Vector3.Subtract(v1, v0);
                 let e2 = Vector3.Subtract(v2, v0);
-                let n = e1.Cross(e2).normalized;
+                let n = e2.Cross(e1).normalized;
 
                 this.normals[i0] = Vector3.Add(this.normals[i0], n);
                 this.normals[i1] = Vector3.Add(this.normals[i1], n);

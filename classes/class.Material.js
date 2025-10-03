@@ -8,18 +8,6 @@ class Material {
         this.name = data.name ?? 'Material';
         this.shader = data.shader ?? '';
 
-        this.bindGroupLayout = GPU.device.createBindGroupLayout({
-            label: 'ViewBindGroupLayout',
-            entries: [
-                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: {}, },
-                { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
-                { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
-                { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
-                { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
-                { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
-            ],
-        });
-
         this.color = data.color ?? Color.white;
 
         this.roughness = data.roughness ?? 1;
@@ -72,7 +60,7 @@ class Material {
 
         this.bindGroup = GPU.CreateBindGroup({
             label: 'gBufferBindGroup',
-            layout: this.bindGroupLayout,
+            layout: Graphics.pbrBindGroupLayout,
             entries: [
                 { binding: 0, resource: this.sampler },
                 { binding: 1, resource: this.textures.albedo.createView() },
@@ -122,7 +110,7 @@ class Material {
     Update() {
         this.bindGroup = GPU.CreateBindGroup({
             label: 'gBufferBindGroup',
-            layout: this.bindGroupLayout,
+            layout: Graphics.pbrBindGroupLayout,
             entries: [
                 { binding: 0, resource: this.sampler },
                 { binding: 1, resource: this.textures.albedo.createView() },
@@ -134,7 +122,7 @@ class Material {
         });
     }
 
-    Use(renderPass, modelBindGroup, viewMatrix, projectionMatrix) {
+    Use(renderPass, transformBindGroup, viewMatrix, projectionMatrix) {
         let renderPipeline = this.shader.Use(renderPass);
         if (renderPipeline) {
             this.uniformValues.set(viewMatrix, 0);
@@ -142,7 +130,7 @@ class Material {
             GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
             renderPass.SetBindGroup(0, this.uniformBindGroup);
 
-            renderPass.SetBindGroup(1, this.modelBindGroup);
+            renderPass.SetBindGroup(1, transformBindGroup);
 
             this.materialValues.set(this.color, 0);
             this.materialValues.set([this.roughness, this.metallic, this.occlusion, this.alphaCutoff], 4);

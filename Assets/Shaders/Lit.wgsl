@@ -95,10 +95,7 @@ fn vs(vert: Vertex) -> VSOut {
   let clipPosition = projectionMatrix * viewMatrix * vec4f(worldPosition, 1.0);
 
   var objectNormal = vert.normal;
-  objectNormal.x = -objectNormal.x;
-
   var objectTangent = vert.tangent;
-  objectTangent.x = -objectTangent.x;
 
   vsOut.clipPosition = clipPosition;
   vsOut.worldPosition = worldPosition;
