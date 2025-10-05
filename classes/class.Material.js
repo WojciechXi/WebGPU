@@ -58,7 +58,7 @@ class Material {
         this.SetTexture('metallic', Color.black);
         this.SetTexture('occlusion', Color.white);
 
-        this.bindGroup = GPU.CreateBindGroup({
+        this.pbrBindGroup = GPU.CreateBindGroup({
             label: 'gBufferBindGroup',
             layout: Graphics.pbrBindGroupLayout,
             entries: [
@@ -108,7 +108,7 @@ class Material {
     }
 
     Update() {
-        this.bindGroup = GPU.CreateBindGroup({
+        this.pbrBindGroup = GPU.CreateBindGroup({
             label: 'gBufferBindGroup',
             layout: Graphics.pbrBindGroupLayout,
             entries: [
@@ -137,7 +137,7 @@ class Material {
             GPU.Queue.writeBuffer(this.materialBuffer, 0, this.materialValues);
             renderPass.SetBindGroup(2, this.materialBindGroup);
 
-            renderPass.SetBindGroup(3, this.bindGroup);
+            renderPass.SetBindGroup(3, this.pbrBindGroup);
 
             return true;
         }

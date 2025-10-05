@@ -148,16 +148,16 @@ window.addEventListener('load', async function (event) {
                 name: 'Terrain',
                 shader: terrainLitShader,
             });
-            loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_Color.jpg', function (albedo) {
-                loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_Normal.jpg', function (normal) {
-                    loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_AmbientOcclusion.jpg', function (occlusion) {
-                        loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_Roughness.jpg', function (roughness) {
-                            terrainMaterial.SetTexture('albedo', albedo);
-                            terrainMaterial.SetTexture('normal', normal);
-                            terrainMaterial.SetTexture('occlusion', occlusion);
-                            terrainMaterial.SetTexture('roughness', roughness);
-                            terrainMaterial.Update();
-                        });
+            loadBitmap('/Assets/Images/rocky-rugged-terrain-unity/rocky-rugged-terrain_1_albedo.png', function (albedo) {
+                loadBitmap('/Assets/Images/rocky-rugged-terrain-unity/rocky-rugged-terrain_1_normal-ogl.png', function (normal) {
+                    loadBitmap('/Assets/Images/rocky-rugged-terrain-unity/rocky-rugged-terrain_1_ao.png', function (occlusion) {
+                        // loadBitmap('/Assets/Images/rocky-rugged-terrain-unity/rocky-rugged-terrain-unity_Roughness.png', function (roughness) {
+                        terrainMaterial.SetTexture('albedo', albedo);
+                        terrainMaterial.SetTexture('normal', normal);
+                        terrainMaterial.SetTexture('occlusion', occlusion);
+                        // terrainMaterial.SetTexture('roughness', roughness);
+                        terrainMaterial.Update();
+                        // });
                     });
                 });
             });
@@ -272,22 +272,22 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            // const terrainGameObject = new GameObject('Terrain');
+            const terrainGameObject = new GameObject('Terrain');
             // terrainGameObject.transform.position = new Vector3(-50, 0, -50);
-            // terrainGameObject.transform.localScale = new Vector3(100, 10, 100);
-            // let terrain = terrainGameObject.AddComponent(Terrain);
-            // let terrainCollider = terrainGameObject.AddComponent(TerrainCollider);
-            // terrain.material = terrainMaterial;
+            terrainGameObject.transform.localScale = new Vector3(100, 10, 100);
+            let terrain = terrainGameObject.AddComponent(Terrain);
+            let terrainCollider = terrainGameObject.AddComponent(TerrainCollider);
+            terrain.material = terrainMaterial;
 
-            // const perlinNoise = new PerlinNoise();
-            // const heights = [];
-            // for (let x = 0; x < terrain.resolution; x++) {
-            //     for (let z = 0; z < terrain.resolution; z++) {
-            //         const noise = perlinNoise.NoiseOctave(x * 0.0123, z * 0.0123, 8);
-            //         heights.push(noise);
-            //     }
-            // }
-            // terrain.SetHeights(0, 0, terrain.resolution, terrain.resolution, heights);
+            const perlinNoise = new PerlinNoise();
+            const heights = [];
+            for (let x = 0; x < terrain.resolution; x++) {
+                for (let z = 0; z < terrain.resolution; z++) {
+                    const noise = perlinNoise.NoiseOctave(x * 0.0123, z * 0.0123, 8);
+                    heights.push(noise);
+                }
+            }
+            terrain.SetHeights(0, 0, terrain.resolution, terrain.resolution, heights);
 
             setTimeout(function () {
                 Physics.simulate = true;
@@ -308,28 +308,28 @@ window.addEventListener('load', async function (event) {
             // voxelChunk.Generate();
             // voxelChunk.BuildMesh();
 
-            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
-                const gameObject = new GameObject('Krakow');
-                gameObject.transform.position = new Vector3(0, 0, 0);
-                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+            // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+            //     const gameObject = new GameObject('Krakow');
+            //     gameObject.transform.position = new Vector3(0, 0, 0);
+            //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
 
-                for (const mesh of meshes) {
-                    const meshGameObject = new GameObject(mesh.name);
-                    meshGameObject.transform.SetParent(gameObject.transform);
-                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+            //     for (const mesh of meshes) {
+            //         const meshGameObject = new GameObject(mesh.name);
+            //         meshGameObject.transform.SetParent(gameObject.transform);
+            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
 
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [];
-                    mesh.subMeshes.forEach(function (subMesh) {
-                        if (materials.hasOwnProperty(subMesh.material)) {
-                            meshRenderer.materials.push(materials[subMesh.material]);
-                        } else {
-                            console.log(subMesh.material);
-                            meshRenderer.materials.push(whiteMaterial);
-                        }
-                    });
-                }
-            });
+            //         meshRenderer.mesh = mesh;
+            //         meshRenderer.materials = [];
+            //         mesh.subMeshes.forEach(function (subMesh) {
+            //             if (materials.hasOwnProperty(subMesh.material)) {
+            //                 meshRenderer.materials.push(materials[subMesh.material]);
+            //             } else {
+            //                 console.log(subMesh.material);
+            //                 meshRenderer.materials.push(whiteMaterial);
+            //             }
+            //         });
+            //     }
+            // });
         });
     });
 });
