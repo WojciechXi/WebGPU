@@ -1,0 +1,14 @@
+Nazwa (nie wpływa na rozkrój);Szerokość;Oklejanie szerokości;Wysokość;Oklejanie wysokości;Grubość płyty;Ilość sztuk;Słoje [0 = bez znaczenia / 1 = po drugim wymiarze (po wysokości) / 2 lub puste = po pierwszym wymiarze (po szerokości)]
+Półka;1800;;100;;18,6;1;0
+Półka;840;;100;;18,6;1;0
+Półka;900;;100;;18,6;1;0
+Półka;500;;100;;18,6;1;0
+Półka;200;=;60;;18,6;4;0
+Półka;418;=;60;=;18,6;1;0
+Półka;792;=;60;-;18,6;1;0
+Półka;732;=;60;-;18,6;1;0
+Półka;1718;=;60;=;18,6;1;0
+Obudowa;2720;=;600;=;18,6;1;0
+Obudowa;753;=;600;=;18,6;1;0
+Obudowa;1245;=;600;=;18,6;1;0
+Obudowa;772;=;600;=;18,6;1;0

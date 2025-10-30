@@ -54,7 +54,9 @@ window.addEventListener('load', async function (event) {
             const goldMaterial = new Material({
                 name: 'Gold',
                 shader: litShader,
-                color: new Color(1, 0.5, 0, 1),
+                color: new Color(1, 0.875, 0, 1),
+                metallic: 0.9,
+                roughness: 0.1,
             });
             const beigeMaterial = new Material({
                 name: 'Beige',
@@ -66,13 +68,31 @@ window.addEventListener('load', async function (event) {
                 name: 'Concrete',
                 shader: litShader,
             });
-            const u702pmst9Material = new Material({
-                name: 'U702PMST9',
-                shader: litShader,
-            });
+
             const u702st9Material = new Material({
                 name: 'U702ST9',
                 shader: litShader,
+                color: new Color(0.8470588235294118, 0.792156862745098, 0.7411764705882353, 1),
+                roughness: 0.5,
+                metallic: 0.25,
+            });
+
+            const u702pmMaterial = new Material({
+                name: 'U702PMST9',
+                shader: litShader,
+                color: new Color(0.8470588235294118, 0.792156862745098, 0.7411764705882353, 1),
+                roughness: 0.5,
+                metallic: 0.5,
+            });
+
+            const h1386st40Material = new Material({
+                name: 'H1386 ST40 Dąb Casella brązowy',
+                shader: litShader,
+                color: new Color(0.8470588235294118, 0.792156862745098, 0.7411764705882353, 1),
+            });
+            loadBitmap('/Assets/Egger/Wood/H1386 ST40 Dąb Casella brązowy.jpg', function (albedo) {
+                h1386st40Material.SetTexture('albedo', albedo);
+                h1386st40Material.Update();
             });
 
             const sonomaMaterial = new Material({
@@ -198,9 +218,14 @@ window.addEventListener('load', async function (event) {
                 });
             });
 
-            loadBitmap('/Assets/Images/U702 PMST9.jpg', function (albedo) {
-                u702pmst9Material.SetTexture('albedo', albedo);
-                u702pmst9Material.Update();
+            loadBitmap('/Assets/Egger/Color/U702 ST9 Kaszmir.jpg', function (albedo) {
+                u702st9Material.SetTexture('albedo', albedo);
+                u702st9Material.Update();
+            });
+
+            loadBitmap('/Assets/Egger/Color/U702 PM Kaszmir.jpg', function (albedo) {
+                u702pmMaterial.SetTexture('albedo', albedo);
+                u702pmMaterial.Update();
             });
 
             loadBitmap('/Assets/Images/D1038 BS BETON MILLENIUM.jpg', function (albedo) {
@@ -235,9 +260,9 @@ window.addEventListener('load', async function (event) {
                 Tiles: floorMaterial,
                 Walnut: sonomaMaterial,
                 Wardrobe: sonomaMaterial,
-                'H1386-ST40': sonomaMaterial,
-                'U702-PM': u702pmst9Material,
-                'U702-ST9': u702pmst9Material,
+                'H1386 ST40': h1386st40Material,
+                'U702 ST9': u702st9Material,
+                'U702 PM': u702pmMaterial,
 
                 'Bedroom S': olivePaintMaterial,
                 'Bedroom E': olivePaintMaterial,
@@ -272,26 +297,26 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            const terrainGameObject = new GameObject('Terrain');
-            // terrainGameObject.transform.position = new Vector3(-50, 0, -50);
-            terrainGameObject.transform.localScale = new Vector3(100, 10, 100);
-            let terrain = terrainGameObject.AddComponent(Terrain);
-            let terrainCollider = terrainGameObject.AddComponent(TerrainCollider);
-            terrain.material = terrainMaterial;
+            // const terrainGameObject = new GameObject('Terrain');
+            // // terrainGameObject.transform.position = new Vector3(-50, 0, -50);
+            // terrainGameObject.transform.localScale = new Vector3(100, 10, 100);
+            // let terrain = terrainGameObject.AddComponent(Terrain);
+            // let terrainCollider = terrainGameObject.AddComponent(TerrainCollider);
+            // terrain.material = terrainMaterial;
 
-            const perlinNoise = new PerlinNoise();
-            const heights = [];
-            for (let x = 0; x < terrain.resolution; x++) {
-                for (let z = 0; z < terrain.resolution; z++) {
-                    const noise = perlinNoise.NoiseOctave(x * 0.0123, z * 0.0123, 8);
-                    heights.push(noise);
-                }
-            }
-            terrain.SetHeights(0, 0, terrain.resolution, terrain.resolution, heights);
+            // const perlinNoise = new PerlinNoise();
+            // const heights = [];
+            // for (let x = 0; x < terrain.resolution; x++) {
+            //     for (let z = 0; z < terrain.resolution; z++) {
+            //         const noise = perlinNoise.NoiseOctave(x * 0.0123, z * 0.0123, 8);
+            //         heights.push(noise);
+            //     }
+            // }
+            // terrain.SetHeights(0, 0, terrain.resolution, terrain.resolution, heights);
 
-            setTimeout(function () {
-                Physics.simulate = true;
-            }, 1000);
+            // setTimeout(function () {
+            //     Physics.simulate = true;
+            // }, 1000);
 
             // let go = new GameObject('Voxel Chunk');
             // let meshRenderer = go.AddComponent(MeshRenderer);
@@ -308,28 +333,28 @@ window.addEventListener('load', async function (event) {
             // voxelChunk.Generate();
             // voxelChunk.BuildMesh();
 
-            // Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
-            //     const gameObject = new GameObject('Krakow');
-            //     gameObject.transform.position = new Vector3(0, 0, 0);
-            //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+                const gameObject = new GameObject('Krakow');
+                gameObject.transform.position = new Vector3(0, 0, 0);
+                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
 
-            //     for (const mesh of meshes) {
-            //         const meshGameObject = new GameObject(mesh.name);
-            //         meshGameObject.transform.SetParent(gameObject.transform);
-            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+                for (const mesh of meshes) {
+                    const meshGameObject = new GameObject(mesh.name);
+                    meshGameObject.transform.SetParent(gameObject.transform);
+                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
 
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [];
-            //         mesh.subMeshes.forEach(function (subMesh) {
-            //             if (materials.hasOwnProperty(subMesh.material)) {
-            //                 meshRenderer.materials.push(materials[subMesh.material]);
-            //             } else {
-            //                 console.log(subMesh.material);
-            //                 meshRenderer.materials.push(whiteMaterial);
-            //             }
-            //         });
-            //     }
-            // });
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [];
+                    mesh.subMeshes.forEach(function (subMesh) {
+                        if (materials.hasOwnProperty(subMesh.material)) {
+                            meshRenderer.materials.push(materials[subMesh.material]);
+                        } else {
+                            console.log(subMesh.material);
+                            meshRenderer.materials.push(whiteMaterial);
+                        }
+                    });
+                }
+            });
         });
     });
 });
