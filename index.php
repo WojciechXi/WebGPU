@@ -1,6 +1,8 @@
 <?php
-$classes = ScanFilesRecursive('/classes', ['js']);
-$game = ScanFilesRecursive('/game', ['js']);
+require_once __DIR__ . '/functions.php';
+
+$classes = ScanFilesRecursive('./Classes', ['js']);
+$game = ScanFilesRecursive('./Game', ['js']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
