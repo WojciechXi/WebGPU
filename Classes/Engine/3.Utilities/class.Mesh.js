@@ -187,15 +187,15 @@ class Mesh {
 
         for (let v of this.vertices) {
             min = new Vector3(
-                Math.min(min.x, v.x),
-                Math.min(min.y, v.y),
-                Math.min(min.z, v.z)
+                Mathf.Min(min.x, v.x),
+                Mathf.Min(min.y, v.y),
+                Mathf.Min(min.z, v.z)
             );
 
             max = new Vector3(
-                Math.max(max.x, v.x),
-                Math.max(max.y, v.y),
-                Math.max(max.z, v.z)
+                Mathf.Max(max.x, v.x),
+                Mathf.Max(max.y, v.y),
+                Mathf.Max(max.z, v.z)
             );
         }
 

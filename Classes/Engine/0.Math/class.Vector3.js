@@ -20,7 +20,7 @@ class Vector3 extends Float32Array {
     }
 
     static Magnitude(v) {
-        return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+        return Mathf.Sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     }
 
     static Add(a, b, dst = null) {
@@ -110,7 +110,7 @@ class Vector3 extends Float32Array {
     }
 
     get magnitude() {
-        return Math.sqrt(this.sqrMagnitude);
+        return Mathf.Sqrt(this.sqrMagnitude);
     }
 
     get normalized() {

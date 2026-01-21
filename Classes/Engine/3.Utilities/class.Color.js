@@ -9,7 +9,7 @@ class Color extends Float32Array {
     static get green() { return new Color(0, 1, 0, 1); }
     static get blue() { return new Color(0, 0, 1, 1); }
 
-    static get Random() { return new Color(Math.random(), Math.random(), Math.random(), 1); }
+    static get Random() { return new Color(Mathf.Random(), Mathf.Random(), Mathf.Random(), 1); }
 
     constructor(r = 1, g = 1, b = 1, a = 1) {
         super(4);

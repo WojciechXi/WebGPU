@@ -3,7 +3,7 @@ class CapsuleCollider extends Collider {
     static ClosestPointOnSegment(a, b, p) {
         const ab = Vector3.Subtract(b, a);
         const t = (Vector3.Subtract(p, a)).Dot(ab) / ab.Dot(ab);
-        const clampedT = Math.max(0, Math.min(1, t));
+        const clampedT = Mathf.Max(0, Mathf.Min(1, t));
         return Vector3.Add(a, Vector3.Multiply(ab, clampedT));
     }
 

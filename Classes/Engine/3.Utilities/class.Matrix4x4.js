@@ -7,7 +7,7 @@ class Matrix4x4 extends Float32Array {
     static PerspectiveLH(fieldOfViewYInRadians, aspect, zNear, zFar, dst) {
         dst = dst || new Matrix4x4();
 
-        const f = 1.0 / Math.tan(fieldOfViewYInRadians * 0.5);
+        const f = 1.0 / Mathf.Tan(fieldOfViewYInRadians * 0.5);
 
         dst[0] = f / aspect;
         dst[1] = 0;
@@ -35,7 +35,7 @@ class Matrix4x4 extends Float32Array {
     static Perspective(fieldOfViewYInRadians, aspect, zNear, zFar, dst) {
         dst = dst || new Matrix4x4();
 
-        const f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
+        const f = Mathf.Tan(Mathf.PI * 0.5 - 0.5 * fieldOfViewYInRadians);
         const rangeInv = 1 / (zNear - zFar);
 
         dst[0] = f / aspect;
@@ -280,8 +280,8 @@ class Matrix4x4 extends Float32Array {
     }
 
     static RotationX(angleInRadians, dst) {
-        const c = Math.cos(angleInRadians);
-        const s = Math.sin(angleInRadians);
+        const c = Mathf.Cos(angleInRadians);
+        const s = Mathf.Sin(angleInRadians);
         dst = dst || new Matrix4x4();
         dst[0] = 1; dst[1] = 0; dst[2] = 0; dst[3] = 0;
         dst[4] = 0; dst[5] = c; dst[6] = s; dst[7] = 0;
@@ -291,8 +291,8 @@ class Matrix4x4 extends Float32Array {
     }
 
     static RotationY(angleInRadians, dst) {
-        const c = Math.cos(angleInRadians);
-        const s = Math.sin(angleInRadians);
+        const c = Mathf.Cos(angleInRadians);
+        const s = Mathf.Sin(angleInRadians);
         dst = dst || new Matrix4x4();
         dst[0] = c; dst[1] = 0; dst[2] = -s; dst[3] = 0;
         dst[4] = 0; dst[5] = 1; dst[6] = 0; dst[7] = 0;
@@ -302,8 +302,8 @@ class Matrix4x4 extends Float32Array {
     }
 
     static RotationZ(angleInRadians, dst) {
-        const c = Math.cos(angleInRadians);
-        const s = Math.sin(angleInRadians);
+        const c = Mathf.Cos(angleInRadians);
+        const s = Mathf.Sin(angleInRadians);
         dst = dst || new Matrix4x4();
         dst[0] = c; dst[1] = s; dst[2] = 0; dst[3] = 0;
         dst[4] = -s; dst[5] = c; dst[6] = 0; dst[7] = 0;
@@ -342,15 +342,15 @@ class Matrix4x4 extends Float32Array {
     }
 
     static RotateX(m, angle, dst) {
-        return Matrix4x4.Multiply(m, Matrix4x4.RotationX(Math.DegToRad(angle)), dst);
+        return Matrix4x4.Multiply(m, Matrix4x4.RotationX(Mathf.DegToRad(angle)), dst);
     }
 
     static RotateY(m, angle, dst) {
-        return Matrix4x4.Multiply(m, Matrix4x4.RotationY(Math.DegToRad(angle)), dst);
+        return Matrix4x4.Multiply(m, Matrix4x4.RotationY(Mathf.DegToRad(angle)), dst);
     }
 
     static RotateZ(m, angle, dst) {
-        return Matrix4x4.Multiply(m, Matrix4x4.RotationZ(Math.DegToRad(angle)), dst);
+        return Matrix4x4.Multiply(m, Matrix4x4.RotationZ(Mathf.DegToRad(angle)), dst);
     }
 
     static Scale(m, scale, dst) {
@@ -442,9 +442,9 @@ class Matrix4x4 extends Float32Array {
         const position = new Vector3(m[12], m[13], m[14]);
 
         // skale to długości wektorów osi
-        const sx = Math.hypot(m[0], m[1], m[2]);
-        const sy = Math.hypot(m[4], m[5], m[6]);
-        const sz = Math.hypot(m[8], m[9], m[10]);
+        const sx = Mathf.hypot(m[0], m[1], m[2]);
+        const sy = Mathf.hypot(m[4], m[5], m[6]);
+        const sz = Mathf.hypot(m[8], m[9], m[10]);
         const scale = new Vector3(sx, sy, sz);
 
         // normalizowana macierz rotacji
@@ -465,26 +465,26 @@ class Matrix4x4 extends Float32Array {
         let x, y, z, w;
 
         if (trace > 0) {
-            let s = 0.5 / Math.sqrt(trace + 1.0);
+            let s = 0.5 / Mathf.Sqrt(trace + 1.0);
             w = 0.25 / s;
             x = (m[6] - m[9]) * s;
             y = (m[8] - m[2]) * s;
             z = (m[1] - m[4]) * s;
         } else {
             if (m[0] > m[5] && m[0] > m[10]) {
-                let s = 2.0 * Math.sqrt(1.0 + m[0] - m[5] - m[10]);
+                let s = 2.0 * Mathf.Sqrt(1.0 + m[0] - m[5] - m[10]);
                 w = (m[6] - m[9]) / s;
                 x = 0.25 * s;
                 y = (m[1] + m[4]) / s;
                 z = (m[2] + m[8]) / s;
             } else if (m[5] > m[10]) {
-                let s = 2.0 * Math.sqrt(1.0 + m[5] - m[0] - m[10]);
+                let s = 2.0 * Mathf.Sqrt(1.0 + m[5] - m[0] - m[10]);
                 w = (m[8] - m[2]) / s;
                 x = (m[1] + m[4]) / s;
                 y = 0.25 * s;
                 z = (m[6] + m[9]) / s;
             } else {
-                let s = 2.0 * Math.sqrt(1.0 + m[10] - m[0] - m[5]);
+                let s = 2.0 * Mathf.Sqrt(1.0 + m[10] - m[0] - m[5]);
                 w = (m[1] - m[4]) / s;
                 x = (m[2] + m[8]) / s;
                 y = (m[6] + m[9]) / s;

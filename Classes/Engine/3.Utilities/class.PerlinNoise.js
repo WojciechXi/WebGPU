@@ -64,12 +64,12 @@ class PerlinNoise {
     // ---------- Perlin 2D ----------
     Noise(x, y) {
         // znajdź jednostkowy kwadrat, w którym leży punkt
-        const X = Math.floor(x) & 255;
-        const Y = Math.floor(y) & 255;
+        const X = Mathf.floor(x) & 255;
+        const Y = Mathf.floor(y) & 255;
 
         // pozycja punktu wewnątrz jednostkowego kwadratu
-        const xf = x - Math.floor(x);
-        const yf = y - Math.floor(y);
+        const xf = x - Mathf.floor(x);
+        const yf = y - Mathf.floor(y);
 
         // fade dla wygładzenia
         const u = PerlinNoise.fade(xf);

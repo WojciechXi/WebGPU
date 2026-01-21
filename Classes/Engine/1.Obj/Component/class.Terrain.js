@@ -32,26 +32,26 @@ class Terrain extends Component {
     }
 
     GetHeightLinear(xLinear, zLinear) {
-        const x = Math.floor(this.resolution * xLinear);
-        const z = Math.floor(this.resolution * zLinear);
+        const x = Mathf.floor(this.resolution * xLinear);
+        const z = Mathf.floor(this.resolution * zLinear);
 
         const x1 = x + 1;
         const z1 = z + 1;
 
         if (x < 0 || z < 0 || x + 1 >= this.resolution || z + 1 >= this.resolution) return -Infinity;
 
-        let lerpX = Math.InverseLerp(x, x1, this.resolution * xLinear);
-        let lerpZ = Math.InverseLerp(z, z1, this.resolution * xLinear);
+        let lerpX = Mathf.InverseLerp(x, x1, this.resolution * xLinear);
+        let lerpZ = Mathf.InverseLerp(z, z1, this.resolution * xLinear);
 
         const h00 = this.GetHeight(x, z);
         const h10 = this.GetHeight(x1, z);
         const h01 = this.GetHeight(x, z1);
         const h11 = this.GetHeight(x1, z1);
 
-        const h0 = Math.Lerp(h00, h10, lerpX);
-        const h1 = Math.Lerp(h01, h11, lerpX);
+        const h0 = Mathf.Lerp(h00, h10, lerpX);
+        const h1 = Mathf.Lerp(h01, h11, lerpX);
 
-        return Math.Lerp(h0, h1, lerpZ);
+        return Mathf.Lerp(h0, h1, lerpZ);
     }
 
     GetObjectHeight(x, z) {
@@ -135,7 +135,7 @@ class Terrain extends Component {
 
         let lod = 0;
         const triangles = [];
-        const offset = Math.pow(2, lod);
+        const offset = Mathf.Pow(2, lod);
         for (let x = 0; x + 1 < this.resolution; x += offset) {
             for (let z = 0; z + 1 < this.resolution; z += offset) {
                 const index = (x) + (z) * this.resolution;

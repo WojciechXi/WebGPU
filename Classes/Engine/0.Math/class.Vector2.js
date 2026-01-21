@@ -75,7 +75,7 @@ class Vector2 extends Float32Array {
     }
 
     get magnitude() {
-        return Math.sqrt(this.sqrMagnitude);
+        return Mathf.Sqrt(this.sqrMagnitude);
     }
 
     get normalized() {

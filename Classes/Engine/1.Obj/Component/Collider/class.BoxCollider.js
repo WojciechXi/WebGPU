@@ -32,9 +32,9 @@ class BoxCollider extends Collider {
             const bMax = otherColliderBounds.max;
 
             // overlap po osiach
-            const dx = Math.min(aMax.x, bMax.x) - Math.max(aMin.x, bMin.x);
-            const dy = Math.min(aMax.y, bMax.y) - Math.max(aMin.y, bMin.y);
-            const dz = Math.min(aMax.z, bMax.z) - Math.max(aMin.z, bMin.z);
+            const dx = Mathf.Min(aMax.x, bMax.x) - Mathf.Max(aMin.x, bMin.x);
+            const dy = Mathf.Min(aMax.y, bMax.y) - Mathf.Max(aMin.y, bMin.y);
+            const dz = Mathf.Min(aMax.z, bMax.z) - Mathf.Max(aMin.z, bMin.z);
 
             if (dx > 0 && dy > 0 && dz > 0) {
                 // najmniejszy overlap → to będzie oś korekcji

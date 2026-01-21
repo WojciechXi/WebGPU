@@ -59,7 +59,7 @@ class Quaternion extends Float32Array {
     static Normalize(q, dst = null) {
         dst = dst || new Quaternion();
         const x = q[0], y = q[1], z = q[2], w = q[3];
-        let len = Math.hypot(x, y, z, w);
+        let len = Mathf.hypot(x, y, z, w);
         if (len > 0.00001) {
             len = 1 / len;
             dst[0] = x * len;
@@ -75,12 +75,12 @@ class Quaternion extends Float32Array {
     // Create quaternion from axis and angle
     static FromAxisAngle(axis, angle, dst = null) {
         dst = dst || new Quaternion();
-        const half = Math.DegToRad(angle) * 0.5;
-        const s = Math.sin(half);
+        const half = Mathf.DegToRad(angle) * 0.5;
+        const s = Mathf.Sin(half);
         dst[0] = axis[0] * s;
         dst[1] = axis[1] * s;
         dst[2] = axis[2] * s;
-        dst[3] = Math.cos(half);
+        dst[3] = Mathf.Cos(half);
         return Quaternion.Normalize(dst, dst);
     }
 
@@ -139,11 +139,11 @@ class Quaternion extends Float32Array {
             return Quaternion.Normalize(dst, dst);
         }
 
-        const halfTheta = Math.acos(cosHalfTheta);
-        const sinHalfTheta = Math.sqrt(1.0 - cosHalfTheta * cosHalfTheta);
+        const halfTheta = Mathf.Acos(cosHalfTheta);
+        const sinHalfTheta = Mathf.Sqrt(1.0 - cosHalfTheta * cosHalfTheta);
 
-        const ratioA = Math.sin((1 - t) * halfTheta) / sinHalfTheta;
-        const ratioB = Math.sin(t * halfTheta) / sinHalfTheta;
+        const ratioA = Mathf.Sin((1 - t) * halfTheta) / sinHalfTheta;
+        const ratioB = Mathf.Sin(t * halfTheta) / sinHalfTheta;
 
         dst[0] = ax * ratioA + bx * ratioB;
         dst[1] = ay * ratioA + by * ratioB;
@@ -164,37 +164,37 @@ class Quaternion extends Float32Array {
         // roll (X-axis rotation)
         const sinr_cosp = 2 * (w * x + y * z);
         const cosr_cosp = 1 - 2 * (x * x + y * y);
-        dst[0] = Math.atan2(sinr_cosp, cosr_cosp);
+        dst[0] = Mathf.Atan2(sinr_cosp, cosr_cosp);
 
         // pitch (Y-axis rotation)
         const sinp = 2 * (w * y - z * x);
-        if (Math.abs(sinp) >= 1) {
-            dst[1] = Math.sign(sinp) * Math.PI / 2; // clamp to 90° if out of range
+        if (Mathf.Abs(sinp) >= 1) {
+            dst[1] = Mathf.Sign(sinp) * Mathf.PI / 2; // clamp to 90° if out of range
         } else {
-            dst[1] = Math.asin(sinp);
+            dst[1] = Mathf.Asin(sinp);
         }
 
         // yaw (Z-axis rotation)
         const siny_cosp = 2 * (w * z + x * y);
         const cosy_cosp = 1 - 2 * (y * y + z * z);
-        dst[2] = Math.atan2(siny_cosp, cosy_cosp);
+        dst[2] = Mathf.Atan2(siny_cosp, cosy_cosp);
 
-        dst[0] = Math.RadToDeg(dst[0]);
-        dst[1] = Math.RadToDeg(dst[1]);
-        dst[2] = Math.RadToDeg(dst[2]);
+        dst[0] = Mathf.RadToDeg(dst[0]);
+        dst[1] = Mathf.RadToDeg(dst[1]);
+        dst[2] = Mathf.RadToDeg(dst[2]);
         return dst; // [roll, pitch, yaw]
     }
 
     static FromEuler(x, y, z, dst = null) {
         dst = dst || Quaternion.Identity();
 
-        x = Math.DegToRad(x);
-        y = Math.DegToRad(y);
-        z = Math.DegToRad(z);
+        x = Mathf.DegToRad(x);
+        y = Mathf.DegToRad(y);
+        z = Mathf.DegToRad(z);
 
-        const c1 = Math.cos(y / 2), s1 = Math.sin(y / 2);
-        const c2 = Math.cos(z / 2), s2 = Math.sin(z / 2);
-        const c3 = Math.cos(x / 2), s3 = Math.sin(x / 2);
+        const c1 = Mathf.Cos(y / 2), s1 = Mathf.Sin(y / 2);
+        const c2 = Mathf.Cos(z / 2), s2 = Mathf.Sin(z / 2);
+        const c3 = Mathf.Cos(x / 2), s3 = Mathf.Sin(x / 2);
 
         dst.w = c1 * c2 * c3 + s1 * s2 * s3;
         dst.x = c1 * c2 * s3 - s1 * s2 * c3;

@@ -27,9 +27,9 @@ class SphereCollider extends Collider {
             const boxMin = otherColliderBounds.min;
             const boxMax = otherColliderBounds.max;
 
-            const x = Math.max(boxMin.x, Math.min(worldCenter.x, boxMax.x));
-            const y = Math.max(boxMin.y, Math.min(worldCenter.y, boxMax.y));
-            const z = Math.max(boxMin.z, Math.min(worldCenter.z, boxMax.z));
+            const x = Mathf.Max(boxMin.x, Mathf.Min(worldCenter.x, boxMax.x));
+            const y = Mathf.Max(boxMin.y, Mathf.Min(worldCenter.y, boxMax.y));
+            const z = Mathf.Max(boxMin.z, Mathf.Min(worldCenter.z, boxMax.z));
 
             const closest = new Vector3(x, y, z);
             const delta = Vector3.Subtract(worldCenter, closest);
@@ -64,9 +64,9 @@ class SphereCollider extends Collider {
 
             // clamp sphere center to box
             const closest = new Vector3(
-                Math.max(boxMin.x, Math.min(worldCenter.x, boxMax.x)),
-                Math.max(boxMin.y, Math.min(worldCenter.y, boxMax.y)),
-                Math.max(boxMin.z, Math.min(worldCenter.z, boxMax.z))
+                Mathf.Max(boxMin.x, Mathf.Min(worldCenter.x, boxMax.x)),
+                Mathf.Max(boxMin.y, Mathf.Min(worldCenter.y, boxMax.y)),
+                Mathf.Max(boxMin.z, Mathf.Min(worldCenter.z, boxMax.z))
             );
 
             const delta = Vector3.Subtract(worldCenter, closest);

@@ -2,8 +2,8 @@ class VoxelChunkData {
 
     static {
         this.resolution = 32;
-        this.area = parseInt(Math.pow(this.resolution, 2));
-        this.volume = parseInt(Math.pow(this.resolution, 3));
+        this.area = parseInt(Mathf.Pow(this.resolution, 2));
+        this.volume = parseInt(Mathf.Pow(this.resolution, 3));
     }
 
     static Index(x, y, z) {

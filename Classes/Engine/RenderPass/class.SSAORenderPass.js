@@ -41,8 +41,8 @@ class SSAORenderPass extends RenderPass {
 
         const noise = new Float32Array(16 * 4);
         for (let i = 0; i < 16; i++) {
-            noise[i * 4 + 0] = Math.random();
-            noise[i * 4 + 1] = Math.random();
+            noise[i * 4 + 0] = Mathf.Random();
+            noise[i * 4 + 1] = Mathf.Random();
             noise[i * 4 + 2] = 0;
             noise[i * 4 + 3] = 0;
         }
@@ -227,13 +227,13 @@ class SSAORenderPass extends RenderPass {
 
         for (let i = 0; i < size; i++) {
             let sample = new Vector3(
-                Math.random() * 2.0 - 1.0,
-                Math.random() * 2.0 - 1.0,
-                Math.random()
+                Mathf.Random() * 2.0 - 1.0,
+                Mathf.Random() * 2.0 - 1.0,
+                Mathf.Random()
             );
 
             sample.Normalize();
-            sample = Vector3.Multiply(sample, Math.random());
+            sample = Vector3.Multiply(sample, Mathf.Random());
 
             kernel.push(sample[0], sample[1], sample[2], 0);
         }
