@@ -1,0 +1,1 @@
+class Vector2Int extends Int16Array { }

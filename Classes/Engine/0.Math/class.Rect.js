@@ -25,6 +25,7 @@ class Rect extends Float32Array {
     // Constructors
     constructor(x = 0, y = 0, width = 1, height = 1) {
         super(4);
+
         this[0] = x;
         this[1] = y;
         this[2] = width;

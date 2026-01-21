@@ -1,4 +1,4 @@
-class Bounds {
+class Bounds extends Int16Array {
 
     static FromMinMax(min, max) {
         const center = Vector3.Multiply(Vector3.Add(min, max), 0.5);
@@ -6,26 +6,30 @@ class Bounds {
         return new Bounds(center, size);
     }
 
+    /* Unity */
+
+    // Properties
+    get center() { return new Vector3(this[0], this[1], this[2]); }
+    get extents() { return new Vector3(this[3], this[4], this[5]); }
+    get min() { return Vector3.Subtract(this.center, this.extents); }
+    get max() { return Vector3.Add(this.center, this.extents); }
+    get size() { return new Vector3(this[3] * 2, this[4] * 2, this[5] * 2); }
+
+    // Constructors
     constructor(center, size) {
-        this.center = new Vector3(center.x, center.y, center.z);
-        this.extends = Vector3.Multiply(size, 0.5);
+        super(6);
+
+        this[0] = center.x;
+        this[1] = center.y;
+        this[2] = center.z;
+
+        this[3] = size.x / 2;
+        this[4] = size.y / 2;
+        this[5] = size.z / 2;
     }
 
-    get min() {
-        return Vector3.Subtract(this.center, this.extends);
-    }
-
-    get max() {
-        return Vector3.Add(this.center, this.extends);
-    }
-
-    get size() {
-        return Vector3.Multiply(this.extends, 2);
-    }
-
-    ClosestPoint(point) {
-        return Bounds.ClosestPoint(this, point);
-    }
+    // Public Methods
+    ClosestPoint(point) { }
 
     Contains(point) {
         const min = this.min;
@@ -68,6 +72,10 @@ class Bounds {
 
     SqrDistance(point) {
         return null;
+    }
+
+    ToString() {
+        return JSON.stringify(this);
     }
 
 

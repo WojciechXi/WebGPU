@@ -1,5 +1,8 @@
-class Color extends Float32Array {
+class Color32 extends Float32Array {
 
+    /* Unity */
+
+    // Static Properties
     static get zero() { return new Color(0, 0, 0, 0); }
 
     static get white() { return new Color(1, 1, 1, 1); }
@@ -11,19 +14,27 @@ class Color extends Float32Array {
 
     static get Random() { return new Color(Mathf.Random(), Mathf.Random(), Mathf.Random(), 1); }
 
-    constructor(r = 1, g = 1, b = 1, a = 1) {
-        super(4);
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = a;
-    }
-
+    // Properties
     get r() { return this[0]; } set r(f) { return this[0] = f; }
     get g() { return this[1]; } set g(f) { return this[1] = f; }
     get b() { return this[2]; } set b(f) { return this[2] = f; }
     get a() { return this[3]; } set a(f) { return this[3] = f; }
+    get gamma() { }
+    get grayscale() { }
+    get linear() { }
+    get maxColorComponent() { }
 
+    // Constructors
+    constructor(r = 1, g = 1, b = 1, a = 1) {
+        super(4);
+
+        this[0] = r;
+        this[1] = g;
+        this[2] = b;
+        this[3] = a;
+    }
+
+    // Public Methods
     Set(r, g, b, a) {
         this[0] = r;
         this[1] = g;
@@ -37,5 +48,11 @@ class Color extends Float32Array {
         this[2] = 0;
         this[3] = 0;
     }
+
+    // Static Methods
+    static HSVToRGB() { }
+    static Lerp() { }
+    static LerpUnclamped() { }
+    static RGBToHSV() { }
 
 }
