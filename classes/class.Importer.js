@@ -13,46 +13,35 @@ class Importer {
                 let x = parseFloat(line[1]);
                 let y = parseFloat(line[2]);
                 let z = parseFloat(line[3]);
-
-                let vertex = new Vector3(x, y, z);
-
-                vertices.push(vertex);
+                vertices.push(new Vector3(x, y, z));
             } else if (line.startsWith('vn ')) {
                 line = line.split(' ');
                 let x = parseFloat(line[1]);
                 let y = parseFloat(line[2]);
                 let z = parseFloat(line[3]);
-
-                let normal = new Vector3(x, y, z);
-
-                normals.push(normal);
+                normals.push(new Vector3(x, y, z));
             } else if (line.startsWith('vt ')) {
                 line = line.split(' ');
                 let x = parseFloat(line[1]);
                 let y = parseFloat(line[2]);
-
-                let uv = new Vector2(x, y);
-
-                uvs.push(uv);
+                uvs.push(new Vector2(x, y));
             }
         }
 
         let meshes = [];
-
         let mesh = null;
+
         for (let line of lines) {
             if (line.startsWith('usemtl')) {
                 if (mesh) {
                     mesh.Update();
                     meshes.push(mesh);
-                    mesh = null;
                 }
-
                 mesh = new Mesh((line.split(' ')[1]).trim());
             } else if (line.startsWith('f ')) {
                 line = line.split(' ');
                 for (let l of line) {
-                    if (l == 'f') continue;
+                    if (l === 'f') continue;
                     l = l.split('/');
 
                     let vertexIndex = parseInt(l[0]) - 1;
@@ -61,8 +50,8 @@ class Importer {
 
                     mesh.vertices.push(vertices[vertexIndex]);
                     mesh.triangles.push(mesh.vertices.length - 1);
-                    mesh.uvs.push(uvs[uvIndex]);
-                    mesh.normals.push(normals[normalIndex]);
+                    if (uvs[uvIndex]) mesh.uvs.push(uvs[uvIndex]);
+                    if (normals[normalIndex]) mesh.normals.push(normals[normalIndex]);
                 }
             }
         }
@@ -70,7 +59,6 @@ class Importer {
         if (mesh) {
             mesh.Update();
             meshes.push(mesh);
-            mesh = null;
         }
 
         callback(meshes);
@@ -81,13 +69,13 @@ class Importer {
         const res = await fetch(`${path}/${file}`);
         const gltf = await res.json();
 
-        // 2. Zakładamy, że pierwszy buffer jest binarny
+        // 2. Wczytujemy plik binarny
         const bufferUri = gltf.buffers[0].uri;
         const bufferRes = await fetch(`${path}/${bufferUri}`);
         const arrayBuffer = await bufferRes.arrayBuffer();
         const intArrayBuffer = [new Uint8Array(arrayBuffer)];
 
-        // Pomocnicza funkcja do liczby komponentów w accessorze
+        // Pomocnicza funkcja liczby komponentów
         function numComponents(type) {
             switch (type) {
                 case 'SCALAR': return 1;
@@ -102,73 +90,95 @@ class Importer {
         // 3. Funkcja do odczytu danych według accessorów
         function getAccessorData(gltf, accessorIndex) {
             const accessor = gltf.accessors[accessorIndex];
-            const bufferView = gltf.bufferViews[accessor.bufferView];
-            const buffer = intArrayBuffer[bufferView.buffer]; // Uint8Array z pliku .bin
+            if (!accessor) return null;
 
+            const bufferView = gltf.bufferViews[accessor.bufferView];
+            if (!bufferView) return null;
+
+            const buffer = intArrayBuffer[bufferView.buffer];
             const byteOffset = (bufferView.byteOffset || 0) + (accessor.byteOffset || 0);
             const length = accessor.count;
-            const numComponents = {
-                SCALAR: 1,
-                VEC2: 2,
-                VEC3: 3,
-                VEC4: 4,
-                MAT4: 16
-            }[accessor.type];
+            const nComponents = numComponents(accessor.type);
 
             let TypedArray;
             switch (accessor.componentType) {
                 case 5123: TypedArray = Uint16Array; break;
                 case 5125: TypedArray = Uint32Array; break;
                 case 5126: TypedArray = Float32Array; break;
-                default: throw new Error("Unsupported componentType");
+                default: throw new Error("Unsupported componentType: " + accessor.componentType);
             }
 
-            const array = new TypedArray(
+            return new TypedArray(
                 buffer.buffer,
                 buffer.byteOffset + byteOffset,
-                length * numComponents
+                length * nComponents
             );
-
-            return array;
         }
 
+        // Bezpieczne wywołanie accessorów
+        function safeGetAccessorData(gltf, accessorIndex) {
+            if (accessorIndex === undefined) return null;
+            return getAccessorData(gltf, accessorIndex);
+        }
+
+        // 4. Tworzymy meshe
         let meshes = [];
         gltf.meshes.forEach((_mesh) => {
             _mesh.primitives.forEach((primitive) => {
                 let mesh = new Mesh(_mesh.name);
 
-                const _positions = getAccessorData(gltf, primitive.attributes.POSITION);
-                const _normals = getAccessorData(gltf, primitive.attributes.NORMAL);
-                const _tangents = getAccessorData(gltf, primitive.attributes.TANGENT);
-                const _uvs = getAccessorData(gltf, primitive.attributes.TEXCOORD_0);
-                const _indices = getAccessorData(gltf, primitive.indices);
+                const _positions = safeGetAccessorData(gltf, primitive.attributes.POSITION);
+                const _normals = safeGetAccessorData(gltf, primitive.attributes.NORMAL);
+                const _tangents = safeGetAccessorData(gltf, primitive.attributes.TANGENT);
+                const _uvs = safeGetAccessorData(gltf, primitive.attributes.TEXCOORD_0);
+                const _indices = safeGetAccessorData(gltf, primitive.indices);
 
                 let vertices = [];
                 let normals = [];
                 let tangents = [];
                 let uvs = [];
 
-                for (let i = 0; i < _positions.length; i += 3) vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
-                for (let i = 0; i < _normals.length; i += 3) normals.push(new Vector3(_normals[i], _normals[i + 1], _normals[i + 2]));
-                for (let i = 0; i < _tangents.length; i += 4) tangents.push(new Vector4(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
-                for (let i = 0; i < _uvs.length; i += 2) uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
+                if (_positions) {
+                    for (let i = 0; i < _positions.length; i += 3)
+                        vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
+                }
+
+                if (_normals) {
+                    for (let i = 0; i < _normals.length; i += 3)
+                        normals.push(new Vector3(_normals[i], _normals[i + 1], _normals[i + 2]));
+                }
+
+                if (_tangents) {
+                    for (let i = 0; i < _tangents.length; i += 4)
+                        tangents.push(new Vector4(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
+                }
+
+                if (_uvs) {
+                    for (let i = 0; i < _uvs.length; i += 2)
+                        uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
+                }
 
                 mesh.vertices = vertices;
                 mesh.normals = normals;
                 mesh.tangents = tangents;
                 mesh.uvs = uvs;
 
+                let materialName = primitive.material !== undefined && gltf.materials
+                    ? gltf.materials[primitive.material]?.name || "default"
+                    : "default";
+
                 let subMesh = new SubMesh({
-                    triangles: _indices,
-                    material: gltf.materials[primitive.material].name,
+                    triangles: _indices || [],
+                    material: materialName,
                 });
 
                 mesh.subMeshes.push(subMesh);
 
-                mesh.RecalculateNormals();
-                mesh.RecalculateTangents();
-                mesh.RecalculateBounds();
-                mesh.Update();
+                mesh.RecalculateNormals?.();
+                mesh.RecalculateTangents?.();
+                mesh.RecalculateBounds?.();
+                mesh.Update?.();
+
                 meshes.push(mesh);
             });
         });

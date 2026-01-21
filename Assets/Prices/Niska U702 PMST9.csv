@@ -1,0 +1,23 @@
+Nazwa (nie wpływa na rozkrój);Szerokość;Oklejanie szerokości;Wysokość;Oklejanie wysokości;Grubość płyty;Ilość sztuk;Słoje [0 = bez znaczenia / 1 = po drugim wymiarze (po wysokości) / 2 lub puste = po pierwszym wymiarze (po szerokości)]
+Szafka 60 1;571;=;596;=;18;1;0
+Szafka 60 1;147;=;596;=;18;1;0
+Szafka 60 2;340;=;596;=;18;1;0
+Szafka 60 2;379;=;596;=;18;1;0
+Szafka 80;340;=;796;=;18;1;0
+Szafka 80;379;=;796;=;18;1;0
+Kuchenka;166;=;596;=;18;1;0
+Kuchenka;171;=;596;=;18;1;0
+Kuchenka;378;=;596;=;18;1;0
+Kuchenka;758;=;596;=;18;1;0
+Nerka lewa;758;=;506;=;18;1;0
+Nerka prawa;758;=;446;=;18;1;0
+Nerka prawa;758;=;117;=;18;1;0
+Kolumna ekspres;406;=;596;=;18;1;0
+Kolumna ekspres;238;=;596;=;18;1;0
+Kolumna ekspres;346;=;596;=;18;1;0
+Kolumna piekarnik;296;=;596;=;18;2;0
+Kolumna piekarnik;396;=;596;=;18;1;0
+Kolumna cargo;806;=;321;=;18;1;0
+Kolumna cargo;1186;=;321;=;18;1;0
+Kolumna lodówka;806;=;752;=;18;1;0
+Kolumna lodówka;1186;=;752;=;18;1;0

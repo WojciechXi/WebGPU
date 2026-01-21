@@ -1,0 +1,16 @@
+{
+    "host": "web-002.webh.cloud",
+    "username": "u234675_vules",
+    "password": "aA8kR9uH6f",
+    "remotePath": "/www/projekt.vules-studio.pl",
+    "protocol": "ftp",
+    "port": 0,
+    "fileNameEncoding": "utf8",
+    "autoUpload": true,
+    "autoDelete": false,
+    "autoDownload": false,
+    "ignore": [
+        ".git",
+        "/.vscode"
+    ]
+}

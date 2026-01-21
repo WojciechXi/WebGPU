@@ -54,7 +54,9 @@ window.addEventListener('load', async function (event) {
             const goldMaterial = new Material({
                 name: 'Gold',
                 shader: litShader,
-                color: new Color(1, 0.5, 0, 1),
+                color: new Color(1, 0.875, 0, 1),
+                metallic: 0.9,
+                roughness: 0.1,
             });
             const beigeMaterial = new Material({
                 name: 'Beige',
@@ -66,13 +68,31 @@ window.addEventListener('load', async function (event) {
                 name: 'Concrete',
                 shader: litShader,
             });
-            const u702pmst9Material = new Material({
-                name: 'U702PMST9',
-                shader: litShader,
-            });
+
             const u702st9Material = new Material({
                 name: 'U702ST9',
                 shader: litShader,
+                color: new Color(0.8470588235294118, 0.792156862745098, 0.7411764705882353, 1),
+                roughness: 0.5,
+                metallic: 0.25,
+            });
+
+            const u702pmMaterial = new Material({
+                name: 'U702PMST9',
+                shader: litShader,
+                color: new Color(0.8470588235294118, 0.792156862745098, 0.7411764705882353, 1),
+                roughness: 0.5,
+                metallic: 0.5,
+            });
+
+            const h1386st40Material = new Material({
+                name: 'H1386 ST40 Dąb Casella brązowy',
+                shader: litShader,
+                color: new Color(0.8470588235294118, 0.792156862745098, 0.7411764705882353, 1),
+            });
+            loadBitmap('/Assets/Egger/Wood/H1386 ST40 Dąb Casella brązowy.jpg', function (albedo) {
+                h1386st40Material.SetTexture('albedo', albedo);
+                h1386st40Material.Update();
             });
 
             const sonomaMaterial = new Material({
@@ -148,16 +168,16 @@ window.addEventListener('load', async function (event) {
                 name: 'Terrain',
                 shader: terrainLitShader,
             });
-            loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_Color.jpg', function (albedo) {
-                loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_Normal.jpg', function (normal) {
-                    loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_AmbientOcclusion.jpg', function (occlusion) {
-                        loadBitmap('/Assets/Images/Grass004_1K-JPG/Grass004_1K-JPG_Roughness.jpg', function (roughness) {
-                            terrainMaterial.SetTexture('albedo', albedo);
-                            terrainMaterial.SetTexture('normal', normal);
-                            terrainMaterial.SetTexture('occlusion', occlusion);
-                            terrainMaterial.SetTexture('roughness', roughness);
-                            terrainMaterial.Update();
-                        });
+            loadBitmap('/Assets/Images/rocky-rugged-terrain-unity/rocky-rugged-terrain_1_albedo.png', function (albedo) {
+                loadBitmap('/Assets/Images/rocky-rugged-terrain-unity/rocky-rugged-terrain_1_normal-ogl.png', function (normal) {
+                    loadBitmap('/Assets/Images/rocky-rugged-terrain-unity/rocky-rugged-terrain_1_ao.png', function (occlusion) {
+                        // loadBitmap('/Assets/Images/rocky-rugged-terrain-unity/rocky-rugged-terrain-unity_Roughness.png', function (roughness) {
+                        terrainMaterial.SetTexture('albedo', albedo);
+                        terrainMaterial.SetTexture('normal', normal);
+                        terrainMaterial.SetTexture('occlusion', occlusion);
+                        // terrainMaterial.SetTexture('roughness', roughness);
+                        terrainMaterial.Update();
+                        // });
                     });
                 });
             });
@@ -198,9 +218,14 @@ window.addEventListener('load', async function (event) {
                 });
             });
 
-            loadBitmap('/Assets/Images/U702 PMST9.jpg', function (albedo) {
-                u702pmst9Material.SetTexture('albedo', albedo);
-                u702pmst9Material.Update();
+            loadBitmap('/Assets/Egger/Color/U702 ST9 Kaszmir.jpg', function (albedo) {
+                u702st9Material.SetTexture('albedo', albedo);
+                u702st9Material.Update();
+            });
+
+            loadBitmap('/Assets/Egger/Color/U702 PM Kaszmir.jpg', function (albedo) {
+                u702pmMaterial.SetTexture('albedo', albedo);
+                u702pmMaterial.Update();
             });
 
             loadBitmap('/Assets/Images/D1038 BS BETON MILLENIUM.jpg', function (albedo) {
@@ -235,9 +260,9 @@ window.addEventListener('load', async function (event) {
                 Tiles: floorMaterial,
                 Walnut: sonomaMaterial,
                 Wardrobe: sonomaMaterial,
-                'H1386-ST40': sonomaMaterial,
-                'U702-PM': u702pmst9Material,
-                'U702-ST9': u702pmst9Material,
+                'H1386 ST40': h1386st40Material,
+                'U702 ST9': u702st9Material,
+                'U702 PM': u702pmMaterial,
 
                 'Bedroom S': olivePaintMaterial,
                 'Bedroom E': olivePaintMaterial,
@@ -273,7 +298,7 @@ window.addEventListener('load', async function (event) {
             cameraGameObject.AddComponent(Test);
 
             // const terrainGameObject = new GameObject('Terrain');
-            // terrainGameObject.transform.position = new Vector3(-50, 0, -50);
+            // // terrainGameObject.transform.position = new Vector3(-50, 0, -50);
             // terrainGameObject.transform.localScale = new Vector3(100, 10, 100);
             // let terrain = terrainGameObject.AddComponent(Terrain);
             // let terrainCollider = terrainGameObject.AddComponent(TerrainCollider);
@@ -289,9 +314,9 @@ window.addEventListener('load', async function (event) {
             // }
             // terrain.SetHeights(0, 0, terrain.resolution, terrain.resolution, heights);
 
-            setTimeout(function () {
-                Physics.simulate = true;
-            }, 1000);
+            // setTimeout(function () {
+            //     Physics.simulate = true;
+            // }, 1000);
 
             // let go = new GameObject('Voxel Chunk');
             // let meshRenderer = go.AddComponent(MeshRenderer);
