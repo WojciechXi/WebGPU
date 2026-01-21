@@ -1,1 +1,1 @@
-class Vector3Int extends Int16Array { }
+class Vector3Int extends Uint16Array { }
