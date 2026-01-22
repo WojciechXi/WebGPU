@@ -30,7 +30,7 @@ struct VSOut {
 fn vs(vert: Vertex) -> VSOut {
     var vsOut: VSOut;
 
-    vsOut.clipPosition = view.projection * view.matrix * transform.matrix * vec4f(vert.position, 1.0);
+    vsOut.clipPosition = view.viewProjection * transform.matrix * vec4f(vert.position, 1.0);
     vsOut.color = vec4f(0, 0, 0, 1);
 
     return vsOut;

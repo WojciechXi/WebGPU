@@ -32,7 +32,7 @@ class ShadowRenderPass extends RenderPass {
             },
         });
 
-        for (let component of camera.renderables) component.Draw(this, camera);
+        for (let component of Engine.Instance.scene.renderables) component.Draw(this, camera);
 
         renderPass.end();
     }

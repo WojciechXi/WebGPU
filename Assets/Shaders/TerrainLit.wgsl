@@ -89,13 +89,9 @@ struct VSOut {
 fn vs(vert: Vertex) -> VSOut {
   var vsOut: VSOut;
 
-  let modelMatrix = transform.matrix;
-  let viewMatrix = view.matrix;
-  let projectionMatrix = view.projection;
-
   var objectPosition = vert.position;
-  let worldPosition = (modelMatrix * vec4f(objectPosition, 1.0)).xyz;
-  let clipPosition = projectionMatrix * viewMatrix * vec4f(worldPosition, 1.0);
+  let worldPosition = (transform.matrix * vec4f(objectPosition, 1.0)).xyz;
+  let clipPosition = view.viewProjection * vec4f(worldPosition, 1.0);
 
   var objectNormal = vert.normal;
   var objectTangent = vert.tangent;
@@ -103,7 +99,7 @@ fn vs(vert: Vertex) -> VSOut {
   vsOut.clipPosition = clipPosition;
   vsOut.worldPosition = worldPosition;
 
-  let normalMatrix = getNormalMatrix(modelMatrix);
+  let normalMatrix = getNormalMatrix(transform.matrix);
   
   let T = normalize(normalMatrix * objectTangent.xyz);
   let N = normalize(normalMatrix * objectNormal);

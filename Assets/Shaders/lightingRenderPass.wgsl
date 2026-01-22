@@ -148,7 +148,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     // --- world space dane z GBuffer ---
     let worldPosition4 = textureSample(worldPositionTexture, screenSampler, vsOut.uv);
     let worldNormal = normalize(textureSample(worldNormalTexture, screenSampler, vsOut.uv).xyz * 2.0 - 1.0);
-    let color         = textureSample(colorTexture, screenSampler, vsOut.uv);
+    let color = textureSample(colorTexture, screenSampler, vsOut.uv);
 
     let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv);
     let roughness = clamp(pbr.r, 0.01, 0.5);
