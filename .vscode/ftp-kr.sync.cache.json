@@ -2639,6 +2639,18 @@
             }
           },
           "Shaders": {
+            "Lit.wgsl": {
+              "type": "-",
+              "size": 5439,
+              "lmtime": 1769096719494.6138,
+              "modified": false
+            },
+            "TerrainLit.wgsl": {
+              "type": "-",
+              "size": 5471,
+              "lmtime": 1769096792272.7375,
+              "modified": false
+            },
             "bloomRenderPass.wgsl": {
               "type": "-",
               "size": 2981,
@@ -2671,20 +2683,14 @@
             },
             "gizmosRenderPass.wgsl": {
               "type": "-",
-              "size": 832,
-              "lmtime": 1759269425290.2937,
+              "size": 919,
+              "lmtime": 1769096820504.971,
               "modified": false
             },
             "lightingRenderPass.wgsl": {
               "type": "-",
-              "size": 7750,
-              "lmtime": 1759369127434.891,
-              "modified": false
-            },
-            "Lit.wgsl": {
-              "type": "-",
-              "size": 5459,
-              "lmtime": 1759528697599.5535,
+              "size": 7742,
+              "lmtime": 1769096814822.0322,
               "modified": false
             },
             "screenSpaceReflectionRenderPass.wgsl": {
@@ -2696,13 +2702,7 @@
             "ssaoRenderPass.wgsl": {
               "type": "-",
               "size": 8508,
-              "lmtime": 1759366423198.1921,
-              "modified": false
-            },
-            "TerrainLit.wgsl": {
-              "type": "-",
-              "size": 5491,
-              "lmtime": 1759528697599.5535,
+              "lmtime": 1769096768603.7727,
               "modified": false
             },
             "tonemappingRenderPass.wgsl": {
@@ -2749,410 +2749,341 @@
             "modified": false
           }
         },
+        "Classes": {
+          "Engine": {
+            "0.Math": {
+              "class.Bounds.js": {
+                "type": "-",
+                "size": 1950,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.BoundsInt.js": {
+                "type": "-",
+                "size": 1954,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Color.js": {
+                "type": "-",
+                "size": 1495,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Color32.js": {
+                "type": "-",
+                "size": 1497,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Matrix4x4.js": {
+                "type": "-",
+                "size": 16786,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.PerlinNoise.js": {
+                "type": "-",
+                "size": 3598,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Quaternion.js": {
+                "type": "-",
+                "size": 6925,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Rect.js": {
+                "type": "-",
+                "size": 1359,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.RectInt.js": {
+                "type": "-",
+                "size": 1332,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Vector2.js": {
+                "type": "-",
+                "size": 3037,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Vector2Int.js": {
+                "type": "-",
+                "size": 40,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Vector3.js": {
+                "type": "-",
+                "size": 4777,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Vector3Int.js": {
+                "type": "-",
+                "size": 40,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Vector4.js": {
+                "type": "-",
+                "size": 787,
+                "lmtime": 0,
+                "modified": false
+              }
+            },
+            "1.Core": {
+              "class.FrustumPlanes.js": {
+                "type": "-",
+                "size": 822,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Keyframe.js": {
+                "type": "-",
+                "size": 118,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Plane.js": {
+                "type": "-",
+                "size": 3054,
+                "lmtime": 1769095404404.736,
+                "modified": false
+              }
+            },
+            "2.Obj": {
+              "Component": {
+                "Behaviour": {
+                  "MonoBehaviour": {},
+                  "class.Camera.js": {
+                    "type": "-",
+                    "size": 2865,
+                    "lmtime": 1769096950872.538,
+                    "modified": false
+                  },
+                  "class.MonoBehaviour.js": {
+                    "type": "-",
+                    "size": 2599,
+                    "lmtime": 0,
+                    "modified": false
+                  }
+                },
+                "Renderer": {
+                  "class.MeshRenderer.js": {
+                    "type": "-",
+                    "size": 1131,
+                    "lmtime": 1769096281510.5686,
+                    "modified": false
+                  }
+                },
+                "class.Behaviour.js": {
+                  "type": "-",
+                  "size": 222,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.Renderer.js": {
+                  "type": "-",
+                  "size": 203,
+                  "lmtime": 1769096097521.568,
+                  "modified": false
+                },
+                "class.Transform.js": {
+                  "type": "-",
+                  "size": 4820,
+                  "lmtime": 0,
+                  "modified": false
+                }
+              }
+            },
+            "3.Utilities": {
+              "class.GeometryUtility.js": {
+                "type": "-",
+                "size": 3677,
+                "lmtime": 1769096069844.3906,
+                "modified": false
+              },
+              "class.Mesh.js": {
+                "type": "-",
+                "size": 8744,
+                "lmtime": 1769096057917.324,
+                "modified": false
+              }
+            },
+            "4.Physics": {},
+            "5.Engine": {
+              "RenderPass": {
+                "class.BloomRenderPass.js": {
+                  "type": "-",
+                  "size": 7721,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ClearRenderPass.js": {
+                  "type": "-",
+                  "size": 1966,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.DebugRenderPass.js": {
+                  "type": "-",
+                  "size": 2770,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.FinalRenderPass.js": {
+                  "type": "-",
+                  "size": 4472,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ForwardRenderPass.js": {
+                  "type": "-",
+                  "size": 1789,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.GBufferRenderPass.js": {
+                  "type": "-",
+                  "size": 3297,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.GizmosRenderPass.js": {
+                  "type": "-",
+                  "size": 4345,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.LightingRenderPass.js": {
+                  "type": "-",
+                  "size": 4690,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.SSAORenderPass.js": {
+                  "type": "-",
+                  "size": 9811,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ScreenSpaceReflectionRenderPass.js": {
+                  "type": "-",
+                  "size": 2705,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ShadowRenderPass.js": {
+                  "type": "-",
+                  "size": 1471,
+                  "lmtime": 1769097011344.1765,
+                  "modified": false
+                },
+                "class.TonemappingRenderPass.js": {
+                  "type": "-",
+                  "size": 2641,
+                  "lmtime": 0,
+                  "modified": false
+                }
+              },
+              "class.Engine.js": {
+                "type": "-",
+                "size": 816,
+                "lmtime": 1769088692237.5962,
+                "modified": false
+              },
+              "class.GPU.js": {
+                "type": "-",
+                "size": 3850,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Graphics.js": {
+                "type": "-",
+                "size": 8471,
+                "lmtime": 1769097015797.1458,
+                "modified": false
+              },
+              "class.Importer.js": {
+                "type": "-",
+                "size": 7033,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Input.js": {
+                "type": "-",
+                "size": 2692,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Material.js": {
+                "type": "-",
+                "size": 4869,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.RenderPass.js": {
+                "type": "-",
+                "size": 1473,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Shader.js": {
+                "type": "-",
+                "size": 5537,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Time.js": {
+                "type": "-",
+                "size": 323,
+                "lmtime": 0,
+                "modified": false
+              }
+            },
+            "class.Object.js": {
+              "type": "-",
+              "size": 716,
+              "lmtime": 0,
+              "modified": false
+            }
+          }
+        },
+        "Game": {},
         "assets.php": {
           "type": "-",
           "size": 722,
           "lmtime": 1758574876866.0037,
           "modified": false
         },
-        "classes": {
-          "class.Ajax.js": {
-            "type": "-",
-            "size": 252,
-            "lmtime": 1758403354973.0845,
-            "modified": false
-          },
-          "class.Component.js": {
-            "type": "-",
-            "size": 380,
-            "lmtime": 1759179916177.6934,
-            "modified": false
-          },
-          "class.Engine.js": {
-            "type": "-",
-            "size": 1052,
-            "lmtime": 1759267847115.7466,
-            "modified": false
-          },
-          "class.GPU.js": {
-            "type": "-",
-            "size": 3850,
-            "lmtime": 1758926712167.1091,
-            "modified": false
-          },
-          "class.GameObject.js": {
-            "type": "-",
-            "size": 2176,
-            "lmtime": 1759269092618.5789,
-            "modified": false
-          },
-          "class.Graphics.js": {
-            "type": "-",
-            "size": 8267,
-            "lmtime": 1759528697599.5535,
-            "modified": false
-          },
-          "class.Importer.js": {
-            "type": "-",
-            "size": 7033,
-            "lmtime": 1761776270471.8462,
-            "modified": false
-          },
-          "class.Input.js": {
-            "type": "-",
-            "size": 2692,
-            "lmtime": 1758485577901.1309,
-            "modified": false
-          },
-          "class.Material.js": {
-            "type": "-",
-            "size": 5650,
-            "lmtime": 1759669273401.4265,
-            "modified": false
-          },
-          "class.Object.js": {
-            "type": "-",
-            "size": 167,
-            "lmtime": 1759179755682.8354,
-            "modified": false
-          },
-          "class.Physics.js": {
-            "type": "-",
-            "size": 125,
-            "lmtime": 1759138713281.643,
-            "modified": false
-          },
-          "class.RenderPass.js": {
-            "type": "-",
-            "size": 1142,
-            "lmtime": 1759270279779.7593,
-            "modified": false
-          },
-          "class.Scene.js": {
-            "type": "-",
-            "size": 37,
-            "lmtime": 1758317997763.8557,
-            "modified": false
-          },
-          "class.Shader.js": {
-            "type": "-",
-            "size": 5537,
-            "lmtime": 1759528697604.0425,
-            "modified": false
-          },
-          "class.Time.js": {
-            "type": "-",
-            "size": 323,
-            "lmtime": 1759272697470.1775,
-            "modified": false
-          },
-          "components": {
-            "class.AmbientLight.js": {
-              "type": "-",
-              "size": 196,
-              "lmtime": 1758929215791.0735,
-              "modified": false
-            },
-            "class.Camera.js": {
-              "type": "-",
-              "size": 1203,
-              "lmtime": 1759360172659.969,
-              "modified": false
-            },
-            "class.Collider.js": {
-              "type": "-",
-              "size": 1679,
-              "lmtime": 1759272844870.63,
-              "modified": false
-            },
-            "class.DirectionalLight.js": {
-              "type": "-",
-              "size": 1358,
-              "lmtime": 1759360192406.3584,
-              "modified": false
-            },
-            "class.MeshRenderer.js": {
-              "type": "-",
-              "size": 1249,
-              "lmtime": 1759528697606.6475,
-              "modified": false
-            },
-            "class.Renderer.js": {
-              "type": "-",
-              "size": 21,
-              "lmtime": 1759179494791.655,
-              "modified": false
-            },
-            "class.Rigidbody.js": {
-              "type": "-",
-              "size": 3438,
-              "lmtime": 1759148012108.1526,
-              "modified": false
-            },
-            "class.Terrain.js": {
-              "type": "-",
-              "size": 6088,
-              "lmtime": 1759528697607.1294,
-              "modified": false
-            },
-            "class.Test.js": {
-              "type": "-",
-              "size": 960,
-              "lmtime": 1759176477884.4795,
-              "modified": false
-            },
-            "class.Transform.js": {
-              "type": "-",
-              "size": 4175,
-              "lmtime": 1759338034650.3862,
-              "modified": false
-            },
-            "Collider": {
-              "class.BoxCollider.js": {
-                "type": "-",
-                "size": 2224,
-                "lmtime": 1759272868213.667,
-                "modified": false
-              },
-              "class.CapsuleCollider.js": {
-                "type": "-",
-                "size": 3929,
-                "lmtime": 1759271216940.3567,
-                "modified": false
-              },
-              "class.MeshCollider.js": {
-                "type": "-",
-                "size": 46,
-                "lmtime": 1759179779400.3022,
-                "modified": false
-              },
-              "class.SphereCollider.js": {
-                "type": "-",
-                "size": 3638,
-                "lmtime": 1759270899791.1904,
-                "modified": false
-              },
-              "class.TerrainCollider.js": {
-                "type": "-",
-                "size": 1222,
-                "lmtime": 1759262947983.0044,
-                "modified": false
-              },
-              "class.WheelCollider.js": {
-                "type": "-",
-                "size": 47,
-                "lmtime": 1759179990041.485,
-                "modified": false
-              }
-            }
-          },
-          "render": {
-            "class.BloomRenderPass.js": {
-              "type": "-",
-              "size": 7714,
-              "lmtime": 1759366710624.5752,
-              "modified": false
-            },
-            "class.ClearRenderPass.js": {
-              "type": "-",
-              "size": 1959,
-              "lmtime": 1759096410282.7507,
-              "modified": false
-            },
-            "class.DebugRenderPass.js": {
-              "type": "-",
-              "size": 2763,
-              "lmtime": 1759258283718.7454,
-              "modified": false
-            },
-            "class.FinalRenderPass.js": {
-              "type": "-",
-              "size": 4465,
-              "lmtime": 1759261871181.564,
-              "modified": false
-            },
-            "class.ForwardRenderPass.js": {
-              "type": "-",
-              "size": 1731,
-              "lmtime": 1759096395482.1726,
-              "modified": false
-            },
-            "class.GBufferRenderPass.js": {
-              "type": "-",
-              "size": 3239,
-              "lmtime": 1759096913948.914,
-              "modified": false
-            },
-            "class.GizmosRenderPass.js": {
-              "type": "-",
-              "size": 4287,
-              "lmtime": 1759271054547.3743,
-              "modified": false
-            },
-            "class.LightingRenderPass.js": {
-              "type": "-",
-              "size": 4683,
-              "lmtime": 1759101808606.8572,
-              "modified": false
-            },
-            "class.ScreenSpaceReflectionRenderPass.js": {
-              "type": "-",
-              "size": 2698,
-              "lmtime": 1759103984857.6377,
-              "modified": false
-            },
-            "class.ShadowRenderPass.js": {
-              "type": "-",
-              "size": 1398,
-              "lmtime": 1759193184059.0613,
-              "modified": false
-            },
-            "class.SSAORenderPass.js": {
-              "type": "-",
-              "size": 9798,
-              "lmtime": 1759366473288.3206,
-              "modified": false
-            },
-            "class.TonemappingRenderPass.js": {
-              "type": "-",
-              "size": 2634,
-              "lmtime": 1759096325490.958,
-              "modified": false
-            }
-          },
-          "systems": {
-            "voxel": {
-              "class.VoxelChunk.js": {
-                "type": "-",
-                "size": 4935,
-                "lmtime": 1759528697607.1294,
-                "modified": false
-              },
-              "data": {
-                "class.VoxelChunkData.js": {
-                  "type": "-",
-                  "size": 594,
-                  "lmtime": 1759367614454.2522,
-                  "modified": false
-                }
-              }
-            }
-          },
-          "utilities": {
-            "class.Bounds.js": {
-              "type": "-",
-              "size": 1643,
-              "lmtime": 1759189351578.0093,
-              "modified": false
-            },
-            "class.Color.js": {
-              "type": "-",
-              "size": 1143,
-              "lmtime": 1758574862584.0107,
-              "modified": false
-            },
-            "class.FrustumPlanes.js": {
-              "type": "-",
-              "size": 26,
-              "lmtime": 1759173705946.0012,
-              "modified": false
-            },
-            "class.Keyframe.js": {
-              "type": "-",
-              "size": 118,
-              "lmtime": 1759173804525.4966,
-              "modified": false
-            },
-            "class.Mathf.js": {
-              "type": "-",
-              "size": 583,
-              "lmtime": 1759192540281.4258,
-              "modified": false
-            },
-            "class.Matrix4x4.js": {
-              "type": "-",
-              "size": 16767,
-              "lmtime": 1759359515668.272,
-              "modified": false
-            },
-            "class.Mesh.js": {
-              "type": "-",
-              "size": 9321,
-              "lmtime": 1759528697607.1294,
-              "modified": false
-            },
-            "class.PerlinNoise.js": {
-              "type": "-",
-              "size": 3594,
-              "lmtime": 1759262923522.0745,
-              "modified": false
-            },
-            "class.Plane.js": {
-              "type": "-",
-              "size": 50,
-              "lmtime": 1759173959790.1206,
-              "modified": false
-            },
-            "class.Quaternion.js": {
-              "type": "-",
-              "size": 6899,
-              "lmtime": 1759337400643.6116,
-              "modified": false
-            },
-            "class.Ray.js": {
-              "type": "-",
-              "size": 131,
-              "lmtime": 1759173941668.5454,
-              "modified": false
-            },
-            "class.RaycastHit.js": {
-              "type": "-",
-              "size": 25,
-              "lmtime": 1759174007151.561,
-              "modified": false
-            },
-            "class.Rect.js": {
-              "type": "-",
-              "size": 566,
-              "lmtime": 1759174031545.4292,
-              "modified": false
-            },
-            "class.Vector2.js": {
-              "type": "-",
-              "size": 3036,
-              "lmtime": 1759192171781.9058,
-              "modified": false
-            },
-            "class.Vector3.js": {
-              "type": "-",
-              "size": 4775,
-              "lmtime": 1759191249761.2798,
-              "modified": false
-            },
-            "class.Vector4.js": {
-              "type": "-",
-              "size": 787,
-              "lmtime": 1759177324133.572,
-              "modified": false
-            }
-          }
+        "functions.php": {
+          "type": "-",
+          "size": 771,
+          "lmtime": 0,
+          "modified": false
         },
         "index.css": {
           "type": "-",
-          "size": 278,
-          "lmtime": 1758301332769.3457,
+          "size": 315,
+          "lmtime": 1769096345545.2192,
           "modified": false
         },
         "index.js": {
           "type": "-",
-          "size": 16866,
-          "lmtime": 1761864212453.4985,
+          "size": 16908,
+          "lmtime": 1769096408560.2563,
           "modified": false
         },
         "index.php": {
           "type": "-",
-          "size": 3920,
-          "lmtime": 1759337400645.396,
+          "size": 750,
+          "lmtime": 1769096436413.0144,
           "modified": false
         },
         "readme.txt": {

@@ -13,6 +13,8 @@ class Graphics {
     static async Init(assets, callback) {
         const device = GPU.device;
         const canvas = this.canvas = document.querySelector('canvas');
+        canvas.focus();
+
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
 
