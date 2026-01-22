@@ -21,7 +21,8 @@ class DirectionalLight extends MonoBehaviour {
     }
 
     Update() {
-        let matrix = Matrix4x4.TRS(Vector3.Add(Camera.main.transform.position, Vector3.Multiply(this.transform.back, (this.farClipPlane - this.nearClipPlane) * 0.5)), this.transform.rotation, this.transform.lossyScale);
+        // let matrix = Matrix4x4.TRS(Vector3.Add(Camera.main.transform.position, Vector3.Multiply(this.transform.back, (this.farClipPlane - this.nearClipPlane) * 0.5)), this.transform.rotation, this.transform.lossyScale);
+        let matrix = Matrix4x4.TRS(Vector3.Multiply(this.transform.back, (this.farClipPlane - this.nearClipPlane) * 0.5), this.transform.rotation, this.transform.lossyScale);
 
         Matrix4x4.Inverse(matrix, this.viewMatrix);
         Matrix4x4.OrthoLH(-this.orthographicSize / 2, this.orthographicSize / 2, -this.orthographicSize / 2, this.orthographicSize / 2, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);

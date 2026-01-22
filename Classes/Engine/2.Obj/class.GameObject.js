@@ -23,10 +23,7 @@ class GameObject extends Obj {
         });
     }
 
-    GetComponent(type) {
-        return this.components.find(function (c) { return c instanceof type });
-    }
-
+    GetComponent(type) { return this.components.find(function (c) { return c instanceof type }); }
     AddComponent(type) {
         let component = new type(this);
         this.components.push(component);

@@ -8,19 +8,12 @@ class Component extends Obj {
         this.tag = '';
         this.enabled = true;
         this.gameObject = gameObject;
-        this.Init();
-    }
-
-    Init() {
-
     }
 
     // Public Methods
     BroadcastMessage() { }
     CompareTag() { }
-    GetComponent(type) {
-        return this.gameObject.GetComponent(type);
-    }
+    GetComponent(type) { return this.gameObject.GetComponent(type); }
     GetComponentInChildren() { }
     GetComponentIndex() { }
     GetComponentInParent() { }
