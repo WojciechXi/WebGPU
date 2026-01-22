@@ -2,6 +2,7 @@ class RenderPass {
 
     constructor(data) {
         this.name = data.name ?? 'renderPass';
+        this.canvas = data.canvas ?? null;
         this.shaderModule = data.code ? GPU.CreateShaderModule({ code: data.code }) : null;
         this.sampler = GPU.CreateSampler({
             addressModeU: 'repeat',

@@ -9,16 +9,16 @@ class Rect extends Float32Array {
 
     // Properties
     get center() { }
-    get height() { return this[3]; } set height(f) { return this[3] = f; }
+    get height() { return this[3]; } set height(value) { return this[3] = value; }
     get max() { }
     get min() { }
     get position() { return new Vector2(this[0], this[1]); }
     get size() { return new Vector2(this[2], this[3]); }
-    get width() { return this[2]; } set width(f) { return this[2] = f; }
-    get x() { return this[0]; } set x(f) { return this[0] = f; }
+    get width() { return this[2]; } set width(value) { return this[2] = value; }
+    get x() { return this[0]; } set x(value) { return this[0] = value; }
     get xMax() { return Mathf.Max(this[0], this[2]); }
     get xMin() { return Mathf.Min(this[0], this[2]); }
-    get y() { return this[1]; } set y(f) { return this[1] = f; }
+    get y() { return this[1]; } set y(value) { return this[1] = value; }
     get yMax() { return Mathf.Max(this[1], this[3]); }
     get yMin() { return Mathf.Min(this[1], this[3]); }
 

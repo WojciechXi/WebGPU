@@ -37,12 +37,13 @@ class Camera extends Behaviour {
 
     OnPreCull() { // co renderować
         const object = this;
+        const planes = GeometryUtility.CalculateFrustumPlanes(this);
         this.renderables = object.scene.renderables.filter(function (component) {
-            return object.IsVisible(component);
+            return GeometryUtility.TestPlanesAABB(planes, component.bounds);
         });
     }
     OnPreRender() { // jak renderować
-        this.aspect = Graphics.Width / Graphics.Height;
+        this.aspect = (Graphics.Width * this.rect.width) / (Graphics.Height * this.rect.height);
 
         Matrix4x4.Inverse(this.transform.matrix4x4, this.viewMatrix);
         Matrix4x4.Inverse(this.viewMatrix, this.inverseViewMatrix);
@@ -60,10 +61,6 @@ class Camera extends Behaviour {
     }
     OnRenderImage(src, dst) { // post-processing
         //Wyświetla obraz na ekranie
-    }
-
-    IsVisible(component) {
-        return true;// Frustum.Check(this.frustum, component.transform.position);
     }
 
 }

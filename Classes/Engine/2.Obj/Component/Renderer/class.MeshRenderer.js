@@ -8,13 +8,8 @@ class MeshRenderer extends Renderer {
         this.mesh = null;
     }
 
-    get material() {
-        return this.materials[0];
-    }
-
-    set material(material) {
-        this.materials[0] = material;
-    }
+    get material() { return this.materials[0]; }
+    set material(material) { this.materials = [material]; }
 
     Draw(renderPass, camera) {
         if (!this.mesh || !this.material) return;

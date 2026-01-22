@@ -295,7 +295,8 @@ window.addEventListener('load', async function (event) {
 
             const cameraGameObject = new GameObject('Camera');
             cameraGameObject.transform.position = new Vector3(0, 1, -5);
-            cameraGameObject.AddComponent(Camera);
+            const camera = cameraGameObject.AddComponent(Camera);
+            // camera.rect.width = 0.5;
             cameraGameObject.AddComponent(Test);
 
             // const terrainGameObject = new GameObject('Terrain');
@@ -334,8 +335,8 @@ window.addEventListener('load', async function (event) {
             // voxelChunk.Generate();
             // voxelChunk.BuildMesh();
 
-            Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
-                const gameObject = new GameObject('Cube');
+            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
+                const gameObject = new GameObject('Krakow');
                 gameObject.transform.position = new Vector3(0, 0, 0);
                 gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
 
@@ -350,7 +351,6 @@ window.addEventListener('load', async function (event) {
                         if (materials.hasOwnProperty(subMesh.material)) {
                             meshRenderer.materials.push(materials[subMesh.material]);
                         } else {
-                            console.log(subMesh.material);
                             meshRenderer.materials.push(whiteMaterial);
                         }
                     });
