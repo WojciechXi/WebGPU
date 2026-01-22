@@ -72,7 +72,7 @@ class GBufferRenderPass extends RenderPass {
             },
         });
 
-        for (let component of camera.renderables) component.Draw(camera, this);
+        for (let component of camera.renderables) component.Draw(this, camera);
 
         renderPass.end();
     }

@@ -23,6 +23,14 @@ class RenderPass {
 
     }
 
+    DrawMesh(mesh, camera, subMeshIndex) {
+        const subMesh = mesh.subMeshes[subMeshIndex];
+
+        this.SetVertexBuffer(0, mesh.vertexBuffer);
+        this.SetIndexBuffer(subMesh.triangleBuffer, 'uint32');
+        this.DrawIndexed(subMesh.triangles.length);
+    }
+
     SetPipeline(renderPipeline) {
         this.renderPass.setPipeline(renderPipeline);
     }

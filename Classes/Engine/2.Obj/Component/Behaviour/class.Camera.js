@@ -19,6 +19,20 @@ class Camera extends Behaviour {
         this.projectionMatrix = Matrix4x4.Identity();
         this.viewProjectionMatrix = Matrix4x4.Identity();
         this.inverseViewProjectionMatrix = Matrix4x4.Identity();
+
+        this.cameraValues = new Float32Array(16 + 16); //view, projection
+        this.cameraBuffer = GPU.CreateBuffer({
+            label: 'uniform buffer',
+            size: this.cameraValues.length * 4,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+        this.cameraBindGroup = GPU.CreateBindGroup({
+            label: 'ViewBindGroup',
+            layout: Graphics.viewBindGroupLayout,
+            entries: [
+                { binding: 0, resource: { buffer: this.cameraBuffer } },
+            ],
+        });
     }
 
     OnPreCull() { // co renderować
@@ -35,6 +49,11 @@ class Camera extends Behaviour {
         Matrix4x4.PerspectiveLH(Mathf.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
         Matrix4x4.Multiply(this.projectionMatrix, this.viewMatrix, this.viewProjectionMatrix);
         Matrix4x4.Inverse(this.viewProjectionMatrix, this.inverseViewProjectionMatrix);
+
+        this.cameraValues.set(this.viewMatrix, 0);
+        this.cameraValues.set(this.projectionMatrix, 16);
+
+        GPU.Queue.writeBuffer(this.cameraBuffer, 0, this.cameraValues);
     }
     OnPostRender() { // rysuj po renderze
         //Rysowanie na GL

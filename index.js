@@ -334,8 +334,8 @@ window.addEventListener('load', async function (event) {
             // voxelChunk.Generate();
             // voxelChunk.BuildMesh();
 
-            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
-                const gameObject = new GameObject('Krakow');
+            Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
+                const gameObject = new GameObject('Cube');
                 gameObject.transform.position = new Vector3(0, 0, 0);
                 gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
 

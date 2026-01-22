@@ -76,11 +76,6 @@ class Mesh {
         for (let subMesh of this.subMeshes) subMesh.Update();
     }
 
-    Render(renderPass, subMeshIndex, mode = 'triangle') {
-        renderPass.SetVertexBuffer(0, this.vertexBuffer);
-        this.subMeshes[subMeshIndex].Render(renderPass, mode);
-    }
-
     RecalculateNormals() {
         this.normals = Array(this.vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
 
@@ -266,16 +261,6 @@ class SubMesh {
         });
 
         GPU.Queue.writeBuffer(this.edgeBuffer, 0, this.edges);
-    }
-
-    Render(renderPass, mode = 'triangle') {
-        if (mode == 'triangle') {
-            renderPass.SetIndexBuffer(this.triangleBuffer, 'uint32');
-            renderPass.DrawIndexed(this.triangles.length);
-        } else if (mode == 'edge') {
-            renderPass.SetIndexBuffer(this.edgeBuffer, 'uint32');
-            renderPass.DrawIndexed(this.edges.length);
-        }
     }
 
 }

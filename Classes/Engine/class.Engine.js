@@ -28,7 +28,6 @@ class Engine {
 
         Time.Update(time / 1000);
         Input.Update();
-        Graphics.Update();
 
         if (this.scene) for (let c of this.scene.updateables) c.Update();
 

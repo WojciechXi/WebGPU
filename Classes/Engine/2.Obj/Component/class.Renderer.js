@@ -1,9 +1,7 @@
 class Renderer extends Component {
 
     OnPreRender() { }
-    Draw(camera, renderPass) {
-
-    }
+    Draw(renderPass, camera) { }
     OnPostRender() { }
 
 }

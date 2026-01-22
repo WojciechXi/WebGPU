@@ -144,62 +144,52 @@ class Graphics {
             canvas: canvas,
         });
 
-        debugRenderPass.textureView = finalRenderPass.sceneTextureView;
-
         const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
             name: 'gizmosRenderPass',
             code: assets.shaders['gizmosRenderPass.wgsl'],
             canvas: canvas,
         });
 
+        debugRenderPass.textureView = finalRenderPass.sceneTextureView;
+
         callback();
     }
 
-    static Update() {
+    static Render(scene) {
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
+
+        for (let component of scene.renderables) if (component.OnPreRender) component.OnPreRender();
+        if (scene && scene.cameras.length) for (let camera of scene.cameras) this.RenderCamera(camera, scene);
+        for (let component of scene.renderables) if (component.OnPostRender) component.OnPostRender();
     }
 
-    static Render(scene) {
-        if (scene && scene.cameras.length) {
-            for (let component of scene.renderables) if (component.OnPreRender) component.OnPreRender();
-            for (let camera of scene.cameras) {
-                camera.OnPreCull();
-                camera.OnPreRender();
+    static RenderCamera(camera, scene) {
+        camera.OnPreCull();
+        camera.OnPreRender();
 
-                const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
+        const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-                if (this.clearRenderPass) this.clearRenderPass.Render(camera, scene, commandEncoder);
-                // if (this.shadowRenderPass) this.shadowRenderPass.Render(camera,scene, commandEncoder);
+        // if (this.clearRenderPass) this.clearRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.shadowRenderPass) this.shadowRenderPass.Render(DirectionalLight.main, scene, commandEncoder);
 
-                if (this.gBufferRenderPass) this.gBufferRenderPass.Render(camera, scene, commandEncoder);
+        if (this.gBufferRenderPass) this.gBufferRenderPass.Render(camera, scene, commandEncoder);
+        if (this.lightingRenderPass) this.lightingRenderPass.Render(camera, scene, commandEncoder);
+        if (this.forwardRenderPass) this.forwardRenderPass.Render(camera, scene, commandEncoder);
+        if (this.finalRenderPass) this.finalRenderPass.Render(camera, scene, commandEncoder);
 
-                if (this.lightingRenderPass) this.lightingRenderPass.Render(camera, scene, commandEncoder);
-                if (this.forwardRenderPass) this.forwardRenderPass.Render(camera, scene, commandEncoder);
-                if (this.finalRenderPass) this.finalRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.ssaoRenderPass) this.ssaoRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.bloomRenderPass) this.bloomRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(camera, scene, commandEncoder);
 
-                // if (this.ssaoRenderPass) this.ssaoRenderPass.Render(camera, scene, commandEncoder);
-                // if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(camera, scene, commandEncoder);
-                // if (this.bloomRenderPass) this.bloomRenderPass.Render(camera, scene, commandEncoder);
-                // if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(camera, scene, commandEncoder);
+        if (this.debugRenderPass) this.debugRenderPass.Render(camera, scene, commandEncoder);
 
-                if (this.debugRenderPass) this.debugRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.gizmosRenderPass) this.gizmosRenderPass.Render(camera, scene, commandEncoder);
 
-                // if (this.gizmosRenderPass) this.gizmosRenderPass.Render(camera, scene, commandEncoder);
+        GPU.Queue.submit([commandEncoder.finish()]);
 
-                GPU.Queue.submit([commandEncoder.finish()]);
-
-                camera.OnPostRender();
-            }
-            for (let component of scene.renderables) if (component.OnPostRender) component.OnPostRender();
-        }
-    }
-
-    static DrawMesh(renderPass, mesh, transformBindGroup, material, subMeshIndex, viewMatrix, projectionMatrix) {
-        if (!mesh) return;
-        if (!material) return;
-        if (!material.Use(renderPass, transformBindGroup, viewMatrix, projectionMatrix)) return;
-        mesh.Render(renderPass, subMeshIndex);
+        camera.OnPostRender();
     }
 
 }
