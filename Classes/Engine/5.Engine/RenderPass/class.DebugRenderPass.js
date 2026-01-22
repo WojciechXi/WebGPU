@@ -73,7 +73,7 @@ class DebugRenderPass extends RenderPass {
         }) : null;
     }
 
-    Render(camera, engine, commandEncoder) {
+    Render(camera, scene, commandEncoder) {
         if (!this.bindGroup) return;
 
         const renderPass = commandEncoder.beginRenderPass({

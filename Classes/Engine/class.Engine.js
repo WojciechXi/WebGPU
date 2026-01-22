@@ -3,13 +3,13 @@ class Engine {
     constructor(assets) {
         Engine.Instance = this;
         this.assets = assets;
+        this.scene = new Scene();
     }
 
     Init(callback) {
         let object = this;
 
         Graphics.Init(this.assets, function () {
-            object.scene = new Scene();
             callback(object);
             object.Start();
         });
@@ -32,7 +32,7 @@ class Engine {
 
         if (this.scene) for (let c of this.scene.updateables) c.Update();
 
-        Graphics.Render(this);
+        Graphics.Render(this.scene);
 
         requestAnimationFrame(function (time) {
             object.Loop(time);

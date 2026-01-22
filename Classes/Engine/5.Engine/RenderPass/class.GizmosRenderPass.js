@@ -76,7 +76,7 @@ class GizmosRenderPass extends RenderPass {
         });
     }
 
-    Render(camera, engine, commandEncoder) {
+    Render(camera, scene, commandEncoder) {
         this.uniformValues.set(Camera.main.viewMatrix, 0);
         this.uniformValues.set(Camera.main.projectionMatrix, 16);
         GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
@@ -103,7 +103,7 @@ class GizmosRenderPass extends RenderPass {
         renderPass.setBindGroup(0, this.viewBindGroup);
         renderPass.setBindGroup(1, this.transformBindGroup);
 
-        engine.Render(this);
+        for (let component of camera.visibleObjects) component.Draw(camera, renderPass);
 
         renderPass.end();
     }

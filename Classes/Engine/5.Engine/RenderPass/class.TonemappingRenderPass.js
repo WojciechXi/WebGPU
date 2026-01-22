@@ -54,7 +54,7 @@ class TonemappingRenderPass extends RenderPass {
         });
     }
 
-    Render(camera, engine, commandEncoder) {
+    Render(camera, scene, commandEncoder) {
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 {

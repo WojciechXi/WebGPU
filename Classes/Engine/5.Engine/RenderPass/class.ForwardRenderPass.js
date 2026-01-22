@@ -25,7 +25,7 @@ class ForwardRenderPass extends RenderPass {
         this.depthStencilTextureView = this.depthStencilTexture.createView();
     }
 
-    Render(camera, engine, commandEncoder) {
+    Render(camera, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 { view: this.colorTextureView, loadOp: "clear", storeOp: "store" },
@@ -40,7 +40,7 @@ class ForwardRenderPass extends RenderPass {
             },
         });
 
-        engine.Render(this);
+        for (let component of camera.visibleObjects) component.Draw(camera, renderPass);
 
         renderPass.end();
     }

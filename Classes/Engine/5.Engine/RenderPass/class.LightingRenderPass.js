@@ -71,7 +71,7 @@ class LightingRenderPass extends RenderPass {
         });
     }
 
-    Render(camera, engine, commandEncoder) {
+    Render(camera, scene, commandEncoder) {
         this.uniformValues.set(Camera.main.transform.matrix4x4, 0);
         this.uniformValues.set(Camera.main.viewMatrix, 16);
         this.uniformValues.set(Camera.main.projectionMatrix, 32);

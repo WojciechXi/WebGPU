@@ -19,7 +19,7 @@ class RenderPass {
 
     }
 
-    Render(camera, engine, commandEncoder) {
+    Render(camera, scene, commandEncoder) {
 
     }
 

@@ -139,7 +139,7 @@ class BloomRenderPass extends RenderPass {
         });
     }
 
-    Render(camera, engine, commandEncoder) {
+    Render(camera, scene, commandEncoder) {
         this.uniformValues.set([this.canvas.width, this.canvas.height]); //screen size
 
         //brightRenderPass

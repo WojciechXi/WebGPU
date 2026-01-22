@@ -53,7 +53,7 @@ class GBufferRenderPass extends RenderPass {
         this.depthStencilTextureView = this.depthStencilTexture.createView();
     }
 
-    Render(camera, engine, commandEncoder) {
+    Render(camera, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 { view: this.positionTextureView, loadOp: "clear", storeOp: "store" },
@@ -72,7 +72,7 @@ class GBufferRenderPass extends RenderPass {
             },
         });
 
-        for (let component of camera.visibleObjects) component.Draw(camera);
+        for (let component of camera.visibleObjects) component.Draw(camera, renderPass);
 
         renderPass.end();
     }
