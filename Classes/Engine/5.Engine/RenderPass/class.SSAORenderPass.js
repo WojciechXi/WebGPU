@@ -176,7 +176,7 @@ class SSAORenderPass extends RenderPass {
         });
     }
 
-    Render(engine, commandEncoder) {
+    Render(camera, engine, commandEncoder) {
         this.uniformValues.set(Camera.main.viewMatrix, this.ssaoKernel.length);
         this.uniformValues.set(Camera.main.projectionMatrix, this.ssaoKernel.length + 16);
         this.uniformValues.set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength], this.ssaoKernel.length + 32);

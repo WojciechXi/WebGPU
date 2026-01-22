@@ -1,4 +1,4 @@
-class MeshRenderer extends MonoBehaviour {
+class MeshRenderer extends Renderer {
 
     Init() {
         this.receiveShadows = true;
@@ -16,7 +16,7 @@ class MeshRenderer extends MonoBehaviour {
         this.materials[0] = material;
     }
 
-    Render(renderPass) {
+    Draw(camera, renderPass) {
         if (!this.mesh || !this.material) return;
 
         if (renderPass.name === 'shadowRenderPass') {
@@ -27,7 +27,7 @@ class MeshRenderer extends MonoBehaviour {
             }
         } else if (renderPass.name == 'gBufferRenderPass') {
             for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
-                Graphics.DrawMesh(renderPass, this.mesh, this.gameObject.transformBindGroup, this.materials[i], i, Camera.main.viewMatrix, Camera.main.projectionMatrix);
+                Graphics.DrawMesh(renderPass, this.mesh, this.gameObject.transformBindGroup, this.materials[i], i, camera.viewMatrix, camera.projectionMatrix);
             }
         } else if (renderPass.name == 'gizmosRenderPass') {
 

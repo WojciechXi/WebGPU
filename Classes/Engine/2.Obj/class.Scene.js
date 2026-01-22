@@ -11,6 +11,10 @@ class Scene extends Obj {
         this.gameObjects.push(gameObject);
     }
 
+    RemoveGameObject(gameObject) {
+        this.gameObjects.splice(this.gameObjects.indexOf(gameObject), 1);
+    }
+
     AddComponent(component) {
         if (component.Update) this.updateables.push(component);
         if (component.Draw) this.renderables.push(component);
@@ -18,7 +22,9 @@ class Scene extends Obj {
     }
 
     RemoveComponent(component) {
-        //Remove from lists
+        if (component.Update) this.updateables.splice(this.updateables.indexOf(component), 1);
+        if (component.Draw) this.renderables.splice(this.renderables.indexOf(component), 1);
+        if (component instanceof Camera) this.cameras.splice(this.cameras.indexOf(component), 1);
     }
 
 }

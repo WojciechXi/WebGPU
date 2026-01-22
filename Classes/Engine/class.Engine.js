@@ -17,7 +17,6 @@ class Engine {
 
     Start() {
         let object = this;
-        if (this.scene) this.scene.Start();
 
         requestAnimationFrame(function (time) {
             object.Loop(time);
@@ -31,20 +30,13 @@ class Engine {
         Input.Update();
         Graphics.Update();
 
-        if (this.scene) this.scene.Update();
-        if (this.scene) this.scene.PreRender();
+        if (this.scene) for (let c of this.scene.updateables) c.Update();
 
         Graphics.Render(this);
-
-        if (this.scene) this.scene.PostRender();
 
         requestAnimationFrame(function (time) {
             object.Loop(time);
         });
-    }
-
-    Render(renderPass) {
-        if (this.scene) this.scene.Render(renderPass);
     }
 
 }

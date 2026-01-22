@@ -76,7 +76,7 @@ class GizmosRenderPass extends RenderPass {
         });
     }
 
-    Render(engine, commandEncoder) {
+    Render(camera, engine, commandEncoder) {
         this.uniformValues.set(Camera.main.viewMatrix, 0);
         this.uniformValues.set(Camera.main.projectionMatrix, 16);
         GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);

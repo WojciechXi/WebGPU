@@ -53,7 +53,7 @@ class ScreenSpaceReflectionRenderPass extends RenderPass {
         });
     }
 
-    Render(engine, commandEncoder) {
+    Render(camera, engine, commandEncoder) {
         this.uniformValues.set(Camera.main.transform.position, 0);
 
         const renderPass = commandEncoder.beginRenderPass({

@@ -3,6 +3,7 @@ class Camera extends Behaviour {
     Init() {
         if (Camera.main == null) Camera.main = this;
 
+        this.visibleObjects = [];
         this.rect = new Rect(0, 0, 1, 1);
 
         this.aspect = 1;
@@ -31,6 +32,10 @@ class Camera extends Behaviour {
     }
 
     OnPreCull() { // co renderować
+        const object = this;
+        this.visibleObjects = Engine.Instance.scene.renderables.filter(function (component) {
+            object.IsVisible(component);
+        });
     }
     OnPreRender() { // jak renderować
         //Set Shader Data
@@ -40,6 +45,10 @@ class Camera extends Behaviour {
     }
     OnRenderImage(src, dst) { // post-processing
         //Wyświetla obraz na ekranie
+    }
+
+    IsVisible(component) {
+        return true;// Frustum.Check(this.frustum, component.transform.position);
     }
 
 }

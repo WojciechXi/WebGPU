@@ -19,7 +19,7 @@ class ShadowRenderPass extends RenderPass {
         this.depthStencilTextureView = this.depthStencilTexture.createView();
     }
 
-    Render(engine, commandEncoder) {
+    Render(camera, engine, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 { view: this.depthTextureView, clearValue: { r: 1.0, g: 0, b: 0, a: 1 }, loadOp: "clear", storeOp: "store", }

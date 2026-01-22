@@ -40,7 +40,7 @@ class ClearRenderPass extends RenderPass {
         });
     }
 
-    Render(engine, commandEncoder) {
+    Render(camera, engine, commandEncoder) {
         this.uniformValues.set(AmbientLight.main.color, 0);
 
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({

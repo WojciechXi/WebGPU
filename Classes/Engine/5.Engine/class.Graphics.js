@@ -161,27 +161,38 @@ class Graphics {
     }
 
     static Render(engine) {
-        const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
+        if (engine.scene) {
+            for (let component of engine.scene.renderables) if (component.OnPreRender) component.OnPreRender();
+            for (let camera of engine.scene.cameras) {
+                camera.OnPreCull();
+                camera.OnPreRender();
 
-        if (this.clearRenderPass) this.clearRenderPass.Render(engine, commandEncoder);
-        // if (this.shadowRenderPass) this.shadowRenderPass.Render(engine, commandEncoder);
+                const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-        if (this.gBufferRenderPass) this.gBufferRenderPass.Render(engine, commandEncoder);
+                if (this.clearRenderPass) this.clearRenderPass.Render(camera, engine, commandEncoder);
+                // if (this.shadowRenderPass) this.shadowRenderPass.Render(camera,engine, commandEncoder);
 
-        if (this.lightingRenderPass) this.lightingRenderPass.Render(engine, commandEncoder);
-        if (this.forwardRenderPass) this.forwardRenderPass.Render(engine, commandEncoder);
-        if (this.finalRenderPass) this.finalRenderPass.Render(engine, commandEncoder);
+                if (this.gBufferRenderPass) this.gBufferRenderPass.Render(camera, engine, commandEncoder);
 
-        if (this.ssaoRenderPass) this.ssaoRenderPass.Render(engine, commandEncoder);
-        if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(engine, commandEncoder);
-        if (this.bloomRenderPass) this.bloomRenderPass.Render(engine, commandEncoder);
-        if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(engine, commandEncoder);
+                if (this.lightingRenderPass) this.lightingRenderPass.Render(camera, engine, commandEncoder);
+                if (this.forwardRenderPass) this.forwardRenderPass.Render(camera, engine, commandEncoder);
+                if (this.finalRenderPass) this.finalRenderPass.Render(camera, engine, commandEncoder);
 
-        if (this.debugRenderPass) this.debugRenderPass.Render(engine, commandEncoder);
+                // if (this.ssaoRenderPass) this.ssaoRenderPass.Render(camera, engine, commandEncoder);
+                // if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(camera, engine, commandEncoder);
+                // if (this.bloomRenderPass) this.bloomRenderPass.Render(camera, engine, commandEncoder);
+                // if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(camera, engine, commandEncoder);
 
-        if (this.gizmosRenderPass) this.gizmosRenderPass.Render(engine, commandEncoder);
+                // if (this.debugRenderPass) this.debugRenderPass.Render(camera, engine, commandEncoder);
 
-        GPU.Queue.submit([commandEncoder.finish()]);
+                // if (this.gizmosRenderPass) this.gizmosRenderPass.Render(camera, engine, commandEncoder);
+
+                GPU.Queue.submit([commandEncoder.finish()]);
+
+                camera.OnPostRender();
+            }
+            for (let component of engine.scene.renderables) if (component.OnPostRender) component.OnPostRender();
+        }
     }
 
     static DrawMesh(renderPass, mesh, transformBindGroup, material, subMeshIndex, viewMatrix, projectionMatrix) {

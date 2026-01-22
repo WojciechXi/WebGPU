@@ -2,12 +2,14 @@ class Component extends Obj {
 
     // Properties
     get transform() { return this.gameObject.transform; }
+    get scene() { return this.gameObject.scene; }
 
     constructor(gameObject) {
         super();
         this.tag = '';
-        this.enabled = true;
         this.gameObject = gameObject;
+
+        this.enabled = true;
     }
 
     get enabled() { return this._enabled; }
@@ -15,8 +17,14 @@ class Component extends Obj {
         if (this._enabled === value) return;
         this._enabled = value;
 
-        if (value) this.scene.AddComponent(this);
-        else this.scene.RemoveComponent(this);
+        if (value) {
+            this.scene.AddComponent(this);
+            if (this.OnEnable) this.OnEnable();
+        }
+        else {
+            this.scene.RemoveComponent(this);
+            if (this.OnDisable) this.OnDisable();
+        }
     }
 
     // Public Methods

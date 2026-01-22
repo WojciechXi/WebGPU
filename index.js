@@ -283,7 +283,8 @@ window.addEventListener('load', async function (event) {
                 'Wall K 2': olivePaintMaterial,
             };
 
-            const ambientLight = engine.scene.AddComponent(AmbientLight);
+            const ambientLightGameObject = new GameObject("Ambient Light");
+            const ambientLight = ambientLightGameObject.AddComponent(AmbientLight);
             ambientLight.color.Set(0.8, 0.9, 1, 0.25);
 
             const directionalLightGameObject = new GameObject('DirectionalLight');

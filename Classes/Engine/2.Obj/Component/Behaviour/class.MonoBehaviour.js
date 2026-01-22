@@ -22,61 +22,61 @@ class MonoBehaviour extends Behaviour {
     Print() { }
 
     // Messages
-    Awake() { }
-    FixedUpdate() { }
-    LateUpdate() { }
-    OnAnimatorIK() { }
-    OnAnimatorMove() { }
-    OnApplicationFocus() { }
-    OnApplicationPause() { }
-    OnApplicationQuit() { }
-    OnAudioFilterRead() { }
-    OnBecameInvisible() { }
-    OnBecameVisible() { }
-    OnChildRectTransformDimensionsChange() { }
-    OnCollisionEnter() { }
-    OnCollisionEnter2D() { }
-    OnCollisionExit() { }
-    OnCollisionExit2D() { }
-    OnCollisionStay() { }
-    OnCollisionStay2D() { }
-    OnControllerColliderHit() { }
-    OnDestroy() { }
-    OnDisable() { }
-    OnDrawGizmos() { }
-    OnDrawGizmosSelected() { }
-    OnEnable() { }
-    OnGUI() { }
-    OnJointBreak() { }
-    OnJointBreak2D() { }
-    OnMouseDown() { }
-    OnMouseDrag() { }
-    OnMouseEnter() { }
-    OnMouseExit() { }
-    OnMouseOver() { }
-    OnMouseUp() { }
-    OnMouseUpAsButton() { }
-    OnParticleCollision() { }
-    OnParticleSystemStopped() { }
-    OnParticleTrigger() { }
-    OnParticleUpdateJobScheduled() { }
-    OnPostRender() { }
-    OnPreCull() { }
-    OnPreRender() { }
-    OnRenderImage() { }
-    OnRenderObject() { }
-    OnTransformChildrenChanged() { }
-    OnTransformParentChanged() { }
-    OnTriggerEnter() { }
-    OnTriggerEnter2D() { }
-    OnTriggerExit() { }
-    OnTriggerExit2D() { }
-    OnTriggerStay() { }
-    OnTriggerStay2D() { }
-    OnValidate() { }
-    OnWillRenderObject() { }
-    Reset() { }
-    Start() { }
-    Update() { }
+    // Awake() { }
+    // FixedUpdate() { }
+    // LateUpdate() { }
+    // OnAnimatorIK() { }
+    // OnAnimatorMove() { }
+    // OnApplicationFocus() { }
+    // OnApplicationPause() { }
+    // OnApplicationQuit() { }
+    // OnAudioFilterRead() { }
+    // OnBecameInvisible() { }
+    // OnBecameVisible() { }
+    // OnChildRectTransformDimensionsChange() { }
+    // OnCollisionEnter() { }
+    // OnCollisionEnter2D() { }
+    // OnCollisionExit() { }
+    // OnCollisionExit2D() { }
+    // OnCollisionStay() { }
+    // OnCollisionStay2D() { }
+    // OnControllerColliderHit() { }
+    // OnDestroy() { }
+    // OnDisable() { }
+    // OnDrawGizmos() { }
+    // OnDrawGizmosSelected() { }
+    // OnEnable() { }
+    // OnGUI() { }
+    // OnJointBreak() { }
+    // OnJointBreak2D() { }
+    // OnMouseDown() { }
+    // OnMouseDrag() { }
+    // OnMouseEnter() { }
+    // OnMouseExit() { }
+    // OnMouseOver() { }
+    // OnMouseUp() { }
+    // OnMouseUpAsButton() { }
+    // OnParticleCollision() { }
+    // OnParticleSystemStopped() { }
+    // OnParticleTrigger() { }
+    // OnParticleUpdateJobScheduled() { }
+    // OnPostRender() { }
+    // OnPreCull() { }
+    // OnPreRender() { }
+    // OnRenderImage() { }
+    // OnRenderObject() { }
+    // OnTransformChildrenChanged() { }
+    // OnTransformParentChanged() { }
+    // OnTriggerEnter() { }
+    // OnTriggerEnter2D() { }
+    // OnTriggerExit() { }
+    // OnTriggerExit2D() { }
+    // OnTriggerStay() { }
+    // OnTriggerStay2D() { }
+    // OnValidate() { }
+    // OnWillRenderObject() { }
+    // Reset() { }
+    // Start() { }
+    // Update() { }
 
 }
