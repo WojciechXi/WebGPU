@@ -26,6 +26,8 @@ class Input {
             },
         };
 
+        window.addEventListener('beforeunload', function (e) { e.stopPropagation(); e.preventDefault(); return false; }, true);
+
         window.addEventListener('mousemove', function (event) {
             event.preventDefault();
             _this.mousePosition.SetXY(event.x / window.innerWidth, event.y / window.innerHeight);
@@ -44,12 +46,12 @@ class Input {
 
         window.addEventListener('keydown', function (event) {
             event.preventDefault();
-            _this._keys[event.key] = true;
+            _this._keys[event.key.toLowerCase()] = true;
         });
 
         window.addEventListener('keyup', function (event) {
             event.preventDefault();
-            _this._keys[event.key] = false;
+            _this._keys[event.key.toLowerCase()] = false;
         });
     }
 
