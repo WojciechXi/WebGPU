@@ -296,7 +296,6 @@ window.addEventListener('load', async function (event) {
             const cameraGameObject = new GameObject('Camera');
             cameraGameObject.transform.position = new Vector3(0, 1, -5);
             const camera = cameraGameObject.AddComponent(Camera);
-            // camera.rect.width = 0.5;
             cameraGameObject.AddComponent(Test);
 
             // const terrainGameObject = new GameObject('Terrain');

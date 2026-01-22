@@ -38,6 +38,7 @@ class Camera extends Behaviour {
     OnPreCull() { // co renderować
         const object = this;
         const planes = GeometryUtility.CalculateFrustumPlanes(this);
+        return this.renderables = object.scene.renderables;
         this.renderables = object.scene.renderables.filter(function (component) {
             return GeometryUtility.TestPlanesAABB(planes, component.bounds);
         });
