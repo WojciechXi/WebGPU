@@ -1,4 +1,4 @@
-class Behaviour extends Obj {
+class Behaviour extends Component {
 
     /* Unity */
 

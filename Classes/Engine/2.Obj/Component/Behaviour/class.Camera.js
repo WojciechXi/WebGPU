@@ -30,14 +30,15 @@ class Camera extends Behaviour {
         Matrix4x4.Inverse(this.viewProjectionMatrix, this.inverseViewProjectionMatrix);
     }
 
-    OnPreCull() { }
-    OnPreRender() {
+    OnPreCull() { // co renderować
+    }
+    OnPreRender() { // jak renderować
         //Set Shader Data
     }
-    OnPostRender() {
+    OnPostRender() { // rysuj po renderze
         //Rysowanie na GL
     }
-    OnRenderImage(src, dst) {
+    OnRenderImage(src, dst) { // post-processing
         //Wyświetla obraz na ekranie
     }
 
