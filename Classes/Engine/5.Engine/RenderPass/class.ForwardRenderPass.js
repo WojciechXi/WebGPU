@@ -40,7 +40,7 @@ class ForwardRenderPass extends RenderPass {
             },
         });
 
-        for (let component of camera.visibleObjects) component.Draw(camera, renderPass);
+        for (let component of camera.renderables) component.Draw(camera, renderPass);
 
         renderPass.end();
     }

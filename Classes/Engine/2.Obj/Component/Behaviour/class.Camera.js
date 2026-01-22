@@ -3,7 +3,7 @@ class Camera extends Behaviour {
     Init() {
         if (Camera.main == null) Camera.main = this;
 
-        this.visibleObjects = [];
+        this.renderables = [];
         this.rect = new Rect(0, 0, 1, 1);
 
         this.aspect = 1;
@@ -33,8 +33,8 @@ class Camera extends Behaviour {
 
     OnPreCull() { // co renderować
         const object = this;
-        this.visibleObjects = Engine.Instance.scene.renderables.filter(function (component) {
-            object.IsVisible(component);
+        this.renderables = object.scene.renderables.filter(function (component) {
+            return object.IsVisible(component);
         });
     }
     OnPreRender() { // jak renderować

@@ -178,12 +178,12 @@ class Graphics {
                 if (this.forwardRenderPass) this.forwardRenderPass.Render(camera, scene, commandEncoder);
                 if (this.finalRenderPass) this.finalRenderPass.Render(camera, scene, commandEncoder);
 
-                // if (this.ssaoRenderPass) this.ssaoRenderPass.Render(camera, scene, commandEncoder);
-                // if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(camera, scene, commandEncoder);
-                // if (this.bloomRenderPass) this.bloomRenderPass.Render(camera, scene, commandEncoder);
-                // if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(camera, scene, commandEncoder);
+                if (this.ssaoRenderPass) this.ssaoRenderPass.Render(camera, scene, commandEncoder);
+                if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(camera, scene, commandEncoder);
+                if (this.bloomRenderPass) this.bloomRenderPass.Render(camera, scene, commandEncoder);
+                if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(camera, scene, commandEncoder);
 
-                // if (this.debugRenderPass) this.debugRenderPass.Render(camera, scene, commandEncoder);
+                if (this.debugRenderPass) this.debugRenderPass.Render(camera, scene, commandEncoder);
 
                 // if (this.gizmosRenderPass) this.gizmosRenderPass.Render(camera, scene, commandEncoder);
 

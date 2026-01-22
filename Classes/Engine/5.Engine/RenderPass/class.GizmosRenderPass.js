@@ -103,7 +103,7 @@ class GizmosRenderPass extends RenderPass {
         renderPass.setBindGroup(0, this.viewBindGroup);
         renderPass.setBindGroup(1, this.transformBindGroup);
 
-        for (let component of camera.visibleObjects) component.Draw(camera, renderPass);
+        for (let component of camera.renderables) component.Draw(camera, renderPass);
 
         renderPass.end();
     }
