@@ -21,16 +21,6 @@ class Camera extends Behaviour {
         this.inverseViewProjectionMatrix = Matrix4x4.Identity();
     }
 
-    Update() {
-        this.aspect = Graphics.Width / Graphics.Height;
-
-        Matrix4x4.Inverse(this.transform.matrix4x4, this.viewMatrix);
-        Matrix4x4.Inverse(this.viewMatrix, this.inverseViewMatrix);
-        Matrix4x4.PerspectiveLH(Mathf.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
-        Matrix4x4.Multiply(this.projectionMatrix, this.viewMatrix, this.viewProjectionMatrix);
-        Matrix4x4.Inverse(this.viewProjectionMatrix, this.inverseViewProjectionMatrix);
-    }
-
     OnPreCull() { // co renderować
         const object = this;
         this.renderables = object.scene.renderables.filter(function (component) {
@@ -38,7 +28,13 @@ class Camera extends Behaviour {
         });
     }
     OnPreRender() { // jak renderować
-        //Set Shader Data
+        this.aspect = Graphics.Width / Graphics.Height;
+
+        Matrix4x4.Inverse(this.transform.matrix4x4, this.viewMatrix);
+        Matrix4x4.Inverse(this.viewMatrix, this.inverseViewMatrix);
+        Matrix4x4.PerspectiveLH(Mathf.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
+        Matrix4x4.Multiply(this.projectionMatrix, this.viewMatrix, this.viewProjectionMatrix);
+        Matrix4x4.Inverse(this.viewProjectionMatrix, this.inverseViewProjectionMatrix);
     }
     OnPostRender() { // rysuj po renderze
         //Rysowanie na GL
