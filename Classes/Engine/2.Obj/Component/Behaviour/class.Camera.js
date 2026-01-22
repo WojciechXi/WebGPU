@@ -15,12 +15,12 @@ class Camera extends Behaviour {
         this.orthographicSize = 100;
 
         this.viewMatrix = Matrix4x4.Identity();
-        this.inverseViewMatrix = Matrix4x4.Identity();
         this.projectionMatrix = Matrix4x4.Identity();
         this.viewProjectionMatrix = Matrix4x4.Identity();
+        this.inverseViewMatrix = Matrix4x4.Identity();
         this.inverseViewProjectionMatrix = Matrix4x4.Identity();
 
-        this.cameraValues = new Float32Array(16 + 16); //view, projection
+        this.cameraValues = new Float32Array(16 + 16 + 16 + 16 + 16); //view, projection, viewProjection, inverseView, inverseViewProjection
         this.cameraBuffer = GPU.CreateBuffer({
             label: 'uniform buffer',
             size: this.cameraValues.length * 4,
@@ -37,8 +37,8 @@ class Camera extends Behaviour {
 
     OnPreCull() { // co renderować
         const object = this;
-        const planes = GeometryUtility.CalculateFrustumPlanes(this);
         return this.renderables = object.scene.renderables;
+        const planes = GeometryUtility.CalculateFrustumPlanes(this);
         this.renderables = object.scene.renderables.filter(function (component) {
             return GeometryUtility.TestPlanesAABB(planes, component.bounds);
         });
@@ -54,6 +54,9 @@ class Camera extends Behaviour {
 
         this.cameraValues.set(this.viewMatrix, 0);
         this.cameraValues.set(this.projectionMatrix, 16);
+        this.cameraValues.set(this.viewProjectionMatrix, 32);
+        this.cameraValues.set(this.inverseViewMatrix, 48);
+        this.cameraValues.set(this.inverseViewProjectionMatrix, 64);
 
         GPU.Queue.writeBuffer(this.cameraBuffer, 0, this.cameraValues);
     }
