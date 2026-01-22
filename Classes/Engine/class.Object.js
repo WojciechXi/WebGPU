@@ -1,10 +1,9 @@
 class Obj {
 
-    Start() { }
-    Update() { }
-    PreRender() { }
-    Render(renderPass) { }
-    PostRender() { }
+    constructor() {
+        this.Init();
+    }
+    Init() { }
 
     /* Unity */
 

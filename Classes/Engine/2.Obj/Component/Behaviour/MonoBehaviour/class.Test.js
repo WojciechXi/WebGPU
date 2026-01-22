@@ -1,4 +1,4 @@
-class Test extends Component {
+class Test extends MonoBehaviour {
 
     Init() {
         this.look = Vector2.zero;

@@ -1,9 +1,9 @@
-class Bounds extends Int16Array {
+class BoundsInt extends Int16Array {
 
     static FromMinMax(min, max) {
         const center = Vector3.Multiply(Vector3.Add(min, max), 0.5);
         const size = Vector3.Subtract(max, min);
-        return new Bounds(center, size);
+        return new BoundsInt(center, size);
     }
 
     /* Unity */

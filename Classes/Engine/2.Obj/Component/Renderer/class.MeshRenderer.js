@@ -1,4 +1,4 @@
-class MeshRenderer extends Component {
+class MeshRenderer extends MonoBehaviour {
 
     Init() {
         this.receiveShadows = true;

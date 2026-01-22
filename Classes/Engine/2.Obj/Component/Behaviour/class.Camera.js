@@ -1,4 +1,4 @@
-class Camera extends Component {
+class Camera extends Behaviour {
 
     Init() {
         if (Camera.main == null) Camera.main = this;
@@ -28,6 +28,17 @@ class Camera extends Component {
         Matrix4x4.PerspectiveLH(Mathf.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
         Matrix4x4.Multiply(this.projectionMatrix, this.viewMatrix, this.viewProjectionMatrix);
         Matrix4x4.Inverse(this.viewProjectionMatrix, this.inverseViewProjectionMatrix);
+    }
+
+    OnPreCull() { }
+    OnPreRender() {
+        //Set Shader Data
+    }
+    OnPostRender() {
+        //Rysowanie na GL
+    }
+    OnRenderImage(src, dst) {
+        //Wyświetla obraz na ekranie
     }
 
 }

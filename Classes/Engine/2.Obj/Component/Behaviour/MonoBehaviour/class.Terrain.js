@@ -1,4 +1,4 @@
-class Terrain extends Component {
+class Terrain extends MonoBehaviour {
 
     Init() {
         this.size = new Vector3(100, 10, 100);

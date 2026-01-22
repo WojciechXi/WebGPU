@@ -1,4 +1,4 @@
-class DirectionalLight extends Component {
+class DirectionalLight extends MonoBehaviour {
 
     Init() {
         if (DirectionalLight.main == null) DirectionalLight.main = this;

@@ -1,4 +1,4 @@
-class Collider extends Component {
+class Collider extends MonoBehaviour {
 
     static {
         this.colliders = [];

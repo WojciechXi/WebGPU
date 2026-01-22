@@ -1,4 +1,4 @@
-class Rigidbody extends Component {
+class Rigidbody extends MonoBehaviour {
     Init() {
         this.velocity = Vector3.zero;
         this.acceleration = Vector3.zero;

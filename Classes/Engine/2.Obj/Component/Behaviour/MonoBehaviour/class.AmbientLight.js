@@ -1,9 +1,9 @@
-class AmbientLight extends Component {
+class AmbientLight extends MonoBehaviour {
 
     Init() {
         if (AmbientLight.main == null) AmbientLight.main = this;
 
-        this.color = Color.white;
+        this.color = Color32.white;
     }
 
     Update() {
