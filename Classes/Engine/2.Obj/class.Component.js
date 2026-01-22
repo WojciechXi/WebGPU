@@ -10,6 +10,15 @@ class Component extends Obj {
         this.gameObject = gameObject;
     }
 
+    get enabled() { return this._enabled; }
+    set enabled(value) {
+        if (this._enabled === value) return;
+        this._enabled = value;
+
+        if (value) this.scene.AddComponent(this);
+        else this.scene.RemoveComponent(this);
+    }
+
     // Public Methods
     BroadcastMessage() { }
     CompareTag() { }
