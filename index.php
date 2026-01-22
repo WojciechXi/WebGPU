@@ -25,7 +25,8 @@ $game = ScanFilesRecursive('./Game', ['js']);
 </head>
 
 <body>
-    <canvas></canvas>
+    <canvas id="scene"></canvas>
+    <canvas id="game"></canvas>
 </body>
 
 </html>
