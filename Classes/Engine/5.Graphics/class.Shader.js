@@ -1,6 +1,7 @@
-class Shader {
+class Shader extends Obj {
 
     constructor(code, renderPipelineBuffers = null, settings = {}) {
+        super();
         const _this = this;
 
         _this.code = code;
