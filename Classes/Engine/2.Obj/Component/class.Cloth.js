@@ -1,0 +1,3 @@
+class Cloth extends Component {
+
+}

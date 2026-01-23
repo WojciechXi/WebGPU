@@ -53,12 +53,5 @@ class BoxCollider extends Collider {
         return null;
     }
 
-    Render(renderPass) {
-        if (renderPass.name == 'gizmosRenderPass') {
-            renderPass.SetBindGroup(1, this.gameObject.transformBindGroup);
-            if (window.meshes.cube) window.meshes.cube.Render(renderPass, 0, 'edge');
-        }
-    }
-
 
 }

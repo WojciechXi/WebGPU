@@ -82,12 +82,5 @@ class SphereCollider extends Collider {
         return null;
     }
 
-    Render(renderPass) {
-        if (renderPass.name == 'gizmosRenderPass') {
-            renderPass.SetBindGroup(1, this.gameObject.transformBindGroup);
-            if (window.meshes.sphere) window.meshes.sphere.Render(renderPass, 0, 'edge');
-        }
-    }
-
 
 }

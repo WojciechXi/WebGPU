@@ -16,13 +16,21 @@ class Obj {
     ToString() { return JSON.stringify(this); }
 
     // Static Methods
-    static Destroy() { }
-    static DestroyImmediate() { }
+    static Destroy(object) {
+
+    }
+    static DestroyImmediate(object) {
+
+    }
     static DontDestroyOnLoad() { }
     static FindAnyObjectByType() { }
     static FindFirstObjectByType() { }
     static FindObjectsByType() { }
-    static Instantiate() { }
-    static InstantiateAsync() { }
+    static Instantiate(prefab) {
+
+    }
+    static InstantiateAsync(prefab) {
+
+    }
 
 }

@@ -1,6 +1,7 @@
-class Mesh {
+class Mesh extends Obj {
 
     constructor(data = {}) {
+        super();
         this.name = data.name ?? 'Mesh';
 
         this.bounds = new Bounds(Vector3.zero, Vector3.zero);
@@ -10,8 +11,12 @@ class Mesh {
         this.tangents = data.tangents ?? [];
         this.colors = data.colors ?? [];
         this.uvs = data.uvs ?? [];
+        this.joints = data.joints ?? [];
+        this.weights = data.weights ?? [];
 
         this.subMeshes = data.subMeshes ?? [];
+
+        this.vertexBuffer = null;
 
         this.Update();
     }

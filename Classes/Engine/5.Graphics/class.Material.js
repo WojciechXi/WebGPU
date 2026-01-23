@@ -1,10 +1,11 @@
-class Material {
+class Material extends Obj {
 
     static {
         console.log('Material class loaded');
     }
 
     constructor(data = {}) {
+        super();
         this.name = data.name ?? 'Material';
         this.shader = data.shader ?? '';
 

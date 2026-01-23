@@ -1,4 +1,4 @@
-class Collider extends MonoBehaviour {
+class Collider extends Component {
 
     static {
         this.colliders = [];
@@ -37,27 +37,5 @@ class Collider extends MonoBehaviour {
     ClosestPointOnBounds() { } // Todo
     GetGeometry() { } // Todo
     Raycast() { } // Todo
-
-    UpdateC() {
-        const newColliding = new Set();
-
-        for (const otherCollider of Collider.colliders) {
-            if (otherCollider === this) continue;
-            if (this.Intersects(otherCollider)) newColliding.add(otherCollider);
-        }
-
-        // OnCollisionEnter
-        for (const otherCollider of newColliding) {
-            if (!this._collidingWith.has(otherCollider)) this.OnCollisionEnter(otherCollider);
-            else this.OnCollisionStay(otherCollider);
-        }
-
-        // OnCollisionExit
-        for (const otherCollider of this._collidingWith) {
-            if (!newColliding.has(otherCollider)) this.OnCollisionExit(otherCollider);
-        }
-
-        this._collidingWith = newColliding;
-    }
 
 }

@@ -1,4 +1,5 @@
-class Rigidbody extends MonoBehaviour {
+class Rigidbody extends Component {
+
     Init() {
         this.velocity = Vector3.zero;
         this.acceleration = Vector3.zero;
@@ -88,4 +89,5 @@ class Rigidbody extends MonoBehaviour {
         const otherPos = other.transform.position;
         return Vector3.Subtract(myPos, otherPos).Normalize();
     }
+
 }
