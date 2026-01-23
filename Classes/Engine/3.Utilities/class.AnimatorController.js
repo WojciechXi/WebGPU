@@ -1,0 +1,3 @@
+class AnimatorController extends Obj {
+
+}
