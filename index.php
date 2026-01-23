@@ -30,20 +30,9 @@ $game = ScanFilesRecursive('./Game', ['js']);
 </head>
 
 <body>
-    <div id="editor" class="column fill">
-        <div class="row grow">
-            <div class="column" style="width: 270px;">
-                <div id="hierarchy"></div>
-            </div>
-            <canvas class="grow" id="view"></canvas>
-            <div class="column" style="width: 270px;">
-                <div id="inspector"></div>
-            </div>
-        </div>
-        <div class="row" style="height: 270px;">
-            <div id="assets"></div>
-        </div>
-    </div>
+    <canvas class="fill" id="view"></canvas>
+    <div id="hierarchy"></div>
+    <div id="inspector"></div>
 </body>
 
 </html>

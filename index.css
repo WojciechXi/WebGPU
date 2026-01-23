@@ -44,3 +44,27 @@ canvas {
         height: 0%;
     }
 }
+
+#hierarchy {
+    border-radius: 1rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    z-index: 1;
+    max-height: calc(100% - 2rem);
+    overflow: auto;
+}
+
+#inspector {
+    border-radius: 1rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    position: fixed;
+    right: 1rem;
+    top: 1rem;
+    z-index: 1;
+    max-height: calc(100% - 2rem);
+    overflow: auto;
+}

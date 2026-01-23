@@ -1,9 +1,16 @@
 class Obj {
 
+    static {
+        this.objs = [];
+    }
+
     constructor() {
         this.Init();
     }
-    Init() { }
+    Init() {
+        Obj.objs.push(this);
+        this._instanceId = Guid.New();
+    }
 
     /* Unity */
 
@@ -12,24 +19,26 @@ class Obj {
     get name() { return this._name; } set name(value) { return this._name = value; }
 
     // Public Methods
-    GetInstanceID() { }
+    GetInstanceID() { return this._instanceId; }
+    GetType() { return this.constructor.name; }
     ToString() { return JSON.stringify(this); }
 
     // Static Methods
     static Destroy(object) {
-
+        this.objs.splice(this.objs.indexOf(object), 1);
     }
     static DestroyImmediate(object) {
+        this.objs.splice(this.objs.indexOf(object), 1);
 
     }
     static DontDestroyOnLoad() { }
     static FindAnyObjectByType() { }
     static FindFirstObjectByType() { }
     static FindObjectsByType() { }
-    static Instantiate(prefab) {
+    static Instantiate(original) {
 
     }
-    static InstantiateAsync(prefab) {
+    static InstantiateAsync(original) {
 
     }
 
