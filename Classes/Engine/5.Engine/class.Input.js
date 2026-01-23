@@ -56,10 +56,12 @@ class Input {
     }
 
     static GetKey(key) {
+        if (!key) return false;
         return this.keys[key] ? this.keys[key].state : false;
     }
 
     static GetAxis(key) {
+        if (!key) return false;
         return this.axis[key] ? this.axis[key].value : 0;
     }
 
