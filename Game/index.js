@@ -288,8 +288,8 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             const camera = cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
-                const gameObject = new GameObject('Krakow');
+            Importer.GLTF('/Assets/Models', 'Ablewicza 15.gltf', function (meshes, gltfMaterials) {
+                const gameObject = new GameObject('Ablewicza 15');
                 gameObject.transform.position = new Vector3(0, 0, 0);
                 gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
 

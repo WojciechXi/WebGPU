@@ -6,8 +6,7 @@ class Test extends MonoBehaviour {
     }
 
     Update() {
-        if (Input.GetKey(0))
-            this.look = Vector2.Add(this.look, Input.mouseMove.Multiply(Time.deltaTime * 2));
+        if (Input.GetKey(0)) this.look = Vector2.Add(this.look, Input.mouseMove.Multiply(Time.deltaTime * 2));
 
         this.move.x = Input.GetAxis('Horizontal');
         this.move.y = Input.GetAxis('Up');

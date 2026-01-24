@@ -16,15 +16,6 @@ class Material extends Obj {
         this.occlusion = data.occlusion ?? 1;
         this.alphaCutoff = data.alphaCutoff ?? 0.5;
 
-        this.materialBuffer = new UniformBuffer(4 + 4); //color, pbr
-        this.materialBindGroup = GPU.CreateBindGroup({
-            label: 'MaterialBindGroup',
-            layout: Graphics.materialBindGroupLayout,
-            entries: [
-                this.materialBuffer.GetBindGroupEntry(0),
-            ],
-        });
-
         this.sampler = GPU.CreateSampler({
             addressModeU: 'repeat',
             addressModeV: 'repeat',
@@ -40,6 +31,14 @@ class Material extends Obj {
         this.SetTexture('metallic', Color.black);
         this.SetTexture('occlusion', Color.white);
 
+        this.materialBuffer = new UniformBuffer(4 + 4); //color, pbr
+        this.materialBindGroup = GPU.CreateBindGroup({
+            label: 'MaterialBindGroup',
+            layout: Graphics.materialBindGroupLayout,
+            entries: [
+                this.materialBuffer.GetBindGroupEntry(0),
+            ],
+        });
         this.pbrBindGroup = GPU.CreateBindGroup({
             label: 'gBufferBindGroup',
             layout: Graphics.pbrBindGroupLayout,

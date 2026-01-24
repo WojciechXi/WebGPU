@@ -30,38 +30,41 @@ class Input {
 
         window.addEventListener('mousemove', function (event) {
             event.preventDefault();
+            event.stopPropagation();
             _this.mousePosition.SetXY(event.x / window.innerWidth, event.y / window.innerHeight);
             _this.mouseMove.SetXY(event.movementX, event.movementY);
         });
 
         window.addEventListener('mousedown', function (event) {
             event.preventDefault();
+            event.stopPropagation();
             _this._keys[event.button] = true;
         });
 
         window.addEventListener('mouseup', function (event) {
             event.preventDefault();
+            event.stopPropagation();
             _this._keys[event.button] = false;
         });
 
         window.addEventListener('keydown', function (event) {
             event.preventDefault();
+            event.stopPropagation();
             _this._keys[event.key.toLowerCase()] = true;
         });
 
         window.addEventListener('keyup', function (event) {
             event.preventDefault();
+            event.stopPropagation();
             _this._keys[event.key.toLowerCase()] = false;
         });
     }
 
     static GetKey(key) {
-        if (!key) return false;
         return this.keys[key] ? this.keys[key].state : false;
     }
 
     static GetAxis(key) {
-        if (!key) return false;
         return this.axis[key] ? this.axis[key].value : 0;
     }
 
