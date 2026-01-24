@@ -153,7 +153,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        screenRenderPass.renderTexture = shadowRenderPass.depthRenderTexture;
+        screenRenderPass.renderTexture = tonemappingRenderPass.sceneRenderTexture;
 
         callback();
     }
@@ -176,18 +176,18 @@ class Graphics {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
         if (this.shadowRenderPass) this.shadowRenderPass.Render(camera, scene, commandEncoder);
-        // if (this.gBufferRenderPass) this.gBufferRenderPass.Render(camera, scene, commandEncoder);
+        if (this.gBufferRenderPass) this.gBufferRenderPass.Render(camera, scene, commandEncoder);
 
-        // if (this.clearRenderPass) this.clearRenderPass.Render(camera, scene, commandEncoder);
+        if (this.clearRenderPass) this.clearRenderPass.Render(camera, scene, commandEncoder);
 
-        // if (this.lightingRenderPass) this.lightingRenderPass.Render(camera, scene, commandEncoder);
-        // if (this.forwardRenderPass) this.forwardRenderPass.Render(camera, scene, commandEncoder);
-        // if (this.finalRenderPass) this.finalRenderPass.Render(camera, scene, commandEncoder);
+        if (this.lightingRenderPass) this.lightingRenderPass.Render(camera, scene, commandEncoder);
+        if (this.forwardRenderPass) this.forwardRenderPass.Render(camera, scene, commandEncoder);
+        if (this.finalRenderPass) this.finalRenderPass.Render(camera, scene, commandEncoder);
 
-        // if (this.ssaoRenderPass) this.ssaoRenderPass.Render(camera, scene, commandEncoder);
+        if (this.ssaoRenderPass) this.ssaoRenderPass.Render(camera, scene, commandEncoder);
         // if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(camera, scene, commandEncoder);
-        // if (this.bloomRenderPass) this.bloomRenderPass.Render(camera, scene, commandEncoder);
-        // if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(camera, scene, commandEncoder);
+        if (this.bloomRenderPass) this.bloomRenderPass.Render(camera, scene, commandEncoder);
+        if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(camera, scene, commandEncoder);
 
         if (this.screenRenderPass) this.screenRenderPass.Render(camera, scene, commandEncoder);
 

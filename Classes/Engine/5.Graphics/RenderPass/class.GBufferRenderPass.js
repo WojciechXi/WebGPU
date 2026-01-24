@@ -6,7 +6,6 @@ class GBufferRenderPass extends RenderPass {
         this.positionRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
         this.normalRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba8unorm', });
         this.colorRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
-        this.emissionRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
         this.pbrRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba8unorm', });
 
         this.depthRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'depth24plus', depth: true, });

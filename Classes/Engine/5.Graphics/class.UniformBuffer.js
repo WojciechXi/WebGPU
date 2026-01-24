@@ -19,13 +19,14 @@ class UniformBuffer {
     }
 
     Set(array, offset = 0, autoWriteBuffer = true) {
-        if (Array.isArray(array)) {
-            this.values.set(array, offset);
-            if (autoWriteBuffer) this.WriteBuffer();
-        } if (Object.is(array)) {
+        const object = this;
+
+        if (array.constructor.name == 'Object') {
             Object.keys(array).forEach(function (offset) {
-                object.Set(data[offset], parseInt(offset), false);
+                object.Set(array[offset], parseInt(offset), false);
             });
+        } else {
+            this.values.set(array, offset);
         }
 
         if (autoWriteBuffer) this.WriteBuffer();

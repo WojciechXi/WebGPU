@@ -16,17 +16,12 @@ class Material extends Obj {
         this.occlusion = data.occlusion ?? 1;
         this.alphaCutoff = data.alphaCutoff ?? 0.5;
 
-        this.materialValues = new Float32Array(4 + 4); //color, pbr
-        this.materialBuffer = GPU.CreateBuffer({
-            label: 'material buffer',
-            size: this.materialValues.length * 4,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
+        this.materialBuffer = new UniformBuffer(4 + 4); //color, pbr
         this.materialBindGroup = GPU.CreateBindGroup({
             label: 'MaterialBindGroup',
             layout: Graphics.materialBindGroupLayout,
             entries: [
-                { binding: 0, resource: { buffer: this.materialBuffer } },
+                this.materialBuffer.GetBindGroupEntry(0),
             ],
         });
 
@@ -112,13 +107,13 @@ class Material extends Obj {
     Use(renderPass, camera) {
         let renderPipeline = this.shader.Use(renderPass);
         if (renderPipeline) {
+            this.materialBuffer.Set({
+                0: this.color,
+                4: [this.roughness, this.metallic, this.occlusion, this.alphaCutoff],
+            });
+
             renderPass.SetBindGroup(0, camera.cameraBindGroup);
-
-            this.materialValues.set(this.color, 0);
-            this.materialValues.set([this.roughness, this.metallic, this.occlusion, this.alphaCutoff], 4);
-            GPU.Queue.writeBuffer(this.materialBuffer, 0, this.materialValues);
             renderPass.SetBindGroup(2, this.materialBindGroup);
-
             renderPass.SetBindGroup(3, this.pbrBindGroup);
 
             return true;

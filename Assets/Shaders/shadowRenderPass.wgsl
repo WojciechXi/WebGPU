@@ -46,6 +46,7 @@ fn getNormalMatrix(modelMatrix: mat4x4f) -> mat3x3f {
 // ----------------------
 // Uniforms
 // ----------------------
+
 struct View {
     matrix : mat4x4f,
     projection : mat4x4f,
