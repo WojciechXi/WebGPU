@@ -11,7 +11,7 @@ class GizmosRenderPass extends RenderPass {
 
         this.renderPipeline = GPU.CreateRenderPipeline({
             label: 'GizmosRenderPipeline',
-            layout: GPU.device.createPipelineLayout({
+            layout: GPU.CreatePipelineLayout({
                 bindGroupLayouts: [
                     Graphics.viewBindGroupLayout,
                     Graphics.transformBindGroupLayout

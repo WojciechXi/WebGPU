@@ -31,7 +31,7 @@ class Shader extends Obj {
 
         if (_this.code.indexOf('fn gBufferRenderPass') !== -1) {
             _this.renderPipelines['gBufferRenderPass'] = GPU.CreateRenderPipeline({
-                layout: GPU.device.createPipelineLayout({
+                layout: GPU.CreatePipelineLayout({
                     bindGroupLayouts: [
                         Graphics.viewBindGroupLayout,
                         Graphics.transformBindGroupLayout,

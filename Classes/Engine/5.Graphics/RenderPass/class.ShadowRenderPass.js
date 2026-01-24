@@ -7,7 +7,7 @@ class ShadowRenderPass extends RenderPass {
         this.depthRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'depth24plus', });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
+            layout: GPU.CreatePipelineLayout({
                 bindGroupLayouts: [
                     Graphics.viewBindGroupLayout,
                     Graphics.transformBindGroupLayout,

@@ -15,9 +15,9 @@ class FinalRenderPass extends RenderPass {
         });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
+            layout: GPU.CreatePipelineLayout({
                 bindGroupLayouts: [
-                    GPU.device.createBindGroupLayout({
+                    GPU.CreateBindGroupLayout({
                         entries: [
                             { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: {}, },
                             { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: {}, },

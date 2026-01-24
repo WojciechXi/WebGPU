@@ -6,9 +6,9 @@ class ScreenRenderPass extends RenderPass {
 
         const format = navigator.gpu.getPreferredCanvasFormat();
 
-        const pipelineLayout = GPU.device.createPipelineLayout({
+        const pipelineLayout = GPU.CreatePipelineLayout({
             bindGroupLayouts: [
-                GPU.device.createBindGroupLayout({
+                GPU.CreateBindGroupLayout({
                     entries: [
                         {
                             binding: 0,

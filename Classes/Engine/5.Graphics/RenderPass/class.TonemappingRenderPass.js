@@ -9,9 +9,9 @@ class TonemappingRenderPass extends RenderPass {
         this.sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: format, });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: GPU.device.createPipelineLayout({
+            layout: GPU.CreatePipelineLayout({
                 bindGroupLayouts: [
-                    GPU.device.createBindGroupLayout({
+                    GPU.CreateBindGroupLayout({
                         entries: [
                             { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
                             { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },

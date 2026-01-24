@@ -63,6 +63,12 @@ class GPU {
         return this.device.queue;
     }
 
+    static CreatePipelineLayout(data, callback = null) {
+        const pipelineLayout = this.device.createPipelineLayout(data);
+        if (callback) callback(pipelineLayout);
+        return pipelineLayout;
+    }
+
     static CreateShaderModule(data, callback = null) {
         const shaderModule = this.device.createShaderModule(data);
         if (callback) callback(shaderModule);
@@ -85,6 +91,12 @@ class GPU {
         const sampler = this.device.createSampler(data);
         if (callback) callback(sampler);
         return sampler;
+    }
+
+    static CreateBindGroupLayout(data, callback = null) {
+        const bindGroupLayout = this.device.createBindGroupLayout(data);
+        if (callback) callback(bindGroupLayout);
+        return bindGroupLayout;
     }
 
     static CreateBindGroup(data, callback = null) {

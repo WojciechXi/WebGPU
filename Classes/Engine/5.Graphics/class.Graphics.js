@@ -11,17 +11,15 @@ class Graphics {
     static get Height() { return this.canvas.height; }
 
     static async Init(callback) {
-        const device = GPU.device;
-        const canvas = this.canvas = document.querySelector('#view');
-        canvas.focus();
+        this.canvas = document.querySelector('#view');
+        this.canvas.focus();
 
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
 
-        const context = this.context = canvas.getContext('webgpu');
-
-        context.configure({
-            device,
+        this.context = this.canvas.getContext('webgpu');
+        this.context.configure({
+            device: GPU.device,
             format: navigator.gpu.getPreferredCanvasFormat(),
             alphaMode: 'premultiplied',
         });
@@ -30,35 +28,35 @@ class Graphics {
     }
 
     static Awake() {
-        this.viewBindGroupLayout = GPU.device.createBindGroupLayout({
+        this.viewBindGroupLayout = GPU.CreateBindGroupLayout({
             label: 'ViewBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
 
-        this.lightBindGroupLayout = GPU.device.createBindGroupLayout({
+        this.lightBindGroupLayout = GPU.CreateBindGroupLayout({
             label: 'LightBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
 
-        this.transformBindGroupLayout = GPU.device.createBindGroupLayout({
+        this.transformBindGroupLayout = GPU.CreateBindGroupLayout({
             label: 'TransformBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
 
-        this.materialBindGroupLayout = GPU.device.createBindGroupLayout({
+        this.materialBindGroupLayout = GPU.CreateBindGroupLayout({
             label: 'TransformBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
 
-        this.pbrBindGroupLayout = GPU.device.createBindGroupLayout({
+        this.pbrBindGroupLayout = GPU.CreateBindGroupLayout({
             label: 'ViewBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: {}, },
@@ -72,89 +70,91 @@ class Graphics {
 
         const sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
 
+        console.log(Resources.Get('/Resources/Shaders/shadowRenderPass.wgsl'));
+
         const shadowRenderPass = this.shadowRenderPass = new ShadowRenderPass({
             name: 'shadowRenderPass',
-            code: assets.shaders['shadowRenderPass.wgsl'],
-            canvas: canvas,
+            code: Resources.Get('/Resources/Shaders/shadowRenderPass.wgsl'),
+            canvas: this.canvas,
         });
 
         const gBufferRenderPass = this.gBufferRenderPass = new GBufferRenderPass({
             name: 'gBufferRenderPass',
-            canvas: canvas,
+            canvas: this.canvas,
         });
 
         const clearRenderPass = this.clearRenderPass = new ClearRenderPass({
             name: 'clearRenderPass',
-            code: assets.shaders['clearRenderPass.wgsl'],
-            canvas: canvas,
+            code: Resources.Get('/Resources/Shaders/clearRenderPass.wgsl'),
+            canvas: this.canvas,
         });
 
         const lightingRenderPass = this.lightingRenderPass = new LightingRenderPass({
             name: 'lightingRenderPass',
-            code: assets.shaders['lightingRenderPass.wgsl'],
+            code: Resources.Get('/Resources/Shaders/lightingRenderPass.wgsl'),
             shadowRenderPass: shadowRenderPass,
             gBufferRenderPass: gBufferRenderPass,
-            canvas: canvas,
+            canvas: this.canvas,
         });
 
         const forwardRenderPass = this.forwardRenderPass = new ForwardRenderPass({
             name: 'forwardRenderPass',
-            code: assets.shaders['forwardRenderPass.wgsl'],
+            code: Resources.Get('/Resources/Shaders/forwardRenderPass.wgsl'),
             lightingRenderPass: lightingRenderPass,
-            canvas: canvas,
+            canvas: this.canvas,
         });
 
         const finalRenderPass = this.finalRenderPass = new FinalRenderPass({
             name: 'finalRenderPass',
-            code: assets.shaders['finalRenderPass.wgsl'],
+            code: Resources.Get('/Resources/Shaders/finalRenderPass.wgsl'),
             clearRenderPass: clearRenderPass,
             gBufferRenderPass: gBufferRenderPass,
             lightingRenderPass: lightingRenderPass,
             forwardRenderPass: forwardRenderPass,
             sceneRenderTexture: sceneRenderTexture,
-            canvas: canvas,
+            canvas: this.canvas,
         });
 
         const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
             name: 'ssaoRenderPass',
-            code: assets.shaders['ssaoRenderPass.wgsl'],
+            code: Resources.Get('/Resources/Shaders/ssaoRenderPass.wgsl'),
             gBufferRenderPass: gBufferRenderPass,
             inputRenderTexture: sceneRenderTexture,
-            canvas: canvas,
+            canvas: this.canvas,
         });
 
         const screenSpaceReflectionRenderPass = this.screenSpaceReflectionRenderPass = new ScreenSpaceReflectionRenderPass({
             name: 'screenSpaceReflectionRenderPass',
-            code: assets.shaders['screenSpaceReflectionRenderPass.wgsl'],
+            code: Resources.Get('/Resources/Shaders/screenSpaceReflectionRenderPass.wgsl'),
             gBufferRenderPass: gBufferRenderPass,
             inputRenderTexture: ssaoRenderPass.sceneRenderTexture,
-            canvas: canvas,
+            canvas: this.canvas,
         });
 
         const bloomRenderPass = this.bloomRenderPass = new BloomRenderPass({
             name: 'bloomRenderPass',
-            code: assets.shaders['bloomRenderPass.wgsl'],
+            code: Resources.Get('/Resources/Shaders/bloomRenderPass.wgsl'),
             inputRenderTexture: ssaoRenderPass.sceneRenderTexture,
-            canvas: canvas,
+            canvas: this.canvas,
         });
 
         const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
             name: 'tonemappingRenderPass',
-            code: assets.shaders['tonemappingRenderPass.wgsl'],
+            code: Resources.Get('/Resources/Shaders/tonemappingRenderPass.wgsl'),
             inputRenderTexture: bloomRenderPass.sceneRenderTexture,
-            canvas: canvas,
+            canvas: this.canvas,
         });
 
         const screenRenderPass = this.screenRenderPass = new ScreenRenderPass({
             name: 'screenRenderPass',
-            code: assets.shaders['screenRenderPass.wgsl'],
-            canvas: canvas,
+            code: Resources.Get('/Resources/Shaders/screenRenderPass.wgsl'),
+            canvas: this.canvas,
         });
 
         const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
             name: 'gizmosRenderPass',
-            code: assets.shaders['gizmosRenderPass.wgsl'],
-            canvas: canvas,
+            code: Resources.Get('/Resources/Shaders/gizmosRenderPass.wgsl'),
+            canvas: this.canvas,
         });
 
         screenRenderPass.renderTexture = tonemappingRenderPass.sceneRenderTexture;
