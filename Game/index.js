@@ -281,47 +281,12 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
             directionalLight.color.Set(1, 1, 1, 0.75);
+            engine.scene.directionalLight = directionalLight;
 
             const cameraGameObject = new GameObject('Camera');
             cameraGameObject.transform.position = new Vector3(0, 1, -5);
             const camera = cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
-
-            // const terrainGameObject = new GameObject('Terrain');
-            // // terrainGameObject.transform.position = new Vector3(-50, 0, -50);
-            // terrainGameObject.transform.localScale = new Vector3(100, 10, 100);
-            // let terrain = terrainGameObject.AddComponent(Terrain);
-            // let terrainCollider = terrainGameObject.AddComponent(TerrainCollider);
-            // terrain.material = terrainMaterial;
-
-            // const perlinNoise = new PerlinNoise();
-            // const heights = [];
-            // for (let x = 0; x < terrain.resolution; x++) {
-            //     for (let z = 0; z < terrain.resolution; z++) {
-            //         const noise = perlinNoise.NoiseOctave(x * 0.0123, z * 0.0123, 8);
-            //         heights.push(noise);
-            //     }
-            // }
-            // terrain.SetHeights(0, 0, terrain.resolution, terrain.resolution, heights);
-
-            // setTimeout(function () {
-            //     Physics.simulate = true;
-            // }, 1000);
-
-            // let go = new GameObject('Voxel Chunk');
-            // let meshRenderer = go.AddComponent(MeshRenderer);
-            // meshRenderer.materials = [whiteMaterial];
-            // let voxelChunk = go.AddComponent(VoxelChunk);
-            // voxelChunk.Generate();
-            // voxelChunk.BuildMesh();
-
-            // go = new GameObject('Voxel Chunk');
-            // go.transform.position = new Vector3(VoxelChunkData.resolution, 0, 0);
-            // meshRenderer = go.AddComponent(MeshRenderer);
-            // meshRenderer.materials = [whiteMaterial];
-            // voxelChunk = go.AddComponent(VoxelChunk);
-            // voxelChunk.Generate();
-            // voxelChunk.BuildMesh();
 
             Importer.GLTF('/Assets/Models', 'Krakow.gltf', function (meshes, gltfMaterials) {
                 const gameObject = new GameObject('Krakow');

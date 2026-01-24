@@ -5,6 +5,7 @@ class Scene extends Obj {
         this.updateables = [];
         this.renderables = [];
         this.ambientLight = null;
+        this.directionalLight = null;
         this.directionalLights = [];
         this.cameras = [];
     }

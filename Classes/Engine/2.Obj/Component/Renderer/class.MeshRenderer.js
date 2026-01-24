@@ -17,16 +17,16 @@ class MeshRenderer extends Renderer {
         if (renderPass.name === 'shadowRenderPass') {
             if (!this.castShadows) return;
             for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
-                this.materials[i].Use(renderPass, this.transform, camera);
-                renderPass.DrawMesh(this.mesh, camera, i);
+                // this.materials[i].Use(renderPass, camera);
+                renderPass.SetBindGroup(1, this.transform.transformBindGroup);
+                renderPass.DrawMesh(this.mesh, i);
             }
         } else if (renderPass.name == 'gBufferRenderPass') {
             for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
-                this.materials[i].Use(renderPass, this.transform, camera);
-                renderPass.DrawMesh(this.mesh, camera, i);
+                this.materials[i].Use(renderPass, camera);
+                renderPass.SetBindGroup(1, this.transform.transformBindGroup);
+                renderPass.DrawMesh(this.mesh, i);
             }
-        } else if (renderPass.name == 'gizmosRenderPass') {
-
         }
     }
 

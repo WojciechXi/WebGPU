@@ -123,12 +123,6 @@ struct ShadowRenderPass {
 fn shadowRenderPass(vsOut: VSOut) -> ShadowRenderPass {
   var shadowRenderPass: ShadowRenderPass;
 
-  let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
-  let normal = textureSample(normalTexture, textureSampler, vsOut.uv);
-  let roughness = textureSample(roughnessTexture, textureSampler, vsOut.uv);
-  let metallic = textureSample(metallicTexture, textureSampler, vsOut.uv);
-  let occlusion = textureSample(occlusionTexture, textureSampler, vsOut.uv);
-
   let clipPosition = vsOut.clipPosition;
   let ndc = (clipPosition.xyz / clipPosition.w);
 

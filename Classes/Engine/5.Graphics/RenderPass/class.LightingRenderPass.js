@@ -79,7 +79,7 @@ class LightingRenderPass extends RenderPass {
                 { binding: 2, resource: gBufferRenderPass.normalTextureView },
                 { binding: 3, resource: gBufferRenderPass.colorTextureView },
                 { binding: 4, resource: gBufferRenderPass.pbrTextureView },
-                { binding: 5, resource: shadowRenderPass.depthTextureView },
+                { binding: 5, resource: shadowRenderPass.shadowTextureView },
             ],
         });
     }

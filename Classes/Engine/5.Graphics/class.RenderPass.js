@@ -24,7 +24,7 @@ class RenderPass {
 
     }
 
-    DrawMesh(mesh, camera, subMeshIndex) {
+    DrawMesh(mesh, subMeshIndex) {
         const subMesh = mesh.subMeshes[subMeshIndex];
 
         this.SetVertexBuffer(0, mesh.vertexBuffer);

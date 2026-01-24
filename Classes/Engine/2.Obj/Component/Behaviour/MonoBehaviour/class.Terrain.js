@@ -165,10 +165,17 @@ class Terrain extends MonoBehaviour {
 
         if (renderPass.name === 'shadowRenderPass') {
             if (!this.castShadows) return;
-
-            Graphics.DrawMesh(renderPass, this.mesh, this.gameObject.transformBindGroup, this.material, 0, DirectionalLight.main.viewMatrix, DirectionalLight.main.projectionMatrix);
+            for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
+                // this.materials[i].Use(renderPass, camera);
+                renderPass.SetBindGroup(1, this.transform.transformBindGroup);
+                renderPass.DrawMesh(this.mesh, i);
+            }
         } else if (renderPass.name === 'gBufferRenderPass') {
-            Graphics.DrawMesh(renderPass, this.mesh, this.gameObject.transformBindGroup, this.material, 0, Camera.main.viewMatrix, Camera.main.projectionMatrix);
+            for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
+                this.materials[i].Use(renderPass, camera);
+                renderPass.SetBindGroup(1, this.transform.transformBindGroup);
+                renderPass.DrawMesh(this.mesh, i);
+            }
         } else if (renderPass.name === 'gizmosRenderPass') {
 
         }

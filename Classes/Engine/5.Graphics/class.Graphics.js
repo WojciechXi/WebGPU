@@ -67,20 +67,20 @@ class Graphics {
 
         this.sceneTextureView = this.sceneTexture.createView();
 
-        const clearRenderPass = this.clearRenderPass = new ClearRenderPass({
-            name: 'clearRenderPass',
-            code: assets.shaders['clearRenderPass.wgsl'],
-            canvas: canvas,
-        });
-
         const shadowRenderPass = this.shadowRenderPass = new ShadowRenderPass({
             name: 'shadowRenderPass',
+            code: assets.shaders['shadowRenderPass.wgsl'],
             canvas: canvas,
         });
 
         const gBufferRenderPass = this.gBufferRenderPass = new GBufferRenderPass({
             name: 'gBufferRenderPass',
-            code: assets.shaders['gBufferRenderPass.wgsl'],
+            canvas: canvas,
+        });
+
+        const clearRenderPass = this.clearRenderPass = new ClearRenderPass({
+            name: 'clearRenderPass',
+            code: assets.shaders['clearRenderPass.wgsl'],
             canvas: canvas,
         });
 
@@ -174,10 +174,11 @@ class Graphics {
 
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
-        if (this.clearRenderPass) this.clearRenderPass.Render(camera, scene, commandEncoder);
-        // if (this.shadowRenderPass) this.shadowRenderPass.Render(DirectionalLight.main, scene, commandEncoder);
-
+        if (this.shadowRenderPass) this.shadowRenderPass.Render(camera, scene, commandEncoder);
         if (this.gBufferRenderPass) this.gBufferRenderPass.Render(camera, scene, commandEncoder);
+
+        if (this.clearRenderPass) this.clearRenderPass.Render(camera, scene, commandEncoder);
+
         if (this.lightingRenderPass) this.lightingRenderPass.Render(camera, scene, commandEncoder);
         if (this.forwardRenderPass) this.forwardRenderPass.Render(camera, scene, commandEncoder);
         if (this.finalRenderPass) this.finalRenderPass.Render(camera, scene, commandEncoder);

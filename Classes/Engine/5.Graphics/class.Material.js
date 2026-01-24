@@ -109,11 +109,10 @@ class Material extends Obj {
         });
     }
 
-    Use(renderPass, transform, camera) {
+    Use(renderPass, camera) {
         let renderPipeline = this.shader.Use(renderPass);
         if (renderPipeline) {
             renderPass.SetBindGroup(0, camera.cameraBindGroup);
-            renderPass.SetBindGroup(1, transform.transformBindGroup);
 
             this.materialValues.set(this.color, 0);
             this.materialValues.set([this.roughness, this.metallic, this.occlusion, this.alphaCutoff], 4);

@@ -29,52 +29,6 @@ class Shader extends Obj {
         // Tworzymy shader module
         _this.shaderModule = GPU.CreateShaderModule({ code: _this.code });
 
-        if (_this.code.indexOf('fn shadowRenderPass') !== -1) {
-            _this.renderPipelines['shadowRenderPass'] = GPU.CreateRenderPipeline({
-                layout: GPU.device.createPipelineLayout({
-                    bindGroupLayouts: [
-                        Graphics.viewBindGroupLayout,
-                        Graphics.transformBindGroupLayout,
-                        Graphics.materialBindGroupLayout,
-                        Graphics.pbrBindGroupLayout,
-                    ],
-                }),
-                vertex: {
-                    module: _this.shaderModule,
-                    entryPoint: "vs",
-                    buffers: [
-                        {
-                            arrayStride: (4 + 4 + 4 + 4 + 4) * 4, // position + normal + tangent + color + uv
-                            attributes: [
-                                { shaderLocation: 0, offset: 0 * 4, format: 'float32x3' }, // position
-                                { shaderLocation: 1, offset: 4 * 4, format: 'float32x3' }, // normal
-                                { shaderLocation: 2, offset: 8 * 4, format: 'float32x4' }, // tangent
-                                { shaderLocation: 3, offset: 12 * 4, format: 'float32x4' }, // color
-                                { shaderLocation: 4, offset: 16 * 4, format: 'float32x2' }, // uv
-                            ],
-                        },
-                    ],
-                },
-                fragment: {
-                    module: _this.shaderModule,
-                    entryPoint: "shadowRenderPass",
-                    targets: [
-                        { format: "r32float" }, // depthTexture
-                    ]
-                },
-                depthStencil: {
-                    format: "depth24plus",
-                    depthWriteEnabled: true,
-                    depthCompare: "less"
-                },
-                primitive: {
-                    topology: "triangle-list",
-                    cullMode: 'back',
-                    frontFace: 'ccw',
-                },
-            });
-        }
-
         if (_this.code.indexOf('fn gBufferRenderPass') !== -1) {
             _this.renderPipelines['gBufferRenderPass'] = GPU.CreateRenderPipeline({
                 layout: GPU.device.createPipelineLayout({
@@ -125,14 +79,6 @@ class Shader extends Obj {
                     frontFace: 'ccw',
                 },
             });
-        }
-
-        if (_this.code.indexOf('fn lightingRenderPass') !== -1) {
-
-        }
-
-        if (_this.code.indexOf('fn forwardRenderPass') !== -1) {
-
         }
     }
 
