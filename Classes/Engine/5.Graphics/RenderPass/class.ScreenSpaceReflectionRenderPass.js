@@ -1,18 +1,15 @@
 class ScreenSpaceReflectionRenderPass extends RenderPass {
 
     Init(data) {
-        this.inputTextureView = data.inputTextureView;
-        const gBufferRenderPass = this.gBufferRenderPass = data.gBufferRenderPass;
+        this.inputRenderTexture = data.inputRenderTexture;
+        this.gBufferRenderPass = data.gBufferRenderPass;
         this.canvas = data.canvas;
 
         const format = navigator.gpu.getPreferredCanvasFormat();
 
-        this.sceneTexture = GPU.CreateTexture({
-            size: [this.canvas.width, this.canvas.height],
+        this.sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, {
             format: format,
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
-        this.sceneTextureView = this.sceneTexture.createView();
 
         this.uniformValues = new Float32Array(8);
         this.uniformBuffer = GPU.CreateBuffer({
@@ -45,9 +42,9 @@ class ScreenSpaceReflectionRenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
-                { binding: 1, resource: this.gBufferRenderPass.positionTextureView },
-                { binding: 2, resource: this.gBufferRenderPass.normalTextureView },
-                { binding: 3, resource: this.inputTextureView },
+                this.gBufferRenderPass.positionRenderTexture.GetBindGroupEntry(1),
+                this.gBufferRenderPass.normalRenderTexture.GetBindGroupEntry(2),
+                this.inputRenderTexture.GetBindGroupEntry(3),
                 { binding: 4, resource: this.sampler },
             ],
         });
@@ -58,11 +55,7 @@ class ScreenSpaceReflectionRenderPass extends RenderPass {
 
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                {
-                    view: this.sceneTextureView, // wyświetlamy na ekranie
-                    loadOp: "clear",
-                    storeOp: "store"
-                }
+                this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
 

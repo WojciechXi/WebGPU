@@ -2,35 +2,12 @@ class BloomRenderPass extends RenderPass {
 
     Init(data) {
         this.canvas = data.canvas;
-        this.inputTextureView = data.inputTextureView;
+        this.inputRenderTexture = data.inputRenderTexture;
 
-        this.brightTexture = GPU.CreateTexture({
-            size: [this.canvas.width / 2, this.canvas.height / 2],
-            format: 'rgba16float',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-        });
-        this.brightTextureView = this.brightTexture.createView();
-
-        this.blurTexture = GPU.CreateTexture({
-            size: [this.canvas.width / 4, this.canvas.height / 4],
-            format: 'rgba16float',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-        });
-        this.blurTextureView = this.blurTexture.createView();
-
-        this.bloomTexture = GPU.CreateTexture({
-            size: [this.canvas.width / 4, this.canvas.height / 4],
-            format: 'rgba16float',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-        });
-        this.bloomTextureView = this.bloomTexture.createView();
-
-        this.sceneTexture = GPU.CreateTexture({
-            size: [this.canvas.width, this.canvas.height],
-            format: 'rgba16float',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-        });
-        this.sceneTextureView = this.sceneTexture.createView();
+        this.brightRenderTexture = new RenderTexture(this.canvas.width / 2, this.canvas.height / 2, { format: 'rgba16float', });
+        this.blurRenderTexture = new RenderTexture(this.canvas.width / 4, this.canvas.height / 4, { format: 'rgba16float', });
+        this.bloomRenderTexture = new RenderTexture(this.canvas.width / 4, this.canvas.height / 4, { format: 'rgba16float', });
+        this.sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
 
         this.brightRenderPipeline = GPU.CreateRenderPipeline({
             layout: 'auto',
@@ -42,7 +19,7 @@ class BloomRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "brightRenderPass",
                 targets: [
-                    { format: 'rgba16float', }
+                    this.brightRenderTexture.GetTarget(),
                 ]
             }
         });
@@ -57,7 +34,7 @@ class BloomRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "blurRenderPass",
                 targets: [
-                    { format: 'rgba16float', }
+                    this.blurRenderTexture.GetTarget(),
                 ]
             }
         });
@@ -72,7 +49,7 @@ class BloomRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "bloomRenderPass",
                 targets: [
-                    { format: 'rgba16float', }
+                    this.bloomRenderTexture.GetTarget(),
                 ]
             }
         });
@@ -87,7 +64,7 @@ class BloomRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "sceneRenderPass",
                 targets: [
-                    { format: 'rgba16float', }
+                    this.sceneRenderTexture.GetTarget(),
                 ]
             }
         });
@@ -109,7 +86,7 @@ class BloomRenderPass extends RenderPass {
             layout: this.brightRenderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: this.sampler },
-                { binding: 1, resource: this.inputTextureView },
+                this.inputRenderTexture.GetBindGroupEntry(1),
             ],
         });
 
@@ -117,7 +94,7 @@ class BloomRenderPass extends RenderPass {
             layout: this.blurRenderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: this.sampler },
-                { binding: 1, resource: this.brightTextureView },
+                this.brightRenderTexture.GetBindGroupEntry(1),
             ],
         });
 
@@ -125,7 +102,7 @@ class BloomRenderPass extends RenderPass {
             layout: this.bloomRenderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: this.sampler },
-                { binding: 1, resource: this.blurTextureView },
+                this.blurRenderTexture.GetBindGroupEntry(1),
             ],
         });
 
@@ -133,8 +110,8 @@ class BloomRenderPass extends RenderPass {
             layout: this.sceneRenderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: this.sampler },
-                { binding: 1, resource: this.bloomTextureView },
-                { binding: 2, resource: this.inputTextureView },
+                this.bloomRenderTexture.GetBindGroupEntry(1),
+                this.inputRenderTexture.GetBindGroupEntry(2),
             ],
         });
     }
@@ -145,11 +122,7 @@ class BloomRenderPass extends RenderPass {
         //brightRenderPass
         const brightRenderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                {
-                    view: this.brightTextureView, // wyświetlamy na ekranie
-                    loadOp: "clear",
-                    storeOp: "store"
-                }
+                this.brightRenderTexture.GetColorAttachment(),
             ],
         });
 
@@ -164,11 +137,7 @@ class BloomRenderPass extends RenderPass {
         //blurRenderPass
         const blurRenderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                {
-                    view: this.blurTextureView, // wyświetlamy na ekranie
-                    loadOp: "clear",
-                    storeOp: "store"
-                }
+                this.blurRenderTexture.GetColorAttachment(),
             ],
         });
 
@@ -183,11 +152,7 @@ class BloomRenderPass extends RenderPass {
         //bloomRenderPass
         const bloomRenderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                {
-                    view: this.bloomTextureView, // wyświetlamy na ekranie
-                    loadOp: "clear",
-                    storeOp: "store"
-                }
+                this.bloomRenderTexture.GetColorAttachment(),
             ],
         });
 
@@ -202,11 +167,7 @@ class BloomRenderPass extends RenderPass {
         //sceneRenderPass
         const sceneRenderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                {
-                    view: this.sceneTextureView, // wyświetlamy na ekranie
-                    loadOp: "clear",
-                    storeOp: "store"
-                }
+                this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
 

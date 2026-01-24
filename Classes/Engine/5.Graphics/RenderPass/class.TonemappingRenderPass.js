@@ -1,17 +1,14 @@
 class TonemappingRenderPass extends RenderPass {
 
     Init(data) {
-        this.inputTextureView = data.inputTextureView;
+        this.inputRenderTexture = data.inputRenderTexture;
         this.canvas = data.canvas;
 
         const format = navigator.gpu.getPreferredCanvasFormat();
 
-        this.sceneTexture = GPU.CreateTexture({
-            size: [this.canvas.width, this.canvas.height],
+        this.sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, {
             format: format,
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
-        this.sceneTextureView = this.sceneTexture.createView();
 
         this.renderPipeline = GPU.CreateRenderPipeline({
             layout: GPU.device.createPipelineLayout({
@@ -49,7 +46,7 @@ class TonemappingRenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: this.sampler },
-                { binding: 1, resource: this.inputTextureView },
+                this.inputRenderTexture.GetBindGroupEntry(1),
             ],
         });
     }
@@ -57,11 +54,7 @@ class TonemappingRenderPass extends RenderPass {
     Render(camera, scene, commandEncoder) {
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                {
-                    view: this.sceneTextureView, // wyświetlamy na ekranie
-                    loadOp: "clear",
-                    storeOp: "store"
-                }
+                this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
 

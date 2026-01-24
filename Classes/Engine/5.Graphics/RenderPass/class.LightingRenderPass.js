@@ -2,15 +2,12 @@ class LightingRenderPass extends RenderPass {
 
     Init(data) {
         const canvas = data.canvas;
-        const shadowRenderPass = data.shadowRenderPass;
-        const gBufferRenderPass = data.gBufferRenderPass;
+        const shadowRenderPass = this.shadowRenderPass = data.shadowRenderPass;
+        const gBufferRenderPass = this.gBufferRenderPass = data.gBufferRenderPass;
 
-        this.sceneTexture = GPU.CreateTexture({
-            size: [canvas.width, canvas.height],
-            format: "rgba16float",
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        this.sceneRenderTexture = new RenderTexture(canvas.width, canvas.height, {
+            format: 'rgba16float',
         });
-        this.sceneTextureView = this.sceneTexture.createView();
 
         this.uniformValues = new Float32Array(16 + 16 + 4 + 4 + 4);
         this.uniformBuffer = GPU.CreateBuffer({
@@ -18,38 +15,36 @@ class LightingRenderPass extends RenderPass {
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
-        const pipelineLayout = GPU.device.createPipelineLayout({
-            bindGroupLayouts: [
-                GPU.device.createBindGroupLayout({
-                    entries: [
-                        { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                    ],
-                }),
-                GPU.device.createBindGroupLayout({
-                    entries: [
-                        { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                    ],
-                }),
-                GPU.device.createBindGroupLayout({
-                    entries: [
-                        { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                    ],
-                }),
-                GPU.device.createBindGroupLayout({
-                    entries: [
-                        { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                        { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                    ],
-                }),
-            ],
-        });
-
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: pipelineLayout,
+            layout: GPU.device.createPipelineLayout({
+                bindGroupLayouts: [
+                    GPU.device.createBindGroupLayout({
+                        entries: [
+                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
+                        ],
+                    }),
+                    GPU.device.createBindGroupLayout({
+                        entries: [
+                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
+                        ],
+                    }),
+                    GPU.device.createBindGroupLayout({
+                        entries: [
+                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
+                        ],
+                    }),
+                    GPU.device.createBindGroupLayout({
+                        entries: [
+                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
+                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                            { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                            { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                            { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                        ],
+                    }),
+                ],
+            }),
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -75,10 +70,10 @@ class LightingRenderPass extends RenderPass {
             layout: this.renderPipeline.getBindGroupLayout(3),
             entries: [
                 { binding: 0, resource: this.sampler },
-                { binding: 1, resource: gBufferRenderPass.positionTextureView },
-                { binding: 2, resource: gBufferRenderPass.normalTextureView },
-                { binding: 3, resource: gBufferRenderPass.colorTextureView },
-                { binding: 4, resource: gBufferRenderPass.pbrTextureView },
+                this.gBufferRenderPass.positionRenderTexture.GetBindGroupEntry(1),
+                this.gBufferRenderPass.normalRenderTexture.GetBindGroupEntry(2),
+                this.gBufferRenderPass.colorRenderTexture.GetBindGroupEntry(3),
+                this.gBufferRenderPass.pbrRenderTexture.GetBindGroupEntry(4),
                 { binding: 5, resource: shadowRenderPass.shadowTextureView },
             ],
         });
@@ -87,7 +82,7 @@ class LightingRenderPass extends RenderPass {
     Render(camera, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                { view: this.sceneTextureView, loadOp: "clear", storeOp: "store" }
+                this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
 

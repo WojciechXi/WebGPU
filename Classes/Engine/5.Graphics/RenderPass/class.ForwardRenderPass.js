@@ -3,12 +3,9 @@ class ForwardRenderPass extends RenderPass {
     Init(data) {
         const canvas = data.canvas;
 
-        this.colorTexture = GPU.CreateTexture({
-            size: [canvas.width, canvas.height],
-            format: "rgba16float",
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        this.sceneRenderTexture = new RenderTexture(canvas.width, canvas.height, {
+            format: 'rgba16float',
         });
-        this.colorTextureView = this.colorTexture.createView();
 
         this.depthTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
@@ -28,8 +25,7 @@ class ForwardRenderPass extends RenderPass {
     Render(camera, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                { view: this.colorTextureView, loadOp: "clear", storeOp: "store" },
-
+                this.sceneRenderTexture.GetColorAttachment(),
                 { view: this.depthTextureView, clearValue: { r: 1.0, g: 0, b: 0, a: 1 }, loadOp: "clear", storeOp: "store", }
             ],
             depthStencilAttachment: {

@@ -59,13 +59,9 @@ class Graphics {
             alphaMode: 'premultiplied',
         });
 
-        const sceneTexture = this.sceneTexture = GPU.CreateTexture({
-            size: [this.canvas.width, this.canvas.height],
+        const sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, {
             format: 'rgba16float',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
-
-        this.sceneTextureView = this.sceneTexture.createView();
 
         const shadowRenderPass = this.shadowRenderPass = new ShadowRenderPass({
             name: 'shadowRenderPass',
@@ -106,7 +102,7 @@ class Graphics {
             gBufferRenderPass: gBufferRenderPass,
             lightingRenderPass: lightingRenderPass,
             forwardRenderPass: forwardRenderPass,
-            sceneTextureView: this.sceneTextureView,
+            sceneRenderTexture: sceneRenderTexture,
             canvas: canvas,
         });
 
@@ -114,7 +110,7 @@ class Graphics {
             name: 'ssaoRenderPass',
             code: assets.shaders['ssaoRenderPass.wgsl'],
             gBufferRenderPass: gBufferRenderPass,
-            inputTextureView: this.sceneTextureView,
+            inputRenderTexture: sceneRenderTexture,
             canvas: canvas,
         });
 
@@ -122,21 +118,21 @@ class Graphics {
             name: 'screenSpaceReflectionRenderPass',
             code: assets.shaders['screenSpaceReflectionRenderPass.wgsl'],
             gBufferRenderPass: gBufferRenderPass,
-            inputTextureView: ssaoRenderPass.sceneTextureView,
+            inputRenderTexture: ssaoRenderPass.sceneRenderTexture,
             canvas: canvas,
         });
 
         const bloomRenderPass = this.bloomRenderPass = new BloomRenderPass({
             name: 'bloomRenderPass',
             code: assets.shaders['bloomRenderPass.wgsl'],
-            inputTextureView: ssaoRenderPass.sceneTextureView,
+            inputRenderTexture: ssaoRenderPass.sceneRenderTexture,
             canvas: canvas,
         });
 
         const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
             name: 'tonemappingRenderPass',
             code: assets.shaders['tonemappingRenderPass.wgsl'],
-            inputTextureView: bloomRenderPass.sceneTextureView,
+            inputRenderTexture: bloomRenderPass.sceneRenderTexture,
             canvas: canvas,
         });
 
@@ -152,7 +148,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        debugRenderPass.textureView = tonemappingRenderPass.sceneTextureView;
+        debugRenderPass.renderTexture = tonemappingRenderPass.sceneRenderTexture;
 
         callback();
     }
@@ -184,13 +180,13 @@ class Graphics {
         if (this.finalRenderPass) this.finalRenderPass.Render(camera, scene, commandEncoder);
 
         if (this.ssaoRenderPass) this.ssaoRenderPass.Render(camera, scene, commandEncoder);
-        if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(camera, scene, commandEncoder);
         if (this.bloomRenderPass) this.bloomRenderPass.Render(camera, scene, commandEncoder);
         if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(camera, scene, commandEncoder);
 
         if (this.debugRenderPass) this.debugRenderPass.Render(camera, scene, commandEncoder);
 
-        // if (this.gizmosRenderPass) this.gizmosRenderPass.Render(camera, scene, commandEncoder);
+        if (this.gizmosRenderPass) this.gizmosRenderPass.Render(camera, scene, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);
 

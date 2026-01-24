@@ -1,12 +1,12 @@
 class FinalRenderPass extends RenderPass {
 
     Init(data) {
-        const clearRenderPass = this.clearRenderPass = data.clearRenderPass;
+        this.clearRenderPass = data.clearRenderPass;
 
         this.gBufferRenderPass = data.gBufferRenderPass;
         this.lightingRenderPass = data.lightingRenderPass;
         this.forwardRenderPass = data.forwardRenderPass;
-        this.sceneTextureView = data.sceneTextureView;
+        this.sceneRenderTexture = data.sceneRenderTexture;
         this.canvas = data.canvas;
 
         this.uniformValues = new Float32Array(4);
@@ -42,7 +42,7 @@ class FinalRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: 'rgba16float', }
+                    this.sceneRenderTexture.GetTarget(),
                 ],
             }
         });
@@ -63,16 +63,16 @@ class FinalRenderPass extends RenderPass {
             mipmapFilter: 'nearest',
         });
 
-        const bindGroup = this.bindGroup = GPU.CreateBindGroup({
+        this.bindGroup = GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
                 { binding: 1, resource: this.sampler },
                 { binding: 2, resource: this.depthSampler },
-                { binding: 3, resource: this.clearRenderPass.sceneTextureView },
-                { binding: 4, resource: this.lightingRenderPass.sceneTextureView },
+                this.clearRenderPass.sceneRenderTexture.GetBindGroupEntry(3),
+                this.lightingRenderPass.sceneRenderTexture.GetBindGroupEntry(4),
                 { binding: 5, resource: this.gBufferRenderPass.depthTextureView },
-                { binding: 6, resource: this.forwardRenderPass.colorTextureView },
+                this.forwardRenderPass.sceneRenderTexture.GetBindGroupEntry(6),
                 { binding: 7, resource: this.forwardRenderPass.depthTextureView },
             ],
         });
@@ -81,11 +81,7 @@ class FinalRenderPass extends RenderPass {
     Render(camera, scene, commandEncoder) {
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                {
-                    view: this.sceneTextureView, // wyświetlamy na ekranie
-                    loadOp: "clear",
-                    storeOp: "store"
-                }
+                this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
 

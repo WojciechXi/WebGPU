@@ -1,35 +1,35 @@
 class DebugRenderPass extends RenderPass {
 
     Init(data) {
-        this._textureView = null;
+        this._renderTexture = null;
 
         const canvas = data.canvas;
 
         const format = navigator.gpu.getPreferredCanvasFormat();
 
-        const bindGroupLayout = GPU.device.createBindGroupLayout({
-            entries: [
-                {
-                    binding: 0,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    texture: {
-                        sampleType: 'unfilterable-float',
-                        viewDimension: '2d',
-                        multisampled: false,
-                    },
-                },
-                {
-                    binding: 1,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    sampler: {
-                        type: 'non-filtering',
-                    },
-                },
-            ],
-        });
-
         const pipelineLayout = GPU.device.createPipelineLayout({
-            bindGroupLayouts: [bindGroupLayout],
+            bindGroupLayouts: [
+                GPU.device.createBindGroupLayout({
+                    entries: [
+                        {
+                            binding: 0,
+                            visibility: GPUShaderStage.FRAGMENT,
+                            texture: {
+                                sampleType: 'unfilterable-float',
+                                viewDimension: '2d',
+                                multisampled: false,
+                            },
+                        },
+                        {
+                            binding: 1,
+                            visibility: GPUShaderStage.FRAGMENT,
+                            sampler: {
+                                type: 'non-filtering',
+                            },
+                        },
+                    ],
+                })
+            ],
         });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
@@ -57,17 +57,17 @@ class DebugRenderPass extends RenderPass {
         this.bindGroup = null;
     }
 
-    get textureView() {
-        return this._textureView;
+    get renderTexture() {
+        return this._renderTexture;
     }
 
-    set textureView(textureView) {
-        this._textureView = textureView;
+    set renderTexture(renderTexture) {
+        this._renderTexture = renderTexture;
 
-        this.bindGroup = this._textureView ? GPU.CreateBindGroup({
+        this.bindGroup = this._renderTexture ? GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this._textureView, },
+                this.renderTexture.GetBindGroupEntry(0),
                 { binding: 1, resource: this.sampler, },
             ],
         }) : null;

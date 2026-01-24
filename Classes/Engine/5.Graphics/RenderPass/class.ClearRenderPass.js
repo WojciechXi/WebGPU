@@ -3,12 +3,9 @@ class ClearRenderPass extends RenderPass {
     Init(data) {
         const canvas = data.canvas;
 
-        this.sceneTexture = GPU.CreateTexture({
-            size: [canvas.width, canvas.height],
-            format: "rgba16float",
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+        this.sceneRenderTexture = new RenderTexture(canvas.width, canvas.height, {
+            format: 'rgba16float',
         });
-        this.sceneTextureView = this.sceneTexture.createView();
 
         const pipelineLayout = GPU.device.createPipelineLayout({
             bindGroupLayouts: [
@@ -40,7 +37,7 @@ class ClearRenderPass extends RenderPass {
     Render(camera, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                { view: this.sceneTextureView, loadOp: "clear", storeOp: "store" },
+                this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
 
