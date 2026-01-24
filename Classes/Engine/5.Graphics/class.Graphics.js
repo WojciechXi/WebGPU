@@ -70,94 +70,92 @@ class Graphics {
 
         const sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
 
-        console.log(Resources.Get('/Resources/Shaders/shadowRenderPass.wgsl'));
-
-        const shadowRenderPass = this.shadowRenderPass = new ShadowRenderPass({
+        this.shadowRenderPass = new ShadowRenderPass({
             name: 'shadowRenderPass',
             code: Resources.Get('/Resources/Shaders/shadowRenderPass.wgsl'),
             canvas: this.canvas,
         });
 
-        const gBufferRenderPass = this.gBufferRenderPass = new GBufferRenderPass({
+        this.gBufferRenderPass = new GBufferRenderPass({
             name: 'gBufferRenderPass',
             canvas: this.canvas,
         });
 
-        const clearRenderPass = this.clearRenderPass = new ClearRenderPass({
+        this.clearRenderPass = new ClearRenderPass({
             name: 'clearRenderPass',
             code: Resources.Get('/Resources/Shaders/clearRenderPass.wgsl'),
             canvas: this.canvas,
         });
 
-        const lightingRenderPass = this.lightingRenderPass = new LightingRenderPass({
+        this.lightingRenderPass = new LightingRenderPass({
             name: 'lightingRenderPass',
             code: Resources.Get('/Resources/Shaders/lightingRenderPass.wgsl'),
-            shadowRenderPass: shadowRenderPass,
-            gBufferRenderPass: gBufferRenderPass,
+            shadowRenderPass: this.shadowRenderPass,
+            gBufferRenderPass: this.gBufferRenderPass,
             canvas: this.canvas,
         });
 
-        const forwardRenderPass = this.forwardRenderPass = new ForwardRenderPass({
+        this.forwardRenderPass = new ForwardRenderPass({
             name: 'forwardRenderPass',
             code: Resources.Get('/Resources/Shaders/forwardRenderPass.wgsl'),
-            lightingRenderPass: lightingRenderPass,
+            lightingRenderPass: this.lightingRenderPass,
             canvas: this.canvas,
         });
 
-        const finalRenderPass = this.finalRenderPass = new FinalRenderPass({
+        this.finalRenderPass = new FinalRenderPass({
             name: 'finalRenderPass',
             code: Resources.Get('/Resources/Shaders/finalRenderPass.wgsl'),
-            clearRenderPass: clearRenderPass,
-            gBufferRenderPass: gBufferRenderPass,
-            lightingRenderPass: lightingRenderPass,
-            forwardRenderPass: forwardRenderPass,
+            clearRenderPass: this.clearRenderPass,
+            gBufferRenderPass: this.gBufferRenderPass,
+            lightingRenderPass: this.lightingRenderPass,
+            forwardRenderPass: this.forwardRenderPass,
             sceneRenderTexture: sceneRenderTexture,
             canvas: this.canvas,
         });
 
-        const ssaoRenderPass = this.ssaoRenderPass = new SSAORenderPass({
+        this.ssaoRenderPass = new SSAORenderPass({
             name: 'ssaoRenderPass',
             code: Resources.Get('/Resources/Shaders/ssaoRenderPass.wgsl'),
-            gBufferRenderPass: gBufferRenderPass,
+            gBufferRenderPass: this.gBufferRenderPass,
             inputRenderTexture: sceneRenderTexture,
             canvas: this.canvas,
         });
 
-        const screenSpaceReflectionRenderPass = this.screenSpaceReflectionRenderPass = new ScreenSpaceReflectionRenderPass({
+        this.screenSpaceReflectionRenderPass = new ScreenSpaceReflectionRenderPass({
             name: 'screenSpaceReflectionRenderPass',
             code: Resources.Get('/Resources/Shaders/screenSpaceReflectionRenderPass.wgsl'),
-            gBufferRenderPass: gBufferRenderPass,
-            inputRenderTexture: ssaoRenderPass.sceneRenderTexture,
+            gBufferRenderPass: this.gBufferRenderPass,
+            inputRenderTexture: this.ssaoRenderPass.sceneRenderTexture,
             canvas: this.canvas,
         });
 
-        const bloomRenderPass = this.bloomRenderPass = new BloomRenderPass({
+        this.bloomRenderPass = new BloomRenderPass({
             name: 'bloomRenderPass',
             code: Resources.Get('/Resources/Shaders/bloomRenderPass.wgsl'),
-            inputRenderTexture: ssaoRenderPass.sceneRenderTexture,
+            inputRenderTexture: this.ssaoRenderPass.sceneRenderTexture,
             canvas: this.canvas,
         });
 
-        const tonemappingRenderPass = this.tonemappingRenderPass = new TonemappingRenderPass({
+        this.tonemappingRenderPass = new TonemappingRenderPass({
             name: 'tonemappingRenderPass',
             code: Resources.Get('/Resources/Shaders/tonemappingRenderPass.wgsl'),
-            inputRenderTexture: bloomRenderPass.sceneRenderTexture,
+            inputRenderTexture: this.bloomRenderPass.sceneRenderTexture,
             canvas: this.canvas,
         });
 
-        const screenRenderPass = this.screenRenderPass = new ScreenRenderPass({
-            name: 'screenRenderPass',
-            code: Resources.Get('/Resources/Shaders/screenRenderPass.wgsl'),
-            canvas: this.canvas,
-        });
-
-        const gizmosRenderPass = this.gizmosRenderPass = new GizmosRenderPass({
+        this.gizmosRenderPass = new GizmosRenderPass({
             name: 'gizmosRenderPass',
             code: Resources.Get('/Resources/Shaders/gizmosRenderPass.wgsl'),
             canvas: this.canvas,
         });
 
-        screenRenderPass.renderTexture = tonemappingRenderPass.sceneRenderTexture;
+        this.screenRenderPass = new ScreenRenderPass({
+            name: 'screenRenderPass',
+            code: Resources.Get('/Resources/Shaders/screenRenderPass.wgsl'),
+            canvas: this.canvas,
+        });
+
+        this.screenRenderPass.renderTexture = this.tonemappingRenderPass.sceneRenderTexture;
     }
 
     static Render(scene) {

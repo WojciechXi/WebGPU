@@ -1,8 +1,6 @@
 class DirectionalLight extends Behaviour {
 
     Init() {
-        if (DirectionalLight.main == null) DirectionalLight.main = this;
-
         this.color = Color.white;
         this.shadowColor = new Color(0.5, 0.5, 0.5, 1);
 

@@ -41,7 +41,6 @@ class ClearRenderPass extends RenderPass {
 
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, scene.ambientLight.lightBindGroup);
-
         renderPass.draw(6);
         renderPass.end();
     }

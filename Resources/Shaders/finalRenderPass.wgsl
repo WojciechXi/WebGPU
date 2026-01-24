@@ -43,13 +43,13 @@ fn fs(vsOut: VSOut) -> FSOut {
   let clear = textureSample(clearTexture, screenSampler, vsOut.uv);
 
   let depth = textureSample(depthTexture, depthSampler, vsOut.uv);
-  let depthForward = textureSample(depthForwardTexture, depthSampler, vsOut.uv);
+  let depthForward = textureSample(depthForwardTexture, depthSampler, vsOut.uv).r;
 
   let lighting = textureSample(lightingTexture, screenSampler, vsOut.uv);
   let forward = textureSample(forwardTexture, screenSampler, vsOut.uv);
 
   var color = lighting.rgb;
-  if(depth.r <= 0) {
+  if(depth.r >= 1) {
     color = vec3f(clear.rgb);
   }
 

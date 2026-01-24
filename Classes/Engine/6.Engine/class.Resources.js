@@ -34,7 +34,7 @@ class Resources {
                     const response = await fetch(path);
                     object.resources[path] = await response.text();
                 } else if (meta.mimeType.startsWith('image/')) {
-                    await loadBitmap(path, function (bitmap) {
+                    await loadBitmap(path, function (bitmap, image) {
                         object.resources[path] = bitmap;
                     });
                 }

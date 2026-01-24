@@ -3,10 +3,15 @@ class AmbientLight extends Behaviour {
     Init() {
         this.color = Color32.white;
 
-        this.lightBuffer = new UniformBuffer(4); //view, projection, viewProjection, inverseView, inverseViewProjection, color, shadowColor
+        this.lightBuffer = new UniformBuffer(4); //color
         this.lightBindGroup = GPU.CreateBindGroup({
-            label: 'ViewBindGroup',
-            layout: Graphics.lightBindGroupLayout,
+            label: 'AmbientLightBindGroup',
+            layout: GPU.CreateBindGroupLayout({
+                label: 'AmbientLightBindGroupLayout',
+                entries: [
+                    { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
+                ],
+            }),
             entries: [
                 this.lightBuffer.GetBindGroupEntry(0),
             ],

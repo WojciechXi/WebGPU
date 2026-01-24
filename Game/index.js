@@ -20,15 +20,24 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             engine.Awake();
             engine.Start();
 
-            let materials = {};
-
             const litShader = new Shader(Resources.Get('/Resources/Shaders/Lit.wgsl'));
             litShader.Compile();
 
-            const defaultMaterial = materials.default = new Material({
+            const glassShader = new Shader(Resources.Get('/Resources/Shaders/Glass.wgsl'));
+            glassShader.Compile();
+
+            let materials = {};
+
+            materials.Default = new Material({
                 name: 'Default',
-                color: Color32.green,
+                color: Color32.white,
                 shader: litShader,
+            });
+
+            materials.Glass = new Material({
+                name: 'Glass',
+                color: Color32.red,
+                shader: glassShader,
             });
 
             const ambientLightGameObject = new GameObject("Ambient Light");
@@ -59,6 +68,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                     meshRenderer.mesh = mesh;
                     meshRenderer.materials = [];
                     mesh.subMeshes.forEach(function (subMesh) {
+                        if (subMesh.material == 'Glass') meshRenderer.castShadows = false;
                         if (materials.hasOwnProperty(subMesh.material)) {
                             meshRenderer.materials.push(materials[subMesh.material]);
                         } else {
@@ -69,25 +79,27 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                                 shader: litShader,
                             });
 
-                            Resources.Get(`/Textures/${material}/Albedo.webp`, function (texture) {
+                            Resources.Get(`/Resources/Textures/${material.name}/Albedo.webp`, function (texture) {
                                 if (texture) material.SetTexture('albedo', texture);
                             });
 
-                            Resources.Get(`/Textures/${material}/Normal.webp`, function (texture) {
+                            Resources.Get(`/Resources/Textures/${material.name}/Normal.webp`, function (texture) {
                                 if (texture) material.SetTexture('normal', texture);
                             });
 
-                            Resources.Get(`/Textures/${material}/Roughness.webp`, function (texture) {
+                            Resources.Get(`/Resources/Textures/${material.name}/Roughness.webp`, function (texture) {
                                 if (texture) material.SetTexture('roughness', texture);
                             });
 
-                            Resources.Get(`/Textures/${material}/Metallic.webp`, function (texture) {
+                            Resources.Get(`/Resources/Textures/${material.name}/Metallic.webp`, function (texture) {
                                 if (texture) material.SetTexture('metallic', texture);
                             });
 
-                            Resources.Get(`/Textures/${material}/Occlusion.webp`, function (texture) {
+                            Resources.Get(`/Resources/Textures/${material.name}/Occlusion.webp`, function (texture) {
                                 if (texture) material.SetTexture('occlussion', texture);
                             });
+
+                            material.Update();
 
                             if (m && m.pbrMetallicRoughness) {
                                 const pbr = m.pbrMetallicRoughness;
