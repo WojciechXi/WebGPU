@@ -69,23 +69,23 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                                 shader: litShader,
                             });
 
-                            Resources.Get(`/Images/${material}/Albedo.webp`, function (texture) {
+                            Resources.Get(`/Textures/${material}/Albedo.webp`, function (texture) {
                                 if (texture) material.SetTexture('albedo', texture);
                             });
 
-                            Resources.Get(`/Images/${material}/Normal.webp`, function (texture) {
+                            Resources.Get(`/Textures/${material}/Normal.webp`, function (texture) {
                                 if (texture) material.SetTexture('normal', texture);
                             });
 
-                            Resources.Get(`/Images/${material}/Roughness.webp`, function (texture) {
+                            Resources.Get(`/Textures/${material}/Roughness.webp`, function (texture) {
                                 if (texture) material.SetTexture('roughness', texture);
                             });
 
-                            Resources.Get(`/Images/${material}/Metallic.webp`, function (texture) {
+                            Resources.Get(`/Textures/${material}/Metallic.webp`, function (texture) {
                                 if (texture) material.SetTexture('metallic', texture);
                             });
 
-                            Resources.Get(`/Images/${material}/Occlusion.webp`, function (texture) {
+                            Resources.Get(`/Textures/${material}/Occlusion.webp`, function (texture) {
                                 if (texture) material.SetTexture('occlussion', texture);
                             });
 
