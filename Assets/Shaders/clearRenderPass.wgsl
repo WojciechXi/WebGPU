@@ -1,8 +1,8 @@
-struct Uniforms {
-  ambientLightColor : vec4f,
+struct AmbientLight {
+  color : vec4f,
 };
 
-@group(0) @binding(0) var<uniform> uni : Uniforms;
+@group(0) @binding(0) var<uniform> ambientLight : AmbientLight;
 
 @vertex
 fn vs(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4f {
@@ -20,5 +20,5 @@ fn vs(@builtin(vertex_index) VertexIndex : u32) -> @builtin(position) vec4f {
 
 @fragment
 fn fs(@builtin(position) fragCoord : vec4f) -> @location(0) vec4f {
-    return vec4f(uni.ambientLightColor.rgb, 1.0);
+    return vec4f(ambientLight.color.rgb, 1.0);
 }

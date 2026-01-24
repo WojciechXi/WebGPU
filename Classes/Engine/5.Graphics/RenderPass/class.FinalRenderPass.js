@@ -69,7 +69,7 @@ class FinalRenderPass extends RenderPass {
                 { binding: 0, resource: { buffer: this.uniformBuffer } },
                 { binding: 1, resource: this.sampler },
                 { binding: 2, resource: this.depthSampler },
-                { binding: 3, resource: this.clearRenderPass.colorTextureView },
+                { binding: 3, resource: this.clearRenderPass.sceneTextureView },
                 { binding: 4, resource: this.lightingRenderPass.sceneTextureView },
                 { binding: 5, resource: this.gBufferRenderPass.depthTextureView },
                 { binding: 6, resource: this.forwardRenderPass.colorTextureView },

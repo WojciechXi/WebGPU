@@ -3,21 +3,25 @@ class ClearRenderPass extends RenderPass {
     Init(data) {
         const canvas = data.canvas;
 
-        this.colorTexture = GPU.CreateTexture({
+        this.sceneTexture = GPU.CreateTexture({
             size: [canvas.width, canvas.height],
             format: "rgba16float",
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
-        this.colorTextureView = this.colorTexture.createView();
+        this.sceneTextureView = this.sceneTexture.createView();
 
-        this.uniformValues = new Float32Array(4);
-        this.uniformBuffer = GPU.CreateBuffer({
-            size: this.uniformValues.length * 4,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        const pipelineLayout = GPU.device.createPipelineLayout({
+            bindGroupLayouts: [
+                GPU.device.createBindGroupLayout({
+                    entries: [
+                        { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
+                    ],
+                }),
+            ],
         });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: "auto",
+            layout: pipelineLayout,
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -31,28 +35,17 @@ class ClearRenderPass extends RenderPass {
             },
             primitive: { topology: "triangle-list" },
         });
-
-        this.bindGroup = GPU.CreateBindGroup({
-            layout: this.renderPipeline.getBindGroupLayout(0),
-            entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
-            ],
-        });
     }
 
     Render(camera, scene, commandEncoder) {
-        this.uniformValues.set(AmbientLight.main.color, 0);
-
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                { view: this.colorTextureView, loadOp: "clear", storeOp: "store" },
+                { view: this.sceneTextureView, loadOp: "clear", storeOp: "store" },
             ],
         });
 
         renderPass.setPipeline(this.renderPipeline);
-        renderPass.setBindGroup(0, this.bindGroup);
-
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
+        renderPass.setBindGroup(0, scene.ambientLight.lightBindGroup);
 
         renderPass.draw(6);
         renderPass.end();

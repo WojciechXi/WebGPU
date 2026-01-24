@@ -162,7 +162,9 @@ class Graphics {
         this.canvas.height = this.canvas.clientHeight;
 
         for (let component of scene.renderables) if (component.OnPreRender) component.OnPreRender();
+        for (let component of scene.directionalLights) if (component.OnPreRender) component.OnPreRender();
         if (scene && scene.cameras.length) for (let camera of scene.cameras) this.RenderCamera(camera, scene);
+        for (let component of scene.directionalLights) if (component.OnPostRender) component.OnPostRender();
         for (let component of scene.renderables) if (component.OnPostRender) component.OnPostRender();
     }
 

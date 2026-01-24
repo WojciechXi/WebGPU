@@ -4,6 +4,8 @@ class Scene extends Obj {
         this.gameObjects = [];
         this.updateables = [];
         this.renderables = [];
+        this.ambientLight = null;
+        this.directionalLights = [];
         this.cameras = [];
     }
 
@@ -18,12 +20,14 @@ class Scene extends Obj {
     AddComponent(component) {
         if (component.Update) this.updateables.push(component);
         if (component.Draw) this.renderables.push(component);
+        if (component instanceof DirectionalLight) this.directionalLights.push(component);
         if (component instanceof Camera) this.cameras.push(component);
     }
 
     RemoveComponent(component) {
         if (component.Update) this.updateables.splice(this.updateables.indexOf(component), 1);
         if (component.Draw) this.renderables.splice(this.renderables.indexOf(component), 1);
+        if (component instanceof DirectionalLight) this.directionalLights.splice(this.cameras.indexOf(component), 1);
         if (component instanceof Camera) this.cameras.splice(this.cameras.indexOf(component), 1);
     }
 

@@ -105,24 +105,38 @@ fn sampleShadow(shadowUV: vec2f, depth: f32, radius: i32, bias: f32) -> f32 {
     return shadow / total;
 }
 
-struct Uniforms {
-    cameraMatrix : mat4x4f,
-    viewMatrix : mat4x4f,
-    projectionMatrix : mat4x4f,
-    lightViewMatrix : mat4x4f,
-    lightProjectionMatrix : mat4x4f,
-    lightColor : vec4f,
-    shadowColor : vec4f,
-    ambientLightColor : vec4f,
+struct View {
+    matrix : mat4x4f,
+    projection : mat4x4f,
+    viewProjection : mat4x4f,
+    inverseView : mat4x4f,
+    inverseViewProjection : mat4x4f,
 };
 
-@group(0) @binding(0) var<uniform> uni : Uniforms;
-@group(0) @binding(1) var screenSampler : sampler;
-@group(0) @binding(2) var worldPositionTexture : texture_2d<f32>;
-@group(0) @binding(3) var worldNormalTexture : texture_2d<f32>;
-@group(0) @binding(4) var colorTexture : texture_2d<f32>;
-@group(0) @binding(5) var pbrTexture : texture_2d<f32>;
-@group(0) @binding(6) var shadowTexture : texture_2d<f32>;
+struct DirectionalLight {
+    matrix : mat4x4f,
+    projection : mat4x4f,
+    viewProjection : mat4x4f,
+    inverseView : mat4x4f,
+    inverseViewProjection : mat4x4f,
+    color : vec4f,
+    shadowColor : vec4f,
+};
+
+struct AmbientLight {
+    color : vec4f,
+};
+
+@group(0) @binding(0) var<uniform> view : View;
+@group(1) @binding(0) var<uniform> directionalLight : DirectionalLight;
+@group(2) @binding(0) var<uniform> ambientLight : AmbientLight;
+
+@group(3) @binding(0) var screenSampler : sampler;
+@group(3) @binding(1) var worldPositionTexture : texture_2d<f32>;
+@group(3) @binding(2) var worldNormalTexture : texture_2d<f32>;
+@group(3) @binding(3) var colorTexture : texture_2d<f32>;
+@group(3) @binding(4) var pbrTexture : texture_2d<f32>;
+@group(3) @binding(5) var shadowTexture : texture_2d<f32>;
 
 struct VSOut {
   @builtin(position) pos : vec4f,
@@ -160,10 +174,10 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let worldPosition = worldPosition4.xyz / max(worldPosition4.w, 1e-6);
 
     // --- kamera ---
-    var cameraWorldPosition = inverse4(uni.viewMatrix)[3].xyz;
+    var cameraWorldPosition = inverse4(view.matrix)[3].xyz;
 
     // --- shadow mapping ---
-    var lightClip = uni.lightProjectionMatrix * uni.lightViewMatrix * vec4f(worldPosition, 1.0);
+    var lightClip = directionalLight.viewProjection * vec4f(worldPosition, 1.0);
     var lightNDC  = lightClip.xyz / lightClip.w;
 
     // --- końcowy kolor ---
@@ -182,7 +196,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
 
     // --- światło ---
     // kierunek w world space: forward = +Z (LH)
-    var lightDirection = normalize((inverse4(uni.lightViewMatrix) * vec4f(0.0, 0.0, 1.0, 0.0)).xyz);
+    var lightDirection = normalize((inverse4(directionalLight.matrix) * vec4f(0.0, 0.0, 1.0, 0.0)).xyz);
 
     // --- diffuse ---
     let N = normalize(worldNormal);
@@ -197,8 +211,8 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let F0 = mix(color.rgb, vec3f(1.0, 1.0, 1.0), metallic);
 
     // --- światła ---
-    let lightColor   = uni.lightColor.rgb * uni.lightColor.a;
-    let ambientColor = uni.ambientLightColor.rgb * uni.ambientLightColor.a;
+    let lightColor   = directionalLight.color.rgb * directionalLight.color.a;
+    let ambientColor = ambientLight.color.rgb * ambientLight.color.a;
 
     let diffuse  = color.rgb * lightColor * diff * shadowVal;
     let specular = F0 * spec * (1.0 - roughness) * shadowVal;

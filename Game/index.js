@@ -274,6 +274,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             const ambientLightGameObject = new GameObject("Ambient Light");
             const ambientLight = ambientLightGameObject.AddComponent(AmbientLight);
             ambientLight.color.Set(0.8, 0.9, 1, 0.25);
+            engine.scene.ambientLight = ambientLight;
 
             const directionalLightGameObject = new GameObject('Directional Light');
             directionalLightGameObject.transform.rotation = Quaternion.FromEuler(45, 0, 15);

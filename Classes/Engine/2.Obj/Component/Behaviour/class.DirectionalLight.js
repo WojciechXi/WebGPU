@@ -1,9 +1,10 @@
-class Light extends Behaviour {
+class DirectionalLight extends Behaviour {
 
     Init() {
-        this.color = Color32.white;
+        if (DirectionalLight.main == null) DirectionalLight.main = this;
 
-        this.shadowColor = new Color32(0.5, 0.5, 0.5, 1);
+        this.color = Color.white;
+        this.shadowColor = new Color(0.5, 0.5, 0.5, 1);
 
         this.aspect = 1;
         this.nearClipPlane = 0.1;
@@ -19,7 +20,7 @@ class Light extends Behaviour {
         this.inverseViewMatrix = Matrix4x4.Identity();
         this.inverseViewProjectionMatrix = Matrix4x4.Identity();
 
-        this.lightValues = new Float32Array(16 + 16 + 16 + 16 + 16); //view, projection, viewProjection, inverseView, inverseViewProjection
+        this.lightValues = new Float32Array(16 + 16 + 16 + 16 + 16 + 4 + 4); //view, projection, viewProjection, inverseView, inverseViewProjection, color, shadowColor
         this.lightBuffer = GPU.CreateBuffer({
             label: 'uniform buffer',
             size: this.lightValues.length * 4,
