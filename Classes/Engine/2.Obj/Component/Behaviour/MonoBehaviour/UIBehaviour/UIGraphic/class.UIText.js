@@ -1,0 +1,3 @@
+class UIText extends UIGraphic {
+
+}

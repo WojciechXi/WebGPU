@@ -1,0 +1,3 @@
+class UIButton extends UISelectable {
+
+}

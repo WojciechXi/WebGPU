@@ -1,0 +1,3 @@
+class UIImage extends UIGraphic {
+
+}

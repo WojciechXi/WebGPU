@@ -1,0 +1,3 @@
+class UIGraphic extends UIBehaviour {
+
+}

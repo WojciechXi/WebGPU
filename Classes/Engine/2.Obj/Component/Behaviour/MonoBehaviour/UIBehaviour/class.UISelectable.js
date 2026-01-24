@@ -1,0 +1,3 @@
+class UISelectable extends UIBehaviour {
+
+}
