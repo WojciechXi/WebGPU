@@ -1,10 +1,20 @@
 class UniformBuffer {
 
     constructor(size, data = { usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, }) {
+        this.data = data;
         this.values = new Float32Array(size);
         this.buffer = GPU.CreateBuffer({
             size: size * 4,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+            usage: this.data.usage ?? GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+    }
+
+    Resize(newSize) {
+        this.buffer.destroy();
+        this.values = new Float32Array(newSize);
+        this.buffer = GPU.CreateBuffer({
+            size: newSize * 4,
+            usage: this.data.usage ?? GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
     }
 
