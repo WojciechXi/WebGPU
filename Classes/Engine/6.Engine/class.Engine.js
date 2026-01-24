@@ -1,18 +1,20 @@
 class Engine {
 
-    constructor(assets) {
+    constructor() {
         Engine.Instance = this;
-        this.assets = assets;
         this.scene = new Scene();
     }
 
     Init(callback) {
         let object = this;
 
-        Graphics.Init(this.assets, function () {
+        Graphics.Init(function () {
             callback(object);
-            object.Start();
         });
+    }
+
+    Awake() {
+        Graphics.Awake();
     }
 
     Start() {

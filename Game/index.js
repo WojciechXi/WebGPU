@@ -1,29 +1,12 @@
 window.addEventListener('DOMContentLoaded', async function (event) {
     const device = await GPU.Request();
+    const engine = new Engine();
 
-    window.meshes = {};
+    engine.Init(function (engine) {
+        Resources.Init(function () {
+            engine.Awake();
 
-    await Importer.GLTF('/Assets/Models', 'Cube.gltf', function (meshes, gltfMaterials) {
-        for (const mesh of meshes) window.meshes.cube = mesh;
-    });
-
-    await Importer.GLTF('/Assets/Models', 'Sphere.gltf', function (meshes, gltfMaterials) {
-        for (const mesh of meshes) window.meshes.sphere = mesh;
-    });
-
-    await Importer.GLTF('/Assets/Models', 'Icosphere.gltf', function (meshes, gltfMaterials) {
-        for (const mesh of meshes) window.meshes.sphere = mesh;
-    });
-
-    await Importer.GLTF('/Assets/Models', 'Capsule.gltf', function (meshes, gltfMaterials) {
-        for (const mesh of meshes) window.meshes.capsule = mesh;
-    });
-
-    Ajax.Get('/assets.php', function (response) {
-        const assets = window.assets = JSON.parse(response);
-
-        const engine = new Engine(assets);
-        engine.Init(function (engine) {
+            console.log('abc');
             const litShader = new Shader(assets.shaders['Lit.wgsl']);
             litShader.Compile();
 
@@ -288,27 +271,27 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             const camera = cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Importer.GLTF('/Assets/Models', 'Ablewicza 15.gltf', function (meshes, gltfMaterials) {
-                const gameObject = new GameObject('Ablewicza 15');
-                gameObject.transform.position = new Vector3(0, 0, 0);
-                gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
+            // Importer.GLTF('/Assets/Models', 'Ablewicza 15.gltf', function (meshes, gltfMaterials) {
+            //     const gameObject = new GameObject('Ablewicza 15');
+            //     gameObject.transform.position = new Vector3(0, 0, 0);
+            //     gameObject.transform.rotation = Quaternion.FromEuler(0, 0, 0);
 
-                for (const mesh of meshes) {
-                    const meshGameObject = new GameObject(mesh.name);
-                    meshGameObject.transform.SetParent(gameObject.transform);
-                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+            //     for (const mesh of meshes) {
+            //         const meshGameObject = new GameObject(mesh.name);
+            //         meshGameObject.transform.SetParent(gameObject.transform);
+            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
 
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [];
-                    mesh.subMeshes.forEach(function (subMesh) {
-                        if (materials.hasOwnProperty(subMesh.material)) {
-                            meshRenderer.materials.push(materials[subMesh.material]);
-                        } else {
-                            meshRenderer.materials.push(whiteMaterial);
-                        }
-                    });
-                }
-            });
+            //         meshRenderer.mesh = mesh;
+            //         meshRenderer.materials = [];
+            //         mesh.subMeshes.forEach(function (subMesh) {
+            //             if (materials.hasOwnProperty(subMesh.material)) {
+            //                 meshRenderer.materials.push(materials[subMesh.material]);
+            //             } else {
+            //                 meshRenderer.materials.push(whiteMaterial);
+            //             }
+            //         });
+            //     }
+            // });
         });
     });
 });

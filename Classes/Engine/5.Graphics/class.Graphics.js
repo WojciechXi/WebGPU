@@ -10,7 +10,7 @@ class Graphics {
     static get Width() { return this.canvas.width; }
     static get Height() { return this.canvas.height; }
 
-    static async Init(assets, callback) {
+    static async Init(callback) {
         const device = GPU.device;
         const canvas = this.canvas = document.querySelector('#view');
         canvas.focus();
@@ -18,6 +18,18 @@ class Graphics {
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
 
+        const context = this.context = canvas.getContext('webgpu');
+
+        context.configure({
+            device,
+            format: navigator.gpu.getPreferredCanvasFormat(),
+            alphaMode: 'premultiplied',
+        });
+
+        callback();
+    }
+
+    static Awake() {
         this.viewBindGroupLayout = GPU.device.createBindGroupLayout({
             label: 'ViewBindGroupLayout',
             entries: [
@@ -56,14 +68,6 @@ class Graphics {
                 { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
                 { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
             ],
-        });
-
-        const context = this.context = canvas.getContext('webgpu');
-
-        context.configure({
-            device,
-            format: navigator.gpu.getPreferredCanvasFormat(),
-            alphaMode: 'premultiplied',
         });
 
         const sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
@@ -154,8 +158,6 @@ class Graphics {
         });
 
         screenRenderPass.renderTexture = tonemappingRenderPass.sceneRenderTexture;
-
-        callback();
     }
 
     static Render(scene) {

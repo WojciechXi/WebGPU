@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/functions.php';
 
-$classes = ScanFilesRecursive('./Classes', ['js']);
-$game = ScanFilesRecursive('./Game', ['js']);
+$classes = ScanFilesRecursive('/Classes', ['js'], [], __DIR__);
+$game = ScanFilesRecursive('/Game', ['js'], [], __DIR__);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,11 +13,11 @@ $game = ScanFilesRecursive('./Game', ['js']);
     <title>Document</title>
     <link rel="stylesheet" type="text/css" href="./index.css">
 
-    <?php foreach ($classes as $script): ?>
+    <?php foreach ($classes as $script => $mime): ?>
         <script src="<?= $script; ?>"></script>
     <?php endforeach; ?>
 
-    <?php foreach ($game as $script): ?>
+    <?php foreach ($game as $script => $mime): ?>
         <script src="<?= $script; ?>"></script>
     <?php endforeach; ?>
 
