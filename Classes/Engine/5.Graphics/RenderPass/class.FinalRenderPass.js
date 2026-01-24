@@ -9,12 +9,9 @@ class FinalRenderPass extends RenderPass {
         this.sceneRenderTexture = data.sceneRenderTexture;
         this.canvas = data.canvas;
 
-        this.uniformValues = new Float32Array(4);
-        this.uniformValues.set([this.canvas.width, this.canvas.height]); //radius / bias / screen size
-
-        this.uniformBuffer = GPU.CreateBuffer({
-            size: this.uniformValues.length * 4,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        this.screenBuffer = new UniformBuffer(4);
+        this.screenBuffer.Set({
+            0: [this.canvas.width, this.canvas.height],
         });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
@@ -66,19 +63,23 @@ class FinalRenderPass extends RenderPass {
         this.bindGroup = GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
+                this.screenBuffer.GetBindGroupEntry(0),
                 { binding: 1, resource: this.sampler },
                 { binding: 2, resource: this.depthSampler },
                 this.clearRenderPass.sceneRenderTexture.GetBindGroupEntry(3),
                 this.lightingRenderPass.sceneRenderTexture.GetBindGroupEntry(4),
-                { binding: 5, resource: this.gBufferRenderPass.depthTextureView },
+                this.gBufferRenderPass.depthRenderTexture.GetBindGroupEntry(5),
                 this.forwardRenderPass.sceneRenderTexture.GetBindGroupEntry(6),
-                { binding: 7, resource: this.forwardRenderPass.depthTextureView },
+                this.forwardRenderPass.depthRenderTexture.GetBindGroupEntry(7),
             ],
         });
     }
 
     Render(camera, scene, commandEncoder) {
+        this.screenBuffer.Set({
+            0: [this.canvas.width, this.canvas.height],
+        });
+
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 this.sceneRenderTexture.GetColorAttachment(),
@@ -87,8 +88,6 @@ class FinalRenderPass extends RenderPass {
 
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, this.bindGroup);
-
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
 
         renderPass.draw(6);
         renderPass.end();

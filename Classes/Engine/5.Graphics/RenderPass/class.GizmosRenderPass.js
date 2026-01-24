@@ -3,26 +3,11 @@ class GizmosRenderPass extends RenderPass {
     Init(data) {
         this.canvas = data.canvas;
 
-        this.depthTexture = GPU.CreateTexture({
-            size: [this.canvas.width, this.canvas.height],
+        this.depthRenderTarget = new RenderTexture(this.canvas.width, this.canvas.height, {
             format: 'depth24plus',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT,
         });
-        this.depthTextureView = this.depthTexture.createView();
 
-        this.uniformValues = new Float32Array(16 + 16);
-        this.uniformBuffer = GPU.CreateBuffer({
-            size: this.uniformValues.length * 4,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
-
-        this.transformValues = new Float32Array(16);
-        this.transformBuffer = GPU.CreateBuffer({
-            size: this.transformValues.length * 4,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
-        GPU.Queue.writeBuffer(this.transformBuffer, 0, this.transformValues);
+        this.transformBuffer = new UniformBuffer(16);
 
         this.renderPipeline = GPU.CreateRenderPipeline({
             label: 'GizmosRenderPipeline',
@@ -56,31 +41,21 @@ class GizmosRenderPass extends RenderPass {
                 ],
             },
             primitive: { topology: 'line-list' },
-            depthStencil: { format: 'depth24plus', depthWriteEnabled: false, depthCompare: 'always' },
-        });
-
-        this.viewBindGroup = GPU.CreateBindGroup({
-            label: 'ViewBindGroup',
-            layout: Graphics.viewBindGroupLayout,
-            entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
-            ],
+            depthStencil: {
+                format: this.depthRenderTarget.format, depthWriteEnabled: false, depthCompare: 'always'
+            },
         });
 
         this.transformBindGroup = GPU.CreateBindGroup({
             label: 'TransformBindGroup',
             layout: Graphics.transformBindGroupLayout,
             entries: [
-                { binding: 0, resource: { buffer: this.transformBuffer } },
+                this.transformBuffer.GetBindGroupEntry(0),
             ],
         });
     }
 
     Render(camera, scene, commandEncoder) {
-        this.uniformValues.set(Camera.main.viewMatrix, 0);
-        this.uniformValues.set(Camera.main.projectionMatrix, 16);
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
-
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 {
@@ -90,17 +65,12 @@ class GizmosRenderPass extends RenderPass {
                     clearValue: { r: 0, g: 0, b: 0, a: 1 },
                 },
             ],
-            depthStencilAttachment: {
-                view: this.depthTextureView,
-                depthLoadOp: 'clear',
-                depthStoreOp: 'store',
-                depthClearValue: 1.0,
-            },
+            depthStencilAttachment: this.depthRenderTarget.GetDepthStencilAttachment(),
         });
 
         renderPass.setPipeline(this.renderPipeline);
 
-        renderPass.setBindGroup(0, this.viewBindGroup);
+        renderPass.setBindGroup(0, camera.cameraBindGroup);
         renderPass.setBindGroup(1, this.transformBindGroup);
 
         for (let component of scene.gizmos) component.OnDrawGizmos(this);

@@ -7,18 +7,16 @@ class ClearRenderPass extends RenderPass {
             format: 'rgba16float',
         });
 
-        const pipelineLayout = GPU.device.createPipelineLayout({
-            bindGroupLayouts: [
-                GPU.device.createBindGroupLayout({
-                    entries: [
-                        { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
-                    ],
-                }),
-            ],
-        });
-
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: pipelineLayout,
+            layout: GPU.device.createPipelineLayout({
+                bindGroupLayouts: [
+                    GPU.device.createBindGroupLayout({
+                        entries: [
+                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: "uniform" }, },
+                        ],
+                    }),
+                ],
+            }),
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -27,7 +25,7 @@ class ClearRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: "rgba16float" }
+                    this.sceneRenderTexture.GetTarget(),
                 ]
             },
             primitive: { topology: "triangle-list" },

@@ -69,20 +69,13 @@ class BloomRenderPass extends RenderPass {
             }
         });
 
-        this.uniformValues = new Float32Array(4);
-        this.uniformValues.set([this.canvas.width, this.canvas.height]); //screen size
-        this.uniformBuffer = GPU.CreateBuffer({
-            size: this.uniformValues.length * 4,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
-
         this.sampler = GPU.CreateSampler({
             magFilter: 'linear',
             minFilter: 'linear',
             mipmapFilter: 'linear',
         });
 
-        const brightBindGroup = this.brightBindGroup = GPU.CreateBindGroup({
+        this.brightBindGroup = GPU.CreateBindGroup({
             layout: this.brightRenderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: this.sampler },
@@ -90,7 +83,7 @@ class BloomRenderPass extends RenderPass {
             ],
         });
 
-        const blurBindGroup = this.blurBindGroup = GPU.CreateBindGroup({
+        this.blurBindGroup = GPU.CreateBindGroup({
             layout: this.blurRenderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: this.sampler },
@@ -98,7 +91,7 @@ class BloomRenderPass extends RenderPass {
             ],
         });
 
-        const bloomBindGroup = this.bloomBindGroup = GPU.CreateBindGroup({
+        this.bloomBindGroup = GPU.CreateBindGroup({
             layout: this.bloomRenderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: this.sampler },
@@ -106,7 +99,7 @@ class BloomRenderPass extends RenderPass {
             ],
         });
 
-        const sceneBindGroup = this.sceneBindGroup = GPU.CreateBindGroup({
+        this.sceneBindGroup = GPU.CreateBindGroup({
             layout: this.sceneRenderPipeline.getBindGroupLayout(0),
             entries: [
                 { binding: 0, resource: this.sampler },
@@ -117,8 +110,6 @@ class BloomRenderPass extends RenderPass {
     }
 
     Render(camera, scene, commandEncoder) {
-        this.uniformValues.set([this.canvas.width, this.canvas.height]); //screen size
-
         //brightRenderPass
         const brightRenderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
@@ -128,8 +119,6 @@ class BloomRenderPass extends RenderPass {
 
         brightRenderPass.setPipeline(this.brightRenderPipeline);
         brightRenderPass.setBindGroup(0, this.brightBindGroup);
-
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
 
         brightRenderPass.draw(6);
         brightRenderPass.end();
@@ -144,8 +133,6 @@ class BloomRenderPass extends RenderPass {
         blurRenderPass.setPipeline(this.blurRenderPipeline);
         blurRenderPass.setBindGroup(0, this.blurBindGroup);
 
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
-
         blurRenderPass.draw(6);
         blurRenderPass.end();
 
@@ -159,8 +146,6 @@ class BloomRenderPass extends RenderPass {
         bloomRenderPass.setPipeline(this.bloomRenderPipeline);
         bloomRenderPass.setBindGroup(0, this.bloomBindGroup);
 
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
-
         bloomRenderPass.draw(6);
         bloomRenderPass.end();
 
@@ -173,8 +158,6 @@ class BloomRenderPass extends RenderPass {
 
         sceneRenderPass.setPipeline(this.sceneRenderPipeline);
         sceneRenderPass.setBindGroup(0, this.sceneBindGroup);
-
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
 
         sceneRenderPass.draw(6);
         sceneRenderPass.end();

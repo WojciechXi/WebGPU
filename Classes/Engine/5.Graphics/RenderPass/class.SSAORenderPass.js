@@ -33,14 +33,9 @@ class SSAORenderPass extends RenderPass {
 
         this.ssaoKernel = this.GenerateKernel(64);
 
-        this.uniformValues = new Float32Array(this.ssaoKernel.length + 16 + 16 + 4 + 4);
-        this.uniformValues.set(this.ssaoKernel, 0);
-        this.uniformValues.set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength], this.ssaoKernel.length + 32);
-
-        this.uniformBuffer = GPU.CreateBuffer({
-            size: this.uniformValues.length * 4,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
+        this.uniformBuffer = new UniformBuffer(this.ssaoKernel.length + 16 + 16 + 4 + 4);
+        this.uniformBuffer.Set(this.ssaoKernel, 0);
+        this.uniformBuffer.Set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength], this.ssaoKernel.length + 32);
 
         this.sampler = GPU.CreateSampler({
             magFilter: 'linear',
@@ -116,7 +111,7 @@ class SSAORenderPass extends RenderPass {
         this.ssaoBindGroup = GPU.CreateBindGroup({
             layout: this.ssaoRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
+                this.uniformBuffer.GetBindGroupEntry(0),
                 { binding: 1, resource: this.sampler },
                 { binding: 2, resource: this.noiseSampler },
                 this.gBufferRenderPass.positionRenderTexture.GetBindGroupEntry(3),
@@ -128,7 +123,7 @@ class SSAORenderPass extends RenderPass {
         this.blurHorizontalBindGroup = GPU.CreateBindGroup({
             layout: this.blurHorizontalRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
+                this.uniformBuffer.GetBindGroupEntry(0),
                 { binding: 1, resource: this.sampler },
                 this.ssaoRenderTexture.GetBindGroupEntry(6),
             ],
@@ -137,7 +132,7 @@ class SSAORenderPass extends RenderPass {
         this.blurVerticalBindGroup = GPU.CreateBindGroup({
             layout: this.blurVerticalRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: { buffer: this.uniformBuffer } },
+                this.uniformBuffer.GetBindGroupEntry(0),
                 { binding: 1, resource: this.sampler },
                 this.blurHorizontalRenderTexture.GetBindGroupEntry(6),
             ],
@@ -154,9 +149,9 @@ class SSAORenderPass extends RenderPass {
     }
 
     Render(camera, scene, commandEncoder) {
-        this.uniformValues.set(Camera.main.viewMatrix, this.ssaoKernel.length);
-        this.uniformValues.set(Camera.main.projectionMatrix, this.ssaoKernel.length + 16);
-        this.uniformValues.set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength], this.ssaoKernel.length + 32);
+        this.uniformBuffer.Set(Camera.main.viewMatrix, this.ssaoKernel.length);
+        this.uniformBuffer.Set(Camera.main.projectionMatrix, this.ssaoKernel.length + 16);
+        this.uniformBuffer.Set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength], this.ssaoKernel.length + 32);
 
         //ssaoRenderPass
         const ssaoRenderPass = commandEncoder.beginRenderPass({
@@ -166,7 +161,6 @@ class SSAORenderPass extends RenderPass {
         });
         ssaoRenderPass.setPipeline(this.ssaoRenderPipeline);
         ssaoRenderPass.setBindGroup(0, this.ssaoBindGroup);
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
         ssaoRenderPass.draw(6);
         ssaoRenderPass.end();
 
@@ -178,7 +172,6 @@ class SSAORenderPass extends RenderPass {
         });
         blurHorizontalRenderPass.setPipeline(this.blurHorizontalRenderPipeline);
         blurHorizontalRenderPass.setBindGroup(0, this.blurHorizontalBindGroup);
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
         blurHorizontalRenderPass.draw(6);
         blurHorizontalRenderPass.end();
 
@@ -190,7 +183,6 @@ class SSAORenderPass extends RenderPass {
         });
         blurVerticalRenderPass.setPipeline(this.blurVerticalRenderPipeline);
         blurVerticalRenderPass.setBindGroup(0, this.blurVerticalBindGroup);
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
         blurVerticalRenderPass.draw(6);
         blurVerticalRenderPass.end();
 
@@ -202,7 +194,6 @@ class SSAORenderPass extends RenderPass {
         });
         sceneRenderPass.setPipeline(this.sceneRenderPipeline);
         sceneRenderPass.setBindGroup(0, this.sceneBindGroup);
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
         sceneRenderPass.draw(6);
         sceneRenderPass.end();
     }

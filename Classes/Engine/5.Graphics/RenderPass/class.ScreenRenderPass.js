@@ -1,9 +1,8 @@
-class DebugRenderPass extends RenderPass {
+class ScreenRenderPass extends RenderPass {
 
     Init(data) {
         this._renderTexture = null;
-
-        const canvas = data.canvas;
+        this.canvas = data.canvas;
 
         const format = navigator.gpu.getPreferredCanvasFormat();
 

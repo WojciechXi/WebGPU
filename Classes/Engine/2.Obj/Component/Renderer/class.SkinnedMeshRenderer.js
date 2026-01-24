@@ -11,7 +11,7 @@ class SkinnedMeshRenderer extends Renderer {
     get material() { return this.materials[0]; }
     set material(material) { this.materials = [material]; }
 
-    Draw(renderPass, camera) {
+    OnDraw(renderPass, camera) {
         if (!this.mesh || !this.material) return;
 
         if (renderPass.name === 'shadowRenderPass') {

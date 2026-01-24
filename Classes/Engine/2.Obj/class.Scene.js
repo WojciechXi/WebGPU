@@ -21,7 +21,7 @@ class Scene extends Obj {
 
     AddComponent(component) {
         if (component.Update) this.updateables.push(component);
-        if (component.Draw) this.renderables.push(component);
+        if (component.OnDraw) this.renderables.push(component);
         if (component.OnDrawGizmos) this.gizmos.push(component);
         if (component instanceof DirectionalLight) this.directionalLights.push(component);
         if (component instanceof Camera) this.cameras.push(component);
@@ -29,7 +29,7 @@ class Scene extends Obj {
 
     RemoveComponent(component) {
         if (component.Update) this.updateables.splice(this.updateables.indexOf(component), 1);
-        if (component.Draw) this.renderables.splice(this.renderables.indexOf(component), 1);
+        if (component.OnDraw) this.renderables.splice(this.renderables.indexOf(component), 1);
         if (component.OnDrawGizmos) this.gizmos.splice(this.gizmos.indexOf(component), 1);
         if (component instanceof DirectionalLight) this.directionalLights.splice(this.cameras.indexOf(component), 1);
         if (component instanceof Camera) this.cameras.splice(this.cameras.indexOf(component), 1);

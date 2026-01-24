@@ -3,24 +3,20 @@ class AmbientLight extends Behaviour {
     Init() {
         this.color = Color32.white;
 
-        this.lightValues = new Float32Array(4); //color
-        this.lightBuffer = GPU.CreateBuffer({
-            label: 'uniform buffer',
-            size: this.lightValues.length * 4,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
+        this.lightBuffer = new UniformBuffer(4); //view, projection, viewProjection, inverseView, inverseViewProjection, color, shadowColor
         this.lightBindGroup = GPU.CreateBindGroup({
             label: 'ViewBindGroup',
-            layout: Graphics.viewBindGroupLayout,
+            layout: Graphics.lightBindGroupLayout,
             entries: [
-                { binding: 0, resource: { buffer: this.lightBuffer } },
+                this.lightBuffer.GetBindGroupEntry(0),
             ],
         });
     }
 
     Update() {
-        this.lightValues.set(this.color, 0);
-        GPU.Queue.writeBuffer(this.lightBuffer, 0, this.lightValues);
+        this.lightBuffer.Set({
+            0: this.color
+        });
     }
 
 }

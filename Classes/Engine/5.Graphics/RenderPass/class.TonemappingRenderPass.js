@@ -6,9 +6,7 @@ class TonemappingRenderPass extends RenderPass {
 
         const format = navigator.gpu.getPreferredCanvasFormat();
 
-        this.sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, {
-            format: format,
-        });
+        this.sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: format, });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
             layout: GPU.device.createPipelineLayout({

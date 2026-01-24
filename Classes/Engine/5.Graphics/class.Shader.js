@@ -64,8 +64,6 @@ class Shader extends Obj {
 
                         { format: "rgba16float" }, // colorTexture
                         { format: "rgba8unorm" }, // pbrTexture
-
-                        { format: "r32float" }, // depthTexture
                     ]
                 },
                 depthStencil: {

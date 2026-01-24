@@ -27,23 +27,19 @@ class Transform extends Component {
         this.parent = null;
         this.children = [];
 
-        this.transformValues = new Float32Array(16);
-        this.transformBuffer = GPU.CreateBuffer({
-            size: this.transformValues.length * 4,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
-
+        this.transformBuffer = new UniformBuffer(16); //matrix4x4
         this.transformBindGroup = GPU.CreateBindGroup({
             layout: Graphics.transformBindGroupLayout,
             entries: [
-                { binding: 0, resource: { buffer: this.transformBuffer } },
+                this.transformBuffer.GetBindGroupEntry(0),
             ],
         });
     }
 
     Update() {
-        this.transformValues.set(this.matrix4x4, 0);
-        GPU.Queue.writeBuffer(this.transformBuffer, 0, this.transformValues);
+        this.transformBuffer.Set({
+            0: this.matrix4x4,
+        });
     }
 
     get childCount() { return this.children.length; }

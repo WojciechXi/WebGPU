@@ -4,12 +4,7 @@ class ShadowRenderPass extends RenderPass {
         this.resolution = data.resolution ?? 2048;
         this.canvas = data.canvas;
 
-        this.shadowTexture = GPU.CreateTexture({
-            size: [this.resolution, this.resolution, 1],
-            format: "depth32float",
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-        });
-        this.shadowTextureView = this.shadowTexture.createView();
+        this.depthRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'depth24plus', });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
             layout: GPU.device.createPipelineLayout({
@@ -45,7 +40,7 @@ class ShadowRenderPass extends RenderPass {
                 frontFace: 'ccw',
             },
             depthStencil: {
-                format: 'depth32float',
+                format: this.depthRenderTexture.format,
                 depthWriteEnabled: true,
                 depthCompare: 'less'
             },
@@ -55,18 +50,13 @@ class ShadowRenderPass extends RenderPass {
     Render(camera, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [],
-            depthStencilAttachment: {
-                view: this.shadowTextureView,
-                depthClearValue: 1.0,
-                depthLoadOp: "clear",
-                depthStoreOp: "store"
-            },
+            depthStencilAttachment: this.depthRenderTexture.GetDepthStencilAttachment(),
         });
 
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, scene.directionalLight.lightBindGroup);
 
-        for (let component of Engine.Instance.scene.renderables) component.Draw(this, scene.directionalLight);
+        for (let component of Engine.Instance.scene.renderables) component.OnDraw(this);
 
         renderPass.end();
     }

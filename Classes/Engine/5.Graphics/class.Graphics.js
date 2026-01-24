@@ -25,6 +25,13 @@ class Graphics {
             ],
         });
 
+        this.lightBindGroupLayout = GPU.device.createBindGroupLayout({
+            label: 'LightBindGroupLayout',
+            entries: [
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
+            ],
+        });
+
         this.transformBindGroupLayout = GPU.device.createBindGroupLayout({
             label: 'TransformBindGroupLayout',
             entries: [
@@ -59,9 +66,7 @@ class Graphics {
             alphaMode: 'premultiplied',
         });
 
-        const sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, {
-            format: 'rgba16float',
-        });
+        const sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
 
         const shadowRenderPass = this.shadowRenderPass = new ShadowRenderPass({
             name: 'shadowRenderPass',
@@ -136,9 +141,9 @@ class Graphics {
             canvas: canvas,
         });
 
-        const debugRenderPass = this.debugRenderPass = new DebugRenderPass({
-            name: 'debugRenderPass',
-            code: assets.shaders['debugRenderPass.wgsl'],
+        const screenRenderPass = this.screenRenderPass = new ScreenRenderPass({
+            name: 'screenRenderPass',
+            code: assets.shaders['screenRenderPass.wgsl'],
             canvas: canvas,
         });
 
@@ -148,7 +153,7 @@ class Graphics {
             canvas: canvas,
         });
 
-        debugRenderPass.renderTexture = tonemappingRenderPass.sceneRenderTexture;
+        screenRenderPass.renderTexture = shadowRenderPass.depthRenderTexture;
 
         callback();
     }
@@ -171,22 +176,22 @@ class Graphics {
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
 
         if (this.shadowRenderPass) this.shadowRenderPass.Render(camera, scene, commandEncoder);
-        if (this.gBufferRenderPass) this.gBufferRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.gBufferRenderPass) this.gBufferRenderPass.Render(camera, scene, commandEncoder);
 
-        if (this.clearRenderPass) this.clearRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.clearRenderPass) this.clearRenderPass.Render(camera, scene, commandEncoder);
 
-        if (this.lightingRenderPass) this.lightingRenderPass.Render(camera, scene, commandEncoder);
-        if (this.forwardRenderPass) this.forwardRenderPass.Render(camera, scene, commandEncoder);
-        if (this.finalRenderPass) this.finalRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.lightingRenderPass) this.lightingRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.forwardRenderPass) this.forwardRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.finalRenderPass) this.finalRenderPass.Render(camera, scene, commandEncoder);
 
-        if (this.ssaoRenderPass) this.ssaoRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.ssaoRenderPass) this.ssaoRenderPass.Render(camera, scene, commandEncoder);
         // if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(camera, scene, commandEncoder);
-        if (this.bloomRenderPass) this.bloomRenderPass.Render(camera, scene, commandEncoder);
-        if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.bloomRenderPass) this.bloomRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(camera, scene, commandEncoder);
 
-        if (this.debugRenderPass) this.debugRenderPass.Render(camera, scene, commandEncoder);
+        if (this.screenRenderPass) this.screenRenderPass.Render(camera, scene, commandEncoder);
 
-        if (this.gizmosRenderPass) this.gizmosRenderPass.Render(camera, scene, commandEncoder);
+        // if (this.gizmosRenderPass) this.gizmosRenderPass.Render(camera, scene, commandEncoder);
 
         GPU.Queue.submit([commandEncoder.finish()]);
 

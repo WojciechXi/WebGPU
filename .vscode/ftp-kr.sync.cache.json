@@ -2669,7 +2669,7 @@
               "lmtime": 1758840440949.4297,
               "modified": false
             },
-            "debugRenderPass.wgsl": {
+            "screenRenderPass.wgsl": {
               "type": "-",
               "size": 695,
               "lmtime": 1759361514518.775,
@@ -2931,7 +2931,7 @@
                   "lmtime": 0,
                   "modified": false
                 },
-                "class.DebugRenderPass.js": {
+                "class.ScreenRenderPass.js": {
                   "type": "-",
                   "size": 2770,
                   "lmtime": 0,

@@ -27,7 +27,7 @@ class ScreenSpaceReflectionRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    { format: format, }
+                    this.sceneRenderTexture.GetTarget(),
                 ]
             }
         });
