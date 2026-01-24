@@ -1,3 +1,16 @@
+async function loadBitmap(src, callback) {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onerror = reject;
+        image.onload = async function (event) {
+            const bitmap = await createImageBitmap(image);
+            resolve(bitmap);
+            callback(bitmap, image);
+        };
+        image.src = src;
+    })
+}
+
 window.addEventListener('DOMContentLoaded', async function (event) {
     const device = await GPU.Request();
     const engine = new Engine();
@@ -5,12 +18,16 @@ window.addEventListener('DOMContentLoaded', async function (event) {
     engine.Init(function (engine) {
         Resources.Init(function () {
             engine.Awake();
+            engine.Start();
+
+            let materials = {};
 
             const litShader = new Shader(Resources.Get('/Resources/Shaders/Lit.wgsl'));
             litShader.Compile();
 
-            const whiteMaterial = new Material({
-                name: 'White',
+            const defaultMaterial = materials.default = new Material({
+                name: 'Default',
+                color: Color32.green,
                 shader: litShader,
             });
 
@@ -31,8 +48,8 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             const camera = cameraGameObject.AddComponent(Camera);
             cameraGameObject.AddComponent(Test);
 
-            Resources.Get('/Resources/Models/Ablewicza 15.gltf', function (gltf) {
-                const gameObject = new GameObject('Ablewicza 15');
+            Resources.Get('/Resources/Models/Krakow.gltf', function (gltf) {
+                const gameObject = new GameObject('Krakow');
 
                 for (const mesh of gltf.meshes) {
                     const meshGameObject = new GameObject(mesh.name);
@@ -42,10 +59,48 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                     meshRenderer.mesh = mesh;
                     meshRenderer.materials = [];
                     mesh.subMeshes.forEach(function (subMesh) {
-                        if (gltf.materials.hasOwnProperty(subMesh.material)) {
+                        if (materials.hasOwnProperty(subMesh.material)) {
                             meshRenderer.materials.push(materials[subMesh.material]);
                         } else {
-                            meshRenderer.materials.push(whiteMaterial);
+                            const m = gltf.materials.find(function (m) { return m.name == subMesh.material; });
+
+                            const material = materials[subMesh.material] = new Material({
+                                name: subMesh.material,
+                                shader: litShader,
+                            });
+
+                            Resources.Get(`/Images/${material}/Albedo.webp`, function (texture) {
+                                if (texture) material.SetTexture('albedo', texture);
+                            });
+
+                            Resources.Get(`/Images/${material}/Normal.webp`, function (texture) {
+                                if (texture) material.SetTexture('normal', texture);
+                            });
+
+                            Resources.Get(`/Images/${material}/Roughness.webp`, function (texture) {
+                                if (texture) material.SetTexture('roughness', texture);
+                            });
+
+                            Resources.Get(`/Images/${material}/Metallic.webp`, function (texture) {
+                                if (texture) material.SetTexture('metallic', texture);
+                            });
+
+                            Resources.Get(`/Images/${material}/Occlusion.webp`, function (texture) {
+                                if (texture) material.SetTexture('occlussion', texture);
+                            });
+
+                            if (m && m.pbrMetallicRoughness) {
+                                const pbr = m.pbrMetallicRoughness;
+                                if (pbr.baseColorFactor) {
+                                    const color = pbr.baseColorFactor;
+                                    material.color.Set(color[0], color[1], color[2], color[3]);
+                                }
+
+                                material.metallic = pbr.metallicFactor ?? 0;
+                                material.roughness = pbr.roughnessFactor ?? 0;
+                            }
+
+                            meshRenderer.materials.push(material);
                         }
                     });
                 }

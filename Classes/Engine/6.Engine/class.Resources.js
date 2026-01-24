@@ -22,6 +22,7 @@ class Resources {
             for (const index in keys) {
                 const path = keys[index];
                 const meta = paths[path];
+
                 if (meta.pathInfo.extension == 'gltf') {
                     await Importer.GLTF(meta.pathInfo.dirname, `${meta.pathInfo.filename}.${meta.pathInfo.extension}`, function (meshes, gltfMaterials) {
                         object.resources[path] = {
@@ -32,6 +33,10 @@ class Resources {
                 } else if (meta.pathInfo.extension == 'wgsl') {
                     const response = await fetch(path);
                     object.resources[path] = await response.text();
+                } else if (meta.mimeType.startsWith('image/')) {
+                    await loadBitmap(path, function (bitmap) {
+                        object.resources[path] = bitmap;
+                    });
                 }
 
                 if (onStep) onStep(parseInt(index) + 1, keys.length, path);
