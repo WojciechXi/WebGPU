@@ -15,8 +15,8 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
   return out;
 }
 
-struct Uniforms {
-  screenSize : vec2f,
+struct Screen {
+  size : vec2f,
 };
 
 // Bindings

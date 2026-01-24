@@ -17,11 +17,11 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
     return out;
 }
 
-struct FinalUniforms {
-  screenSize : vec2f,
+struct Screen {
+  size : vec2f,
 };
 
-@group(0) @binding(0) var<uniform> uni : FinalUniforms;
+@group(0) @binding(0) var<uniform> screen : Screen;
 @group(0) @binding(1) var screenSampler: sampler;
 @group(0) @binding(2) var depthSampler: sampler;
 @group(0) @binding(3) var clearTexture: texture_2d<f32>;
@@ -38,7 +38,7 @@ struct FSOut {
 fn fs(vsOut: VSOut) -> FSOut {
   var out: FSOut;
 
-  let screenSize = uni.screenSize;
+  let screenSize = screen.size;
 
   let clear = textureSample(clearTexture, screenSampler, vsOut.uv);
 
