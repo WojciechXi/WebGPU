@@ -12,31 +12,1083 @@
       "meble.vules-studio.pl": {},
       "old.silnewsparcie.pl": {},
       "projekt.vules-studio.pl": {
-        "Assets": {
+        ".htaccess": {
+          "type": "-",
+          "size": 232,
+          "lmtime": 0,
+          "modified": false
+        },
+        "Classes": {
+          "Engine": {
+            "0.Math": {
+              "class.Bounds.js": {
+                "type": "-",
+                "size": 1950,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.BoundsInt.js": {
+                "type": "-",
+                "size": 1954,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Color.js": {
+                "type": "-",
+                "size": 1495,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Color32.js": {
+                "type": "-",
+                "size": 1497,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Matrix4x4.js": {
+                "type": "-",
+                "size": 16786,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.PerlinNoise.js": {
+                "type": "-",
+                "size": 3598,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Quaternion.js": {
+                "type": "-",
+                "size": 6925,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Rect.js": {
+                "type": "-",
+                "size": 1359,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.RectInt.js": {
+                "type": "-",
+                "size": 1332,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Vector2.js": {
+                "type": "-",
+                "size": 3037,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Vector2Int.js": {
+                "type": "-",
+                "size": 40,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Vector3.js": {
+                "type": "-",
+                "size": 4777,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Vector3Int.js": {
+                "type": "-",
+                "size": 40,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Vector4.js": {
+                "type": "-",
+                "size": 787,
+                "lmtime": 0,
+                "modified": false
+              }
+            },
+            "1.Core": {
+              "class.FrustumPlanes.js": {
+                "type": "-",
+                "size": 822,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Keyframe.js": {
+                "type": "-",
+                "size": 118,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Plane.js": {
+                "type": "-",
+                "size": 3054,
+                "lmtime": 1769095404404.736,
+                "modified": false
+              }
+            },
+            "2.Obj": {
+              "Component": {
+                "Behaviour": {
+                  "MonoBehaviour": {},
+                  "class.AmbientLight.js": {
+                    "type": "-",
+                    "size": 763,
+                    "lmtime": 1769290027948.4995,
+                    "modified": false
+                  },
+                  "class.Animator.js": {
+                    "type": "-",
+                    "size": 43,
+                    "lmtime": 0,
+                    "modified": false
+                  },
+                  "class.AudioListener.js": {
+                    "type": "-",
+                    "size": 44,
+                    "lmtime": 0,
+                    "modified": false
+                  },
+                  "class.AudioSource.js": {
+                    "type": "-",
+                    "size": 42,
+                    "lmtime": 0,
+                    "modified": false
+                  },
+                  "class.Camera.js": {
+                    "type": "-",
+                    "size": 2507,
+                    "lmtime": 1769096950872.538,
+                    "modified": true
+                  },
+                  "class.Canvas.js": {
+                    "type": "-",
+                    "size": 37,
+                    "lmtime": 0,
+                    "modified": false
+                  },
+                  "class.DirectionalLight.js": {
+                    "type": "-",
+                    "size": 2754,
+                    "lmtime": 1769289967115.672,
+                    "modified": false
+                  },
+                  "class.Light.js": {
+                    "type": "-",
+                    "size": 2748,
+                    "lmtime": 0,
+                    "modified": false
+                  },
+                  "class.MonoBehaviour.js": {
+                    "type": "-",
+                    "size": 2599,
+                    "lmtime": 0,
+                    "modified": false
+                  }
+                },
+                "Renderer": {
+                  "class.MeshRenderer.js": {
+                    "type": "-",
+                    "size": 1131,
+                    "lmtime": 1769096281510.5686,
+                    "modified": false
+                  }
+                },
+                "class.Behaviour.js": {
+                  "type": "-",
+                  "size": 222,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.Renderer.js": {
+                  "type": "-",
+                  "size": 203,
+                  "lmtime": 1769096097521.568,
+                  "modified": false
+                },
+                "class.Transform.js": {
+                  "type": "-",
+                  "size": 4820,
+                  "lmtime": 0,
+                  "modified": false
+                }
+              }
+            },
+            "3.Utilities": {
+              "class.GeometryUtility.js": {
+                "type": "-",
+                "size": 3677,
+                "lmtime": 1769096069844.3906,
+                "modified": false
+              },
+              "class.Mesh.js": {
+                "type": "-",
+                "size": 8744,
+                "lmtime": 1769096057917.324,
+                "modified": false
+              }
+            },
+            "4.Physics": {},
+            "5.Engine": {
+              "RenderPass": {
+                "class.BloomRenderPass.js": {
+                  "type": "-",
+                  "size": 7721,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ClearRenderPass.js": {
+                  "type": "-",
+                  "size": 1966,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ScreenRenderPass.js": {
+                  "type": "-",
+                  "size": 2770,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.FinalRenderPass.js": {
+                  "type": "-",
+                  "size": 4472,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ForwardRenderPass.js": {
+                  "type": "-",
+                  "size": 1789,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.GBufferRenderPass.js": {
+                  "type": "-",
+                  "size": 3297,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.GizmosRenderPass.js": {
+                  "type": "-",
+                  "size": 4345,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.LightingRenderPass.js": {
+                  "type": "-",
+                  "size": 4690,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.SSAORenderPass.js": {
+                  "type": "-",
+                  "size": 9811,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ScreenSpaceReflectionRenderPass.js": {
+                  "type": "-",
+                  "size": 2705,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ShadowRenderPass.js": {
+                  "type": "-",
+                  "size": 1471,
+                  "lmtime": 1769097011344.1765,
+                  "modified": false
+                },
+                "class.TonemappingRenderPass.js": {
+                  "type": "-",
+                  "size": 2641,
+                  "lmtime": 0,
+                  "modified": false
+                }
+              },
+              "class.Engine.js": {
+                "type": "-",
+                "size": 816,
+                "lmtime": 1769088692237.5962,
+                "modified": false
+              },
+              "class.GPU.js": {
+                "type": "-",
+                "size": 3850,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Graphics.js": {
+                "type": "-",
+                "size": 8498,
+                "lmtime": 1769100798888.9912,
+                "modified": false
+              },
+              "class.Importer.js": {
+                "type": "-",
+                "size": 7033,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Input.js": {
+                "type": "-",
+                "size": 2851,
+                "lmtime": 1769101194054.5642,
+                "modified": false
+              },
+              "class.Material.js": {
+                "type": "-",
+                "size": 4869,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.RenderPass.js": {
+                "type": "-",
+                "size": 1473,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Shader.js": {
+                "type": "-",
+                "size": 5537,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Time.js": {
+                "type": "-",
+                "size": 323,
+                "lmtime": 0,
+                "modified": false
+              }
+            },
+            "class.Object.js": {
+              "type": "-",
+              "size": 716,
+              "lmtime": 0,
+              "modified": false
+            },
+            "5.Graphics": {
+              "RenderPass": {
+                "class.BloomRenderPass.js": {
+                  "type": "-",
+                  "size": 5659,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ClearRenderPass.js": {
+                  "type": "-",
+                  "size": 1554,
+                  "lmtime": 1769290070285.2595,
+                  "modified": false
+                },
+                "class.FinalRenderPass.js": {
+                  "type": "-",
+                  "size": 4112,
+                  "lmtime": 1769290329479.4426,
+                  "modified": false
+                },
+                "class.ForwardRenderPass.js": {
+                  "type": "-",
+                  "size": 809,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.GBufferRenderPass.js": {
+                  "type": "-",
+                  "size": 1387,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.GizmosRenderPass.js": {
+                  "type": "-",
+                  "size": 3045,
+                  "lmtime": 1769285844630.3074,
+                  "modified": false
+                },
+                "class.LightingRenderPass.js": {
+                  "type": "-",
+                  "size": 4529,
+                  "lmtime": 1769285880060.953,
+                  "modified": false
+                },
+                "class.SSAORenderPass.js": {
+                  "type": "-",
+                  "size": 8542,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ScreenRenderPass.js": {
+                  "type": "-",
+                  "size": 2897,
+                  "lmtime": 1769285882897.691,
+                  "modified": false
+                },
+                "class.ScreenSpaceReflectionRenderPass.js": {
+                  "type": "-",
+                  "size": 2395,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.ShadowRenderPass.js": {
+                  "type": "-",
+                  "size": 2477,
+                  "lmtime": 1769285851987.2483,
+                  "modified": false
+                },
+                "class.TonemappingRenderPass.js": {
+                  "type": "-",
+                  "size": 2310,
+                  "lmtime": 1769285872069.3157,
+                  "modified": false
+                }
+              },
+              "class.GPU.js": {
+                "type": "-",
+                "size": 4295,
+                "lmtime": 1769285868017.0737,
+                "modified": false
+              },
+              "class.Graphics.js": {
+                "type": "-",
+                "size": 8758,
+                "lmtime": 1769290460224.4265,
+                "modified": false
+              },
+              "class.Material.js": {
+                "type": "-",
+                "size": 4507,
+                "lmtime": 0,
+                "modified": true
+              },
+              "class.Mesh.js": {
+                "type": "-",
+                "size": 8897,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.RenderPass.js": {
+                "type": "-",
+                "size": 1465,
+                "lmtime": 0,
+                "modified": true
+              },
+              "class.RenderTexture.js": {
+                "type": "-",
+                "size": 1261,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Shader.js": {
+                "type": "-",
+                "size": 3204,
+                "lmtime": 1769285831619.4539,
+                "modified": false
+              },
+              "class.UniformBuffer.js": {
+                "type": "-",
+                "size": 1351,
+                "lmtime": 0,
+                "modified": false
+              }
+            },
+            "6.Engine": {
+              "class.Engine.js": {
+                "type": "-",
+                "size": 788,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Importer.js": {
+                "type": "-",
+                "size": 7033,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Input.js": {
+                "type": "-",
+                "size": 3041,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Resources.js": {
+                "type": "-",
+                "size": 1681,
+                "lmtime": 1769289176175.214,
+                "modified": false
+              },
+              "class.Time.js": {
+                "type": "-",
+                "size": 323,
+                "lmtime": 0,
+                "modified": false
+              }
+            }
+          }
+        },
+        "Game": {
+          "class.Test.js": {
+            "type": "-",
+            "size": 951,
+            "lmtime": 0,
+            "modified": false
+          },
+          "index.js": {
+            "type": "-",
+            "size": 5717,
+            "lmtime": 1769289903335.236,
+            "modified": false
+          }
+        },
+        "Resources": {
+          "179_black concrete bare PBR texture-seamless.jpg": {
+            "type": "-",
+            "size": 761334,
+            "lmtime": 0,
+            "modified": false
+          },
+          "181_black concrete bare PBR texture-seamless.jpg": {
+            "type": "-",
+            "size": 709268,
+            "lmtime": 0,
+            "modified": false
+          },
+          "79_Concrete cracked wall pbr texture-seamless.jpg": {
+            "type": "-",
+            "size": 1276448,
+            "lmtime": 0,
+            "modified": false
+          },
           "Ablewicza 15.blend": {
             "type": "-",
-            "size": 2086294,
-            "lmtime": 1759079025514.5085,
+            "size": 2320032,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Ablewicza 15.blend1": {
+            "type": "-",
+            "size": 2320032,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Ablewicza 15.fbx": {
+            "type": "-",
+            "size": 291132,
+            "lmtime": 0,
             "modified": false
           },
           "Capsule.blend": {
             "type": "-",
             "size": 532704,
-            "lmtime": 1759269842878.264,
+            "lmtime": 0,
             "modified": false
           },
           "Cube.blend": {
             "type": "-",
             "size": 483067,
-            "lmtime": 1759256621622.8762,
+            "lmtime": 0,
             "modified": false
           },
           "Cubes.blend": {
             "type": "-",
             "size": 517216,
-            "lmtime": 1758933487844.7876,
+            "lmtime": 0,
             "modified": false
           },
+          "Dobek Racing Kawasaki.blend": {
+            "type": "-",
+            "size": 412365,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing Kawasaki.blend1": {
+            "type": "-",
+            "size": 412872,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing Kawasaki.fbx": {
+            "type": "-",
+            "size": 93292,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing Lada.blend": {
+            "type": "-",
+            "size": 115783,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing Lada.blend1": {
+            "type": "-",
+            "size": 115830,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing Lada.fbx": {
+            "type": "-",
+            "size": 171740,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing Meble.blend": {
+            "type": "-",
+            "size": 595490,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing Meble.blend1": {
+            "type": "-",
+            "size": 595612,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing Meble.fbx": {
+            "type": "-",
+            "size": 1855900,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing Romet.blend": {
+            "type": "-",
+            "size": 400888,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing Romet.blend1": {
+            "type": "-",
+            "size": 401023,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing Romet.fbx": {
+            "type": "-",
+            "size": 92524,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing.blend": {
+            "type": "-",
+            "size": 467268,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing.blend1": {
+            "type": "-",
+            "size": 467322,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Dobek Racing.fbx": {
+            "type": "-",
+            "size": 941276,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Grass.blend": {
+            "type": "-",
+            "size": 1046105,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Icosphere.blend": {
+            "type": "-",
+            "size": 536724,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Krakow.blend": {
+            "type": "-",
+            "size": 1448390,
+            "lmtime": 1769288893483.365,
+            "modified": false
+          },
+          "Krakow.blend1": {
+            "type": "-",
+            "size": 1448038,
+            "lmtime": 1769288811658.3706,
+            "modified": false
+          },
+          "Krakow.fbx": {
+            "type": "-",
+            "size": 696124,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Models": {
+            "Ablewicza 15.bin": {
+              "type": "-",
+              "size": 205660,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Ablewicza 15.gltf": {
+              "type": "-",
+              "size": 22479,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Capsule.bin": {
+              "type": "-",
+              "size": 107520,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Capsule.gltf": {
+              "type": "-",
+              "size": 1843,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Cube.bin": {
+              "type": "-",
+              "size": 1224,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Cube.gltf": {
+              "type": "-",
+              "size": 1627,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Cubes.bin": {
+              "type": "-",
+              "size": 3672,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Cubes.gltf": {
+              "type": "-",
+              "size": 3052,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Grass.bin": {
+              "type": "-",
+              "size": 408,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Grass.gltf": {
+              "type": "-",
+              "size": 1733,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Icosphere.bin": {
+              "type": "-",
+              "size": 48000,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Icosphere.gltf": {
+              "type": "-",
+              "size": 1821,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Krakow.bin": {
+              "type": "-",
+              "size": 2763508,
+              "lmtime": 1769288841694.1738,
+              "modified": false
+            },
+            "Krakow.gltf": {
+              "type": "-",
+              "size": 78127,
+              "lmtime": 1769288841738.2603,
+              "modified": false
+            },
+            "Monkey.bin": {
+              "type": "-",
+              "size": 100176,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Monkey.gltf": {
+              "type": "-",
+              "size": 1815,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Odlegla.bin": {
+              "type": "-",
+              "size": 455848,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Odlegla.glb": {
+              "type": "-",
+              "size": 764456,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Odlegla.gltf": {
+              "type": "-",
+              "size": 27142,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Sphere.bin": {
+              "type": "-",
+              "size": 100992,
+              "lmtime": 0,
+              "modified": false
+            },
+            "Sphere.gltf": {
+              "type": "-",
+              "size": 1821,
+              "lmtime": 0,
+              "modified": false
+            }
+          },
+          "Monkey.blend": {
+            "type": "-",
+            "size": 1089688,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Odlegla.blend": {
+            "type": "-",
+            "size": 1557623,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Quad.blend": {
+            "type": "-",
+            "size": 2306701,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Quad.blend1": {
+            "type": "-",
+            "size": 2335773,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Quad.fbx": {
+            "type": "-",
+            "size": 2682828,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Radek.blend": {
+            "type": "-",
+            "size": 115824,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Radek.blend1": {
+            "type": "-",
+            "size": 116959,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Radek.fbx": {
+            "type": "-",
+            "size": 127004,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Shaders": {
+            "Glass.wgsl": {
+              "type": "-",
+              "size": 5121,
+              "lmtime": 1769289761190.1135,
+              "modified": false
+            },
+            "Lit.wgsl": {
+              "type": "-",
+              "size": 5061,
+              "lmtime": 0,
+              "modified": false
+            },
+            "TerrainLit.wgsl": {
+              "type": "-",
+              "size": 5471,
+              "lmtime": 0,
+              "modified": false
+            },
+            "bloomRenderPass.wgsl": {
+              "type": "-",
+              "size": 2973,
+              "lmtime": 0,
+              "modified": false
+            },
+            "clearRenderPass.wgsl": {
+              "type": "-",
+              "size": 594,
+              "lmtime": 1769290107144.2312,
+              "modified": false
+            },
+            "finalRenderPass.wgsl": {
+              "type": "-",
+              "size": 1624,
+              "lmtime": 1769290684921.6147,
+              "modified": false
+            },
+            "gizmosRenderPass.wgsl": {
+              "type": "-",
+              "size": 919,
+              "lmtime": 0,
+              "modified": false
+            },
+            "lightingRenderPass.wgsl": {
+              "type": "-",
+              "size": 8050,
+              "lmtime": 1769290565573.7424,
+              "modified": false
+            },
+            "screenRenderPass.wgsl": {
+              "type": "-",
+              "size": 695,
+              "lmtime": 0,
+              "modified": false
+            },
+            "screenSpaceReflectionRenderPass.wgsl": {
+              "type": "-",
+              "size": 2576,
+              "lmtime": 0,
+              "modified": false
+            },
+            "shadowRenderPass.wgsl": {
+              "type": "-",
+              "size": 2116,
+              "lmtime": 0,
+              "modified": false
+            },
+            "ssaoRenderPass.wgsl": {
+              "type": "-",
+              "size": 8508,
+              "lmtime": 0,
+              "modified": false
+            },
+            "tonemappingRenderPass.wgsl": {
+              "type": "-",
+              "size": 1226,
+              "lmtime": 0,
+              "modified": false
+            }
+          },
+          "Sphere.blend": {
+            "type": "-",
+            "size": 563028,
+            "lmtime": 0,
+            "modified": false
+          },
+          "Textures": {
+            "Floor": {
+              "Albedo.webp": {
+                "type": "-",
+                "size": 255112,
+                "lmtime": 1769288573595.144,
+                "modified": false
+              },
+              "Normal.webp": {
+                "type": "-",
+                "size": 154614,
+                "lmtime": 1769288601176.907,
+                "modified": false
+              },
+              "Occlussion.webp": {
+                "type": "-",
+                "size": 200992,
+                "lmtime": 1769288582234.2737,
+                "modified": false
+              },
+              "Roughness.webp": {
+                "type": "-",
+                "size": 85442,
+                "lmtime": 1769288593254.452,
+                "modified": false
+              }
+            },
+            "MDF": {
+              "Albedo.webp": {
+                "type": "-",
+                "size": 154224,
+                "lmtime": 1769288675327.215,
+                "modified": false
+              }
+            },
+            "Paint": {
+              "Albedo.webp": {
+                "type": "-",
+                "size": 1926,
+                "lmtime": 1769288472646.1792,
+                "modified": false
+              },
+              "Metallic.webp": {
+                "type": "-",
+                "size": 1926,
+                "lmtime": 1769288516237.9836,
+                "modified": false
+              },
+              "Normal.webp": {
+                "type": "-",
+                "size": 66884,
+                "lmtime": 1769288496154.4648,
+                "modified": false
+              },
+              "Roughness.webp": {
+                "type": "-",
+                "size": 79774,
+                "lmtime": 1769288508488.0261,
+                "modified": false
+              }
+            },
+            "U702 PM": {
+              "Albedo.webp": {
+                "type": "-",
+                "size": 190,
+                "lmtime": 1769288939083.2712,
+                "modified": false
+              }
+            },
+            "U702 ST9": {
+              "Albedo.webp": {
+                "type": "-",
+                "size": 190,
+                "lmtime": 1769288949674.1338,
+                "modified": false
+              }
+            }
+          }
+        },
+        "assets.php": {
+          "type": "-",
+          "size": 722,
+          "lmtime": 1758574876866.0037,
+          "modified": false
+        },
+        "functions.php": {
+          "type": "-",
+          "size": 1091,
+          "lmtime": 0,
+          "modified": true
+        },
+        "index.css": {
+          "type": "-",
+          "size": 1045,
+          "lmtime": 1769174732083.2139,
+          "modified": true
+        },
+        "index.php": {
+          "type": "-",
+          "size": 869,
+          "lmtime": 1769175159915.3796,
+          "modified": true
+        },
+        "readme.txt": {
+          "type": "-",
+          "size": 81,
+          "lmtime": 1758301332770.3423,
+          "modified": false
+        },
+        "resources.php": {
+          "type": "-",
+          "size": 253,
+          "lmtime": 0,
+          "modified": false
+        },
+        "Assets": {
           "Egger": {
             "Color": {
               "U104 ST7 Alabaster.jpg": {
@@ -2042,1102 +3094,7 @@
                 "modified": false
               }
             }
-          },
-          "Full H1386 ST40.csv": {
-            "type": "-",
-            "size": 633,
-            "lmtime": 1760642139171.578,
-            "modified": false
-          },
-          "Full U702 PMST9.csv": {
-            "type": "-",
-            "size": 1210,
-            "lmtime": 1760642424602.6206,
-            "modified": false
-          },
-          "Full U702 ST9.csv": {
-            "type": "-",
-            "size": 1798,
-            "lmtime": 1760644759831.8972,
-            "modified": false
-          },
-          "Grass.blend": {
-            "type": "-",
-            "size": 1046105,
-            "lmtime": 1759080310436.3838,
-            "modified": false
-          },
-          "Icosphere.blend": {
-            "type": "-",
-            "size": 536724,
-            "lmtime": 1759256716744.4836,
-            "modified": false
-          },
-          "Images": {
-            "D1038 BS BETON MILLENIUM.jpg": {
-              "type": "-",
-              "size": 596699,
-              "lmtime": 1709919619074.1724,
-              "modified": false
-            },
-            "D3025 OW DAB SONOMA": {
-              "Albedo.jpg": {
-                "type": "-",
-                "size": 288850,
-                "lmtime": 1709919263615.6746,
-                "modified": false
-              },
-              "AmbientOcclusionMap.png": {
-                "type": "-",
-                "size": 600348,
-                "lmtime": 1759079462264.5005,
-                "modified": false
-              },
-              "DisplacementMap.png": {
-                "type": "-",
-                "size": 620143,
-                "lmtime": 1759079462260.9863,
-                "modified": false
-              },
-              "Normal.png": {
-                "type": "-",
-                "size": 842498,
-                "lmtime": 1759079302821.7063,
-                "modified": false
-              },
-              "NormalMap.png": {
-                "type": "-",
-                "size": 1949082,
-                "lmtime": 1759079462289.8032,
-                "modified": false
-              },
-              "SpecularMap.png": {
-                "type": "-",
-                "size": 863255,
-                "lmtime": 1759079462306.5476,
-                "modified": false
-              }
-            },
-            "D4428_OV_Dąb_naturalny.jpg": {
-              "type": "-",
-              "size": 2567289,
-              "lmtime": 1584962216000,
-              "modified": false
-            },
-            "Grass.png": {
-              "type": "-",
-              "size": 760715,
-              "lmtime": 1759080221189.7742,
-              "modified": false
-            },
-            "Grass004_1K-JPG": {
-              "Grass004_1K-JPG_AmbientOcclusion.jpg": {
-                "type": "-",
-                "size": 904824,
-                "lmtime": 1691921552000,
-                "modified": false
-              },
-              "Grass004_1K-JPG_Color.jpg": {
-                "type": "-",
-                "size": 1985561,
-                "lmtime": 1691921260000,
-                "modified": false
-              },
-              "Grass004_1K-JPG_Displacement.jpg": {
-                "type": "-",
-                "size": 918011,
-                "lmtime": 1691921624000,
-                "modified": false
-              },
-              "Grass004_1K-JPG_Normal.jpg": {
-                "type": "-",
-                "size": 2339612,
-                "lmtime": 1691921306000,
-                "modified": false
-              },
-              "Grass004_1K-JPG_NormalDX.jpg": {
-                "type": "-",
-                "size": 2339065,
-                "lmtime": 1691921572000,
-                "modified": false
-              },
-              "Grass004_1K-JPG_Roughness.jpg": {
-                "type": "-",
-                "size": 851664,
-                "lmtime": 1691921222000,
-                "modified": false
-              }
-            },
-            "MDF.jpg": {
-              "type": "-",
-              "size": 922048,
-              "lmtime": 1580357084000,
-              "modified": false
-            },
-            "Poliigon_PlasterPainted_7664": {
-              "Poliigon_PlasterPainted_7664_BaseColor.jpg": {
-                "type": "-",
-                "size": 9293,
-                "lmtime": 1759070948000,
-                "modified": false
-              },
-              "Poliigon_PlasterPainted_7664_Metallic.jpg": {
-                "type": "-",
-                "size": 10149,
-                "lmtime": 1759070948000,
-                "modified": false
-              },
-              "Poliigon_PlasterPainted_7664_Normal.png": {
-                "type": "-",
-                "size": 1722458,
-                "lmtime": 1759070948000,
-                "modified": false
-              },
-              "Poliigon_PlasterPainted_7664_Roughness.jpg": {
-                "type": "-",
-                "size": 170237,
-                "lmtime": 1759070948000,
-                "modified": false
-              }
-            },
-            "Stack of Bricks": {
-              "Albedo.jpg": {
-                "type": "-",
-                "size": 1619755,
-                "lmtime": 1758839420567.1084,
-                "modified": false
-              },
-              "Normal.jpg": {
-                "type": "-",
-                "size": 1122040,
-                "lmtime": 1758839420568.127,
-                "modified": false
-              },
-              "Occlusion.jpg": {
-                "type": "-",
-                "size": 988683,
-                "lmtime": 1758839420577.946,
-                "modified": false
-              }
-            },
-            "U702 PMST9.jpg": {
-              "type": "-",
-              "size": 16026,
-              "lmtime": 1758574862546.8179,
-              "modified": false
-            },
-            "WhiteStuccoWall01_MR_1K": {
-              "WhiteStuccoWall01_1K_AO.png": {
-                "type": "-",
-                "size": 1260116,
-                "lmtime": 1616946774000,
-                "modified": false
-              },
-              "WhiteStuccoWall01_1K_BaseColor.png": {
-                "type": "-",
-                "size": 464090,
-                "lmtime": 1616946792000,
-                "modified": false
-              },
-              "WhiteStuccoWall01_1K_Height.png": {
-                "type": "-",
-                "size": 1109271,
-                "lmtime": 1616946834000,
-                "modified": false
-              },
-              "WhiteStuccoWall01_1K_Normal.png": {
-                "type": "-",
-                "size": 2984227,
-                "lmtime": 1616946846000,
-                "modified": false
-              },
-              "WhiteStuccoWall01_1K_Roughness.png": {
-                "type": "-",
-                "size": 771425,
-                "lmtime": 1616946858000,
-                "modified": false
-              }
-            },
-            "frog.webp": {
-              "type": "-",
-              "size": 65284,
-              "lmtime": 1758406398398.8337,
-              "modified": false
-            },
-            "hungarian-point-flooring-unity": {
-              "hungarian-point-flooring_albedo.png": {
-                "type": "-",
-                "size": 6254816,
-                "lmtime": 1696500626000,
-                "modified": false
-              },
-              "hungarian-point-flooring_ao.png": {
-                "type": "-",
-                "size": 1847220,
-                "lmtime": 1696500626000,
-                "modified": false
-              },
-              "hungarian-point-flooring_height.png": {
-                "type": "-",
-                "size": 1506729,
-                "lmtime": 1696500626000,
-                "modified": false
-              },
-              "hungarian-point-flooring_normal.png": {
-                "type": "-",
-                "size": 3378772,
-                "lmtime": 1696500626000,
-                "modified": false
-              }
-            },
-            "pbr_sphere": {
-              "sphere_Base_Color.png": {
-                "type": "-",
-                "size": 2421767,
-                "lmtime": 1552408707476.994,
-                "modified": false
-              },
-              "sphere_Metallic.png": {
-                "type": "-",
-                "size": 228140,
-                "lmtime": 1552408707570.7417,
-                "modified": false
-              },
-              "sphere_Mixed_AO.png": {
-                "type": "-",
-                "size": 916189,
-                "lmtime": 1552408712885.917,
-                "modified": false
-              },
-              "sphere_Normal.png": {
-                "type": "-",
-                "size": 559722,
-                "lmtime": 1552408710334.5803,
-                "modified": false
-              },
-              "sphere_Roughness.png": {
-                "type": "-",
-                "size": 543576,
-                "lmtime": 1552408707753.2512,
-                "modified": false
-              }
-            },
-            "red-scifi-metal-unity": {
-              "red-scifi-metal_albedo.png": {
-                "type": "-",
-                "size": 4575703,
-                "lmtime": 1758839420589.085,
-                "modified": false
-              },
-              "red-scifi-metal_ao.png": {
-                "type": "-",
-                "size": 463179,
-                "lmtime": 1758839420597.974,
-                "modified": false
-              },
-              "red-scifi-metal_height.png": {
-                "type": "-",
-                "size": 317597,
-                "lmtime": 1758839420601.178,
-                "modified": false
-              },
-              "red-scifi-metal_normal-ogl.png": {
-                "type": "-",
-                "size": 6956637,
-                "lmtime": 1758839420622.3914,
-                "modified": false
-              }
-            },
-            "rocky-rugged-terrain-unity": {
-              "rocky-rugged-terrain_1_albedo.png": {
-                "type": "-",
-                "size": 8486131,
-                "lmtime": 1731974225000,
-                "modified": false
-              },
-              "rocky-rugged-terrain_1_ao.png": {
-                "type": "-",
-                "size": 5865457,
-                "lmtime": 1731974226000,
-                "modified": false
-              },
-              "rocky-rugged-terrain_1_height.png": {
-                "type": "-",
-                "size": 3375587,
-                "lmtime": 1731974226000,
-                "modified": false
-              },
-              "rocky-rugged-terrain_1_normal-ogl.png": {
-                "type": "-",
-                "size": 11457937,
-                "lmtime": 1731974226000,
-                "modified": false
-              }
-            },
-            "WoodFloor057_1K-JPG_Color.jpg": {
-              "type": "-",
-              "size": 1272643,
-              "lmtime": 1691972542000,
-              "modified": false
-            }
-          },
-          "Krakow.blend": {
-            "type": "-",
-            "size": 1418827,
-            "lmtime": 1765333376660.0178,
-            "modified": false
-          },
-          "Krakow.blend@": {
-            "type": "-",
-            "size": 1321687,
-            "lmtime": 1761863901216.1755,
-            "modified": false
-          },
-          "Models": {
-            "Ablewicza 15.bin": {
-              "type": "-",
-              "size": 205660,
-              "lmtime": 1759079029508.1882,
-              "modified": false
-            },
-            "Ablewicza 15.gltf": {
-              "type": "-",
-              "size": 22479,
-              "lmtime": 1759079029508.1882,
-              "modified": false
-            },
-            "Capsule.bin": {
-              "type": "-",
-              "size": 107520,
-              "lmtime": 1759269849014.383,
-              "modified": false
-            },
-            "Capsule.gltf": {
-              "type": "-",
-              "size": 1843,
-              "lmtime": 1759269849015.3857,
-              "modified": false
-            },
-            "Cube.bin": {
-              "type": "-",
-              "size": 1224,
-              "lmtime": 1759256635205.9172,
-              "modified": false
-            },
-            "Cube.gltf": {
-              "type": "-",
-              "size": 1627,
-              "lmtime": 1759256635209.3467,
-              "modified": false
-            },
-            "Cubes.bin": {
-              "type": "-",
-              "size": 3672,
-              "lmtime": 1758933493332.605,
-              "modified": false
-            },
-            "Cubes.gltf": {
-              "type": "-",
-              "size": 3052,
-              "lmtime": 1758933493334.6035,
-              "modified": false
-            },
-            "D3025 OW DAB SONOMA.jpg": {
-              "type": "-",
-              "size": 288850,
-              "lmtime": 1759080123393.5586,
-              "modified": false
-            },
-            "Grass.bin": {
-              "type": "-",
-              "size": 408,
-              "lmtime": 1759080314112.0818,
-              "modified": false
-            },
-            "Grass.gltf": {
-              "type": "-",
-              "size": 1733,
-              "lmtime": 1759080314112.0818,
-              "modified": false
-            },
-            "Icosphere.bin": {
-              "type": "-",
-              "size": 48000,
-              "lmtime": 1759256721618.4666,
-              "modified": false
-            },
-            "Icosphere.gltf": {
-              "type": "-",
-              "size": 1821,
-              "lmtime": 1759256721618.4666,
-              "modified": false
-            },
-            "Krakow.bin": {
-              "type": "-",
-              "size": 2062508,
-              "lmtime": 1761863905405.5793,
-              "modified": false
-            },
-            "Krakow.glb": {
-              "type": "-",
-              "size": 2040080,
-              "lmtime": 1761776090771.792,
-              "modified": false
-            },
-            "Krakow.gltf": {
-              "type": "-",
-              "size": 63475,
-              "lmtime": 1761863905420.399,
-              "modified": false
-            },
-            "Monkey.bin": {
-              "type": "-",
-              "size": 100176,
-              "lmtime": 1758921314699.1174,
-              "modified": false
-            },
-            "Monkey.gltf": {
-              "type": "-",
-              "size": 1815,
-              "lmtime": 1758921314699.1174,
-              "modified": false
-            },
-            "Odlegla.bin": {
-              "type": "-",
-              "size": 455848,
-              "lmtime": 1759080123379.9573,
-              "modified": false
-            },
-            "Odlegla.glb": {
-              "type": "-",
-              "size": 764456,
-              "lmtime": 1759080116710.5503,
-              "modified": false
-            },
-            "Odlegla.gltf": {
-              "type": "-",
-              "size": 27142,
-              "lmtime": 1759080123411.3047,
-              "modified": false
-            },
-            "Sphere.bin": {
-              "type": "-",
-              "size": 100992,
-              "lmtime": 1759256686138.6848,
-              "modified": false
-            },
-            "Sphere.gltf": {
-              "type": "-",
-              "size": 1821,
-              "lmtime": 1759256686138.6848,
-              "modified": false
-            },
-            "Stack of Bricks.bin": {
-              "type": "-",
-              "size": 582204,
-              "lmtime": 1758919616275.9558,
-              "modified": false
-            },
-            "Stack of Bricks.gltf": {
-              "type": "-",
-              "size": 2277,
-              "lmtime": 1758919616275.9558,
-              "modified": false
-            },
-            "SunstanceSphere.bin": {
-              "type": "-",
-              "size": 6586872,
-              "lmtime": 1759022652932.0913,
-              "modified": false
-            },
-            "SunstanceSphere.gltf": {
-              "type": "-",
-              "size": 2247,
-              "lmtime": 1759072252738.3594,
-              "modified": false
-            },
-            "scene.bin": {
-              "type": "-",
-              "size": 6137360,
-              "lmtime": 1646826498000,
-              "modified": false
-            },
-            "scene.gltf": {
-              "type": "-",
-              "size": 7291,
-              "lmtime": 1646826498000,
-              "modified": false
-            }
-          },
-          "Monkey.blend": {
-            "type": "-",
-            "size": 1089688,
-            "lmtime": 1758921315374.29,
-            "modified": false
-          },
-          "Niska U702 PMST9.csv": {
-            "type": "-",
-            "size": 980,
-            "lmtime": 1760580489988.1543,
-            "modified": false
-          },
-          "Niska U702 ST9.csv": {
-            "type": "-",
-            "size": 1841,
-            "lmtime": 1760578894454.3755,
-            "modified": false
-          },
-          "Nowy folder": {},
-          "Odlegla.blend": {
-            "type": "-",
-            "size": 1557623,
-            "lmtime": 1759080123940.2742,
-            "modified": false
-          },
-          "Prices": {
-            "Full H1386 ST40.csv": {
-              "type": "-",
-              "size": 633,
-              "lmtime": 1760642139171.578,
-              "modified": false
-            },
-            "Full U702 PMST9.csv": {
-              "type": "-",
-              "size": 1210,
-              "lmtime": 1760642424602.6206,
-              "modified": false
-            },
-            "Full U702 ST9.csv": {
-              "type": "-",
-              "size": 1798,
-              "lmtime": 1760644759831.8972,
-              "modified": false
-            },
-            "Niska U702 PMST9.csv": {
-              "type": "-",
-              "size": 980,
-              "lmtime": 1760580489988.1543,
-              "modified": false
-            },
-            "Niska U702 ST9.csv": {
-              "type": "-",
-              "size": 1841,
-              "lmtime": 1760578894454.3755,
-              "modified": false
-            },
-            "Wysoka U702 PMST9.csv": {
-              "type": "-",
-              "size": 1107,
-              "lmtime": 1760580644297.717,
-              "modified": false
-            },
-            "Wysoka U702 ST9.csv": {
-              "type": "-",
-              "size": 2092,
-              "lmtime": 1760580630945.7368,
-              "modified": false
-            }
-          },
-          "Shaders": {
-            "Lit.wgsl": {
-              "type": "-",
-              "size": 5439,
-              "lmtime": 1769096719494.6138,
-              "modified": false
-            },
-            "TerrainLit.wgsl": {
-              "type": "-",
-              "size": 5471,
-              "lmtime": 1769096792272.7375,
-              "modified": false
-            },
-            "bloomRenderPass.wgsl": {
-              "type": "-",
-              "size": 2981,
-              "lmtime": 1759366732388.9702,
-              "modified": false
-            },
-            "clearRenderPass.wgsl": {
-              "type": "-",
-              "size": 592,
-              "lmtime": 1759185931888.979,
-              "modified": false
-            },
-            "debugDepthRenderPass.wgsl": {
-              "type": "-",
-              "size": 789,
-              "lmtime": 1758840440949.4297,
-              "modified": false
-            },
-            "screenRenderPass.wgsl": {
-              "type": "-",
-              "size": 695,
-              "lmtime": 1759361514518.775,
-              "modified": false
-            },
-            "finalRenderPass.wgsl": {
-              "type": "-",
-              "size": 1642,
-              "lmtime": 1759185915171.5781,
-              "modified": false
-            },
-            "gizmosRenderPass.wgsl": {
-              "type": "-",
-              "size": 919,
-              "lmtime": 1769096820504.971,
-              "modified": false
-            },
-            "lightingRenderPass.wgsl": {
-              "type": "-",
-              "size": 7742,
-              "lmtime": 1769096814822.0322,
-              "modified": false
-            },
-            "screenSpaceReflectionRenderPass.wgsl": {
-              "type": "-",
-              "size": 2576,
-              "lmtime": 1759362779481.4407,
-              "modified": false
-            },
-            "ssaoRenderPass.wgsl": {
-              "type": "-",
-              "size": 8508,
-              "lmtime": 1769096768603.7727,
-              "modified": false
-            },
-            "tonemappingRenderPass.wgsl": {
-              "type": "-",
-              "size": 1226,
-              "lmtime": 1759089319005.955,
-              "modified": false
-            }
-          },
-          "Sphere.blend": {
-            "type": "-",
-            "size": 563028,
-            "lmtime": 1759256679040.5957,
-            "modified": false
-          },
-          "Stack of Bricks.blend": {
-            "type": "-",
-            "size": 854821,
-            "lmtime": 1758919617764.92,
-            "modified": false
-          },
-          "SubstanceSphere.blend": {
-            "type": "-",
-            "size": 4708201,
-            "lmtime": 1759022649504.4568,
-            "modified": false
-          },
-          "Wysoka U702 PMST9.csv": {
-            "type": "-",
-            "size": 1107,
-            "lmtime": 1760580644297.717,
-            "modified": false
-          },
-          "Wysoka U702 ST9.csv": {
-            "type": "-",
-            "size": 2092,
-            "lmtime": 1760580630945.7368,
-            "modified": false
-          },
-          "Krakow.blend1": {
-            "type": "-",
-            "size": 1409477,
-            "lmtime": 1765129564196.1826,
-            "modified": false
           }
-        },
-        "Classes": {
-          "Engine": {
-            "0.Math": {
-              "class.Bounds.js": {
-                "type": "-",
-                "size": 1950,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.BoundsInt.js": {
-                "type": "-",
-                "size": 1954,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Color.js": {
-                "type": "-",
-                "size": 1495,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Color32.js": {
-                "type": "-",
-                "size": 1497,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Matrix4x4.js": {
-                "type": "-",
-                "size": 16786,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.PerlinNoise.js": {
-                "type": "-",
-                "size": 3598,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Quaternion.js": {
-                "type": "-",
-                "size": 6925,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Rect.js": {
-                "type": "-",
-                "size": 1359,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.RectInt.js": {
-                "type": "-",
-                "size": 1332,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Vector2.js": {
-                "type": "-",
-                "size": 3037,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Vector2Int.js": {
-                "type": "-",
-                "size": 40,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Vector3.js": {
-                "type": "-",
-                "size": 4777,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Vector3Int.js": {
-                "type": "-",
-                "size": 40,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Vector4.js": {
-                "type": "-",
-                "size": 787,
-                "lmtime": 0,
-                "modified": false
-              }
-            },
-            "1.Core": {
-              "class.FrustumPlanes.js": {
-                "type": "-",
-                "size": 822,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Keyframe.js": {
-                "type": "-",
-                "size": 118,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Plane.js": {
-                "type": "-",
-                "size": 3054,
-                "lmtime": 1769095404404.736,
-                "modified": false
-              }
-            },
-            "2.Obj": {
-              "Component": {
-                "Behaviour": {
-                  "MonoBehaviour": {},
-                  "class.Camera.js": {
-                    "type": "-",
-                    "size": 2865,
-                    "lmtime": 1769096950872.538,
-                    "modified": false
-                  },
-                  "class.MonoBehaviour.js": {
-                    "type": "-",
-                    "size": 2599,
-                    "lmtime": 0,
-                    "modified": false
-                  }
-                },
-                "Renderer": {
-                  "class.MeshRenderer.js": {
-                    "type": "-",
-                    "size": 1131,
-                    "lmtime": 1769096281510.5686,
-                    "modified": false
-                  }
-                },
-                "class.Behaviour.js": {
-                  "type": "-",
-                  "size": 222,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.Renderer.js": {
-                  "type": "-",
-                  "size": 203,
-                  "lmtime": 1769096097521.568,
-                  "modified": false
-                },
-                "class.Transform.js": {
-                  "type": "-",
-                  "size": 4820,
-                  "lmtime": 0,
-                  "modified": false
-                }
-              }
-            },
-            "3.Utilities": {
-              "class.GeometryUtility.js": {
-                "type": "-",
-                "size": 3677,
-                "lmtime": 1769096069844.3906,
-                "modified": false
-              },
-              "class.Mesh.js": {
-                "type": "-",
-                "size": 8744,
-                "lmtime": 1769096057917.324,
-                "modified": false
-              }
-            },
-            "4.Physics": {},
-            "5.Engine": {
-              "RenderPass": {
-                "class.BloomRenderPass.js": {
-                  "type": "-",
-                  "size": 7721,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.ClearRenderPass.js": {
-                  "type": "-",
-                  "size": 1966,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.ScreenRenderPass.js": {
-                  "type": "-",
-                  "size": 2770,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.FinalRenderPass.js": {
-                  "type": "-",
-                  "size": 4472,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.ForwardRenderPass.js": {
-                  "type": "-",
-                  "size": 1789,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.GBufferRenderPass.js": {
-                  "type": "-",
-                  "size": 3297,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.GizmosRenderPass.js": {
-                  "type": "-",
-                  "size": 4345,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.LightingRenderPass.js": {
-                  "type": "-",
-                  "size": 4690,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.SSAORenderPass.js": {
-                  "type": "-",
-                  "size": 9811,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.ScreenSpaceReflectionRenderPass.js": {
-                  "type": "-",
-                  "size": 2705,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.ShadowRenderPass.js": {
-                  "type": "-",
-                  "size": 1471,
-                  "lmtime": 1769097011344.1765,
-                  "modified": false
-                },
-                "class.TonemappingRenderPass.js": {
-                  "type": "-",
-                  "size": 2641,
-                  "lmtime": 0,
-                  "modified": false
-                }
-              },
-              "class.Engine.js": {
-                "type": "-",
-                "size": 816,
-                "lmtime": 1769088692237.5962,
-                "modified": false
-              },
-              "class.GPU.js": {
-                "type": "-",
-                "size": 3850,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Graphics.js": {
-                "type": "-",
-                "size": 8498,
-                "lmtime": 1769100798888.9912,
-                "modified": false
-              },
-              "class.Importer.js": {
-                "type": "-",
-                "size": 7033,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Input.js": {
-                "type": "-",
-                "size": 2851,
-                "lmtime": 1769101194054.5642,
-                "modified": false
-              },
-              "class.Material.js": {
-                "type": "-",
-                "size": 4869,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.RenderPass.js": {
-                "type": "-",
-                "size": 1473,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Shader.js": {
-                "type": "-",
-                "size": 5537,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Time.js": {
-                "type": "-",
-                "size": 323,
-                "lmtime": 0,
-                "modified": false
-              }
-            },
-            "class.Object.js": {
-              "type": "-",
-              "size": 716,
-              "lmtime": 0,
-              "modified": false
-            },
-            "5.Graphics": {
-              "RenderPass": {},
-              "class.GPU.js": {
-                "type": "-",
-                "size": 3850,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Graphics.js": {
-                "type": "-",
-                "size": 8497,
-                "lmtime": 1769175037175.2803,
-                "modified": false
-              },
-              "class.Material.js": {
-                "type": "-",
-                "size": 4899,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Mesh.js": {
-                "type": "-",
-                "size": 8897,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.RenderPass.js": {
-                "type": "-",
-                "size": 1473,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Shader.js": {
-                "type": "-",
-                "size": 5567,
-                "lmtime": 1769174748338.3923,
-                "modified": false
-              }
-            }
-          }
-        },
-        "Editor": {
-          "class.Editor.js": {
-            "type": "-",
-            "size": 607,
-            "lmtime": 1769175256981.191,
-            "modified": false
-          }
-        },
-        "Game": {},
-        "assets.php": {
-          "type": "-",
-          "size": 722,
-          "lmtime": 1758574876866.0037,
-          "modified": false
-        },
-        "functions.php": {
-          "type": "-",
-          "size": 771,
-          "lmtime": 0,
-          "modified": false
-        },
-        "index.css": {
-          "type": "-",
-          "size": 572,
-          "lmtime": 1769174732083.2139,
-          "modified": false
-        },
-        "index.js": {
-          "type": "-",
-          "size": 16908,
-          "lmtime": 1769096408560.2563,
-          "modified": false
-        },
-        "index.php": {
-          "type": "-",
-          "size": 1389,
-          "lmtime": 1769175159915.3796,
-          "modified": false
-        },
-        "readme.txt": {
-          "type": "-",
-          "size": 81,
-          "lmtime": 1758301332770.3423,
-          "modified": false
         }
       },
       "przewodniktarnow.pl": {},
