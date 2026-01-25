@@ -31,10 +31,10 @@ class Shader extends Obj {
 
         if (_this.code.indexOf('fn gBufferRenderPass') !== -1) {
             _this.renderPipelines['gBufferRenderPass'] = GPU.CreateRenderPipeline({
+                label: 'gBufferRenderPipeline',
                 layout: GPU.CreatePipelineLayout({
                     bindGroupLayouts: [
                         Graphics.viewBindGroupLayout,
-                        Graphics.transformBindGroupLayout,
                         Graphics.materialBindGroupLayout,
                         Graphics.pbrBindGroupLayout,
                     ],
@@ -51,6 +51,16 @@ class Shader extends Obj {
                                 { shaderLocation: 2, offset: 8 * 4, format: 'float32x4' }, // tangent
                                 { shaderLocation: 3, offset: 12 * 4, format: 'float32x4' }, // color
                                 { shaderLocation: 4, offset: 16 * 4, format: 'float32x2' }, // uv
+                            ],
+                        },
+                        {
+                            arrayStride: (16) * 4, // matrix4x4
+                            stepMode: 'instance',
+                            attributes: [
+                                { shaderLocation: 5, offset: 0 * 4, format: 'float32x4' },
+                                { shaderLocation: 6, offset: 4 * 4, format: 'float32x4' },
+                                { shaderLocation: 7, offset: 8 * 4, format: 'float32x4' },
+                                { shaderLocation: 8, offset: 12 * 4, format: 'float32x4' },
                             ],
                         },
                     ],

@@ -23,9 +23,9 @@ class GBufferRenderPass extends RenderPass {
         });
 
         for (let camera of cameras) {
-            renderPass.setBindGroup(0, camera.cameraBindGroup);
             renderPass.setViewport(this.positionRenderTexture.width * camera.rect.x, this.positionRenderTexture.height * camera.rect.y, this.positionRenderTexture.width * camera.rect.width, this.positionRenderTexture.height * camera.rect.height, 0, 1);
             renderPass.setScissorRect(this.positionRenderTexture.width * camera.rect.x, this.positionRenderTexture.height * camera.rect.y, this.positionRenderTexture.width * camera.rect.width, this.positionRenderTexture.height * camera.rect.height);
+            renderPass.setBindGroup(0, camera.cameraBindGroup);
             for (let component of camera.renderables) component.OnDraw(this, camera);
         }
 

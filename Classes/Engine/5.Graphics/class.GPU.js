@@ -30,10 +30,10 @@ class GPU {
             }
             if (
                 desc.usage & GPUBufferUsage.UNIFORM &&
-                desc.size > limits.maxUniformBufferBindingSize
+                desc.size > limits.maxBufferBindingSize
             ) {
                 console.warn(
-                    `⚠️ Uniform buffer za duży: ${desc.size} bajtów > ${limits.maxUniformBufferBindingSize}`
+                    `⚠️ Uniform buffer za duży: ${desc.size} bajtów > ${limits.maxBufferBindingSize}`
                 );
             }
             return originalCreateBuffer(desc);

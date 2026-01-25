@@ -3,7 +3,7 @@ class AmbientLight extends Behaviour {
     Init() {
         this.color = Color32.white;
 
-        this.lightBuffer = new UniformBuffer(4); //color
+        this.lightBuffer = new Buffer(4); //color
         this.lightBindGroup = GPU.CreateBindGroup({
             label: 'AmbientLightBindGroup',
             layout: GPU.CreateBindGroupLayout({

@@ -33,12 +33,12 @@ class SSAORenderPass extends RenderPass {
 
         this.ssaoKernel = this.GenerateKernel(64);
 
-        this.noiseBuffer = new UniformBuffer(this.ssaoKernel.length);
+        this.noiseBuffer = new Buffer(this.ssaoKernel.length);
         this.noiseBuffer.Set({
             0: this.ssaoKernel,
         });
 
-        this.uniformBuffer = new UniformBuffer(4 + 4);
+        this.uniformBuffer = new Buffer(4 + 4);
         this.uniformBuffer.Set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength]);
 
         this.sampler = GPU.CreateSampler({

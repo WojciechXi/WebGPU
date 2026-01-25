@@ -19,7 +19,7 @@ class Light extends Behaviour {
         this.inverseViewMatrix = Matrix4x4.Identity();
         this.inverseViewProjectionMatrix = Matrix4x4.Identity();
 
-        this.lightBuffer = new UniformBuffer(16 + 16 + 16 + 16 + 16 + 4 + 4); //view, projection, viewProjection, inverseView, inverseViewProjection, color, shadowColor
+        this.lightBuffer = new Buffer(16 + 16 + 16 + 16 + 16 + 4 + 4); //view, projection, viewProjection, inverseView, inverseViewProjection, color, shadowColor
         this.lightBindGroup = GPU.CreateBindGroup({
             label: 'ViewBindGroup',
             layout: Graphics.viewBindGroupLayout,

@@ -9,6 +9,7 @@ class TonemappingRenderPass extends RenderPass {
         this.sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: format, });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
+            label: 'tonemappingRenderPipeline',
             layout: GPU.CreatePipelineLayout({
                 bindGroupLayouts: [
                     GPU.CreateBindGroupLayout({

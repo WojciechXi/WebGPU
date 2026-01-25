@@ -3,18 +3,19 @@ class GizmosRenderPass extends RenderPass {
     Init(data) {
         this.canvas = data.canvas;
 
+        this.buffers = [];
+        this.bufferIndex = 0;
+        for (let i = 0; i < 128; i++) this.buffers[i] = new Buffer(16, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }); //matrix4x4
+
         this.depthRenderTarget = new RenderTexture(this.canvas.width, this.canvas.height, {
             format: 'depth24plus',
         });
 
-        this.transformBuffer = new UniformBuffer(16);
-
         this.renderPipeline = GPU.CreateRenderPipeline({
-            label: 'GizmosRenderPipeline',
+            label: 'gimosRenderPipeline',
             layout: GPU.CreatePipelineLayout({
                 bindGroupLayouts: [
                     Graphics.viewBindGroupLayout,
-                    Graphics.transformBindGroupLayout
                 ],
             }),
             vertex: {
@@ -31,6 +32,16 @@ class GizmosRenderPass extends RenderPass {
                             { shaderLocation: 4, offset: 16 * 4, format: 'float32x2' }, // uv
                         ],
                     },
+                    {
+                        arrayStride: (16) * 4, // matrix4x4
+                        stepMode: 'instance',
+                        attributes: [
+                            { shaderLocation: 5, offset: 0 * 4, format: 'float32x4' },
+                            { shaderLocation: 6, offset: 4 * 4, format: 'float32x4' },
+                            { shaderLocation: 7, offset: 8 * 4, format: 'float32x4' },
+                            { shaderLocation: 8, offset: 12 * 4, format: 'float32x4' },
+                        ],
+                    },
                 ],
             },
             fragment: {
@@ -44,14 +55,6 @@ class GizmosRenderPass extends RenderPass {
             depthStencil: {
                 format: this.depthRenderTarget.format, depthWriteEnabled: false, depthCompare: 'always'
             },
-        });
-
-        this.transformBindGroup = GPU.CreateBindGroup({
-            label: 'TransformBindGroup',
-            layout: Graphics.transformBindGroupLayout,
-            entries: [
-                this.transformBuffer.GetBindGroupEntry(0),
-            ],
         });
     }
 
@@ -69,16 +72,26 @@ class GizmosRenderPass extends RenderPass {
         });
 
         renderPass.setPipeline(this.renderPipeline);
-        renderPass.setBindGroup(0, camera.cameraBindGroup);
-        renderPass.setBindGroup(1, this.transformBindGroup);
 
         for (let camera of cameras) {
+            renderPass.setBindGroup(0, camera.cameraBindGroup);
             renderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
             renderPass.setScissorRect(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height);
-            for (let component of scene.gizmos) component.OnDrawGizmos(this);
+
+            this.bufferIndex = 0;
+            for (let component of scene.gizmos) {
+                component.OnDrawGizmos(this, camera);
+            }
         }
 
         renderPass.end();
+    }
+
+    DrawMesh(mesh, subMeshIndex, matrix4x4) {
+        this.buffers[this.bufferIndex].Set(matrix4x4);
+        super.DrawMesh(mesh, subMeshIndex, this.buffers[this.bufferIndex].buffer);
+
+        this.bufferIndex++;
     }
 
 }

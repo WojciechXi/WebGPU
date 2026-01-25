@@ -17,19 +17,19 @@ class MeshRenderer extends Renderer {
         if (renderPass.name === 'shadowRenderPass') {
             if (!this.castShadows) return;
             for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
-                renderPass.SetBindGroup(1, this.transform.transformBindGroup);
-                renderPass.DrawMesh(this.mesh, i);
+                renderPass.DrawMesh(this.mesh, i, this.transform.transformBuffer.buffer);
             }
         } else if (renderPass.name == 'gBufferRenderPass') {
             for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
                 this.materials[i].Use(renderPass, camera);
-                renderPass.SetBindGroup(1, this.transform.transformBindGroup);
-                renderPass.DrawMesh(this.mesh, i);
+                renderPass.DrawMesh(this.mesh, i, this.transform.transformBuffer.buffer);
             }
         }
     }
 
-    OnDrawGizmos(renderPass) {
+    OnDrawGizmos(renderPass, camera) {
+        const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
+        renderPass.DrawMesh(cube.meshes[0], 0, this.transform.matrix4x4);
     }
 
 }

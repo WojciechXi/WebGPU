@@ -8,6 +8,7 @@ class LightingRenderPass extends RenderPass {
         this.sceneRenderTexture = new RenderTexture(canvas.width, canvas.height, { format: 'rgba16float', });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
+            label: 'lightingRenderPipeline',
             layout: GPU.CreatePipelineLayout({
                 bindGroupLayouts: [
                     GPU.CreateBindGroupLayout({

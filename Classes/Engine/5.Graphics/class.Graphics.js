@@ -42,13 +42,6 @@ class Graphics {
             ],
         });
 
-        this.transformBindGroupLayout = GPU.CreateBindGroupLayout({
-            label: 'TransformBindGroupLayout',
-            entries: [
-                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
-            ],
-        });
-
         this.materialBindGroupLayout = GPU.CreateBindGroupLayout({
             label: 'TransformBindGroupLayout',
             entries: [
@@ -125,6 +118,12 @@ class Graphics {
         });
 
         this.screenRenderPass.renderTexture = this.tonemappingRenderPass.sceneRenderTexture;
+
+        this.gizmosRenderPass = new GizmosRenderPass({
+            name: 'gizmosRenderPass',
+            code: Resources.Get('/Resources/Shaders/gizmosRenderPass.wgsl'),
+            canvas: this.canvas,
+        });
     }
 
     static Render(scene) {
@@ -157,14 +156,13 @@ class Graphics {
         if (this.forwardRenderPass) this.forwardRenderPass.Render(cameras, scene, commandEncoder);
         if (this.finalRenderPass) this.finalRenderPass.Render(cameras, scene, commandEncoder);
 
-        if (this.gizmosRenderPass) this.gizmosRenderPass.Render(cameras, scene, commandEncoder);
-
         if (this.ssaoRenderPass) this.ssaoRenderPass.Render(cameras, scene, commandEncoder);
         if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(cameras, scene, commandEncoder);
         if (this.bloomRenderPass) this.bloomRenderPass.Render(cameras, scene, commandEncoder);
         if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(cameras, scene, commandEncoder);
 
         if (this.screenRenderPass) this.screenRenderPass.Render(cameras, scene, commandEncoder);
+        if (this.gizmosRenderPass) this.gizmosRenderPass.Render(cameras, scene, commandEncoder);
     }
 
 }

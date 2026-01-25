@@ -20,7 +20,7 @@ class Camera extends Behaviour {
         this.inverseViewMatrix = Matrix4x4.Identity();
         this.inverseViewProjectionMatrix = Matrix4x4.Identity();
 
-        this.cameraBuffer = new UniformBuffer(16 + 16 + 16 + 16 + 16); //view, projection, viewProjection, inverseView, inverseViewProjection
+        this.cameraBuffer = new Buffer(16 + 16 + 16 + 16 + 16); //view, projection, viewProjection, inverseView, inverseViewProjection
         this.cameraBindGroup = GPU.CreateBindGroup({
             label: 'ViewBindGroup',
             layout: Graphics.viewBindGroupLayout,
@@ -60,6 +60,11 @@ class Camera extends Behaviour {
     }
     OnRenderImage(src, dst) { // post-processing
         //Wyświetla obraz na ekranie
+    }
+
+    OnDrawGizmos(renderPass, camera) {
+        const cube = Resources.Get('/Resources/Primitives/Camera.gltf');
+        renderPass.DrawMesh(cube.meshes[0], 0, this.transform.matrix4x4);
     }
 
 }

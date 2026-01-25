@@ -10,6 +10,7 @@ class BloomRenderPass extends RenderPass {
         this.sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
 
         this.brightRenderPipeline = GPU.CreateRenderPipeline({
+            label: 'brightRenderPipeline',
             layout: 'auto',
             vertex: {
                 module: this.shaderModule,
@@ -25,6 +26,7 @@ class BloomRenderPass extends RenderPass {
         });
 
         this.blurRenderPipeline = GPU.CreateRenderPipeline({
+            label: 'blurRenderPipeline',
             layout: 'auto',
             vertex: {
                 module: this.shaderModule,
@@ -40,6 +42,7 @@ class BloomRenderPass extends RenderPass {
         });
 
         this.bloomRenderPipeline = GPU.CreateRenderPipeline({
+            label: 'bloomRenderPipeline',
             layout: 'auto',
             vertex: {
                 module: this.shaderModule,
@@ -55,6 +58,7 @@ class BloomRenderPass extends RenderPass {
         });
 
         this.sceneRenderPipeline = GPU.CreateRenderPipeline({
+            label: 'sceneRenderPipeline',
             layout: 'auto',
             vertex: {
                 module: this.shaderModule,

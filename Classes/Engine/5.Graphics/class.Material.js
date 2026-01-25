@@ -31,7 +31,7 @@ class Material extends Obj {
         this.SetTexture('metallic', Color.black);
         this.SetTexture('occlusion', Color.white);
 
-        this.materialBuffer = new UniformBuffer(4 + 4); //color, pbr
+        this.materialBuffer = new Buffer(4 + 4); //color, pbr
         this.materialBindGroup = GPU.CreateBindGroup({
             label: 'MaterialBindGroup',
             layout: Graphics.materialBindGroupLayout,
@@ -111,8 +111,8 @@ class Material extends Obj {
                 4: [this.roughness, this.metallic, this.occlusion, this.alphaCutoff],
             });
 
-            renderPass.SetBindGroup(2, this.materialBindGroup);
-            renderPass.SetBindGroup(3, this.pbrBindGroup);
+            renderPass.SetBindGroup(1, this.materialBindGroup);
+            renderPass.SetBindGroup(2, this.pbrBindGroup);
 
             return true;
         }

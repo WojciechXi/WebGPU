@@ -27,13 +27,7 @@ class Transform extends Component {
         this.parent = null;
         this.children = [];
 
-        this.transformBuffer = new UniformBuffer(16); //matrix4x4
-        this.transformBindGroup = GPU.CreateBindGroup({
-            layout: Graphics.transformBindGroupLayout,
-            entries: [
-                this.transformBuffer.GetBindGroupEntry(0),
-            ],
-        });
+        this.transformBuffer = new Buffer(16, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }); //matrix4x4
     }
 
     Update() {

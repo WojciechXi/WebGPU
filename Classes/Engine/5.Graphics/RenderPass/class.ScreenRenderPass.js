@@ -6,33 +6,32 @@ class ScreenRenderPass extends RenderPass {
 
         const format = navigator.gpu.getPreferredCanvasFormat();
 
-        const pipelineLayout = GPU.CreatePipelineLayout({
-            bindGroupLayouts: [
-                GPU.CreateBindGroupLayout({
-                    entries: [
-                        {
-                            binding: 0,
-                            visibility: GPUShaderStage.FRAGMENT,
-                            texture: {
-                                sampleType: 'unfilterable-float',
-                                viewDimension: '2d',
-                                multisampled: false,
-                            },
-                        },
-                        {
-                            binding: 1,
-                            visibility: GPUShaderStage.FRAGMENT,
-                            sampler: {
-                                type: 'non-filtering',
-                            },
-                        },
-                    ],
-                })
-            ],
-        });
-
         this.renderPipeline = GPU.CreateRenderPipeline({
-            layout: pipelineLayout,
+            label: 'screenRenderPipeline',
+            layout: GPU.CreatePipelineLayout({
+                bindGroupLayouts: [
+                    GPU.CreateBindGroupLayout({
+                        entries: [
+                            {
+                                binding: 0,
+                                visibility: GPUShaderStage.FRAGMENT,
+                                texture: {
+                                    sampleType: 'unfilterable-float',
+                                    viewDimension: '2d',
+                                    multisampled: false,
+                                },
+                            },
+                            {
+                                binding: 1,
+                                visibility: GPUShaderStage.FRAGMENT,
+                                sampler: {
+                                    type: 'non-filtering',
+                                },
+                            },
+                        ],
+                    })
+                ],
+            }),
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs",
@@ -79,7 +78,7 @@ class ScreenRenderPass extends RenderPass {
             colorAttachments: [
                 {
                     view: Graphics.context.getCurrentTexture().createView(),
-                    loadOp: "clear",
+                    loadOp: "load",
                     storeOp: "store"
                 }
             ],

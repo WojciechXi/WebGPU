@@ -6,12 +6,13 @@ class FinalRenderPass extends RenderPass {
         this.sceneRenderTexture = data.sceneRenderTexture;
         this.canvas = data.canvas;
 
-        this.screenBuffer = new UniformBuffer(4);
+        this.screenBuffer = new Buffer(4);
         this.screenBuffer.Set({
             0: [this.canvas.width, this.canvas.height],
         });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
+            label: 'finalRenderPipeline',
             layout: GPU.CreatePipelineLayout({
                 bindGroupLayouts: [
                     GPU.CreateBindGroupLayout({

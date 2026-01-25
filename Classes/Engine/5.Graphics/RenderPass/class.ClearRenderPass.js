@@ -8,6 +8,7 @@ class ClearRenderPass extends RenderPass {
         });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
+            label: 'clearRenderPipeline',
             layout: GPU.CreatePipelineLayout({
                 bindGroupLayouts: [
                     GPU.CreateBindGroupLayout({

@@ -55,20 +55,20 @@ struct View {
     inverseViewProjection : mat4x4f,
 };
 
-struct Transform {
-    matrix : mat4x4f,
-};
-
 struct Vertex {
     @location(0) position: vec3f,
     @location(1) normal: vec3f,
     @location(2) tangent: vec4f,
     @location(3) color: vec4f,
     @location(4) uv: vec2f,
+
+    @location(5) m0 : vec4<f32>,
+    @location(6) m1 : vec4<f32>,
+    @location(7) m2 : vec4<f32>,
+    @location(8) m3 : vec4<f32>,
 };
 
 @group(0) @binding(0) var<uniform> view : View;
-@group(1) @binding(0) var<uniform> transform : Transform;
 
 // ----------------------
 // Vertex Shader
@@ -80,7 +80,8 @@ struct VSOut {
 @vertex
 fn vs(vert: Vertex) -> VSOut {
   var vsOut: VSOut;
-  let worldPosition = (transform.matrix * vec4f(vert.position, 1.0)).xyz;
+  let matrix = mat4x4<f32>(vert.m0, vert.m1, vert.m2, vert.m3);
+  let worldPosition = (matrix * vec4f(vert.position, 1.0)).xyz;
   vsOut.clipPosition = view.viewProjection * vec4f(worldPosition, 1.0);
   return vsOut;
 }

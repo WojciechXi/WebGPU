@@ -48,10 +48,6 @@ struct View {
     inverseViewProjection : mat4x4f,
 };
 
-struct Transform {
-    matrix : mat4x4f,
-};
-
 struct Material {
     color : vec4f,
     pbr : vec4f,
@@ -66,15 +62,14 @@ struct Vertex {
 };
 
 @group(0) @binding(0) var<uniform> view : View;
-@group(1) @binding(0) var<uniform> transform : Transform;
-@group(2) @binding(0) var<uniform> material : Material;
+@group(1) @binding(0) var<uniform> material : Material;
 
-@group(3) @binding(0) var textureSampler : sampler;
-@group(3) @binding(1) var albedoTexture : texture_2d<f32>;
-@group(3) @binding(2) var normalTexture : texture_2d<f32>;
-@group(3) @binding(3) var roughnessTexture : texture_2d<f32>;
-@group(3) @binding(4) var metallicTexture : texture_2d<f32>;
-@group(3) @binding(5) var occlusionTexture : texture_2d<f32>;
+@group(2) @binding(0) var textureSampler : sampler;
+@group(2) @binding(1) var albedoTexture : texture_2d<f32>;
+@group(2) @binding(2) var normalTexture : texture_2d<f32>;
+@group(2) @binding(3) var roughnessTexture : texture_2d<f32>;
+@group(2) @binding(4) var metallicTexture : texture_2d<f32>;
+@group(2) @binding(5) var occlusionTexture : texture_2d<f32>;
 
 struct VSOut {
   @builtin(position) clipPosition : vec4f,
@@ -88,9 +83,10 @@ struct VSOut {
 @vertex
 fn vs(vert: Vertex) -> VSOut {
   var vsOut: VSOut;
+  let matrix = mat4x4<f32>(vert.m0, vert.m1, vert.m2, vert.m3);
 
   var objectPosition = vert.position;
-  let worldPosition = (transform.matrix * vec4f(objectPosition, 1.0)).xyz;
+  let worldPosition = (matrix * vec4f(objectPosition, 1.0)).xyz;
   let clipPosition = view.viewProjection * vec4f(worldPosition, 1.0);
 
   var objectNormal = vert.normal;
@@ -99,7 +95,7 @@ fn vs(vert: Vertex) -> VSOut {
   vsOut.clipPosition = clipPosition;
   vsOut.worldPosition = worldPosition;
 
-  let normalMatrix = getNormalMatrix(transform.matrix);
+  let normalMatrix = getNormalMatrix(matrix);
   
   let T = normalize(normalMatrix * objectTangent.xyz);
   let N = normalize(normalMatrix * objectNormal);
