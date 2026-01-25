@@ -3,7 +3,7 @@ class Camera extends Behaviour {
     Init() {
         if (Camera.main == null) Camera.main = this;
 
-        this.drawGizmos = Camera.main != this;
+        this.drawGizmos = Camera.main == this;
         this.parentCamera = Camera.main != this ? Camera.main : null;
 
         this.renderables = [];
@@ -64,6 +64,37 @@ class Camera extends Behaviour {
     }
     OnRenderImage(src, dst) { // post-processing
         //Wyświetla obraz na ekranie
+    }
+
+    ScreenPointToRay(position) {
+        const origin = this.transform.position;
+        const ivp = this.inverseViewProjectionMatrix;
+        const ndc = new Vector2(
+            position.x * 2 - 1,
+            -(position.y * 2 - 1)
+        );
+
+        const clip = [ndc.x, ndc.y, -1, 1];
+
+        const w = clip[0] * ivp[3] + clip[1] * ivp[7] + clip[2] * ivp[11] + clip[3] * ivp[15];
+
+        const nearPoint = new Vector3(
+            (clip[0] * ivp[0] + clip[1] * ivp[4] + clip[2] * ivp[8] + clip[3] * ivp[12]) / w,
+            (clip[0] * ivp[1] + clip[1] * ivp[5] + clip[2] * ivp[9] + clip[3] * ivp[13]) / w,
+            (clip[0] * ivp[2] + clip[1] * ivp[6] + clip[2] * ivp[10] + clip[3] * ivp[14]) / w
+        );
+
+        const direction = Vector3.Subtract(nearPoint, origin).Normalize();
+
+        return new Ray(origin, direction);
+    }
+
+    ScreenToViewportPoint(position) {
+
+    }
+
+    ScreenToWorldPoint(position) {
+
     }
 
     OnDrawGizmos(renderPass, camera) {

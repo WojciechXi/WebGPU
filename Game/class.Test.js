@@ -5,6 +5,10 @@ class Test extends MonoBehaviour {
         this.move = Vector3.zero;
     }
 
+    OnEnable() {
+        this.camera = this.GetComponent(Camera);
+    }
+
     Update() {
         if (Input.GetKey(0)) this.look = Vector2.Add(this.look, Input.mouseMove.Multiply(Time.deltaTime * 2));
 
@@ -19,6 +23,17 @@ class Test extends MonoBehaviour {
         position = Vector3.Add(position, Vector3.Multiply(this.transform.up, this.move.y * Time.deltaTime * 5));
         position = Vector3.Add(position, Vector3.Multiply(this.transform.right, this.move.x * Time.deltaTime * 5));
         this.transform.position = position;
+
+        if (Input.GetKeyDown(0)) {
+            const ray = this.camera.ScreenPointToRay(Input.mousePosition);
+            const hits = Physics.Raycast(ray, 10);
+            if (hits.length) {
+                const meshRenderer = hits[0].GetComponent(MeshRenderer);
+                if (meshRenderer) {
+                    meshRenderer.materials[0].color = new Color32(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1));
+                }
+            }
+        }
     }
 
 }

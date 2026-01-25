@@ -54,16 +54,41 @@ class Bounds extends Float32Array {
     }
 
     IntersectRay(ray) {
-        return null;
+        const min = this.min;
+        const max = this.max;
+
+        let tmin = (min.x - ray.origin.x) / ray.direction.x;
+        let tmax = (max.x - ray.origin.x) / ray.direction.x;
+        if (tmin > tmax) [tmin, tmax] = [tmax, tmin];
+
+        let tymin = (min.y - ray.origin.y) / ray.direction.y;
+        let tymax = (max.y - ray.origin.y) / ray.direction.y;
+        if (tymin > tymax) [tymin, tymax] = [tymax, tymin];
+
+        if ((tmin > tymax) || (tymin > tmax)) return false;
+
+        if (tymin > tmin) tmin = tymin;
+        if (tymax < tmax) tmax = tymax;
+
+        let tzmin = (min.z - ray.origin.z) / ray.direction.z;
+        let tzmax = (max.z - ray.origin.z) / ray.direction.z;
+        if (tzmin > tzmax) [tzmin, tzmax] = [tzmax, tzmin];
+
+        if ((tmin > tzmax) || (tzmin > tmax)) return false;
+
+        // jeśli potrzebujesz odległość do trafienia:
+        // return tmin >= 0 ? tmin : tmax;
+
+        return true;
     }
 
     Intersects(otherBounds) {
-        const aMin = this.min, aMax = this.max;
-        const bMin = otherBounds.min, bMax = otherBounds.max;
+        const aMin = this.min;
+        const aMax = this.max;
+        const bMin = otherBounds.min;
+        const bMax = otherBounds.max;
 
-        return (aMin.x <= bMax.x && aMax.x >= bMin.x) &&
-            (aMin.y <= bMax.y && aMax.y >= bMin.y) &&
-            (aMin.z <= bMax.z && aMax.z >= bMin.z);
+        return (aMin.x <= bMax.x && aMax.x >= bMin.x) && (aMin.y <= bMax.y && aMax.y >= bMin.y) && (aMin.z <= bMax.z && aMax.z >= bMin.z);
     }
 
     SetMinMax(min, max) {
@@ -75,7 +100,7 @@ class Bounds extends Float32Array {
     }
 
     ToString() {
-        return JSON.stringify(this);
+        return Json.ToJson(this);
     }
 
 

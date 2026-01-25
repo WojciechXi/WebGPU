@@ -59,7 +59,7 @@ class Rigidbody extends Component {
         let newPosition = Vector3.Add(this.position, Vector3.Multiply(this.linearVelocity, Time.fixedDeltaTime));
 
         if (this.collider) { // --- 5. Sprawdzenie kolizji ---
-            for (const other of Collider.colliders) {
+            for (const other of Engine.Instance.scene.colliders) {
                 if (other === this.collider) continue;
 
                 const originalPos = this.position;

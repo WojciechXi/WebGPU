@@ -1,12 +1,6 @@
 class Collider extends Component {
 
-    static {
-        this.colliders = [];
-    }
-
     Init() {
-        Collider.colliders.push(this);
-
         this.center = Vector3.zero;
 
         this.isTrigger = false; // Jeśli true, kolizja nie wpływa fizycznie
@@ -33,9 +27,11 @@ class Collider extends Component {
         return null;
     }
 
-    ClosestPoint() { } // Todo
-    ClosestPointOnBounds() { } // Todo
+    ClosestPoint(position) { } // Todo
+    ClosestPointOnBounds(position) { } // Todo
     GetGeometry() { } // Todo
-    Raycast() { } // Todo
+    Raycast(ray, maxDistance) {
+        return null;
+    }
 
 }

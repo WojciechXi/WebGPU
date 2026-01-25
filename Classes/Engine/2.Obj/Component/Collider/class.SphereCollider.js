@@ -82,6 +82,15 @@ class SphereCollider extends Collider {
         return null;
     }
 
+    Raycast(ray, maxDistance) {
+        const oc = Vector3.Sub(ray.origin, this.worldCenter);
+        const a = Vector3.Dot(ray.direction, ray.direction);
+        const b = 2 * Vector3.Dot(oc, ray.direction);
+        const c = Vector3.Dot(oc, oc) - this.radius * this.radius;
+        const discriminant = b * b - 4 * a * c;
+        return discriminant >= 0;
+    }
+
     OnDrawGizmos(renderPass, camera) {
         const cube = Resources.Get('/Resources/Primitives/Sphere.gltf');
         const bounds = this.bounds;

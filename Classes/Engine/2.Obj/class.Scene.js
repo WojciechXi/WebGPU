@@ -8,6 +8,7 @@ class Scene extends Obj {
         this.ambientLight = null;
         this.directionalLight = null;
         this.directionalLights = [];
+        this.colliders = [];
         this.cameras = [];
         this.gizmos = [];
     }
@@ -26,6 +27,7 @@ class Scene extends Obj {
         if (component.OnDraw) this.renderables.push(component);
         if (component.OnDrawGizmos) this.gizmos.push(component);
         if (component instanceof DirectionalLight) this.directionalLights.push(component);
+        if (component instanceof Collider) this.colliders.push(component);
         if (component instanceof Camera) this.cameras.push(component);
     }
 
@@ -35,6 +37,7 @@ class Scene extends Obj {
         if (component.OnDraw) this.renderables.splice(this.renderables.indexOf(component), 1);
         if (component.OnDrawGizmos) this.gizmos.splice(this.gizmos.indexOf(component), 1);
         if (component instanceof DirectionalLight) this.directionalLights.splice(this.cameras.indexOf(component), 1);
+        if (component instanceof Collider) this.colliders.splice(this.colliders.indexOf(component), 1);
         if (component instanceof Camera) this.cameras.splice(this.cameras.indexOf(component), 1);
     }
 

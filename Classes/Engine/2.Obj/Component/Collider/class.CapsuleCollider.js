@@ -83,4 +83,21 @@ class CapsuleCollider extends Collider {
         return null;
     }
 
+    Raycast(ray, maxDistance) {
+        const position = this.transform.position;
+
+        const p1a = Vector3.Add(position, new Vector3(0, this.height / 2 - this.radius, 0));
+        const p2a = Vector3.Subtract(position, new Vector3(0, this.height / 2 - this.radius, 0));
+
+        const pa = Vector3.ClosestPointOnSegment(ray.origin, p1a, p2a);
+        const oc = sub(ray.origin, pa);
+
+        const a = dot(ray.direction, ray.direction);
+        const b = 2 * dot(ray.direction, oc);
+        const c = dot(oc, oc) - this.radius * this.radius;
+        const discriminant = b * b - 4 * a * c;
+
+        return discriminant >= 0;
+    }
+
 }

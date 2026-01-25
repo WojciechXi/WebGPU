@@ -60,6 +60,18 @@ class BoxCollider extends Collider {
         return null;
     }
 
+    Raycast(ray, maxDistance) {
+        const bounds = this.bounds;
+
+        if (bounds.IntersectRay(ray)) {
+            // const localRay = new Ray(this.transform.InverseTransformPoint(ray.origin), this.transform.InverseTransformDirection(ray.direction));
+            //return this.localBounds.IntersectsRay(ray);
+            return true;
+        }
+
+        return false;
+    }
+
     OnDrawGizmos(renderPass, camera) {
         const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
         const bounds = this.bounds;

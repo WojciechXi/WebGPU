@@ -1,24 +1,5 @@
 class Transform extends Component {
 
-    // ---------- Helper funkcje ----------
-    static TransformPoint(parent, localPos) {
-        const pScale = parent.lossyScale;
-        return new Vector3(
-            localPos.x * pScale.x + parent.position.x,
-            localPos.y * pScale.y + parent.position.y,
-            localPos.z * pScale.z + parent.position.z
-        );
-    }
-
-    static InverseTransformPoint(parent, position) {
-        const pScale = parent.lossyScale;
-        return new Vector3(
-            (position.x - parent.position.x) / pScale.x,
-            (position.y - parent.position.y) / pScale.y,
-            (position.z - parent.position.z) / pScale.z
-        );
-    }
-
     Init() {
         this.localPosition = Vector3.zero;
         this.localRotation = Quaternion.identity;
@@ -137,5 +118,43 @@ class Transform extends Component {
     }
 
     get down() { return Vector3.Multiply(this.up, -1); }
+
+    InverseTransformPoint(point) {
+        return Transform.InverseTransformPoint(this.parent, point);
+    }
+
+    InverseTransformDirection(direction) {
+        return Transform.InverseTransformDirection(this.parent, direction);
+    }
+
+    // ---------- Helper funkcje ----------
+    static TransformPoint(parent, localPos) {
+        const pScale = parent.lossyScale;
+        return new Vector3(
+            localPos.x * pScale.x + parent.position.x,
+            localPos.y * pScale.y + parent.position.y,
+            localPos.z * pScale.z + parent.position.z
+        );
+    }
+
+    static InverseTransformPoint(parent, point) {
+        //TODO dorobić rotację parenta
+        const pScale = parent.lossyScale;
+        return new Vector3(
+            (point.x - parent.position.x) / pScale.x,
+            (point.y - parent.position.y) / pScale.y,
+            (point.z - parent.position.z) / pScale.z
+        );
+    }
+
+    static InverseTransformDirection(parent, direction) {
+        //TODO dorobić rotację parenta
+        const pScale = parent.lossyScale;
+        return new Vector3(
+            direction.x / pScale.x,
+            direction.y / pScale.y,
+            direction.z / pScale.z
+        );
+    }
 
 }

@@ -157,9 +157,8 @@ class Vector3 extends Float32Array {
         return dst;
     }
 
-    Dot(other) {
-        return this[0] * other[0] + this[1] * other[1] + this[2] * other[2];
-    }
+    Dot(other) { return this[0] * other[0] + this[1] * other[1] + this[2] * other[2]; }
+    static Dot(a, b) { return a.Dot(b); }
 
     Set(value) {
         if (Number.isFinite(value)) this[0] = this[1] = this[2] = value;

@@ -64,6 +64,14 @@ class Input {
         return this.keys[key] ? this.keys[key].state : false;
     }
 
+    static GetKeyDown(key) {
+        return this.keys[key] ? this.keys[key].down : false;
+    }
+
+    static GetKeyUp(key) {
+        return this.keys[key] ? this.keys[key].down : false;
+    }
+
     static GetAxis(key) {
         return this.axis[key] ? this.axis[key].value : 0;
     }
