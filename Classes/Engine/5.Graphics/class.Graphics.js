@@ -76,15 +76,16 @@ class Graphics {
             canvas: this.canvas,
         });
 
-        this.gBufferRenderPass = new GBufferRenderPass({
-            name: 'gBufferRenderPass',
-            canvas: this.canvas,
-        });
-
         this.clearRenderPass = new ClearRenderPass({
             name: 'clearRenderPass',
             code: Resources.Get('/Resources/Shaders/clearRenderPass.wgsl'),
             canvas: this.canvas,
+        });
+
+        this.gBufferRenderPass = new GBufferRenderPass({
+            name: 'gBufferRenderPass',
+            canvas: this.canvas,
+            clearRenderPass: this.clearRenderPass,
         });
 
         this.lightingRenderPass = new LightingRenderPass({
@@ -95,59 +96,27 @@ class Graphics {
             canvas: this.canvas,
         });
 
-        // this.forwardRenderPass = new ForwardRenderPass({
-        //     name: 'forwardRenderPass',
-        //     code: Resources.Get('/Resources/Shaders/forwardRenderPass.wgsl'),
-        //     lightingRenderPass: this.lightingRenderPass,
-        //     canvas: this.canvas,
-        // });
-
-        this.finalRenderPass = new FinalRenderPass({
-            name: 'finalRenderPass',
-            code: Resources.Get('/Resources/Shaders/finalRenderPass.wgsl'),
-            clearRenderPass: this.clearRenderPass,
-            gBufferRenderPass: this.gBufferRenderPass,
-            lightingRenderPass: this.lightingRenderPass,
-            forwardRenderPass: this.forwardRenderPass,
-            sceneRenderTexture: sceneRenderTexture,
-            canvas: this.canvas,
-        });
-
         // this.ssaoRenderPass = new SSAORenderPass({
         //     name: 'ssaoRenderPass',
         //     code: Resources.Get('/Resources/Shaders/ssaoRenderPass.wgsl'),
         //     gBufferRenderPass: this.gBufferRenderPass,
-        //     inputRenderTexture: sceneRenderTexture,
+        //     inputRenderTexture: this.lightingRenderPass.sceneRenderTexture,
         //     canvas: this.canvas,
         // });
 
-        // this.screenSpaceReflectionRenderPass = new ScreenSpaceReflectionRenderPass({
-        //     name: 'screenSpaceReflectionRenderPass',
-        //     code: Resources.Get('/Resources/Shaders/screenSpaceReflectionRenderPass.wgsl'),
-        //     gBufferRenderPass: this.gBufferRenderPass,
-        //     inputRenderTexture: this.ssaoRenderPass.sceneRenderTexture,
-        //     canvas: this.canvas,
-        // });
+        this.bloomRenderPass = new BloomRenderPass({
+            name: 'bloomRenderPass',
+            code: Resources.Get('/Resources/Shaders/bloomRenderPass.wgsl'),
+            inputRenderTexture: this.lightingRenderPass.sceneRenderTexture,
+            canvas: this.canvas,
+        });
 
-        // this.bloomRenderPass = new BloomRenderPass({
-        //     name: 'bloomRenderPass',
-        //     code: Resources.Get('/Resources/Shaders/bloomRenderPass.wgsl'),
-        //     inputRenderTexture: this.ssaoRenderPass.sceneRenderTexture,
-        //     canvas: this.canvas,
-        // });
-
-        // this.tonemappingRenderPass = new TonemappingRenderPass({
-        //     name: 'tonemappingRenderPass',
-        //     code: Resources.Get('/Resources/Shaders/tonemappingRenderPass.wgsl'),
-        //     inputRenderTexture: this.bloomRenderPass.sceneRenderTexture,
-        //     canvas: this.canvas,
-        // });
-
-        // this.gizmosRenderPass = new GizmosRenderPass({
-        //     name: 'gizmosRenderPass',
-        //     code: Resources.Get('/Resources/Shaders/gizmosRenderPass.wgsl'),
-        //     canvas: this.canvas,
-        // });
+        this.tonemappingRenderPass = new TonemappingRenderPass({
+            name: 'tonemappingRenderPass',
+            code: Resources.Get('/Resources/Shaders/tonemappingRenderPass.wgsl'),
+            inputRenderTexture: this.bloomRenderPass.sceneRenderTexture,
+            canvas: this.canvas,
+        });
 
         this.screenRenderPass = new ScreenRenderPass({
             name: 'screenRenderPass',
@@ -155,7 +124,7 @@ class Graphics {
             canvas: this.canvas,
         });
 
-        this.screenRenderPass.renderTexture = this.finalRenderPass.sceneRenderTexture;
+        this.screenRenderPass.renderTexture = this.tonemappingRenderPass.sceneRenderTexture;
     }
 
     static Render(scene) {
@@ -166,10 +135,12 @@ class Graphics {
 
         for (let component of scene.renderables) if (component.OnPreRender) component.OnPreRender();
         for (let component of scene.directionalLights) if (component.OnPreRender) component.OnPreRender();
+
+        for (let component of scene.cameras) if (component.OnPreCull) component.OnPreCull();
         for (let component of scene.cameras) if (component.OnPreRender) component.OnPreRender();
 
-        if (this.shadowRenderPass) this.shadowRenderPass.Render(cameras, scene, commandEncoder);
-        this.RenderCameras(cameras, scene, commandEncoder);
+        if (this.shadowRenderPass) this.shadowRenderPass.Render(scene.cameras, scene, commandEncoder);
+        this.RenderCameras(scene.cameras, scene, commandEncoder);
 
         for (let component of scene.cameras) if (component.OnPostRender) component.OnPostRender();
         for (let component of scene.directionalLights) if (component.OnPostRender) component.OnPostRender();
@@ -179,22 +150,21 @@ class Graphics {
     }
 
     static RenderCameras(cameras, scene, commandEncoder) {
-        if (this.gBufferRenderPass) this.gBufferRenderPass.Render(cameras, scene, commandEncoder);
-
         if (this.clearRenderPass) this.clearRenderPass.Render(cameras, scene, commandEncoder);
+        if (this.gBufferRenderPass) this.gBufferRenderPass.Render(cameras, scene, commandEncoder);
 
         if (this.lightingRenderPass) this.lightingRenderPass.Render(cameras, scene, commandEncoder);
         if (this.forwardRenderPass) this.forwardRenderPass.Render(cameras, scene, commandEncoder);
         if (this.finalRenderPass) this.finalRenderPass.Render(cameras, scene, commandEncoder);
 
+        if (this.gizmosRenderPass) this.gizmosRenderPass.Render(cameras, scene, commandEncoder);
+
         if (this.ssaoRenderPass) this.ssaoRenderPass.Render(cameras, scene, commandEncoder);
-        // if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(cameras, scene, commandEncoder);
+        if (this.screenSpaceReflectionRenderPass) this.screenSpaceReflectionRenderPass.Render(cameras, scene, commandEncoder);
         if (this.bloomRenderPass) this.bloomRenderPass.Render(cameras, scene, commandEncoder);
         if (this.tonemappingRenderPass) this.tonemappingRenderPass.Render(cameras, scene, commandEncoder);
 
         if (this.screenRenderPass) this.screenRenderPass.Render(cameras, scene, commandEncoder);
-
-        // if (this.gizmosRenderPass) this.gizmosRenderPass.Render(cameras, scene, commandEncoder);
     }
 
 }

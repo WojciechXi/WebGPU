@@ -52,6 +52,7 @@ class ScreenSpaceReflectionRenderPass extends RenderPass {
 
     Render(cameras, scene, commandEncoder) {
         this.uniformValues.set(Camera.main.transform.position, 0);
+        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
 
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
@@ -61,9 +62,6 @@ class ScreenSpaceReflectionRenderPass extends RenderPass {
 
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, this.bindGroup);
-
-        GPU.Queue.writeBuffer(this.uniformBuffer, 0, this.uniformValues);
-
         renderPass.draw(6);
         renderPass.end();
     }

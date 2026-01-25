@@ -33,9 +33,13 @@ class SSAORenderPass extends RenderPass {
 
         this.ssaoKernel = this.GenerateKernel(64);
 
-        this.uniformBuffer = new UniformBuffer(this.ssaoKernel.length + 16 + 16 + 4 + 4);
-        this.uniformBuffer.Set(this.ssaoKernel, 0);
-        this.uniformBuffer.Set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength], this.ssaoKernel.length + 32);
+        this.noiseBuffer = new UniformBuffer(this.ssaoKernel.length);
+        this.noiseBuffer.Set({
+            0: this.ssaoKernel,
+        });
+
+        this.uniformBuffer = new UniformBuffer(4 + 4);
+        this.uniformBuffer.Set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength]);
 
         this.sampler = GPU.CreateSampler({
             magFilter: 'linear',
@@ -49,7 +53,30 @@ class SSAORenderPass extends RenderPass {
         });
 
         this.ssaoRenderPipeline = GPU.CreateRenderPipeline({
-            layout: 'auto',
+            layout: GPU.CreatePipelineLayout({
+                bindGroupLayouts: [
+                    GPU.CreateBindGroupLayout({
+                        entries: [
+                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: {}, },
+                        ],
+                    }),
+                    GPU.CreateBindGroupLayout({
+                        entries: [
+                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: {}, },
+                        ],
+                    }),
+                    GPU.CreateBindGroupLayout({
+                        entries: [
+                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: {}, },
+                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: {}, },
+                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: {}, },
+                            { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                            { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                            { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
+                        ],
+                    }),
+                ],
+            }),
             vertex: {
                 module: this.shaderModule,
                 entryPoint: "vs"
@@ -63,53 +90,60 @@ class SSAORenderPass extends RenderPass {
             },
         });
 
-        this.blurHorizontalRenderPipeline = GPU.CreateRenderPipeline({
-            layout: 'auto',
-            vertex: {
-                module: this.shaderModule,
-                entryPoint: "vs"
-            },
-            fragment: {
-                module: this.shaderModule,
-                entryPoint: "blurHorizontalRenderPass",
-                targets: [
-                    this.blurHorizontalRenderTexture.GetTarget(),
-                ]
-            },
-        });
+        // this.blurHorizontalRenderPipeline = GPU.CreateRenderPipeline({
+        //     layout: 'auto',
+        //     vertex: {
+        //         module: this.shaderModule,
+        //         entryPoint: "vs"
+        //     },
+        //     fragment: {
+        //         module: this.shaderModule,
+        //         entryPoint: "blurHorizontalRenderPass",
+        //         targets: [
+        //             this.blurHorizontalRenderTexture.GetTarget(),
+        //         ]
+        //     },
+        // });
 
-        this.blurVerticalRenderPipeline = GPU.CreateRenderPipeline({
-            layout: 'auto',
-            vertex: {
-                module: this.shaderModule,
-                entryPoint: "vs"
-            },
-            fragment: {
-                module: this.shaderModule,
-                entryPoint: "blurVerticalRenderPass",
-                targets: [
-                    this.blurVerticalRenderTexture.GetTarget(),
-                ]
-            },
-        });
+        // this.blurVerticalRenderPipeline = GPU.CreateRenderPipeline({
+        //     layout: 'auto',
+        //     vertex: {
+        //         module: this.shaderModule,
+        //         entryPoint: "vs"
+        //     },
+        //     fragment: {
+        //         module: this.shaderModule,
+        //         entryPoint: "blurVerticalRenderPass",
+        //         targets: [
+        //             this.blurVerticalRenderTexture.GetTarget(),
+        //         ]
+        //     },
+        // });
 
-        this.sceneRenderPipeline = GPU.CreateRenderPipeline({
-            layout: 'auto',
-            vertex: {
-                module: this.shaderModule,
-                entryPoint: "vs"
-            },
-            fragment: {
-                module: this.shaderModule,
-                entryPoint: "sceneRenderPass",
-                targets: [
-                    this.sceneRenderTexture.GetTarget(),
-                ]
-            },
+        // this.sceneRenderPipeline = GPU.CreateRenderPipeline({
+        //     layout: 'auto',
+        //     vertex: {
+        //         module: this.shaderModule,
+        //         entryPoint: "vs"
+        //     },
+        //     fragment: {
+        //         module: this.shaderModule,
+        //         entryPoint: "sceneRenderPass",
+        //         targets: [
+        //             this.sceneRenderTexture.GetTarget(),
+        //         ]
+        //     },
+        // });
+
+        this.noiseBindGroup = GPU.CreateBindGroup({
+            layout: this.ssaoRenderPipeline.getBindGroupLayout(1),
+            entries: [
+                this.noiseBuffer.GetBindGroupEntry(0),
+            ],
         });
 
         this.ssaoBindGroup = GPU.CreateBindGroup({
-            layout: this.ssaoRenderPipeline.getBindGroupLayout(0),
+            layout: this.ssaoRenderPipeline.getBindGroupLayout(2),
             entries: [
                 this.uniformBuffer.GetBindGroupEntry(0),
                 { binding: 1, resource: this.sampler },
@@ -120,38 +154,36 @@ class SSAORenderPass extends RenderPass {
             ],
         });
 
-        this.blurHorizontalBindGroup = GPU.CreateBindGroup({
-            layout: this.blurHorizontalRenderPipeline.getBindGroupLayout(0),
-            entries: [
-                this.uniformBuffer.GetBindGroupEntry(0),
-                { binding: 1, resource: this.sampler },
-                this.ssaoRenderTexture.GetBindGroupEntry(6),
-            ],
-        });
+        // this.blurHorizontalBindGroup = GPU.CreateBindGroup({
+        //     layout: this.blurHorizontalRenderPipeline.getBindGroupLayout(1),
+        //     entries: [
+        //         this.uniformBuffer.GetBindGroupEntry(0),
+        //         { binding: 1, resource: this.sampler },
+        //         this.ssaoRenderTexture.GetBindGroupEntry(6),
+        //     ],
+        // });
 
-        this.blurVerticalBindGroup = GPU.CreateBindGroup({
-            layout: this.blurVerticalRenderPipeline.getBindGroupLayout(0),
-            entries: [
-                this.uniformBuffer.GetBindGroupEntry(0),
-                { binding: 1, resource: this.sampler },
-                this.blurHorizontalRenderTexture.GetBindGroupEntry(6),
-            ],
-        });
+        // this.blurVerticalBindGroup = GPU.CreateBindGroup({
+        //     layout: this.blurVerticalRenderPipeline.getBindGroupLayout(1),
+        //     entries: [
+        //         this.uniformBuffer.GetBindGroupEntry(0),
+        //         { binding: 1, resource: this.sampler },
+        //         this.blurHorizontalRenderTexture.GetBindGroupEntry(6),
+        //     ],
+        // });
 
-        this.sceneBindGroup = GPU.CreateBindGroup({
-            layout: this.sceneRenderPipeline.getBindGroupLayout(0),
-            entries: [
-                { binding: 1, resource: this.sampler },
-                this.blurVerticalRenderTexture.GetBindGroupEntry(6),
-                this.inputRenderTexture.GetBindGroupEntry(7),
-            ],
-        });
+        // this.sceneBindGroup = GPU.CreateBindGroup({
+        //     layout: this.sceneRenderPipeline.getBindGroupLayout(1),
+        //     entries: [
+        //         { binding: 1, resource: this.sampler },
+        //         this.blurVerticalRenderTexture.GetBindGroupEntry(6),
+        //         this.inputRenderTexture.GetBindGroupEntry(7),
+        //     ],
+        // });
     }
 
     Render(cameras, scene, commandEncoder) {
-        this.uniformBuffer.Set(Camera.main.viewMatrix, this.ssaoKernel.length);
-        this.uniformBuffer.Set(Camera.main.projectionMatrix, this.ssaoKernel.length + 16);
-        this.uniformBuffer.Set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength], this.ssaoKernel.length + 32);
+        this.uniformBuffer.Set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength]);
 
         //ssaoRenderPass
         const ssaoRenderPass = commandEncoder.beginRenderPass({
@@ -159,47 +191,48 @@ class SSAORenderPass extends RenderPass {
                 this.ssaoRenderTexture.GetColorAttachment(),
             ],
         });
-        ssaoRenderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
         ssaoRenderPass.setPipeline(this.ssaoRenderPipeline);
-        ssaoRenderPass.setBindGroup(0, this.ssaoBindGroup);
-        ssaoRenderPass.draw(6);
+        for (const camera of cameras) {
+            ssaoRenderPass.setScissorRect(this.ssaoRenderTexture.width * camera.rect.x, this.ssaoRenderTexture.height * camera.rect.y, this.ssaoRenderTexture.width * camera.rect.width, this.ssaoRenderTexture.height * camera.rect.height);
+            ssaoRenderPass.setBindGroup(0, camera.cameraBindGroup);
+            ssaoRenderPass.setBindGroup(1, this.noiseBindGroup);
+            ssaoRenderPass.setBindGroup(2, this.ssaoBindGroup);
+            ssaoRenderPass.draw(6);
+        }
         ssaoRenderPass.end();
 
-        //blurHorizontalRenderPass
-        const blurHorizontalRenderPass = commandEncoder.beginRenderPass({
-            colorAttachments: [
-                this.blurHorizontalRenderTexture.GetColorAttachment(),
-            ],
-        });
-        blurHorizontalRenderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
-        blurHorizontalRenderPass.setPipeline(this.blurHorizontalRenderPipeline);
-        blurHorizontalRenderPass.setBindGroup(0, this.blurHorizontalBindGroup);
-        blurHorizontalRenderPass.draw(6);
-        blurHorizontalRenderPass.end();
+        // //blurHorizontalRenderPass
+        // const blurHorizontalRenderPass = commandEncoder.beginRenderPass({
+        //     colorAttachments: [
+        //         this.blurHorizontalRenderTexture.GetColorAttachment(),
+        //     ],
+        // });
+        // blurHorizontalRenderPass.setPipeline(this.blurHorizontalRenderPipeline);
+        // blurHorizontalRenderPass.setBindGroup(1, this.blurHorizontalBindGroup);
+        // blurHorizontalRenderPass.draw(6);
+        // blurHorizontalRenderPass.end();
 
-        //blurVerticalRenderPass
-        const blurVerticalRenderPass = commandEncoder.beginRenderPass({
-            colorAttachments: [
-                this.blurVerticalRenderTexture.GetColorAttachment(),
-            ],
-        });
-        blurVerticalRenderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
-        blurVerticalRenderPass.setPipeline(this.blurVerticalRenderPipeline);
-        blurVerticalRenderPass.setBindGroup(0, this.blurVerticalBindGroup);
-        blurVerticalRenderPass.draw(6);
-        blurVerticalRenderPass.end();
+        // //blurVerticalRenderPass
+        // const blurVerticalRenderPass = commandEncoder.beginRenderPass({
+        //     colorAttachments: [
+        //         this.blurVerticalRenderTexture.GetColorAttachment(),
+        //     ],
+        // });
+        // blurVerticalRenderPass.setPipeline(this.blurVerticalRenderPipeline);
+        // blurVerticalRenderPass.setBindGroup(1, this.blurVerticalBindGroup);
+        // blurVerticalRenderPass.draw(6);
+        // blurVerticalRenderPass.end();
 
-        //sceneRenderPass
-        const sceneRenderPass = commandEncoder.beginRenderPass({
-            colorAttachments: [
-                this.sceneRenderTexture.GetColorAttachment(),
-            ],
-        });
-        sceneRenderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
-        sceneRenderPass.setPipeline(this.sceneRenderPipeline);
-        sceneRenderPass.setBindGroup(0, this.sceneBindGroup);
-        sceneRenderPass.draw(6);
-        sceneRenderPass.end();
+        // //sceneRenderPass
+        // const sceneRenderPass = commandEncoder.beginRenderPass({
+        //     colorAttachments: [
+        //         this.sceneRenderTexture.GetColorAttachment(),
+        //     ],
+        // });
+        // sceneRenderPass.setPipeline(this.sceneRenderPipeline);
+        // sceneRenderPass.setBindGroup(1, this.sceneBindGroup);
+        // sceneRenderPass.draw(6);
+        // sceneRenderPass.end();
     }
 
     GenerateKernel(size = 64) {

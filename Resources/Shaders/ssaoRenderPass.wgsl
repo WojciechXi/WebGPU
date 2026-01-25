@@ -71,10 +71,19 @@ fn getNormalMatrix(modelMatrix: mat4x4f) -> mat3x3f {
     return transpose3(inverse3(m3));
 }
 
-struct Uniforms {
+struct View {
+    matrix : mat4x4f,
+    projection : mat4x4f,
+    viewProjection : mat4x4f,
+    inverseView : mat4x4f,
+    inverseViewProjection : mat4x4f,
+};
+
+struct Noise {
   samples : array<vec4f, 64>,
-  viewMatrix : mat4x4f,
-  projectionMatrix : mat4x4f,
+}
+
+struct Uniforms {
   screenSize : vec2f,
   radius : f32,
   bias : f32,
@@ -101,14 +110,18 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
 }
 
 // Bindings
-@group(0) @binding(0) var<uniform> uniforms : Uniforms;
-@group(0) @binding(1) var screenSampler : sampler;
-@group(0) @binding(2) var noiseSampler : sampler;
-@group(0) @binding(3) var worldPositionTexture : texture_2d<f32>;  // world-space depth / z
-@group(0) @binding(4) var worldNormalTexture : texture_2d<f32>; // world-space normal
-@group(0) @binding(5) var noiseTexture : texture_2d<f32>;
-@group(0) @binding(6) var ssaoTexture : texture_2d<f32>;
-@group(0) @binding(7) var sceneTexture : texture_2d<f32>;
+@group(0) @binding(0) var<uniform> view : View;
+
+@group(1) @binding(0) var<uniform> noise : Noise;
+
+@group(2) @binding(0) var<uniform> uniforms : Uniforms;
+@group(2) @binding(1) var screenSampler : sampler;
+@group(2) @binding(2) var noiseSampler : sampler;
+@group(2) @binding(3) var worldPositionTexture : texture_2d<f32>;  // world-space depth / z
+@group(2) @binding(4) var worldNormalTexture : texture_2d<f32>; // world-space normal
+@group(2) @binding(5) var noiseTexture : texture_2d<f32>;
+@group(2) @binding(6) var ssaoTexture : texture_2d<f32>;
+@group(2) @binding(7) var sceneTexture : texture_2d<f32>;
 
 struct FSOut {
   @location(0) colorOut : vec4f,
@@ -119,16 +132,16 @@ fn ssaoRenderPass(vsOut: VSOut) -> FSOut {
   var fsOut: FSOut;
   let uv = vsOut.uv;
 
-  let screenSize = vec2f(textureDimensions(worldPositionTexture));
+  let screenSize = uniforms.screenSize;// vec2f(textureDimensions(worldPositionTexture));
 
-  let viewMatrix = uniforms.viewMatrix;
+  let viewMatrix = view.matrix;
   let normalMatrix = getNormalMatrix(viewMatrix);
 
   let worldPoition = textureSample(worldPositionTexture, screenSampler, uv);
   let viewPosition4 = viewMatrix * vec4f(worldPoition.xyz, 1.0);
   let viewPosition = viewPosition4.xyz;
 
-  let clipPosition = uniforms.projectionMatrix * viewMatrix * worldPoition;
+  let clipPosition = view.viewProjection * worldPoition;
 
   let noiseScale = screenSize / 4;
   let noiseUV = fract(uv * noiseScale);
@@ -137,9 +150,9 @@ fn ssaoRenderPass(vsOut: VSOut) -> FSOut {
   let viewNormal = normalMatrix * worldNormal;
 
   let random = (textureSample(noiseTexture, noiseSampler, noiseUV).xyz * 2.0 - 1.0);
-  let noise = normalize(random);
+  let randomNormal = normalize(random);
 
-  let tangent = normalize(noise - viewNormal * dot(noise, viewNormal));
+  let tangent = normalize(randomNormal - viewNormal * dot(randomNormal, viewNormal));
   let bitangent = cross(viewNormal, tangent);
   let TBN = mat3x3f(tangent, bitangent, viewNormal);
 
@@ -147,11 +160,11 @@ fn ssaoRenderPass(vsOut: VSOut) -> FSOut {
     var occlusion : f32 = 0.0;
     for (var i = 0u; i < 64u; i++) {
       // Kernel sample w view space
-      var sample = TBN * uniforms.samples[i].xyz;
+      var sample = TBN * noise.samples[i].xyz;
       sample = viewPosition + sample * uniforms.radius;
 
       // Przekształcenie do UV (proj. matrix)
-      let offset = uniforms.projectionMatrix * vec4f(sample, 1.0);
+      let offset = view.projection * vec4f(sample, 1.0);
       let offsetNDC = offset.xyz / offset.w;
       let offsetUV = offsetNDC.xy * 0.5 + 0.5;
 
@@ -177,7 +190,7 @@ fn ssaoRenderPass(vsOut: VSOut) -> FSOut {
 fn blurHorizontalRenderPass(vsOut: VSOut) -> FSOut {
     var fsOut: FSOut;
 
-    let screenSize = vec2f(textureDimensions(ssaoTexture));
+    let screenSize = uniforms.screenSize;//vec2f(textureDimensions(ssaoTexture));
 
     let radius = uniforms.blurRadius;
     let sigmaDepth = uniforms.sigmaDepth;
@@ -210,7 +223,7 @@ fn blurHorizontalRenderPass(vsOut: VSOut) -> FSOut {
 fn blurVerticalRenderPass(vsOut: VSOut) -> FSOut {
     var fsOut: FSOut;
 
-    let screenSize = vec2f(textureDimensions(ssaoTexture));
+    let screenSize = uniforms.screenSize;//vec2f(textureDimensions(ssaoTexture));
 
     let radius = uniforms.blurRadius;
     let sigmaDepth = uniforms.sigmaDepth;

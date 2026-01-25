@@ -14,7 +14,6 @@ class ForwardRenderPass extends RenderPass {
             ],
             depthStencilAttachment: this.depthRenderTexture.GetDepthStencilAttachment(),
         });
-        renderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
 
         for (let component of camera.renderables) component.OnDraw(this, camera);
 

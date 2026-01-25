@@ -116,11 +116,12 @@ class BloomRenderPass extends RenderPass {
                 this.brightRenderTexture.GetColorAttachment(),
             ],
         });
-
         brightRenderPass.setPipeline(this.brightRenderPipeline);
-        brightRenderPass.setBindGroup(0, this.brightBindGroup);
-
-        brightRenderPass.draw(6);
+        for (const camera of cameras) {
+            brightRenderPass.setScissorRect(this.brightRenderTexture.width * camera.rect.x, this.brightRenderTexture.height * camera.rect.y, this.brightRenderTexture.width * camera.rect.width, this.brightRenderTexture.height * camera.rect.height);
+            brightRenderPass.setBindGroup(0, this.brightBindGroup);
+            brightRenderPass.draw(6);
+        }
         brightRenderPass.end();
 
         //blurRenderPass
@@ -129,11 +130,12 @@ class BloomRenderPass extends RenderPass {
                 this.blurRenderTexture.GetColorAttachment(),
             ],
         });
-
         blurRenderPass.setPipeline(this.blurRenderPipeline);
-        blurRenderPass.setBindGroup(0, this.blurBindGroup);
-
-        blurRenderPass.draw(6);
+        for (const camera of cameras) {
+            blurRenderPass.setScissorRect(this.blurRenderTexture.width * camera.rect.x, this.blurRenderTexture.height * camera.rect.y, this.blurRenderTexture.width * camera.rect.width, this.blurRenderTexture.height * camera.rect.height);
+            blurRenderPass.setBindGroup(0, this.blurBindGroup);
+            blurRenderPass.draw(6);
+        }
         blurRenderPass.end();
 
         //bloomRenderPass
@@ -142,11 +144,12 @@ class BloomRenderPass extends RenderPass {
                 this.bloomRenderTexture.GetColorAttachment(),
             ],
         });
-
         bloomRenderPass.setPipeline(this.bloomRenderPipeline);
-        bloomRenderPass.setBindGroup(0, this.bloomBindGroup);
-
-        bloomRenderPass.draw(6);
+        for (const camera of cameras) {
+            bloomRenderPass.setScissorRect(this.bloomRenderTexture.width * camera.rect.x, this.bloomRenderTexture.height * camera.rect.y, this.bloomRenderTexture.width * camera.rect.width, this.bloomRenderTexture.height * camera.rect.height);
+            bloomRenderPass.setBindGroup(0, this.bloomBindGroup);
+            bloomRenderPass.draw(6);
+        }
         bloomRenderPass.end();
 
         //sceneRenderPass
@@ -155,11 +158,12 @@ class BloomRenderPass extends RenderPass {
                 this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
-
         sceneRenderPass.setPipeline(this.sceneRenderPipeline);
-        sceneRenderPass.setBindGroup(0, this.sceneBindGroup);
-
-        sceneRenderPass.draw(6);
+        for (const camera of cameras) {
+            sceneRenderPass.setScissorRect(this.sceneRenderTexture.width * camera.rect.x, this.sceneRenderTexture.height * camera.rect.y, this.sceneRenderTexture.width * camera.rect.width, this.sceneRenderTexture.height * camera.rect.height);
+            sceneRenderPass.setBindGroup(0, this.sceneBindGroup);
+            sceneRenderPass.draw(6);
+        }
         sceneRenderPass.end();
     }
 

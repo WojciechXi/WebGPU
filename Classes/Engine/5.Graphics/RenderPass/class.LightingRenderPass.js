@@ -77,16 +77,17 @@ class LightingRenderPass extends RenderPass {
                 this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
-        renderPass.setScissorRect(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height);
 
         renderPass.setPipeline(this.renderPipeline);
-
-        renderPass.setBindGroup(0, camera.cameraBindGroup);
         renderPass.setBindGroup(1, scene.directionalLight.lightBindGroup);
         renderPass.setBindGroup(2, scene.ambientLight.lightBindGroup);
         renderPass.setBindGroup(3, this.bindGroup3);
 
-        renderPass.draw(6);
+        for (let camera of cameras) {
+            renderPass.setScissorRect(this.sceneRenderTexture.width * camera.rect.x, this.sceneRenderTexture.height * camera.rect.y, this.sceneRenderTexture.width * camera.rect.width, this.sceneRenderTexture.height * camera.rect.height);
+            renderPass.setBindGroup(0, camera.cameraBindGroup);
+            renderPass.draw(6);
+        }
 
         renderPass.end();
     }

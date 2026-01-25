@@ -38,9 +38,6 @@ class ClearRenderPass extends RenderPass {
                 this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
-
-        renderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
-
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, scene.ambientLight.lightBindGroup);
         renderPass.draw(6);

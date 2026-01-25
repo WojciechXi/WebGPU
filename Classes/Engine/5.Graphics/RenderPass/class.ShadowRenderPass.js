@@ -52,12 +52,9 @@ class ShadowRenderPass extends RenderPass {
             colorAttachments: [],
             depthStencilAttachment: this.depthRenderTexture.GetDepthStencilAttachment(),
         });
-
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, scene.directionalLight.lightBindGroup);
-
         for (let component of scene.renderables) component.OnDraw(this);
-
         renderPass.end();
     }
 

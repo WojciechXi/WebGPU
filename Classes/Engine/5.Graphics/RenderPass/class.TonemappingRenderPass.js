@@ -55,10 +55,8 @@ class TonemappingRenderPass extends RenderPass {
                 this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
-
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, this.bindGroup);
-
         renderPass.draw(6);
         renderPass.end();
     }

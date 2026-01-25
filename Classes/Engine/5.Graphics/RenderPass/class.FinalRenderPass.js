@@ -1,8 +1,6 @@
 class FinalRenderPass extends RenderPass {
 
     Init(data) {
-        this.clearRenderPass = data.clearRenderPass;
-
         this.gBufferRenderPass = data.gBufferRenderPass;
         this.lightingRenderPass = data.lightingRenderPass;
         this.sceneRenderTexture = data.sceneRenderTexture;
@@ -22,8 +20,7 @@ class FinalRenderPass extends RenderPass {
                             { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: {}, },
                             { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
                             { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
-                            { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
-                            { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                            { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
                         ],
                     })
                 ],
@@ -63,9 +60,8 @@ class FinalRenderPass extends RenderPass {
                 this.screenBuffer.GetBindGroupEntry(0),
                 { binding: 1, resource: this.sampler },
                 { binding: 2, resource: this.depthSampler },
-                this.clearRenderPass.sceneRenderTexture.GetBindGroupEntry(3),
-                this.lightingRenderPass.sceneRenderTexture.GetBindGroupEntry(4),
-                this.gBufferRenderPass.depthRenderTexture.GetBindGroupEntry(5),
+                this.lightingRenderPass.sceneRenderTexture.GetBindGroupEntry(3),
+                this.gBufferRenderPass.depthRenderTexture.GetBindGroupEntry(4),
             ],
         });
     }
@@ -80,11 +76,8 @@ class FinalRenderPass extends RenderPass {
                 this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
-        renderPass.setScissorRect(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height);
-
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, this.bindGroup);
-
         renderPass.draw(6);
         renderPass.end();
     }

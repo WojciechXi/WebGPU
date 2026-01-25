@@ -24,9 +24,8 @@ struct Screen {
 @group(0) @binding(0) var<uniform> screen : Screen;
 @group(0) @binding(1) var screenSampler: sampler;
 @group(0) @binding(2) var depthSampler: sampler;
-@group(0) @binding(3) var clearTexture: texture_2d<f32>;
-@group(0) @binding(4) var lightingTexture: texture_2d<f32>;
-@group(0) @binding(5) var depthTexture: texture_2d<f32>;
+@group(0) @binding(3) var lightingTexture: texture_2d<f32>;
+@group(0) @binding(4) var depthTexture: texture_2d<f32>;
 
 struct FSOut {
   @location(0) colorOut: vec4f,
@@ -38,16 +37,10 @@ fn fs(vsOut: VSOut) -> FSOut {
 
   let screenSize = screen.size;
 
-  let clear = textureSample(clearTexture, screenSampler, vsOut.uv);
-
   let depth = textureSample(depthTexture, depthSampler, vsOut.uv);
-
   let lighting = textureSample(lightingTexture, screenSampler, vsOut.uv);
 
   var color = lighting.rgb;
-  if(depth.r >= 1) {
-    color = vec3f(clear.rgb);
-  }
 
   out.colorOut = vec4f(color, 1.0);
 

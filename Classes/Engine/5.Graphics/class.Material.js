@@ -111,7 +111,6 @@ class Material extends Obj {
                 4: [this.roughness, this.metallic, this.occlusion, this.alphaCutoff],
             });
 
-            renderPass.SetBindGroup(0, camera.cameraBindGroup);
             renderPass.SetBindGroup(2, this.materialBindGroup);
             renderPass.SetBindGroup(3, this.pbrBindGroup);
 

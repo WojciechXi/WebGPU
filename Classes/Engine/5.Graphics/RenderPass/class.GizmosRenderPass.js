@@ -69,11 +69,14 @@ class GizmosRenderPass extends RenderPass {
         });
 
         renderPass.setPipeline(this.renderPipeline);
-
         renderPass.setBindGroup(0, camera.cameraBindGroup);
         renderPass.setBindGroup(1, this.transformBindGroup);
 
-        for (let component of scene.gizmos) component.OnDrawGizmos(this);
+        for (let camera of cameras) {
+            renderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
+            renderPass.setScissorRect(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height);
+            for (let component of scene.gizmos) component.OnDrawGizmos(this);
+        }
 
         renderPass.end();
     }

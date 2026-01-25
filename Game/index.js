@@ -46,23 +46,15 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             engine.scene.ambientLight = ambientLight;
 
             const directionalLightGameObject = new GameObject('Directional Light');
-            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(45, 0, 15);
+            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(45, 0, -135);
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
             directionalLight.color.Set(1, 1, 1, 0.75);
             engine.scene.directionalLight = directionalLight;
 
-            const cameraGameObject = new GameObject('Camera');
-            cameraGameObject.transform.position = new Vector3(0, 1, -5);
-            const camera = cameraGameObject.AddComponent(Camera);
-            camera.rect.x = 0;
-            camera.rect.width = 0.5;
-
             const testCameraGameObject = new GameObject('Test Camera');
             testCameraGameObject.transform.position = new Vector3(0, 1, -5);
             const testCamera = testCameraGameObject.AddComponent(Camera);
-            testCamera.rect.x = 0.5;
-            testCamera.rect.width = 0.5;
             testCameraGameObject.AddComponent(Test);
 
             Resources.Get('/Resources/Models/Krakow.gltf', function (gltf) {
