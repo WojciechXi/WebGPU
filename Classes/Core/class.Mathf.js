@@ -45,8 +45,8 @@ class Mathf {
     static LinearToGammaSpace() { }
     static Log(x) { return Math.log(x); }
     static Log10(x) { return Math.log10(x); }
-    static Max(...values) { return Math.max(values); }
-    static Min(...values) { return Math.min(values); }
+    static Max(...values) { return Math.max(...values); }
+    static Min(...values) { return Math.min(...values); }
     static MoveTowards() { }
     static MoveTowardsAngle() { }
     static NextPowerOfTwo() { }

@@ -1,6 +1,6 @@
 class Renderer extends Component {
 
-    get bounds() { return new Bounds(this.transform.position, Vector3.one); }
+    get bounds() { return new Bounds(this.worldCenter, Vector3.zero); }
 
     // OnPreRender() { }
     // OnDraw(renderPass, camera) { }

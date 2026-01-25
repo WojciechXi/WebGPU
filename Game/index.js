@@ -59,10 +59,42 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             testCameraGameObject.AddComponent(Test);
 
             const cameraGameObject = new GameObject('Camera');
-            cameraGameObject.transform.position = new Vector3(0, 1, -5);
+            cameraGameObject.transform.position = new Vector3(-1, 1, -5);
             const camera = cameraGameObject.AddComponent(Camera);
             camera.rect.x = 0.5;
             camera.rect.width = 0.5;
+
+            Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
+                const gameObject = new GameObject('Cube');
+
+                for (const mesh of gltf.meshes) {
+                    const meshGameObject = new GameObject(mesh.name);
+                    meshGameObject.transform.SetParent(gameObject.transform);
+                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [materials.Default];
+
+                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
+                }
+            });
+
+            Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
+                const gameObject = new GameObject('Sphere');
+                gameObject.transform.position = new Vector3(0, 3, 0);
+
+                for (const mesh of gltf.meshes) {
+                    const meshGameObject = new GameObject(mesh.name);
+                    meshGameObject.transform.SetParent(gameObject.transform);
+                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [materials.Default];
+
+                    const sphereCollider = meshGameObject.AddComponent(SphereCollider);
+                    const rigidbody = meshGameObject.AddComponent(Rigidbody);
+                }
+            });
+
+            return;
 
             Resources.Get('/Resources/Models/Krakow.gltf', function (gltf) {
                 const gameObject = new GameObject('Krakow');
@@ -71,7 +103,6 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                     const meshGameObject = new GameObject(mesh.name);
                     meshGameObject.transform.SetParent(gameObject.transform);
                     const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-
                     meshRenderer.mesh = mesh;
                     meshRenderer.materials = [];
                     mesh.subMeshes.forEach(function (subMesh) {
@@ -122,8 +153,10 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                             meshRenderer.materials.push(material);
                         }
                     });
+
+                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
                 }
-            })
+            });
         }, function (index, total, path) {
             console.log(`${index}/${total} - ${path}`);
         });

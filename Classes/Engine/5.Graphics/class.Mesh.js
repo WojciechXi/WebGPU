@@ -4,7 +4,7 @@ class Mesh extends Obj {
         super();
         this.name = data.name ?? 'Mesh';
 
-        this.bounds = new Bounds(Vector3.zero, Vector3.zero);
+        this.bounds = new Bounds(Vector3.zero, Vector3.one);
 
         this.vertices = data.vertices ?? [];
         this.normals = data.normals ?? [];
@@ -166,10 +166,9 @@ class Mesh extends Obj {
         }
     }
 
-
     RecalculateBounds() {
         if (this.vertices.length === 0) {
-            this.bounds.Set(Vector3.zero, Vector3.zero);
+            this.bounds.Set(Vector3.zero, Vector3.one);
             return;
         }
 
@@ -186,17 +185,8 @@ class Mesh extends Obj {
         );
 
         for (let v of this.vertices) {
-            min = new Vector3(
-                Mathf.Min(min.x, v.x),
-                Mathf.Min(min.y, v.y),
-                Mathf.Min(min.z, v.z)
-            );
-
-            max = new Vector3(
-                Mathf.Max(max.x, v.x),
-                Mathf.Max(max.y, v.y),
-                Mathf.Max(max.z, v.z)
-            );
+            min = new Vector3(Mathf.Min(min.x, v.x), Mathf.Min(min.y, v.y), Mathf.Min(min.z, v.z));
+            max = new Vector3(Mathf.Max(max.x, v.x), Mathf.Max(max.y, v.y), Mathf.Max(max.z, v.z));
         }
 
         let center = Vector3.Multiply(Vector3.Add(min, max), 0.5);

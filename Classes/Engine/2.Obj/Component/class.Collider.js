@@ -14,7 +14,7 @@ class Collider extends Component {
     }
 
     get worldCenter() {
-        return Vector3.Add(this.transform.position, this.center);
+        return Vector3.Add(this.transform.position, Vector3.Scale(this.center, this.transform.lossyScale));
     }
 
     get bounds() {

@@ -6,7 +6,7 @@ class SphereCollider extends Collider {
     }
 
     get bounds() {
-        return new Bounds(this.worldCenter, Vector3.Multiply(this.transform.lossyScale, this.radius));
+        return new Bounds(this.worldCenter, Vector3.Multiply(this.transform.lossyScale, this.radius * 2));
     }
 
     Intersects(otherCollider) {
@@ -80,6 +80,13 @@ class SphereCollider extends Collider {
         }
 
         return null;
+    }
+
+    OnDrawGizmos(renderPass, camera) {
+        const cube = Resources.Get('/Resources/Primitives/Sphere.gltf');
+        const bounds = this.bounds;
+        let matrix = Matrix4x4.TRS(bounds.center, this.transform.rotation, bounds.size);
+        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
     }
 
 

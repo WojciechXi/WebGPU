@@ -5,10 +5,17 @@ class BoxCollider extends Collider {
         this.size = Vector3.one; // rozmiar boxa w lokalnej skali
     }
 
-    get bounds() {
-        let size = Vector3.Scale(this.size, this.transform.lossyScale);
+    OnEnable() {
+        const meshRenderer = this.GetComponent(MeshRenderer);
+        if (meshRenderer) {
+            const bounds = meshRenderer.mesh.bounds;
+            this.center = bounds.center;
+            this.size = bounds.size;
+        }
+    }
 
-        return new Bounds(this.worldCenter, size);
+    get bounds() {
+        return new Bounds(this.worldCenter, Vector3.Scale(this.size, this.transform.lossyScale));
     }
 
     Intersects(otherCollider) {
@@ -51,6 +58,13 @@ class BoxCollider extends Collider {
         }
 
         return null;
+    }
+
+    OnDrawGizmos(renderPass, camera) {
+        const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
+        const bounds = this.bounds;
+        let matrix = Matrix4x4.TRS(bounds.center, this.transform.rotation, bounds.size);
+        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
     }
 
 

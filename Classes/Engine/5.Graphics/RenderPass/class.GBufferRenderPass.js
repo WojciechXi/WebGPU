@@ -16,7 +16,7 @@ class GBufferRenderPass extends RenderPass {
             colorAttachments: [
                 this.positionRenderTexture.GetColorAttachment(),
                 this.normalRenderTexture.GetColorAttachment(),
-                this.colorRenderTexture.GetColorAttachment(),
+                this.colorRenderTexture.GetColorAttachment('clear', 'store', scene.ambientLight.color),
                 this.pbrRenderTexture.GetColorAttachment(),
             ],
             depthStencilAttachment: this.depthRenderTexture.GetDepthStencilAttachment(),

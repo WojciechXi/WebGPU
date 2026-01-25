@@ -2,6 +2,7 @@ class Scene extends Obj {
 
     Init() {
         this.gameObjects = [];
+        this.fixedUpdateables = [];
         this.updateables = [];
         this.renderables = [];
         this.ambientLight = null;
@@ -20,6 +21,7 @@ class Scene extends Obj {
     }
 
     AddComponent(component) {
+        if (component.FixedUpdate) this.fixedUpdateables.push(component);
         if (component.Update) this.updateables.push(component);
         if (component.OnDraw) this.renderables.push(component);
         if (component.OnDrawGizmos) this.gizmos.push(component);
@@ -28,6 +30,7 @@ class Scene extends Obj {
     }
 
     RemoveComponent(component) {
+        if (component.FixedUpdate) this.fixedUpdateables.splice(this.fixedUpdateables.indexOf(component), 1);
         if (component.Update) this.updateables.splice(this.updateables.indexOf(component), 1);
         if (component.OnDraw) this.renderables.splice(this.renderables.indexOf(component), 1);
         if (component.OnDrawGizmos) this.gizmos.splice(this.gizmos.indexOf(component), 1);

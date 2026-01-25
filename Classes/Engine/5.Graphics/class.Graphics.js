@@ -69,16 +69,9 @@ class Graphics {
             canvas: this.canvas,
         });
 
-        this.clearRenderPass = new ClearRenderPass({
-            name: 'clearRenderPass',
-            code: Resources.Get('/Resources/Shaders/clearRenderPass.wgsl'),
-            canvas: this.canvas,
-        });
-
         this.gBufferRenderPass = new GBufferRenderPass({
             name: 'gBufferRenderPass',
             canvas: this.canvas,
-            clearRenderPass: this.clearRenderPass,
         });
 
         this.lightingRenderPass = new LightingRenderPass({
@@ -149,7 +142,6 @@ class Graphics {
     }
 
     static RenderCameras(cameras, scene, commandEncoder) {
-        if (this.clearRenderPass) this.clearRenderPass.Render(cameras, scene, commandEncoder);
         if (this.gBufferRenderPass) this.gBufferRenderPass.Render(cameras, scene, commandEncoder);
 
         if (this.lightingRenderPass) this.lightingRenderPass.Render(cameras, scene, commandEncoder);

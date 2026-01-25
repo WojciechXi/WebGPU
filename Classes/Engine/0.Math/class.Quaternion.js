@@ -1,10 +1,10 @@
 class Quaternion extends Float32Array {
 
-    static get identity() { return new Quaternion(0, 0, 0, 1); }
+    static get identity() { return new this(0, 0, 0, 1); }
 
     // Identity quaternion (no rotation)
     static Identity(dst = null) {
-        dst = dst || new Quaternion();
+        dst = dst || new this();
         dst[0] = 0; dst[1] = 0; dst[2] = 0; dst[3] = 1;
         return dst;
     }

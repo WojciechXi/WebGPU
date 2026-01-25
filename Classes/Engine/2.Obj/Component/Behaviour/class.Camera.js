@@ -3,6 +3,9 @@ class Camera extends Behaviour {
     Init() {
         if (Camera.main == null) Camera.main = this;
 
+        this.drawGizmos = Camera.main != this;
+        this.parentCamera = Camera.main != this ? Camera.main : null;
+
         this.renderables = [];
         this.rect = new Rect(0, 0, 1, 1);
 
@@ -32,7 +35,8 @@ class Camera extends Behaviour {
 
     OnPreCull() { // co renderować
         const object = this;
-        return this.renderables = object.scene.renderables;
+        if (this.parentCamera) return this.renderables = this.parentCamera.renderables;
+
         const planes = GeometryUtility.CalculateFrustumPlanes(this);
         this.renderables = object.scene.renderables.filter(function (component) {
             return GeometryUtility.TestPlanesAABB(planes, component.bounds);
@@ -63,6 +67,7 @@ class Camera extends Behaviour {
     }
 
     OnDrawGizmos(renderPass, camera) {
+        if (camera == this) return;
         const cube = Resources.Get('/Resources/Primitives/Camera.gltf');
         renderPass.DrawMesh(cube.meshes[0], 0, this.transform.matrix4x4);
     }

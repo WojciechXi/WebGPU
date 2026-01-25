@@ -74,6 +74,8 @@ class GizmosRenderPass extends RenderPass {
         renderPass.setPipeline(this.renderPipeline);
 
         for (let camera of cameras) {
+            if (!camera.drawGizmos) continue;
+
             renderPass.setBindGroup(0, camera.cameraBindGroup);
             renderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
             renderPass.setScissorRect(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height);

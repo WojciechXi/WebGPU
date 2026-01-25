@@ -8,6 +8,12 @@ class MeshRenderer extends Renderer {
         this.mesh = null;
     }
 
+    get bounds() {
+        if (!this.mesh) return super.bounds;
+        const bounds = this.mesh.bounds;
+        return new Bounds(Vector3.Add(this.transform.position, Vector3.Scale(bounds.center, this.transform.lossyScale)), Vector3.Scale(bounds.size, this.transform.lossyScale));
+    }
+
     get material() { return this.materials[0]; }
     set material(material) { this.materials = [material]; }
 
@@ -27,9 +33,11 @@ class MeshRenderer extends Renderer {
         }
     }
 
-    OnDrawGizmos(renderPass, camera) {
-        const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
-        renderPass.DrawMesh(cube.meshes[0], 0, this.transform.matrix4x4);
-    }
+    // OnDrawGizmos(renderPass, camera) {
+    //     const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
+    //     const bounds = this.bounds;
+    //     let matrix = Matrix4x4.TRS(bounds.center, this.transform.rotation, bounds.size);
+    //     renderPass.DrawMesh(cube.meshes[0], 0, matrix);
+    // }
 
 }

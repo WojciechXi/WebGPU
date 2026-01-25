@@ -4,7 +4,10 @@ class Obj {
         this.objs = [];
     }
 
-    constructor() {
+
+    constructor(data = {}) {
+        const object = this;
+        Object.keys(data).forEach(function (key) { object[key] = data[key]; });
         this.Init();
     }
     Init() {

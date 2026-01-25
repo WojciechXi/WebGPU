@@ -5,9 +5,10 @@ class Component extends Obj {
     get scene() { return this.gameObject.scene; }
 
     constructor(gameObject) {
-        super();
-        this.tag = '';
-        this.gameObject = gameObject;
+        super({
+            tag: '',
+            gameObject: gameObject,
+        });
 
         this.enabled = true;
     }
@@ -30,6 +31,7 @@ class Component extends Obj {
     // Public Methods
     BroadcastMessage() { }
     CompareTag() { }
+    AddComponent(type) { return this.gameObject.AddComponent(type); }
     GetComponent(type) { return this.gameObject.GetComponent(type); }
     GetComponentInChildren() { }
     GetComponentIndex() { }
