@@ -71,12 +71,13 @@ class LightingRenderPass extends RenderPass {
         });
     }
 
-    Render(camera, scene, commandEncoder) {
+    Render(cameras, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
+        renderPass.setScissorRect(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height);
 
         renderPass.setPipeline(this.renderPipeline);
 

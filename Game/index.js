@@ -55,7 +55,15 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             const cameraGameObject = new GameObject('Camera');
             cameraGameObject.transform.position = new Vector3(0, 1, -5);
             const camera = cameraGameObject.AddComponent(Camera);
-            cameraGameObject.AddComponent(Test);
+            camera.rect.x = 0;
+            camera.rect.width = 0.5;
+
+            const testCameraGameObject = new GameObject('Test Camera');
+            testCameraGameObject.transform.position = new Vector3(0, 1, -5);
+            const testCamera = testCameraGameObject.AddComponent(Camera);
+            testCamera.rect.x = 0.5;
+            testCamera.rect.width = 0.5;
+            testCameraGameObject.AddComponent(Test);
 
             Resources.Get('/Resources/Models/Krakow.gltf', function (gltf) {
                 const gameObject = new GameObject('Krakow');

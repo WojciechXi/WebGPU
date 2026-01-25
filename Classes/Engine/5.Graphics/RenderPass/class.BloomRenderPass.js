@@ -109,7 +109,7 @@ class BloomRenderPass extends RenderPass {
         });
     }
 
-    Render(camera, scene, commandEncoder) {
+    Render(cameras, scene, commandEncoder) {
         //brightRenderPass
         const brightRenderPass = commandEncoder.beginRenderPass({
             colorAttachments: [

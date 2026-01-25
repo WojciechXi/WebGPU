@@ -55,7 +55,7 @@ class GizmosRenderPass extends RenderPass {
         });
     }
 
-    Render(camera, scene, commandEncoder) {
+    Render(cameras, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 {

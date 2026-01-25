@@ -47,7 +47,7 @@ class ShadowRenderPass extends RenderPass {
         });
     }
 
-    Render(camera, scene, commandEncoder) {
+    Render(cameras, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [],
             depthStencilAttachment: this.depthRenderTexture.GetDepthStencilAttachment(),
@@ -56,7 +56,7 @@ class ShadowRenderPass extends RenderPass {
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, scene.directionalLight.lightBindGroup);
 
-        for (let component of Engine.Instance.scene.renderables) component.OnDraw(this);
+        for (let component of scene.renderables) component.OnDraw(this);
 
         renderPass.end();
     }

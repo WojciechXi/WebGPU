@@ -148,7 +148,7 @@ class SSAORenderPass extends RenderPass {
         });
     }
 
-    Render(camera, scene, commandEncoder) {
+    Render(cameras, scene, commandEncoder) {
         this.uniformBuffer.Set(Camera.main.viewMatrix, this.ssaoKernel.length);
         this.uniformBuffer.Set(Camera.main.projectionMatrix, this.ssaoKernel.length + 16);
         this.uniformBuffer.Set([this.canvas.width, this.canvas.height, this.radius, this.bias, this.blurRadius, this.sigmaDepth, this.strength], this.ssaoKernel.length + 32);
@@ -159,6 +159,7 @@ class SSAORenderPass extends RenderPass {
                 this.ssaoRenderTexture.GetColorAttachment(),
             ],
         });
+        ssaoRenderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
         ssaoRenderPass.setPipeline(this.ssaoRenderPipeline);
         ssaoRenderPass.setBindGroup(0, this.ssaoBindGroup);
         ssaoRenderPass.draw(6);
@@ -170,6 +171,7 @@ class SSAORenderPass extends RenderPass {
                 this.blurHorizontalRenderTexture.GetColorAttachment(),
             ],
         });
+        blurHorizontalRenderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
         blurHorizontalRenderPass.setPipeline(this.blurHorizontalRenderPipeline);
         blurHorizontalRenderPass.setBindGroup(0, this.blurHorizontalBindGroup);
         blurHorizontalRenderPass.draw(6);
@@ -181,6 +183,7 @@ class SSAORenderPass extends RenderPass {
                 this.blurVerticalRenderTexture.GetColorAttachment(),
             ],
         });
+        blurVerticalRenderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
         blurVerticalRenderPass.setPipeline(this.blurVerticalRenderPipeline);
         blurVerticalRenderPass.setBindGroup(0, this.blurVerticalBindGroup);
         blurVerticalRenderPass.draw(6);
@@ -192,6 +195,7 @@ class SSAORenderPass extends RenderPass {
                 this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
+        sceneRenderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
         sceneRenderPass.setPipeline(this.sceneRenderPipeline);
         sceneRenderPass.setBindGroup(0, this.sceneBindGroup);
         sceneRenderPass.draw(6);

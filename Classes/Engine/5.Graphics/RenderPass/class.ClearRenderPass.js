@@ -1,9 +1,9 @@
 class ClearRenderPass extends RenderPass {
 
     Init(data) {
-        const canvas = data.canvas;
+        this.canvas = data.canvas;
 
-        this.sceneRenderTexture = new RenderTexture(canvas.width, canvas.height, {
+        this.sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, {
             format: 'rgba16float',
         });
 
@@ -32,12 +32,14 @@ class ClearRenderPass extends RenderPass {
         });
     }
 
-    Render(camera, scene, commandEncoder) {
+    Render(cameras, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
                 this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
+
+        renderPass.setViewport(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height, 0, 1);
 
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, scene.ambientLight.lightBindGroup);

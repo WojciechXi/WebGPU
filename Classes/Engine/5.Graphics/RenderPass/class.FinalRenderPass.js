@@ -5,7 +5,6 @@ class FinalRenderPass extends RenderPass {
 
         this.gBufferRenderPass = data.gBufferRenderPass;
         this.lightingRenderPass = data.lightingRenderPass;
-        this.forwardRenderPass = data.forwardRenderPass;
         this.sceneRenderTexture = data.sceneRenderTexture;
         this.canvas = data.canvas;
 
@@ -25,8 +24,6 @@ class FinalRenderPass extends RenderPass {
                             { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
                             { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
                             { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                            { binding: 6, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
-                            { binding: 7, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
                         ],
                     })
                 ],
@@ -69,13 +66,11 @@ class FinalRenderPass extends RenderPass {
                 this.clearRenderPass.sceneRenderTexture.GetBindGroupEntry(3),
                 this.lightingRenderPass.sceneRenderTexture.GetBindGroupEntry(4),
                 this.gBufferRenderPass.depthRenderTexture.GetBindGroupEntry(5),
-                this.forwardRenderPass.sceneRenderTexture.GetBindGroupEntry(6),
-                this.forwardRenderPass.depthRenderTexture.GetBindGroupEntry(7),
             ],
         });
     }
 
-    Render(camera, scene, commandEncoder) {
+    Render(cameras, scene, commandEncoder) {
         this.screenBuffer.Set({
             0: [this.canvas.width, this.canvas.height],
         });
@@ -85,6 +80,7 @@ class FinalRenderPass extends RenderPass {
                 this.sceneRenderTexture.GetColorAttachment(),
             ],
         });
+        renderPass.setScissorRect(this.canvas.width * camera.rect.x, this.canvas.height * camera.rect.y, this.canvas.width * camera.rect.width, this.canvas.height * camera.rect.height);
 
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, this.bindGroup);
