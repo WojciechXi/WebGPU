@@ -1,17 +1,18 @@
 class Component extends Obj {
 
     // Properties
-    get transform() { return this.gameObject.transform; }
-    get scene() { return this.gameObject.scene; }
 
     constructor(gameObject) {
         super({
-            tag: '',
             gameObject: gameObject,
         });
 
         this.enabled = true;
     }
+
+    get tag() { return this.gameObject.tag; }
+    get transform() { return this.gameObject.transform; }
+    get scene() { return this.gameObject.scene; }
 
     get enabled() { return this._enabled; }
     set enabled(value) {

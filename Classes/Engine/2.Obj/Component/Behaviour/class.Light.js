@@ -29,15 +29,7 @@ class Light extends Behaviour {
         });
     }
 
-    OnPreCull() { // co renderować
-        const object = this;
-        return this.renderables = object.scene.renderables;
-        const planes = GeometryUtility.CalculateFrustumPlanes(this);
-        this.renderables = object.scene.renderables.filter(function (component) {
-            return GeometryUtility.TestPlanesAABB(planes, component.bounds);
-        });
-    }
-    OnPreRender() { // jak renderować
+    Update() {
         this.aspect = 1;
 
         let matrix = Matrix4x4.TRS(Vector3.Add(Camera.main.transform.position, Vector3.Multiply(this.transform.back, (this.farClipPlane - this.nearClipPlane) * 0.5)), this.transform.rotation, this.transform.scale);
@@ -57,12 +49,10 @@ class Light extends Behaviour {
             80: this.color,
             84: this.shadowColor,
         });
-    }
-    OnPostRender() { // rysuj po renderze
-        //Rysowanie na GL
-    }
-    OnRenderImage(src, dst) { // post-processing
-        //Wyświetla obraz na ekranie
+
+        return this.renderables = this.scene.renderables;
+        const planes = GeometryUtility.CalculateFrustumPlanes(this);
+        this.renderables = this.scene.renderables.filter(c => GeometryUtility.TestPlanesAABB(planes, c.bounds));
     }
 
 }

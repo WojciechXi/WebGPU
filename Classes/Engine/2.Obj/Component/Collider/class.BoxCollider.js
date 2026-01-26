@@ -2,6 +2,7 @@ class BoxCollider extends Collider {
 
     Init() {
         super.Init();
+        this.center = Vector3.zero;
         this.size = Vector3.one; // rozmiar boxa w lokalnej skali
     }
 
@@ -14,9 +15,8 @@ class BoxCollider extends Collider {
         }
     }
 
-    get localBounds() {
-        return new Bounds(this.center.Clone(), this.size.Clone());
-    }
+    get worldCenter() { return Vector3.Add(this.transform.position, this.center); }
+    get localBounds() { return new Bounds(this.center.Clone(), this.size.Clone()); }
     get bounds() {
         const hx = this.size.x / 2;
         const hy = this.size.y / 2;

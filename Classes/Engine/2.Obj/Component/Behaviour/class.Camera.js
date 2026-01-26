@@ -33,16 +33,7 @@ class Camera extends Behaviour {
         });
     }
 
-    OnPreCull() { // co renderować
-        const object = this;
-        if (this.parentCamera) return this.renderables = this.parentCamera.renderables;
-
-        const planes = GeometryUtility.CalculateFrustumPlanes(this);
-        this.renderables = object.scene.renderables.filter(function (component) {
-            return GeometryUtility.TestPlanesAABB(planes, component.bounds);
-        });
-    }
-    OnPreRender() { // jak renderować
+    Update() {
         this.aspect = (Graphics.Width * this.rect.width) / (Graphics.Height * this.rect.height);
 
         Matrix4x4.Inverse(this.transform.matrix4x4, this.viewMatrix);
@@ -58,12 +49,15 @@ class Camera extends Behaviour {
             48: this.inverseViewMatrix,
             64: this.inverseViewProjectionMatrix,
         });
-    }
-    OnPostRender() { // rysuj po renderze
-        //Rysowanie na GL
-    }
-    OnRenderImage(src, dst) { // post-processing
-        //Wyświetla obraz na ekranie
+
+        if (this.parentCamera) {
+            this.renderables = this.parentCamera.renderables;
+            this.SendMessage('OnPreCull')
+        } else {
+            const planes = GeometryUtility.CalculateFrustumPlanes(this);
+            this.renderables = this.scene.renderables.filter(c => GeometryUtility.TestPlanesAABB(planes, c.bounds));
+            this.SendMessage('OnPreCull')
+        }
     }
 
     ScreenPointToRay(position) {

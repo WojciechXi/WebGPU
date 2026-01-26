@@ -152,22 +152,16 @@ class Graphics {
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;
 
+        for (let camera of scene.cameras) camera.SendMessage("OnPreRender");
+
         const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
-
-        for (let component of scene.renderables) if (component.OnPreRender) component.OnPreRender();
-        for (let component of scene.directionalLights) if (component.OnPreRender) component.OnPreRender();
-
-        for (let component of scene.cameras) if (component.OnPreCull) component.OnPreCull();
-        for (let component of scene.cameras) if (component.OnPreRender) component.OnPreRender();
 
         if (this.shadowRenderPass) this.shadowRenderPass.Render(scene.cameras, scene, commandEncoder);
         this.RenderCameras(scene.cameras, scene, commandEncoder);
 
-        for (let component of scene.cameras) if (component.OnPostRender) component.OnPostRender();
-        for (let component of scene.directionalLights) if (component.OnPostRender) component.OnPostRender();
-        for (let component of scene.renderables) if (component.OnPostRender) component.OnPostRender();
-
         GPU.Queue.submit([commandEncoder.finish()]);
+
+        for (let camera of scene.cameras) camera.SendMessage("OnPostRender");
     }
 
     static RenderCameras(cameras, scene, commandEncoder) {

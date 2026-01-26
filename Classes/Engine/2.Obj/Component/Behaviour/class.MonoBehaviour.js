@@ -60,9 +60,6 @@ class MonoBehaviour extends Behaviour {
     // OnParticleSystemStopped() { }
     // OnParticleTrigger() { }
     // OnParticleUpdateJobScheduled() { }
-    // OnPostRender() { }
-    // OnPreCull() { }
-    // OnPreRender() { }
     // OnRenderImage() { }
     // OnRenderObject() { }
     // OnTransformChildrenChanged() { }

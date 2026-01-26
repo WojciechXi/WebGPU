@@ -1,19 +1,21 @@
 class Collider extends Component {
 
     Init() {
-        this.center = Vector3.zero;
-
         this.isTrigger = false; // Jeśli true, kolizja nie wpływa fizycznie
         this._collidingWith = new Set(); // set aktualnych kolizji
     }
 
-    get localBounds() { return new Bounds(this.center.Clone(), this.size.Clone()); }
-    get bounds() { return new Bounds(Vector3.Add(this.transform.position, this.center), Vector3.zero); }
-    get worldCenter() { return this.transform.TransformPoint(this.center); }
+    get localBounds() { return new Bounds(Vector3.zero, Vector3.zero); }
+    get bounds() { return new Bounds(this.transform.position, Vector3.zero); }
+    get worldCenter() { return Vector3.zero; }
 
-    // OnCollisionEnter(otherCollider) { }
-    // OnCollisionStay(otherCollider) { }
-    // OnCollisionExit(otherCollider) { }
+    // Messages
+    // OnCollisionEnter(collision) { }
+    // OnCollisionStay(collision) { }
+    // OnCollisionExit(collision) { }
+    // OnTriggerEnter(collider) { }
+    // OnTriggerExit(collider) { }
+    // OnTriggerStay(collider) { }
 
     Intersects(otherCollider) {
         return false;

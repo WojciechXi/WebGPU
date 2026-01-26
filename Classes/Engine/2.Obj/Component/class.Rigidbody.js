@@ -39,6 +39,11 @@ class Rigidbody extends Component {
         this._isSleeping = false;
     }
 
+    // Messages
+    // OnCollisionEnter(collision) { }
+    // OnCollisionExit(collision) { }
+    // OnCollisionStay(collision) { }
+
     OnEnable() {
         this.collider = this.GetComponent(Collider);
     }
