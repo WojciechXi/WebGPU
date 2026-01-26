@@ -31,7 +31,7 @@ class Test extends MonoBehaviour {
             if (hits.length) {
                 const meshRenderer = hits[0].GetComponent(MeshRenderer);
                 if (meshRenderer) {
-                    meshRenderer.materials[0].color = new Color32(Random.Range(0, 1), Random.Range(0, 1), Random.Range(0, 1));
+                    meshRenderer.materials[0].color = new Color32(Random.Range(0, 0.5), Random.Range(0, 0.5), Random.Range(0, 0.5));
                 }
             }
         }

@@ -36,14 +36,14 @@ class GeometryUtility {
     }
 
     static CalculateFrustumPlanes(camera) {
-        const m = camera.viewProjectionMatrix;
+        const vpm = camera.viewProjectionMatrix;
         return [
-            Plane.FromInNormalDistance(new Vector3(m[3] + m[0], m[7] + m[4], m[11] + m[8]), m[15] + m[12]), // Left
-            Plane.FromInNormalDistance(new Vector3(m[3] - m[0], m[7] - m[4], m[11] - m[8]), m[15] - m[12]), // Right
-            Plane.FromInNormalDistance(new Vector3(m[3] + m[1], m[7] + m[5], m[11] + m[9]), m[15] + m[13]), // Bottom
-            Plane.FromInNormalDistance(new Vector3(m[3] - m[1], m[7] - m[5], m[11] - m[9]), m[15] - m[13]), // Top
-            Plane.FromInNormalDistance(new Vector3(m[2], m[6], m[10]), m[14]),                              // Near
-            Plane.FromInNormalDistance(new Vector3(m[3] - m[2], m[7] - m[6], m[11] - m[10]), m[15] - m[14]) // Far
+            Plane.FromInNormalDistance(new Vector3(vpm[3] + vpm[0], vpm[7] + vpm[4], vpm[11] + vpm[8]), vpm[15] + vpm[12]), // Left
+            Plane.FromInNormalDistance(new Vector3(vpm[3] - vpm[0], vpm[7] - vpm[4], vpm[11] - vpm[8]), vpm[15] - vpm[12]), // Right
+            Plane.FromInNormalDistance(new Vector3(vpm[3] + vpm[1], vpm[7] + vpm[5], vpm[11] + vpm[9]), vpm[15] + vpm[13]), // Bottom
+            Plane.FromInNormalDistance(new Vector3(vpm[3] - vpm[1], vpm[7] - vpm[5], vpm[11] - vpm[9]), vpm[15] - vpm[13]), // Top
+            Plane.FromInNormalDistance(new Vector3(vpm[2], vpm[6], vpm[10]), vpm[14]),                              // Near
+            Plane.FromInNormalDistance(new Vector3(vpm[3] - vpm[2], vpm[7] - vpm[6], vpm[11] - vpm[10]), vpm[15] - vpm[14]) // Far
         ];
     }
 
@@ -55,11 +55,9 @@ class GeometryUtility {
             const plane = planes[i];
             const normal = plane.normal;
 
-            const px = normal.x >= 0 ? max.x : min.x;
-            const py = normal.y >= 0 ? max.y : min.y;
-            const pz = normal.z >= 0 ? max.z : min.z;
+            const point = new Vector3(normal.x >= 0 ? max.x : min.x, normal.y >= 0 ? max.y : min.y, normal.z >= 0 ? max.z : min.z);
 
-            if (plane.GetDistanceToPoint({ x: px, y: py, z: pz }) < 0) return false;
+            if (plane.GetDistanceToPoint(point) < 0) return false;
         }
 
         return true;
