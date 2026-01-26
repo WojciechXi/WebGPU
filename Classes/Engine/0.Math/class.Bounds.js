@@ -92,7 +92,9 @@ class Bounds extends Float32Array {
     }
 
     SetMinMax(min, max) {
-        return null;
+        this.center = Vector3.Multiply(Vector3.Add(min, max), 0.5);
+        this.extents = Vector3.Subtract(max, min).Divide(2);
+        return this;
     }
 
     SqrDistance(point) {

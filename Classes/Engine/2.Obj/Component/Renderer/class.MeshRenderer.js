@@ -28,7 +28,7 @@ class MeshRenderer extends Renderer {
 
     get localBounds() {
         if (!this.mesh) return super.bounds;
-        return new Bounds(this.mesh.bounds.center.Clone(), this.mesh.bounds.extents.Clone());
+        return new Bounds(this.mesh.bounds.center.Clone(), this.mesh.bounds.size);
     }
     get bounds() {
         if (!this.mesh) return super.bounds;

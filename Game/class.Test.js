@@ -24,8 +24,9 @@ class Test extends MonoBehaviour {
         position = Vector3.Add(position, Vector3.Multiply(this.transform.right, this.move.x * Time.deltaTime * 5));
         this.transform.position = position;
 
-        if (Input.GetKeyDown(0)) {
-            const ray = this.camera.ScreenPointToRay(Input.mousePosition);
+        if (Input.GetKey(0)) {
+            // const ray = this.camera.ScreenPointToRay(Input.mousePosition);
+            const ray = new Ray(this.transform.position, this.transform.forward);
             const hits = Physics.Raycast(ray, 10);
             if (hits.length) {
                 const meshRenderer = hits[0].GetComponent(MeshRenderer);

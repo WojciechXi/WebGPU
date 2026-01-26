@@ -18,20 +18,19 @@ class BoxCollider extends Collider {
         return new Bounds(this.center.Clone(), this.size.Clone());
     }
     get bounds() {
-        const c = this.center;
         const hx = this.size.x / 2;
         const hy = this.size.y / 2;
         const hz = this.size.z / 2;
 
         const worldPoints = this.transform.TransformPoints([
-            new Vector3(c.x + hx, c.y + hy, c.z + hz),
-            new Vector3(c.x + hx, c.y + hy, c.z - hz),
-            new Vector3(c.x + hx, c.y - hy, c.z + hz),
-            new Vector3(c.x + hx, c.y - hy, c.z - hz),
-            new Vector3(c.x - hx, c.y + hy, c.z + hz),
-            new Vector3(c.x - hx, c.y + hy, c.z - hz),
-            new Vector3(c.x - hx, c.y - hy, c.z + hz),
-            new Vector3(c.x - hx, c.y - hy, c.z - hz),
+            new Vector3(this.center.x + hx, this.center.y + hy, this.center.z + hz),
+            new Vector3(this.center.x + hx, this.center.y + hy, this.center.z - hz),
+            new Vector3(this.center.x + hx, this.center.y - hy, this.center.z + hz),
+            new Vector3(this.center.x + hx, this.center.y - hy, this.center.z - hz),
+            new Vector3(this.center.x - hx, this.center.y + hy, this.center.z + hz),
+            new Vector3(this.center.x - hx, this.center.y + hy, this.center.z - hz),
+            new Vector3(this.center.x - hx, this.center.y - hy, this.center.z + hz),
+            new Vector3(this.center.x - hx, this.center.y - hy, this.center.z - hz),
         ]);
 
         const min = Vector3.positiveInfinity;
@@ -101,7 +100,7 @@ class BoxCollider extends Collider {
         const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
 
         let localBounds = this.localBounds;
-        let matrix = Matrix4x4.TRS(localBounds.center, this.transform.rotation, localBounds.size);
+        let matrix = Matrix4x4.TRS(Vector3.Add(this.transform.position, localBounds.center), this.transform.rotation, localBounds.size);
         renderPass.DrawMesh(cube.meshes[0], 0, matrix);
 
         let bounds = this.bounds;

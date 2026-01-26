@@ -1,48 +1,72 @@
 class CapsuleCollider extends Collider {
 
-    static ClosestPointOnSegment(a, b, p) {
-        const ab = Vector3.Subtract(b, a);
-        const t = (Vector3.Subtract(p, a)).Dot(ab) / ab.Dot(ab);
-        const clampedT = Mathf.Max(0, Mathf.Min(1, t));
-        return Vector3.Add(a, Vector3.Multiply(ab, clampedT));
-    }
-
-
     Init() {
         super.Init();
         this.radius = 0.5;
         this.height = 2.0; // odległość między końcami kapsuły
     }
 
+    get bottom() { return Vector3.Sub(this.center, new Vector3(0, this.height / 2 - this.radius, 0)); }
+    get top() { return Vector3.Add(this.center, new Vector3(0, this.height / 2 - this.radius, 0)); }
+
+    get localBounds() { return new Bounds(this.center, new Vector3(this.radius * 2, this.height, this.radius * 2)); }
     get bounds() {
-        return new Bounds(this.worldCenter, new Vector3(this.radius * 2, this.height, this.radius * 2));
+        const hx = this.radius;
+        const hy = this.height / 2;
+        const hz = this.radius;
+
+        const worldPoints = this.transform.TransformPoints([
+            new Vector3(this.center.x + hx, this.center.y + hy, this.center.z + hz),
+            new Vector3(this.center.x + hx, this.center.y + hy, this.center.z - hz),
+            new Vector3(this.center.x + hx, this.center.y - hy, this.center.z + hz),
+            new Vector3(this.center.x + hx, this.center.y - hy, this.center.z - hz),
+            new Vector3(this.center.x - hx, this.center.y + hy, this.center.z + hz),
+            new Vector3(this.center.x - hx, this.center.y + hy, this.center.z - hz),
+            new Vector3(this.center.x - hx, this.center.y - hy, this.center.z + hz),
+            new Vector3(this.center.x - hx, this.center.y - hy, this.center.z - hz),
+        ]);
+
+        const min = Vector3.positiveInfinity;
+        const max = Vector3.negativeInfinity;
+
+        for (const v of worldPoints) {
+            if (v.x < min.x) min.x = v.x;
+            if (v.y < min.y) min.y = v.y;
+            if (v.z < min.z) min.z = v.z;
+
+            if (v.x > max.x) max.x = v.x;
+            if (v.y > max.y) max.y = v.y;
+            if (v.z > max.z) max.z = v.z;
+        }
+
+        return Bounds.FromMinMax(min, max);
     }
 
     // Punkty końcowe kapsuły w world space
-    GetTop() {
-        return Vector3.Add(this.worldCenter, new Vector3(0, this.height * 0.5, 0));
+    GetWorldTop() {
+        return Vector3.Add(this.worldCenter, new Vector3(0, this.height / 2, 0));
     }
 
-    GetBottom() {
-        return Vector3.Add(this.worldCenter, new Vector3(0, -this.height * 0.5, 0));
+    GetWorldBottom() {
+        return Vector3.Sub(this.worldCenter, new Vector3(0, this.height / 2, 0));
     }
 
     Intersects(otherCollider) {
         if (otherCollider instanceof SphereCollider) {
             // Najbliższy punkt segmentu kapsuły do sfery
             const position = otherCollider.transform.position;
-            const top = this.GetTop();
-            const bottom = this.GetBottom();
+            const top = this.GetWorldTop();
+            const bottom = this.GetWorldBottom();
             const closest = CapsuleCollider.ClosestPointOnSegment(bottom, top, position);
             const delta = Vector3.Subtract(position, closest);
 
             return delta.SqrMagnitude() <= otherCollider.radius * otherCollider.radius;
         } else if (otherCollider instanceof CapsuleCollider) {
             // Prosta kolizja capsule-capsule: dystans między segmentami < sum radius
-            const aTop = this.GetTop();
-            const aBottom = this.GetBottom();
-            const bTop = otherCollider.GetTop();
-            const bBottom = otherCollider.GetBottom();
+            const aTop = this.GetWorldTop();
+            const aBottom = this.GetWorldBottom();
+            const bTop = otherCollider.GetWorldTop();
+            const bBottom = otherCollider.GetWorldBottom();
 
             const closestA = CapsuleCollider.ClosestPointOnSegment(aBottom, aTop, bBottom);
             const closestB = CapsuleCollider.ClosestPointOnSegment(bBottom, bTop, closestA);
@@ -60,15 +84,9 @@ class CapsuleCollider extends Collider {
             const position = this.transform.position;
             const otherColliderPosition = otherCollider.transform.position;
 
-            const p1a = Vector3.Add(position, new Vector3(0, this.height / 2 - this.radius, 0));
-            const p2a = Vector3.Subtract(position, new Vector3(0, this.height / 2 - this.radius, 0));
-
-            const p1b = Vector3.Add(otherColliderPosition, new Vector3(0, otherCollider.height / 2 - otherCollider.radius, 0));
-            const p2b = Vector3.Subtract(otherColliderPosition, new Vector3(0, otherCollider.height / 2 - otherCollider.radius, 0));
-
             // najbliższe punkty między odcinkami
-            const closestA = Vector3.ClosestPointOnSegment(p1a, p2a, otherColliderPosition);
-            const closestB = Vector3.ClosestPointOnSegment(p1b, p2b, position);
+            const closestA = Vector3.ClosestPointOnSegment(this.top, this.bottom, otherColliderPosition);
+            const closestB = Vector3.ClosestPointOnSegment(otherCollider.top, otherCollider.bottom, position);
 
             const delta = Vector3.Subtract(closestA, closestB);
             const dist = delta.Magnitude();
@@ -101,6 +119,26 @@ class CapsuleCollider extends Collider {
         const discriminant = b * b - 4 * a * c;
 
         return discriminant >= 0;
+    }
+
+    ClosestPointOnSegment(position) { return CapsuleCollider.ClosestPointOnSegment(this.top, this.bottom, position); }
+    static ClosestPointOnSegment(top, bottom, position) {
+        const ab = Vector3.Subtract(bottom, top);
+        const t = (Vector3.Subtract(position, top)).Dot(ab) / ab.Dot(ab);
+        const clampedT = Mathf.Max(0, Mathf.Min(1, t));
+        return Vector3.Add(top, Vector3.Multiply(ab, clampedT));
+    }
+
+    OnDrawGizmos(renderPass, camera) {
+        const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
+
+        let localBounds = this.localBounds;
+        let matrix = Matrix4x4.TRS(Vector3.Add(this.transform.position, localBounds.center), this.transform.rotation, localBounds.size);
+        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
+
+        let bounds = this.bounds;
+        matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
+        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
     }
 
 }

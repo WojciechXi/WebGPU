@@ -54,7 +54,8 @@ window.addEventListener('DOMContentLoaded', async function (event) {
 
             const directionalLightGameObject = new GameObject('Directional Light');
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
-            directionalLightGameObject.AddComponent(Test2);
+            const test2 = directionalLightGameObject.AddComponent(Test2);
+            test2.turn.x = 30;
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
             directionalLight.color.Set(1, 1, 1, 0.75);
             engine.scene.directionalLight = directionalLight;
@@ -73,8 +74,8 @@ window.addEventListener('DOMContentLoaded', async function (event) {
 
             Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
                 const gameObject = new GameObject('Cube');
-                gameObject.transform.position = new Vector3(-2, 1, 0);
-                gameObject.transform.localScale = new Vector3(1, 3, 2);
+                gameObject.transform.position = new Vector3(2, 0, 0);
+                // gameObject.transform.localScale = new Vector3(1, 3, 2);
                 gameObject.AddComponent(Test2);
 
                 for (const mesh of gltf.meshes) {
@@ -90,8 +91,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
 
             Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
                 const gameObject = new GameObject('Sphere');
-                gameObject.transform.position = new Vector3(2, 1, 0);
-                gameObject.transform.localScale = new Vector3(1, 3, 2);
+                gameObject.transform.position = new Vector3(4, 0, 0);
                 gameObject.AddComponent(Test2);
 
                 for (const mesh of gltf.meshes) {
@@ -102,6 +102,22 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                     meshRenderer.materials = [materials.Emissive];
 
                     const sphereCollider = meshGameObject.AddComponent(SphereCollider);
+                }
+            });
+
+            Resources.Get('/Resources/Primitives/Capsule.gltf', function (gltf) {
+                const gameObject = new GameObject('Capsule');
+                gameObject.transform.position = new Vector3(6, 0, 0);
+                gameObject.AddComponent(Test2);
+
+                for (const mesh of gltf.meshes) {
+                    const meshGameObject = new GameObject(mesh.name);
+                    meshGameObject.transform.SetParent(gameObject.transform);
+                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [materials.Emissive];
+
+                    const capsuleCollider = meshGameObject.AddComponent(CapsuleCollider);
                 }
             });
 

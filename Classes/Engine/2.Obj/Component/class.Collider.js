@@ -7,12 +7,8 @@ class Collider extends Component {
         this._collidingWith = new Set(); // set aktualnych kolizji
     }
 
-    get worldCenter() {
-        return Vector3.Add(this.transform.position, Vector3.Scale(this.center, this.transform.scale));
-    }
-
     get bounds() {
-        return new Bounds(this.worldCenter, Vector3.zero);
+        return new Bounds(Vector3.Add(this.transform.position, this.center), Vector3.zero);
     }
 
     OnCollisionEnter(otherCollider) { }

@@ -2,22 +2,27 @@ class SphereCollider extends Collider {
 
     Init() {
         super.Init();
+        this.center.Clear();
         this.radius = 0.5;
     }
 
     get localBounds() {
-        return new Bounds(this.center.Clone(), new Vector3(this.radius, this.radius, this.radius));
+        return new Bounds(this.center.Clone(), new Vector3(this.radius * 2, this.radius * 2, this.radius * 2));
     }
     get bounds() {
+        const hx = this.radius;
+        const hy = this.radius;
+        const hz = this.radius;
+
         const worldPoints = this.transform.TransformPoints([
-            new Vector3(this.center.x + this.radius, this.center.y + this.radius, this.center.z + this.radius),
-            new Vector3(this.center.x + this.radius, this.center.y + this.radius, this.center.z - this.radius),
-            new Vector3(this.center.x + this.radius, this.center.y - this.radius, this.center.z + this.radius),
-            new Vector3(this.center.x + this.radius, this.center.y - this.radius, this.center.z - this.radius),
-            new Vector3(this.center.x - this.radius, this.center.y + this.radius, this.center.z + this.radius),
-            new Vector3(this.center.x - this.radius, this.center.y + this.radius, this.center.z - this.radius),
-            new Vector3(this.center.x - this.radius, this.center.y - this.radius, this.center.z + this.radius),
-            new Vector3(this.center.x - this.radius, this.center.y - this.radius, this.center.z - this.radius),
+            new Vector3(this.center.x + hx, this.center.y + hy, this.center.z + hz),
+            new Vector3(this.center.x + hx, this.center.y + hy, this.center.z - hz),
+            new Vector3(this.center.x + hx, this.center.y - hy, this.center.z + hz),
+            new Vector3(this.center.x + hx, this.center.y - hy, this.center.z - hz),
+            new Vector3(this.center.x - hx, this.center.y + hy, this.center.z + hz),
+            new Vector3(this.center.x - hx, this.center.y + hy, this.center.z - hz),
+            new Vector3(this.center.x - hx, this.center.y - hy, this.center.z + hz),
+            new Vector3(this.center.x - hx, this.center.y - hy, this.center.z - hz),
         ]);
 
         const min = Vector3.positiveInfinity;
@@ -111,7 +116,7 @@ class SphereCollider extends Collider {
 
     Raycast(ray, maxDistance) {
         const localRay = this.transform.InverseTransformRay(ray);
-        return this.localBounds.IntersectRay(localRay);
+        // return this.localBounds.IntersectRay(localRay);
 
         const a = Vector3.Dot(localRay.direction, localRay.direction);          // = 1
         const b = 2 * Vector3.Dot(localRay.origin, localRay.direction);
@@ -131,12 +136,11 @@ class SphereCollider extends Collider {
     }
 
     OnDrawGizmos(renderPass, camera) {
-        const sphere = Resources.Get('/Resources/Primitives/Sphere.gltf');
-        let localBounds = this.localBounds;
-        let matrix = Matrix4x4.TRS(localBounds.center, this.transform.rotation, localBounds.size);
-        renderPass.DrawMesh(sphere.meshes[0], 0, matrix);
-
         const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
+
+        let localBounds = this.localBounds;
+        let matrix = Matrix4x4.TRS(Vector3.Add(this.transform.position, localBounds.center), this.transform.rotation, localBounds.size);
+        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
 
         let bounds = this.bounds;
         matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);

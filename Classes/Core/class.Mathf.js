@@ -18,7 +18,7 @@ class Mathf {
 
     //Unity
 
-    static Abs() { }
+    static Abs(x) { return Math.abs(x); }
     static Acos(x) { return Math.acos(x); }
     static Approximately() { }
     static Asin(x) { return Math.asin(x); }

@@ -1,7 +1,7 @@
 class Test2 extends MonoBehaviour {
 
     Init() {
-        this.turn = new Vector3(30, 45, 0);
+        this.turn = new Vector3(0, 0, 0);
     }
 
     OnEnable() {
