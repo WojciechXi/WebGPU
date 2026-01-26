@@ -84,6 +84,9 @@ class CapsuleCollider extends Collider {
     }
 
     Raycast(ray, maxDistance) {
+        const localRay = this.transform.InverseTransformRay(ray);
+        return this.localBounds.IntersectRay(localRay);
+
         const position = this.transform.position;
 
         const p1a = Vector3.Add(position, new Vector3(0, this.height / 2 - this.radius, 0));

@@ -6,7 +6,7 @@ class SphereCollider extends Collider {
     }
 
     get localBounds() {
-        return new Bounds(this.center.Clone(), Vector3.Multiply(Vector3.one, this.radius));
+        return new Bounds(this.center.Clone(), new Vector3(this.radius, this.radius, this.radius));
     }
     get bounds() {
         const worldPoints = this.transform.TransformPoints([
@@ -110,9 +110,8 @@ class SphereCollider extends Collider {
     }
 
     Raycast(ray, maxDistance) {
-        return this.bounds.IntersectRay(ray);
-
-        const localRay = new Ray(this.transform.InverseTransformPoint(ray.origin), this.transform.InverseTransformDirection(ray.direction).Normalize());
+        const localRay = this.transform.InverseTransformRay(ray);
+        return this.localBounds.IntersectRay(localRay);
 
         const a = Vector3.Dot(localRay.direction, localRay.direction);          // = 1
         const b = 2 * Vector3.Dot(localRay.origin, localRay.direction);

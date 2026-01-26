@@ -93,13 +93,7 @@ class BoxCollider extends Collider {
     }
 
     Raycast(ray, maxDistance) {
-        return this.bounds.IntersectRay(ray);
-
-        const localRay = new Ray(
-            this.transform.InverseTransformPoint(ray.origin),
-            this.transform.InverseTransformDirection(ray.direction)
-        );
-
+        const localRay = this.transform.InverseTransformRay(ray);
         return this.localBounds.IntersectRay(localRay);
     }
 

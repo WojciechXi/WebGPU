@@ -46,9 +46,7 @@ class Quaternion extends Float32Array {
         return dst;
     }
 
-    Inverse() {
-        return Quaternion.Inverse(this, this);
-    }
+    Inverse(dst = this) { return Quaternion.Inverse(this, dst); }
     static Inverse(q, dst = null) {
         dst = dst || new Quaternion();
 
@@ -210,7 +208,7 @@ class Quaternion extends Float32Array {
     }
 
     static FromEuler(x, y, z, dst = null) {
-        dst = dst || Quaternion.Identity();
+        dst = dst || Quaternion.identity;
 
         x = Mathf.DegToRad(x);
         y = Mathf.DegToRad(y);

@@ -118,4 +118,7 @@ class Transform extends Component {
         //Todo set new position
     }
 
+    TransformRay(localRay) { return new Ray(this.TransformPoint(localRay.origin), this.TransformDirection(localRay.direction)); }
+    InverseTransformRay(worldRay) { return new Ray(this.InverseTransformPoint(worldRay.origin), this.InverseTransformDirection(worldRay.direction)); }
+
 }
