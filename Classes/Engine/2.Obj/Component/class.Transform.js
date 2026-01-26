@@ -106,16 +106,10 @@ class Transform extends Component {
     TransformDirections(directions) { return directions.map(d => this.TransformDirection(d)); }
 
     TransformPoint(point) {
-        //Todo rekurencyjnie
-        const position = this.position;
-        const rotation = this.rotation;
-        const scale = this.scale;
-
-        const newPoint = Vector3.Scale(point, scale);
-        Quaternion.MultiplyVector3(rotation, newPoint, newPoint);
-        newPoint.Add(position);
-
-        return this.parent ? this.parent.TransformPoint(newPoint) : newPoint;
+        const newPoint = Vector3.Scale(point, this.scale);
+        Quaternion.MultiplyVector3(this.rotation, newPoint, newPoint);
+        newPoint.Add(this.position);
+        return newPoint;
     }
     TransformPoints(points) { return points.map(p => this.TransformPoint(p)); }
 

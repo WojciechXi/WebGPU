@@ -119,6 +119,35 @@ class Graphics {
         });
     }
 
+    static set Preview(value) {
+        switch (value) {
+            case 1:
+                this.screenRenderPass.renderTexture = this.tonemappingRenderPass.sceneRenderTexture;
+                return;
+            case 2:
+                this.screenRenderPass.renderTexture = this.bloomRenderPass.bloomRenderTexture;
+                return;
+            case 3:
+                this.screenRenderPass.renderTexture = this.lightingRenderPass.sceneRenderTexture;
+                return;
+            case 4:
+                this.screenRenderPass.renderTexture = this.gBufferRenderPass.positionRenderTexture;
+                return;
+            case 5:
+                this.screenRenderPass.renderTexture = this.gBufferRenderPass.normalRenderTexture;
+                return;
+            case 6:
+                this.screenRenderPass.renderTexture = this.gBufferRenderPass.colorRenderTexture;
+                return;
+            case 7:
+                this.screenRenderPass.renderTexture = this.gBufferRenderPass.depthRenderTexture;
+                return;
+            case 8:
+                this.screenRenderPass.renderTexture = this.shadowRenderPass.depthRenderTexture;
+                return;
+        }
+    }
+
     static Render(scene) {
         this.canvas.width = this.canvas.clientWidth;
         this.canvas.height = this.canvas.clientHeight;

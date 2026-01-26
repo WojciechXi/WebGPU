@@ -73,6 +73,7 @@ class Shader extends Obj {
                         { format: "rgba8unorm" }, // viewNormalTexture
 
                         { format: "rgba16float" }, // colorTexture
+                        { format: "rgba16float" }, // emissiveTexture
                         { format: "rgba8unorm" }, // pbrTexture
                     ]
                 },

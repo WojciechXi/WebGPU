@@ -34,6 +34,7 @@ class LightingRenderPass extends RenderPass {
                             { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
                             { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
                             { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                            { binding: 6, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
                         ],
                     }),
                 ],
@@ -66,8 +67,9 @@ class LightingRenderPass extends RenderPass {
                 this.gBufferRenderPass.positionRenderTexture.GetBindGroupEntry(1),
                 this.gBufferRenderPass.normalRenderTexture.GetBindGroupEntry(2),
                 this.gBufferRenderPass.colorRenderTexture.GetBindGroupEntry(3),
-                this.gBufferRenderPass.pbrRenderTexture.GetBindGroupEntry(4),
-                this.shadowRenderPass.depthRenderTexture.GetBindGroupEntry(5),
+                this.gBufferRenderPass.emissiveRenderTexture.GetBindGroupEntry(4),
+                this.gBufferRenderPass.pbrRenderTexture.GetBindGroupEntry(5),
+                this.shadowRenderPass.depthRenderTexture.GetBindGroupEntry(6),
             ],
         });
     }

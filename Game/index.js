@@ -34,6 +34,13 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                 shader: litShader,
             });
 
+            materials.Emissive = new Material({
+                name: 'Emissive',
+                color: Color32.red,
+                emissive: new Color32(10, 0, 0),
+                shader: litShader,
+            });
+
             materials.Glass = new Material({
                 name: 'Glass',
                 color: Color32.red,
@@ -64,22 +71,19 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             // camera.rect.x = 0.5;
             // camera.rect.width = 0.5;
 
-            // Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
-            //     const gameObject = new GameObject('Cube');
-            //     gameObject.transform.localScale.Scale(new Vector3(1, 2, 3));
-            //     gameObject.AddComponent(Test2);
-            //     gameObject.AddComponent(BoxCollider);
+            Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
+                const gameObject = new GameObject('Cube');
+                gameObject.transform.position = new Vector3(-4, 1, -5);
 
-            //     for (const mesh of gltf.meshes) {
-            //         const meshGameObject = new GameObject(mesh.name);
-            //         meshGameObject.transform.SetParent(gameObject.transform);
-            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [materials.Default];
-
-            //         // const boxCollider = meshGameObject.AddComponent(BoxCollider);
-            //     }
-            // });
+                for (const mesh of gltf.meshes) {
+                    const meshGameObject = new GameObject(mesh.name);
+                    meshGameObject.transform.SetParent(gameObject.transform);
+                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [materials.Emissive];
+                    meshGameObject.AddComponent(Test2);
+                }
+            });
 
             // Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
             //     const gameObject = new GameObject('Sphere');

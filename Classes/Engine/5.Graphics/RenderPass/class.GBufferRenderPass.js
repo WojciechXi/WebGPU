@@ -6,6 +6,7 @@ class GBufferRenderPass extends RenderPass {
         this.positionRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
         this.normalRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba8unorm', });
         this.colorRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
+        this.emissiveRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
         this.pbrRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba8unorm', });
 
         this.depthRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'depth24plus', depth: true, });
@@ -16,7 +17,8 @@ class GBufferRenderPass extends RenderPass {
             colorAttachments: [
                 this.positionRenderTexture.GetColorAttachment(),
                 this.normalRenderTexture.GetColorAttachment(),
-                this.colorRenderTexture.GetColorAttachment('clear', 'store', scene.ambientLight.color),
+                this.colorRenderTexture.GetColorAttachment('clear', 'store', [scene.ambientLight.color.r, scene.ambientLight.color.g, scene.ambientLight.color.b, 1]),
+                this.emissiveRenderTexture.GetColorAttachment(),
                 this.pbrRenderTexture.GetColorAttachment(),
             ],
             depthStencilAttachment: this.depthRenderTexture.GetDepthStencilAttachment(),

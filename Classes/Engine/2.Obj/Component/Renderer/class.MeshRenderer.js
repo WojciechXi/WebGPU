@@ -31,6 +31,7 @@ class MeshRenderer extends Renderer {
         return new Bounds(this.mesh.bounds.center.Clone(), this.mesh.bounds.extents.Clone());
     }
     get bounds() {
+        if (!this.mesh) return super.bounds;
         const lb = this.mesh.bounds;
         const c = lb.center;
         const hx = lb.extents.x;

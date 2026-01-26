@@ -9,7 +9,8 @@ class Material extends Obj {
         this.name = data.name ?? 'Material';
         this.shader = data.shader ?? '';
 
-        this.color = data.color ?? Color.white;
+        this.color = data.color ?? Color32.white;
+        this.emissive = data.emissive ?? new Color32(0, 0, 0, 0);
 
         this.roughness = data.roughness ?? 1;
         this.metallic = data.metallic ?? 1;
@@ -25,13 +26,13 @@ class Material extends Obj {
         });
 
         this.textures = {};
-        this.SetTexture('albedo', data.albedo ?? Color.white);
-        this.SetTexture('normal', new Color(0.5, 0.5, 1, 1));
-        this.SetTexture('roughness', Color.white);
-        this.SetTexture('metallic', Color.black);
-        this.SetTexture('occlusion', Color.white);
+        this.SetTexture('albedo', data.albedo ?? Color32.white);
+        this.SetTexture('normal', new Color32(0.5, 0.5, 1, 1));
+        this.SetTexture('roughness', Color32.white);
+        this.SetTexture('metallic', Color32.black);
+        this.SetTexture('occlusion', Color32.white);
 
-        this.materialBuffer = new Buffer(4 + 4); //color, pbr
+        this.materialBuffer = new Buffer(4 + 4 + 4); //color, pbr
         this.materialBindGroup = GPU.CreateBindGroup({
             label: 'MaterialBindGroup',
             layout: Graphics.materialBindGroupLayout,
@@ -54,7 +55,7 @@ class Material extends Obj {
     }
 
     SetTexture(name, texture) {
-        if (texture instanceof Color) {
+        if (texture instanceof Color || texture instanceof Color32) {
             const width = 1;
             const height = 1;
 
@@ -108,7 +109,8 @@ class Material extends Obj {
         if (renderPipeline) {
             this.materialBuffer.Set({
                 0: this.color,
-                4: [this.roughness, this.metallic, this.occlusion, this.alphaCutoff],
+                4: this.emissive,
+                8: [this.roughness, this.metallic, this.occlusion, this.alphaCutoff],
             });
 
             renderPass.SetBindGroup(1, this.materialBindGroup);

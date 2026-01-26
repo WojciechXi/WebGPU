@@ -135,8 +135,9 @@ struct AmbientLight {
 @group(3) @binding(1) var worldPositionTexture : texture_2d<f32>;
 @group(3) @binding(2) var worldNormalTexture : texture_2d<f32>;
 @group(3) @binding(3) var colorTexture : texture_2d<f32>;
-@group(3) @binding(4) var pbrTexture : texture_2d<f32>;
-@group(3) @binding(5) var shadowTexture : texture_2d<f32>;
+@group(3) @binding(4) var emissiveTexture : texture_2d<f32>;
+@group(3) @binding(5) var pbrTexture : texture_2d<f32>;
+@group(3) @binding(6) var shadowTexture : texture_2d<f32>;
 
 struct VSOut {
   @builtin(position) pos : vec4f,
@@ -163,12 +164,12 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let worldPosition4 = textureSample(worldPositionTexture, screenSampler, vsOut.uv);
     let worldNormal = normalize(textureSample(worldNormalTexture, screenSampler, vsOut.uv).xyz * 2.0 - 1.0);
     let color = textureSample(colorTexture, screenSampler, vsOut.uv);
+    let emissive = textureSample(emissiveTexture, screenSampler, vsOut.uv);
 
     let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv);
     let roughness = clamp(pbr.r, 0.01, 0.5);
     let metallic  = clamp(pbr.g, 0.0, 1.0);
     let occlusion = clamp(pbr.b, 0.0, 1.0);
-    let emission  = clamp(pbr.a, 0.0, 1.0);
     
     // --- konwersja pozycji ---
     let worldPosition = worldPosition4.xyz / max(worldPosition4.w, 1e-6);
@@ -217,8 +218,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let diffuse  = color.rgb * lightColor * diff * shadowVal;
     let specular = F0 * spec * (1.0 - roughness) * shadowVal;
     let ambient  = ambientColor * color.rgb * occlusion;
-    let emissive = color.rgb * emission;
 
     // --- końcowy kolor ---
-    return vec4f(ambient + diffuse + specular + emissive, 1.0);
+    return vec4f(ambient + diffuse + specular + emissive.rgb, 1.0);
 }
