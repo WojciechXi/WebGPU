@@ -14,7 +14,7 @@ class SphereCollider extends Collider {
         const hy = this.radius;
         const hz = this.radius;
 
-        const worldPoints = this.transform.TransformPoints([
+        return GeometryUtility.CalculateBounds([
             new Vector3(this.center.x + hx, this.center.y + hy, this.center.z + hz),
             new Vector3(this.center.x + hx, this.center.y + hy, this.center.z - hz),
             new Vector3(this.center.x + hx, this.center.y - hy, this.center.z + hz),
@@ -23,28 +23,11 @@ class SphereCollider extends Collider {
             new Vector3(this.center.x - hx, this.center.y + hy, this.center.z - hz),
             new Vector3(this.center.x - hx, this.center.y - hy, this.center.z + hz),
             new Vector3(this.center.x - hx, this.center.y - hy, this.center.z - hz),
-        ]);
-
-        const min = Vector3.positiveInfinity;
-        const max = Vector3.negativeInfinity;
-
-        for (const v of worldPoints) {
-            if (v.x < min.x) min.x = v.x;
-            if (v.y < min.y) min.y = v.y;
-            if (v.z < min.z) min.z = v.z;
-
-            if (v.x > max.x) max.x = v.x;
-            if (v.y > max.y) max.y = v.y;
-            if (v.z > max.z) max.z = v.z;
-        }
-
-        return Bounds.FromMinMax(min, max);
+        ], this.transform.matrix4x4);
     }
 
     Intersects(otherCollider) {
-        if (otherCollider instanceof TerrainCollider) {
-            return otherCollider.Intersects(this);
-        } else if (otherCollider instanceof SphereCollider) {
+        if (otherCollider instanceof SphereCollider) {
             const worldCenter = this.worldCenter;
             const otherColliderWorldCenter = otherCollider.worldCenter;
 
@@ -118,7 +101,7 @@ class SphereCollider extends Collider {
         const localRay = this.transform.InverseTransformRay(ray);
         // return this.localBounds.IntersectRay(localRay);
 
-        const a = Vector3.Dot(localRay.direction, localRay.direction);          // = 1
+        const a = Vector3.Dot(localRay.direction, localRay.direction);
         const b = 2 * Vector3.Dot(localRay.origin, localRay.direction);
         const c = Vector3.Dot(localRay.origin, localRay.origin) - this.radius * this.radius;
 

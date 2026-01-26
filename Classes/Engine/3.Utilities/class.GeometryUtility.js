@@ -1,34 +1,38 @@
 class GeometryUtility {
 
     static CalculateBounds(positions, transform) {
-        if (!positions || positions.length === 0) return null;
+        if (!positions || positions.length === 0) return new Bounds(Vector3.zero, Vector3.zero);
 
-        let minX = Infinity, minY = Infinity, minZ = Infinity;
-        let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+        let min = Vector3.positiveInfinity;
+        let max = Vector3.negativeInfinity;
 
-        // Iterujemy co 3, aby pobierać punkty (x, y, z)
-        for (let i = 0; i < positions.length; i += 3) {
-            let x = positions[i];
-            let y = positions[i + 1];
-            let z = positions[i + 2];
+        for (let i = 0; i < positions.length; i++) {
+            let position = positions[i];
 
-            // Transformacja punktu przez macierz świata (jeśli transform istnieje)
+            let x = position.x;
+            let y = position.y;
+            let z = position.z;
+
             if (transform) {
                 const tx = transform[0] * x + transform[4] * y + transform[8] * z + transform[12];
                 const ty = transform[1] * x + transform[5] * y + transform[9] * z + transform[13];
                 const tz = transform[2] * x + transform[6] * y + transform[10] * z + transform[14];
-                x = tx; y = ty; z = tz;
+
+                x = tx;
+                y = ty;
+                z = tz;
             }
 
-            if (x < minX) minX = x; if (x > maxX) maxX = x;
-            if (y < minY) minY = y; if (y > maxY) maxY = y;
-            if (z < minZ) minZ = z; if (z > maxZ) maxZ = z;
+            if (x < min.x) min.x = x;
+            if (y < min.y) min.y = y;
+            if (z < min.z) min.z = z;
+
+            if (x > max.x) max.x = x;
+            if (y > max.y) max.y = y;
+            if (z > max.z) max.z = z;
         }
 
-        const center = new Vector3((minX + maxX) * 0.5, (minY + maxY) * 0.5, (minZ + maxZ) * 0.5);
-        const size = new Vector3(maxX - minX, maxY - minY, maxZ - minZ);
-
-        return new Bounds(center, size);
+        return Bounds.FromMinMax(min, max);
     }
 
     static CalculateFrustumPlanes(camera) {

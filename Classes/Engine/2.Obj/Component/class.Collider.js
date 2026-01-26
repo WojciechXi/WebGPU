@@ -7,9 +7,9 @@ class Collider extends Component {
         this._collidingWith = new Set(); // set aktualnych kolizji
     }
 
-    get bounds() {
-        return new Bounds(Vector3.Add(this.transform.position, this.center), Vector3.zero);
-    }
+    get localBounds() { return new Bounds(this.center.Clone(), this.size.Clone()); }
+    get bounds() { return new Bounds(Vector3.Add(this.transform.position, this.center), Vector3.zero); }
+    get worldCenter() { return this.transform.TransformPoint(this.center); }
 
     OnCollisionEnter(otherCollider) { }
     OnCollisionStay(otherCollider) { }
@@ -27,7 +27,8 @@ class Collider extends Component {
     ClosestPointOnBounds(position) { } // Todo
     GetGeometry() { } // Todo
     Raycast(ray, maxDistance) {
-        return null;
+        const localRay = this.transform.InverseTransformRay(ray);
+        return this.localBounds.IntersectRay(localRay);
     }
 
 }

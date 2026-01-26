@@ -28,7 +28,7 @@ fn vs(vert: Vertex) -> VSOut {
     let matrix = mat4x4<f32>(vert.m0, vert.m1, vert.m2, vert.m3);
 
     vsOut.clipPosition = view.viewProjection * matrix * vec4f(vert.position, 1.0);
-    vsOut.color = vec4f(1, 0, 0, 1);
+    vsOut.color = vec4f(0, 0.5, 0, 1);
 
     return vsOut;
 }

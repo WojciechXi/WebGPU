@@ -22,7 +22,7 @@ class BoxCollider extends Collider {
         const hy = this.size.y / 2;
         const hz = this.size.z / 2;
 
-        const worldPoints = this.transform.TransformPoints([
+        return GeometryUtility.CalculateBounds([
             new Vector3(this.center.x + hx, this.center.y + hy, this.center.z + hz),
             new Vector3(this.center.x + hx, this.center.y + hy, this.center.z - hz),
             new Vector3(this.center.x + hx, this.center.y - hy, this.center.z + hz),
@@ -31,31 +31,7 @@ class BoxCollider extends Collider {
             new Vector3(this.center.x - hx, this.center.y + hy, this.center.z - hz),
             new Vector3(this.center.x - hx, this.center.y - hy, this.center.z + hz),
             new Vector3(this.center.x - hx, this.center.y - hy, this.center.z - hz),
-        ]);
-
-        const min = Vector3.positiveInfinity;
-        const max = Vector3.negativeInfinity;
-
-        for (const v of worldPoints) {
-            if (v.x < min.x) min.x = v.x;
-            if (v.y < min.y) min.y = v.y;
-            if (v.z < min.z) min.z = v.z;
-
-            if (v.x > max.x) max.x = v.x;
-            if (v.y > max.y) max.y = v.y;
-            if (v.z > max.z) max.z = v.z;
-        }
-
-        return Bounds.FromMinMax(min, max);
-    }
-
-    Intersects(otherCollider) {
-        if (otherCollider instanceof BoxCollider) {
-            return this.bounds.Intersects(otherCollider.bounds);
-        } else if (otherCollider instanceof SphereCollider || otherCollider instanceof CapsuleCollider) {
-            return otherCollider.Intersects(this);
-        }
-        return false;
+        ], this.transform.matrix4x4);
     }
 
     ComputePenetration(otherCollider) {
@@ -91,9 +67,15 @@ class BoxCollider extends Collider {
         return null;
     }
 
-    Raycast(ray, maxDistance) {
-        const localRay = this.transform.InverseTransformRay(ray);
-        return this.localBounds.IntersectRay(localRay);
+    Intersects(otherCollider) {
+        if (otherCollider instanceof BoxCollider) {
+            if (this.bounds.Intersects(otherCollider.bounds)) { //AABB
+                return true; //OBB
+            }
+        } else if (otherCollider instanceof SphereCollider || otherCollider instanceof CapsuleCollider) {
+            return otherCollider.Intersects(this);
+        }
+        return false;
     }
 
     OnDrawGizmos(renderPass, camera) {

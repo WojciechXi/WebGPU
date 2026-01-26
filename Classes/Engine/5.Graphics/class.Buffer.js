@@ -1,9 +1,10 @@
 class Buffer {
 
-    constructor(size, data = { usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, }) {
+    constructor(size, data = { usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST }, type = Float32Array) {
         this.size = size;
         this.data = data;
-        this.values = new Float32Array(size);
+        this.type = type;
+        this.values = new (this.type)(size);
         this.buffer = GPU.CreateBuffer({
             size: size * 4,
             usage: this.data.usage ?? GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
@@ -13,7 +14,7 @@ class Buffer {
     Resize(newSize) {
         this.size = newSize;
         this.buffer.destroy();
-        this.values = new Float32Array(newSize);
+        this.values = new (this.type)(newSize);
         this.buffer = GPU.CreateBuffer({
             size: newSize * 4,
             usage: this.data.usage ?? GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,

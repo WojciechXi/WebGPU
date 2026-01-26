@@ -29,7 +29,7 @@ class RenderPass {
 
         this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
         this.SetVertexBuffer(1, matrixBuffer);
-        this.SetIndexBuffer(subMesh.triangleBuffer, 'uint32');
+        this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
         this.DrawIndexed(subMesh.triangles.length);
     }
 

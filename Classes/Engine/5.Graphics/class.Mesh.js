@@ -169,32 +169,7 @@ class Mesh extends Obj {
     }
 
     RecalculateBounds() {
-        if (this.vertices.length === 0) {
-            this.bounds.Set(Vector3.zero, Vector3.one);
-            return;
-        }
-
-        let min = new Vector3(
-            Number.POSITIVE_INFINITY,
-            Number.POSITIVE_INFINITY,
-            Number.POSITIVE_INFINITY
-        );
-
-        let max = new Vector3(
-            Number.NEGATIVE_INFINITY,
-            Number.NEGATIVE_INFINITY,
-            Number.NEGATIVE_INFINITY
-        );
-
-        for (let v of this.vertices) {
-            min = new Vector3(Mathf.Min(min.x, v.x), Mathf.Min(min.y, v.y), Mathf.Min(min.z, v.z));
-            max = new Vector3(Mathf.Max(max.x, v.x), Mathf.Max(max.y, v.y), Mathf.Max(max.z, v.z));
-        }
-
-        let center = Vector3.Multiply(Vector3.Add(min, max), 0.5);
-        let size = Vector3.Subtract(max, min);
-
-        this.bounds = new Bounds(center, size);
+        return this.bounds = GeometryUtility.CalculateBounds(this.vertices, Matrix4x4.Identity());
     }
 
 }
@@ -205,42 +180,22 @@ class SubMesh {
         this.material = data.material ?? null;
 
         this.triangles = new Uint32Array(data.triangles ?? 0);
+        this.edges = new Uint32Array(data.edges ?? 0);
 
-        this.triangleBuffer = GPU.CreateBuffer({
-            size: 0,
-            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
-        });
-
-        this.edgeBuffer = GPU.CreateBuffer({
-            size: 0,
-            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
-        });
+        this.triangleBuffer = new Buffer(0, { usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST }, Uint32Array);
+        this.edgeBuffer = new Buffer(0, { usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST }, Uint32Array);
     }
 
     Clear() {
         this.triangles = new Uint32Array(0);
-
-        if (this.triangleBuffer) this.triangleBuffer.destroy();
-        this.triangleBuffer = GPU.CreateBuffer({
-            size: 0,
-            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
-        });
-
-        if (this.edgeBuffer) this.edgeBuffer.destroy();
-        this.edgeBuffer = GPU.CreateBuffer({
-            size: 0,
-            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
-        });
+        this.edges = new Uint32Array(0);
+        this.triangleBuffer.Resize(0);
+        this.edgeBuffer.Resize(0);
     }
 
     Update() {
-        if (this.triangleBuffer) this.triangleBuffer.destroy();
-        this.triangleBuffer = GPU.CreateBuffer({
-            size: this.triangles.length * 4,
-            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
-        });
-
-        GPU.Queue.writeBuffer(this.triangleBuffer, 0, this.triangles);
+        this.triangleBuffer.Resize(this.triangles.length);
+        this.triangleBuffer.Set(this.triangles);
 
         const edges = [];
         for (let i = 0; i < this.triangles.length; i += 3) {
@@ -251,13 +206,8 @@ class SubMesh {
         }
         this.edges = new Uint32Array(edges);
 
-        if (this.edgeBuffer) this.edgeBuffer.destroy();
-        this.edgeBuffer = GPU.CreateBuffer({
-            size: this.edges.length * 4,
-            usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST,
-        });
-
-        GPU.Queue.writeBuffer(this.edgeBuffer, 0, this.edges);
+        this.edgeBuffer.Resize(this.edges.length);
+        this.edgeBuffer.Set(this.edges);
     }
 
 }

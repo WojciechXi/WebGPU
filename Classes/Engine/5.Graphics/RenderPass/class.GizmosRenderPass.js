@@ -85,15 +85,16 @@ class GizmosRenderPass extends RenderPass {
 
     DrawMesh(mesh, subMeshIndex, matrix4x4) {
         this.buffers[this.bufferIndex].Set(matrix4x4);
+        const buffer = this.buffers[this.bufferIndex];
+        this.bufferIndex++;
 
         const subMesh = mesh.subMeshes[subMeshIndex];
 
         this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
-        this.SetVertexBuffer(1, this.buffers[this.bufferIndex].buffer);
-        this.SetIndexBuffer(subMesh.triangleBuffer, 'uint32');
-        this.DrawIndexed(subMesh.triangles.length);
+        this.SetVertexBuffer(1, buffer.buffer);
+        this.SetIndexBuffer(subMesh.edgeBuffer.buffer, 'uint32');
+        this.DrawIndexed(subMesh.edges.length);
 
-        this.bufferIndex++;
     }
 
 }
