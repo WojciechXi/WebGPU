@@ -34,6 +34,9 @@ class Rigidbody extends Component {
         this.acceleration = Vector3.zero;
         this.drag = 0.0;
         this.bounce = 0.5; // odbicie
+
+        //private
+        this._isSleeping = false;
     }
 
     OnEnable() {
@@ -81,16 +84,16 @@ class Rigidbody extends Component {
 
                         // Eventy
                         if (!this.collider._collidingWith.has(other)) {
-                            this.collider.OnCollisionEnter(other);
                             this.collider._collidingWith.add(other);
+                            this.SendMessage('OnCollisionEnter', other);
                         } else {
-                            this.collider.OnCollisionStay(other);
+                            this.SendMessage('OnCollisionStay', other);
                         }
                     }
                 } else {
                     if (this.collider._collidingWith.has(other)) {
-                        this.collider.OnCollisionExit(other);
                         this.collider._collidingWith.delete(other);
+                        this.SendMessage('OnCollisionExit', other);
                     }
                 }
 
@@ -103,23 +106,42 @@ class Rigidbody extends Component {
 
         // --- 7. Reset przyspieszenia ---
         this.acceleration.Set(0, 0, 0);
-    }
 
-    Update() {
         this.transform.position = this.position;
         this.transform.rotation = this.rotation;
     }
 
-    AddForce(force) {
+    AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardsModifier = 0.0, mode = ForceMode.Force) { }
+    AddForce(force, mode = ForceMode.Force) {
         const a = force.Multiply(1.0 / this.mass);
-        this.acceleration = Vector3.Add(this.acceleration, a);
+        this.acceleration.Add(a);
     }
+    AddForceAtPosition(force, position, mode = ForceMode.Force) { }
+    AddRelativeForce(force, mode = ForceMode.Force) { }
+    AddRelativeTorque(torque, mode = ForceMode.Force) { }
+    AddTorque(torque, mode = ForceMode.Force) { }
+    ClosestPointOnBounds(position) { }
+    GetAccumulatedForce(step = Time.fixedDeltaTime) { }
+    GetAccumulatedTorque(step = Time.fixedDeltaTime) { }
+    GetPointVelocity(worldPoint) { }
+    GetRelativePointVelocity(relativePoint) { }
+    IsSleeping() { return this._isSleeping; }
+    Move(position, rotation) { }
+    MovePosition(position) { }
+    MoveRotation(rotation) { }
+    PublishTransform() {
+        this.transform.position = this.position;
+        this.transform.rotation = this.rotation;
+    }
+    ResetCenterOfMass() { }
+    ResetInertiaTensor() { }
+    Sleep() { this._isSleeping = true; }
+    SweepTest(direction, maxDistance = Mathf.Infinity, queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, raycastHit = null) {
+        raycastHit = raycastHit || new RaycastHit();
 
-    // Prosta normalna kontaktu dla odbicia
-    ComputeContactNormal(other) {
-        const myPos = this.transform.position;
-        const otherPos = other.transform.position;
-        return Vector3.Subtract(myPos, otherPos).Normalize();
+        return raycastHit;
     }
+    SweepTestAll(direction, maxDistance = Mathf.Infinity, queryTriggerInteraction = QueryTriggerInteraction.UseGlobal) { }
+    WakeUp() { this._isSleeping = false; }
 
 }

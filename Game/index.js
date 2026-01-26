@@ -74,9 +74,8 @@ window.addEventListener('DOMContentLoaded', async function (event) {
 
             Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
                 const gameObject = new GameObject('Cube');
-                gameObject.transform.position = new Vector3(2, 0, 0);
-                // gameObject.transform.localScale = new Vector3(1, 3, 2);
-                gameObject.AddComponent(Test2);
+                gameObject.transform.position = new Vector3(0, -1, 0);
+                gameObject.transform.localScale = new Vector3(4, 1, 4);
 
                 for (const mesh of gltf.meshes) {
                     const meshGameObject = new GameObject(mesh.name);
@@ -89,10 +88,9 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                 }
             });
 
-            Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
-                const gameObject = new GameObject('Sphere');
-                gameObject.transform.position = new Vector3(4, 0, 0);
-                gameObject.AddComponent(Test2);
+            Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
+                const gameObject = new GameObject('Cube');
+                gameObject.transform.position = new Vector3(-2, 1, 0);
 
                 for (const mesh of gltf.meshes) {
                     const meshGameObject = new GameObject(mesh.name);
@@ -101,14 +99,35 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                     meshRenderer.mesh = mesh;
                     meshRenderer.materials = [materials.Emissive];
 
-                    const sphereCollider = meshGameObject.AddComponent(SphereCollider);
+                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
+                    const rigidbody = meshGameObject.AddComponent(Rigidbody);
+                }
+            });
+
+            Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
+                const gameObject = new GameObject('Sphere');
+                gameObject.transform.position = new Vector3(0, 1, 0);
+                gameObject.AddComponent(Test2);
+
+                const sphereCollider = gameObject.AddComponent(SphereCollider);
+                const rigidbody = gameObject.AddComponent(Rigidbody);
+
+                for (const mesh of gltf.meshes) {
+                    const meshGameObject = new GameObject(mesh.name);
+                    meshGameObject.transform.SetParent(gameObject.transform);
+                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [materials.Emissive];
                 }
             });
 
             Resources.Get('/Resources/Primitives/Capsule.gltf', function (gltf) {
                 const gameObject = new GameObject('Capsule');
-                gameObject.transform.position = new Vector3(6, 0, 0);
+                gameObject.transform.position = new Vector3(2, 1, 0);
                 gameObject.AddComponent(Test2);
+
+                const capsuleCollider = gameObject.AddComponent(CapsuleCollider);
+                const rigidbody = gameObject.AddComponent(Rigidbody);
 
                 for (const mesh of gltf.meshes) {
                     const meshGameObject = new GameObject(mesh.name);
@@ -116,8 +135,6 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                     const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
                     meshRenderer.mesh = mesh;
                     meshRenderer.materials = [materials.Emissive];
-
-                    const capsuleCollider = meshGameObject.AddComponent(CapsuleCollider);
                 }
             });
 

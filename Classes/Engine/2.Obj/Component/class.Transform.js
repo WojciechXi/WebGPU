@@ -1,35 +1,6 @@
 class Transform extends Component {
 
-    Init() {
-        this.localPosition = Vector3.zero;
-        this.localRotation = Quaternion.identity;
-        this.localScale = Vector3.one;
-
-        this.parent = null;
-        this.children = [];
-
-        this.transformBuffer = new Buffer(16, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }); //matrix4x4
-    }
-
-    Update() {
-        this.transformBuffer.Set({
-            0: this.matrix4x4,
-        });
-    }
-
     get childCount() { return this.children.length; }
-
-    // ---------- Hierarchia ----------
-    SetParent(newParent) {
-        if (this.parent) {
-            const index = this.parent.children.indexOf(this);
-            if (index !== -1) this.parent.children.splice(index, 1);
-        }
-        this.parent = newParent;
-        if (newParent) newParent.children.push(this);
-    }
-
-    ClearParent() { this.SetParent(null); }
 
     // ---------- World Gettery / Settery ----------
 
@@ -78,6 +49,35 @@ class Transform extends Component {
     get back() { return Vector3.Multiply(this.forward, -1); }
     get left() { return Vector3.Multiply(this.right, -1); }
     get down() { return Vector3.Multiply(this.up, -1); }
+
+    Init() {
+        this.localPosition = Vector3.zero;
+        this.localRotation = Quaternion.identity;
+        this.localScale = Vector3.one;
+
+        this.parent = null;
+        this.children = [];
+
+        this.transformBuffer = new Buffer(16, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }); //matrix4x4
+    }
+
+    Update() {
+        this.transformBuffer.Set({
+            0: this.matrix4x4,
+        });
+    }
+
+    // ---------- Hierarchia ----------
+    SetParent(newParent) {
+        if (this.parent) {
+            const index = this.parent.children.indexOf(this);
+            if (index !== -1) this.parent.children.splice(index, 1);
+        }
+        this.parent = newParent;
+        if (newParent) newParent.children.push(this);
+    }
+
+    ClearParent() { this.SetParent(null); }
 
     InverseTransformDirection(worldDirection) {
         const newDirection = Quaternion.MultiplyVector3(this.rotation.Inverse(), worldDirection);

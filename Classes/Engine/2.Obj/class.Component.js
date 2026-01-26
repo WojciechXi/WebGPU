@@ -29,18 +29,18 @@ class Component extends Obj {
     }
 
     // Public Methods
-    BroadcastMessage() { }
-    CompareTag() { }
     AddComponent(type) { return this.gameObject.AddComponent(type); }
+    BroadcastMessage(methodName, ...parameters) { return this.gameObject.BroadcastMessage(methodName, ...parameters); }
+    CompareTag(tag) { return this.gameObject.CompareTag(tag); }
     GetComponent(type) { return this.gameObject.GetComponent(type); }
-    GetComponentInChildren() { }
-    GetComponentIndex() { }
-    GetComponentInParent() { }
-    GetComponents() { }
-    GetComponentsInChildren() { }
-    GetComponentsInParent() { }
-    SendMessage() { }
-    SendMessageUpwards() { }
-    TryGetComponent() { }
+    GetComponentInChildren(type, includeInactive = false) { return this.gameObject.GetComponentInChildren(type, includeInactive); }
+    GetComponentIndex(component) { return this.gameObject.GetComponentIndex(component); }
+    GetComponentInParent(type, includeInactive = false) { return this.gameObject.GetComponentInParent(type, includeInactive); }
+    GetComponents(type) { return this.gameObject.GetComponents(type); }
+    GetComponentsInChildren(type, includeInactive = true) { return this.gameObject.GetComponentsInChildren(type, includeInactive); }
+    GetComponentsInParent(type, includeInactive = true) { return this.gameObject.GetComponentsInParent(type, includeInactive); }
+    SendMessage(methodName, ...parameters) { return this.gameObject.SendMessage(methodName, ...parameters); }
+    SendMessageUpwards(methodName, ...parameters) { return this.gameObject.SendMessageUpwards(methodName, ...parameters); }
+    TryGetComponent(type) { return this.gameObject.TryGetComponent(type); }
 
 }
