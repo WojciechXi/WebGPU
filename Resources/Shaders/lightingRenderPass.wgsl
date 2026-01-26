@@ -166,6 +166,10 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let color = textureSample(colorTexture, screenSampler, vsOut.uv);
     let emissive = textureSample(emissiveTexture, screenSampler, vsOut.uv);
 
+    if(worldPosition4.r + worldPosition4.g + worldPosition4.b <= 0) {
+        return vec4f(color.rgb,1.0);
+    }
+
     let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv);
     let roughness = clamp(pbr.r, 0.01, 0.5);
     let metallic  = clamp(pbr.g, 0.0, 1.0);
@@ -219,6 +223,5 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let specular = F0 * spec * (1.0 - roughness) * shadowVal;
     let ambient  = ambientColor * color.rgb * occlusion;
 
-    // --- końcowy kolor ---
     return vec4f(ambient + diffuse + specular + emissive.rgb, 1.0);
 }

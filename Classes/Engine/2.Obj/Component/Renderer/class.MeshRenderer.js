@@ -32,21 +32,16 @@ class MeshRenderer extends Renderer {
     }
     get bounds() {
         if (!this.mesh) return super.bounds;
-        const lb = this.mesh.bounds;
-        const c = lb.center;
-        const hx = lb.extents.x;
-        const hy = lb.extents.y;
-        const hz = lb.extents.z;
 
         const worldPoints = this.transform.TransformPoints([
-            new Vector3(c.x + hx, c.y + hy, c.z + hz),
-            new Vector3(c.x + hx, c.y + hy, c.z - hz),
-            new Vector3(c.x + hx, c.y - hy, c.z + hz),
-            new Vector3(c.x + hx, c.y - hy, c.z - hz),
-            new Vector3(c.x - hx, c.y + hy, c.z + hz),
-            new Vector3(c.x - hx, c.y + hy, c.z - hz),
-            new Vector3(c.x - hx, c.y - hy, c.z + hz),
-            new Vector3(c.x - hx, c.y - hy, c.z - hz),
+            new Vector3(this.mesh.bounds.center.x + this.mesh.bounds.extents.x, this.mesh.bounds.center.y + this.mesh.bounds.extents.y, this.mesh.bounds.center.z + this.mesh.bounds.extents.z),
+            new Vector3(this.mesh.bounds.center.x + this.mesh.bounds.extents.x, this.mesh.bounds.center.y + this.mesh.bounds.extents.y, this.mesh.bounds.center.z - this.mesh.bounds.extents.z),
+            new Vector3(this.mesh.bounds.center.x + this.mesh.bounds.extents.x, this.mesh.bounds.center.y - this.mesh.bounds.extents.y, this.mesh.bounds.center.z + this.mesh.bounds.extents.z),
+            new Vector3(this.mesh.bounds.center.x + this.mesh.bounds.extents.x, this.mesh.bounds.center.y - this.mesh.bounds.extents.y, this.mesh.bounds.center.z - this.mesh.bounds.extents.z),
+            new Vector3(this.mesh.bounds.center.x - this.mesh.bounds.extents.x, this.mesh.bounds.center.y + this.mesh.bounds.extents.y, this.mesh.bounds.center.z + this.mesh.bounds.extents.z),
+            new Vector3(this.mesh.bounds.center.x - this.mesh.bounds.extents.x, this.mesh.bounds.center.y + this.mesh.bounds.extents.y, this.mesh.bounds.center.z - this.mesh.bounds.extents.z),
+            new Vector3(this.mesh.bounds.center.x - this.mesh.bounds.extents.x, this.mesh.bounds.center.y - this.mesh.bounds.extents.y, this.mesh.bounds.center.z + this.mesh.bounds.extents.z),
+            new Vector3(this.mesh.bounds.center.x - this.mesh.bounds.extents.x, this.mesh.bounds.center.y - this.mesh.bounds.extents.y, this.mesh.bounds.center.z - this.mesh.bounds.extents.z),
         ]);
 
         const min = Vector3.positiveInfinity;

@@ -83,6 +83,8 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                     const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
                     meshRenderer.mesh = mesh;
                     meshRenderer.materials = [materials.Emissive];
+
+                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
                 }
             });
 
