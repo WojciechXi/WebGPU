@@ -46,8 +46,8 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             engine.scene.ambientLight = ambientLight;
 
             const directionalLightGameObject = new GameObject('Directional Light');
-            directionalLightGameObject.transform.rotation = Quaternion.FromEuler(45, 0, -135);
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
+            directionalLightGameObject.AddComponent(Test2);
             const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
             directionalLight.color.Set(1, 1, 1, 0.75);
             engine.scene.directionalLight = directionalLight;
@@ -64,22 +64,22 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             // camera.rect.x = 0.5;
             // camera.rect.width = 0.5;
 
-            Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
-                const gameObject = new GameObject('Cube');
-                gameObject.transform.localScale.Scale(new Vector3(1, 2, 3));
-                gameObject.AddComponent(Test2);
-                gameObject.AddComponent(BoxCollider);
+            // Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
+            //     const gameObject = new GameObject('Cube');
+            //     gameObject.transform.localScale.Scale(new Vector3(1, 2, 3));
+            //     gameObject.AddComponent(Test2);
+            //     gameObject.AddComponent(BoxCollider);
 
-                for (const mesh of gltf.meshes) {
-                    const meshGameObject = new GameObject(mesh.name);
-                    meshGameObject.transform.SetParent(gameObject.transform);
-                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [materials.Default];
+            //     for (const mesh of gltf.meshes) {
+            //         const meshGameObject = new GameObject(mesh.name);
+            //         meshGameObject.transform.SetParent(gameObject.transform);
+            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+            //         meshRenderer.mesh = mesh;
+            //         meshRenderer.materials = [materials.Default];
 
-                    // const boxCollider = meshGameObject.AddComponent(BoxCollider);
-                }
-            });
+            //         // const boxCollider = meshGameObject.AddComponent(BoxCollider);
+            //     }
+            // });
 
             // Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
             //     const gameObject = new GameObject('Sphere');
@@ -96,8 +96,6 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             //         const rigidbody = meshGameObject.AddComponent(Rigidbody);
             //     }
             // });
-
-            return;
 
             Resources.Get('/Resources/Models/Krakow.gltf', function (gltf) {
                 const gameObject = new GameObject('Krakow');
@@ -160,6 +158,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                     const boxCollider = meshGameObject.AddComponent(BoxCollider);
                 }
             });
+
         }, function (index, total, path) {
             console.log(`${index}/${total} - ${path}`);
         });

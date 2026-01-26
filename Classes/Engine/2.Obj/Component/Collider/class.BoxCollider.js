@@ -102,11 +102,8 @@ class BoxCollider extends Collider {
     }
 
     OnDrawGizmos(renderPass, camera) {
+        return;
         const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
-
-        const localBounds = this.localBounds;
-        let matrix = Matrix4x4.TRS(localBounds.center, Quaternion.identity, localBounds.size);
-        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
 
         const bounds = this.bounds;
         matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
