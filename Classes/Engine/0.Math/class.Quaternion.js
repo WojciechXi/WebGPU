@@ -26,9 +26,7 @@ class Quaternion extends Float32Array {
         return dst;
     }
 
-    MultiplyVector3(v) {
-        return Quaternion.MultiplyVector3(this, v);
-    }
+    MultiplyVector3(v) { return Quaternion.MultiplyVector3(this, v); }
     static MultiplyVector3(q, v, dst = null) {
         dst = dst || new Vector3();
 

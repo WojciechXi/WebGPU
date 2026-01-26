@@ -5,8 +5,40 @@ class SphereCollider extends Collider {
         this.radius = 0.5;
     }
 
+    get localBounds() {
+        return new Bounds(this.center.Clone(), Vector3.Multiply(Vector3.one, this.radius));
+    }
     get bounds() {
-        return new Bounds(this.worldCenter, Vector3.Multiply(this.transform.scale, this.radius * 2));
+        const c = this.center;
+        const hx = this.radius;
+        const hy = this.radius;
+        const hz = this.radius;
+
+        const worldPoints = this.transform.TransformPoints([
+            new Vector3(c.x + hx, c.y + hy, c.z + hz),
+            new Vector3(c.x + hx, c.y + hy, c.z - hz),
+            new Vector3(c.x + hx, c.y - hy, c.z + hz),
+            new Vector3(c.x + hx, c.y - hy, c.z - hz),
+            new Vector3(c.x - hx, c.y + hy, c.z + hz),
+            new Vector3(c.x - hx, c.y + hy, c.z - hz),
+            new Vector3(c.x - hx, c.y - hy, c.z + hz),
+            new Vector3(c.x - hx, c.y - hy, c.z - hz),
+        ]);
+
+        const min = Vector3.positiveInfinity;
+        const max = Vector3.negativeInfinity;
+
+        for (const v of worldPoints) {
+            if (v.x < min.x) min.x = v.x;
+            if (v.y < min.y) min.y = v.y;
+            if (v.z < min.z) min.z = v.z;
+
+            if (v.x > max.x) max.x = v.x;
+            if (v.y > max.y) max.y = v.y;
+            if (v.z > max.z) max.z = v.z;
+        }
+
+        return Bounds.FromMinMax(min, max);
     }
 
     Intersects(otherCollider) {
@@ -83,18 +115,34 @@ class SphereCollider extends Collider {
     }
 
     Raycast(ray, maxDistance) {
-        const oc = Vector3.Sub(ray.origin, this.worldCenter);
-        const a = Vector3.Dot(ray.direction, ray.direction);
-        const b = 2 * Vector3.Dot(oc, ray.direction);
-        const c = Vector3.Dot(oc, oc) - this.radius * this.radius;
+        const localRay = new Ray(this.transform.InverseTransformPoint(ray.origin), this.transform.InverseTransformDirection(ray.direction).Normalize());
+
+        const a = Vector3.Dot(localRay.direction, localRay.direction);          // = 1
+        const b = 2 * Vector3.Dot(localRay.origin, localRay.direction);
+        const c = Vector3.Dot(localRay.origin, localRay.origin) - this.radius * this.radius;
+
         const discriminant = b * b - 4 * a * c;
-        return discriminant >= 0;
+        if (discriminant < 0)
+            return false;
+
+        const sqrtD = Math.sqrt(discriminant);
+        const t0 = (-b - sqrtD) / (2 * a);
+        const t1 = (-b + sqrtD) / (2 * a);
+
+        // maxDistance w world space → lokalny?
+        // jeśli skala ≠ 1, musisz to przeliczyć
+        return t0 <= maxDistance && t1 >= 0;
     }
 
     OnDrawGizmos(renderPass, camera) {
-        const cube = Resources.Get('/Resources/Primitives/Sphere.gltf');
-        const bounds = this.bounds;
+        const sphere = Resources.Get('/Resources/Primitives/Sphere.gltf');
+        let bounds = this.bounds;
         let matrix = Matrix4x4.TRS(bounds.center, this.transform.rotation, bounds.size);
+        renderPass.DrawMesh(sphere.meshes[0], 0, matrix);
+
+        const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
+
+        matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
         renderPass.DrawMesh(cube.meshes[0], 0, matrix);
     }
 

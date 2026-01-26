@@ -73,7 +73,9 @@ window.addEventListener('DOMContentLoaded', async function (event) {
 
             Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
                 const gameObject = new GameObject('Cube');
-                gameObject.transform.position = new Vector3(-4, 1, -5);
+                gameObject.transform.position = new Vector3(-2, 1, 0);
+                gameObject.transform.localScale = new Vector3(1, 3, 2);
+                gameObject.AddComponent(Test2);
 
                 for (const mesh of gltf.meshes) {
                     const meshGameObject = new GameObject(mesh.name);
@@ -81,87 +83,87 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                     const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
                     meshRenderer.mesh = mesh;
                     meshRenderer.materials = [materials.Emissive];
-                    meshGameObject.AddComponent(Test2);
                 }
             });
 
-            // Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
-            //     const gameObject = new GameObject('Sphere');
-            //     gameObject.transform.position = new Vector3(0, 3, 0);
-
-            //     for (const mesh of gltf.meshes) {
-            //         const meshGameObject = new GameObject(mesh.name);
-            //         meshGameObject.transform.SetParent(gameObject.transform);
-            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [materials.Default];
-
-            //         const sphereCollider = meshGameObject.AddComponent(SphereCollider);
-            //         const rigidbody = meshGameObject.AddComponent(Rigidbody);
-            //     }
-            // });
-
-            Resources.Get('/Resources/Models/Krakow.gltf', function (gltf) {
-                const gameObject = new GameObject('Krakow');
+            Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
+                const gameObject = new GameObject('Sphere');
+                gameObject.transform.position = new Vector3(2, 1, 0);
+                gameObject.transform.localScale = new Vector3(1, 3, 2);
+                gameObject.AddComponent(Test2);
 
                 for (const mesh of gltf.meshes) {
                     const meshGameObject = new GameObject(mesh.name);
                     meshGameObject.transform.SetParent(gameObject.transform);
                     const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
                     meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [];
-                    mesh.subMeshes.forEach(function (subMesh) {
-                        if (subMesh.material == 'Glass') meshRenderer.castShadows = false;
-                        if (materials.hasOwnProperty(subMesh.material)) {
-                            meshRenderer.materials.push(materials[subMesh.material]);
-                        } else {
-                            const m = gltf.materials.find(function (m) { return m.name == subMesh.material; });
+                    meshRenderer.materials = [materials.Emissive];
 
-                            const material = materials[subMesh.material] = new Material({
-                                name: subMesh.material,
-                                shader: litShader,
-                            });
-
-                            Resources.Get(`/Resources/Textures/${material.name}/Albedo.webp`, function (texture) {
-                                if (texture) material.SetTexture('albedo', texture);
-                            });
-
-                            Resources.Get(`/Resources/Textures/${material.name}/Normal.webp`, function (texture) {
-                                if (texture) material.SetTexture('normal', texture);
-                            });
-
-                            Resources.Get(`/Resources/Textures/${material.name}/Roughness.webp`, function (texture) {
-                                if (texture) material.SetTexture('roughness', texture);
-                            });
-
-                            Resources.Get(`/Resources/Textures/${material.name}/Metallic.webp`, function (texture) {
-                                if (texture) material.SetTexture('metallic', texture);
-                            });
-
-                            Resources.Get(`/Resources/Textures/${material.name}/Occlusion.webp`, function (texture) {
-                                if (texture) material.SetTexture('occlussion', texture);
-                            });
-
-                            material.Update();
-
-                            if (m && m.pbrMetallicRoughness) {
-                                const pbr = m.pbrMetallicRoughness;
-                                if (pbr.baseColorFactor) {
-                                    const color = pbr.baseColorFactor;
-                                    material.color.Set(color[0], color[1], color[2], color[3]);
-                                }
-
-                                material.metallic = pbr.metallicFactor ?? 0;
-                                material.roughness = pbr.roughnessFactor ?? 0;
-                            }
-
-                            meshRenderer.materials.push(material);
-                        }
-                    });
-
-                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
+                    const sphereCollider = meshGameObject.AddComponent(SphereCollider);
                 }
             });
+
+            // Resources.Get('/Resources/Models/Krakow.gltf', function (gltf) {
+            //     const gameObject = new GameObject('Krakow');
+
+            //     for (const mesh of gltf.meshes) {
+            //         const meshGameObject = new GameObject(mesh.name);
+            //         meshGameObject.transform.SetParent(gameObject.transform);
+            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+            //         meshRenderer.mesh = mesh;
+            //         meshRenderer.materials = [];
+            //         mesh.subMeshes.forEach(function (subMesh) {
+            //             if (subMesh.material == 'Glass') meshRenderer.castShadows = false;
+            //             if (materials.hasOwnProperty(subMesh.material)) {
+            //                 meshRenderer.materials.push(materials[subMesh.material]);
+            //             } else {
+            //                 const m = gltf.materials.find(function (m) { return m.name == subMesh.material; });
+
+            //                 const material = materials[subMesh.material] = new Material({
+            //                     name: subMesh.material,
+            //                     shader: litShader,
+            //                 });
+
+            //                 Resources.Get(`/Resources/Textures/${material.name}/Albedo.webp`, function (texture) {
+            //                     if (texture) material.SetTexture('albedo', texture);
+            //                 });
+
+            //                 Resources.Get(`/Resources/Textures/${material.name}/Normal.webp`, function (texture) {
+            //                     if (texture) material.SetTexture('normal', texture);
+            //                 });
+
+            //                 Resources.Get(`/Resources/Textures/${material.name}/Roughness.webp`, function (texture) {
+            //                     if (texture) material.SetTexture('roughness', texture);
+            //                 });
+
+            //                 Resources.Get(`/Resources/Textures/${material.name}/Metallic.webp`, function (texture) {
+            //                     if (texture) material.SetTexture('metallic', texture);
+            //                 });
+
+            //                 Resources.Get(`/Resources/Textures/${material.name}/Occlusion.webp`, function (texture) {
+            //                     if (texture) material.SetTexture('occlussion', texture);
+            //                 });
+
+            //                 material.Update();
+
+            //                 if (m && m.pbrMetallicRoughness) {
+            //                     const pbr = m.pbrMetallicRoughness;
+            //                     if (pbr.baseColorFactor) {
+            //                         const color = pbr.baseColorFactor;
+            //                         material.color.Set(color[0], color[1], color[2], color[3]);
+            //                     }
+
+            //                     material.metallic = pbr.metallicFactor ?? 0;
+            //                     material.roughness = pbr.roughnessFactor ?? 0;
+            //                 }
+
+            //                 meshRenderer.materials.push(material);
+            //             }
+            //         });
+
+            //         const boxCollider = meshGameObject.AddComponent(BoxCollider);
+            //     }
+            // });
 
         }, function (index, total, path) {
             console.log(`${index}/${total} - ${path}`);

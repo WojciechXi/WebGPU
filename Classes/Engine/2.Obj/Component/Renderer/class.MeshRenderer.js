@@ -84,22 +84,4 @@ class MeshRenderer extends Renderer {
         }
     }
 
-    OnDrawGizmos(renderPass, camera) {
-        return;
-        if (!this.mesh) return;
-        const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
-
-        const meshBounds = this.mesh.bounds;
-        let matrix = Matrix4x4.TRS(meshBounds.center, Quaternion.identity, meshBounds.size);
-        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
-
-        const localBounds = this.localBounds;
-        matrix = Matrix4x4.TRS(localBounds.center, Quaternion.identity, localBounds.size);
-        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
-
-        const bounds = this.bounds;
-        matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
-        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
-    }
-
 }
