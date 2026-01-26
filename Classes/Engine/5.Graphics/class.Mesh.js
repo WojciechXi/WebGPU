@@ -16,7 +16,8 @@ class Mesh extends Obj {
 
         this.subMeshes = data.subMeshes ?? [];
 
-        this.vertexBuffer = null;
+        this.vertexBuffer = new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST });
+        this.lineBuffer = new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST });
 
         this.Update();
     }
@@ -40,11 +41,8 @@ class Mesh extends Obj {
         this.colors = [];
         this.uvs = [];
 
-        if (this.vertexBuffer) this.vertexBuffer.destroy();
-        this.vertexBuffer = GPU.CreateBuffer({
-            size: 0,
-            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-        });
+        this.lineBuffer.Resize(0);
+        this.vertexBuffer.Resize(0);
 
         for (let subMesh of this.subMeshes) subMesh.Clear();
         this.subMeshes = [];
@@ -52,7 +50,9 @@ class Mesh extends Obj {
 
     Update() {
         let offset = 4 + 4 + 4 + 4 + 4; // position + normal + tangent + color + uv
-        let data = new Float32Array(this.vertices.length * offset);
+
+        let vertices = new Float32Array(this.vertices.length * offset);
+        let lines = new Float32Array(this.vertices.length * 4);
 
         for (let i = 0; i < this.vertices.length; i++) {
             let vertex = this.vertices[i] ?? new Vector3(0, 0, 0);
@@ -61,22 +61,24 @@ class Mesh extends Obj {
             let color = this.colors[i] ?? new Color(1, 1, 1);
             let uv = this.uvs[i] ?? new Vector2(0, 0);
 
-            data.set([
+            vertices.set([
                 vertex.x, vertex.y, vertex.z, 0,
                 normal.x, normal.y, normal.z, 0,
                 tangent.x, tangent.y, tangent.z, tangent.w,
                 color.r, color.g, color.b, color.a,
                 uv.x, uv.y, 0, 0
             ], i * offset);
+
+            lines.set([
+                vertex.x, vertex.y, vertex.z, 0,
+            ], i * 4);
         }
 
-        if (this.vertexBuffer) this.vertexBuffer.destroy();
-        this.vertexBuffer = GPU.CreateBuffer({
-            size: data.byteLength,
-            usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
-        });
+        this.vertexBuffer.Resize(vertices.length);
+        this.vertexBuffer.Set(vertices);
 
-        GPU.Queue.writeBuffer(this.vertexBuffer, 0, data);
+        this.lineBuffer.Resize(lines.length);
+        this.lineBuffer.Set(lines);
 
         for (let subMesh of this.subMeshes) subMesh.Update();
     }

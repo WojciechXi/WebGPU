@@ -23,13 +23,9 @@ class GizmosRenderPass extends RenderPass {
                 entryPoint: "vs",
                 buffers: [
                     {
-                        arrayStride: (4 + 4 + 4 + 4 + 4) * 4, // position + normal + tangent + color + uv
+                        arrayStride: (4 + 4 + 4 + 4 + 4) * 4, // position
                         attributes: [
                             { shaderLocation: 0, offset: 0 * 4, format: 'float32x3' }, // position
-                            { shaderLocation: 1, offset: 4 * 4, format: 'float32x3' }, // normal
-                            { shaderLocation: 2, offset: 8 * 4, format: 'float32x4' }, // tangent
-                            { shaderLocation: 3, offset: 12 * 4, format: 'float32x4' }, // color
-                            { shaderLocation: 4, offset: 16 * 4, format: 'float32x2' }, // uv
                         ],
                     },
                     {
@@ -72,7 +68,6 @@ class GizmosRenderPass extends RenderPass {
         });
 
         renderPass.setPipeline(this.renderPipeline);
-
         for (let camera of cameras) {
             if (!camera.drawGizmos) continue;
 
@@ -85,13 +80,18 @@ class GizmosRenderPass extends RenderPass {
                 component.OnDrawGizmos(this, camera);
             }
         }
-
         renderPass.end();
     }
 
     DrawMesh(mesh, subMeshIndex, matrix4x4) {
         this.buffers[this.bufferIndex].Set(matrix4x4);
-        super.DrawMesh(mesh, subMeshIndex, this.buffers[this.bufferIndex].buffer);
+
+        const subMesh = mesh.subMeshes[subMeshIndex];
+
+        this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
+        this.SetVertexBuffer(1, this.buffers[this.bufferIndex].buffer);
+        this.SetIndexBuffer(subMesh.triangleBuffer, 'uint32');
+        this.DrawIndexed(subMesh.triangles.length);
 
         this.bufferIndex++;
     }

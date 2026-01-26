@@ -8,10 +8,6 @@ struct View {
 
 struct Vertex {
     @location(0) position: vec3f,
-    @location(1) normal: vec3f,
-    @location(2) tangent: vec4f,
-    @location(3) color: vec4f,
-    @location(4) uv: vec2f,
 
     @location(5) m0 : vec4<f32>,
     @location(6) m1 : vec4<f32>,
@@ -32,7 +28,7 @@ fn vs(vert: Vertex) -> VSOut {
     let matrix = mat4x4<f32>(vert.m0, vert.m1, vert.m2, vert.m3);
 
     vsOut.clipPosition = view.viewProjection * matrix * vec4f(vert.position, 1.0);
-    vsOut.color = vec4f(0, 0, 0, 1);
+    vsOut.color = vec4f(1, 0, 0, 1);
 
     return vsOut;
 }
