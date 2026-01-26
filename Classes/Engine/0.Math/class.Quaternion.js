@@ -2,6 +2,23 @@ class Quaternion extends Float32Array {
 
     static get identity() { return new this(0, 0, 0, 1); }
 
+    constructor(x = 0, y = 0, z = 0, w = 1) {
+        super(4);
+        this[0] = x; // x
+        this[1] = y; // y
+        this[2] = z; // z
+        this[3] = w; // w
+    }
+
+    get x() { return this[0]; } set x(f) { return this[0] = f; }
+    get y() { return this[1]; } set y(f) { return this[1] = f; }
+    get z() { return this[2]; } set z(f) { return this[2] = f; }
+    get w() { return this[3]; } set w(f) { return this[3] = f; }
+
+    Clone() {
+        return new Quaternion(this[0], this[1], this[2], this[3]);
+    }
+
     // Identity quaternion (no rotation)
     static Identity(dst = null) {
         dst = dst || new this();
@@ -9,6 +26,9 @@ class Quaternion extends Float32Array {
         return dst;
     }
 
+    MultiplyVector3(v) {
+        return Quaternion.MultiplyVector3(this, v);
+    }
     static MultiplyVector3(q, v, dst = null) {
         dst = dst || new Vector3();
 
@@ -28,6 +48,9 @@ class Quaternion extends Float32Array {
         return dst;
     }
 
+    Inverse() {
+        return Quaternion.Inverse(this, this);
+    }
     static Inverse(q, dst = null) {
         dst = dst || new Quaternion();
 
@@ -41,6 +64,9 @@ class Quaternion extends Float32Array {
     }
 
     // Quaternion multiplication (combines rotations)
+    Multiply(b) {
+        return Quaternion.Multiply(this, b, this);
+    }
     static Multiply(a, b, dst = null) {
         dst = dst || new Quaternion();
 
@@ -192,8 +218,8 @@ class Quaternion extends Float32Array {
         y = Mathf.DegToRad(y);
         z = Mathf.DegToRad(z);
 
-        const c1 = Mathf.Cos(y / 2), s1 = Mathf.Sin(y / 2);
-        const c2 = Mathf.Cos(z / 2), s2 = Mathf.Sin(z / 2);
+        const c1 = Mathf.Cos(z / 2), s1 = Mathf.Sin(z / 2);
+        const c2 = Mathf.Cos(y / 2), s2 = Mathf.Sin(y / 2);
         const c3 = Mathf.Cos(x / 2), s3 = Mathf.Sin(x / 2);
 
         dst.w = c1 * c2 * c3 + s1 * s2 * s3;
@@ -202,22 +228,5 @@ class Quaternion extends Float32Array {
         dst.z = s1 * c2 * c3 - c1 * s2 * s3;
 
         return dst;
-    }
-
-    constructor(x = 0, y = 0, z = 0, w = 1) {
-        super(4);
-        this[0] = x; // x
-        this[1] = y; // y
-        this[2] = z; // z
-        this[3] = w; // w
-    }
-
-    get x() { return this[0]; } set x(f) { return this[0] = f; }
-    get y() { return this[1]; } set y(f) { return this[1] = f; }
-    get z() { return this[2]; } set z(f) { return this[2] = f; }
-    get w() { return this[3]; } set w(f) { return this[3] = f; }
-
-    Clone() {
-        return new Quaternion(this[0], this[1], this[2], this[3]);
     }
 }

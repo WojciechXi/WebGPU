@@ -22,7 +22,7 @@ class Terrain extends MonoBehaviour {
     }
 
     get bounds() {
-        const size = Vector3.Scale(this.transform.lossyScale, this.size);
+        const size = Vector3.Scale(this.transform.scale, this.size);
         return new Bounds(Vector3.Add(this.transform.position, Vector3.Multiply(size, 0.5)), size);
     }
 
@@ -55,11 +55,11 @@ class Terrain extends MonoBehaviour {
     }
 
     GetObjectHeight(x, z) {
-        return this.GetHeight(x, z) * this.size.y * this.transform.lossyScale.y;
+        return this.GetHeight(x, z) * this.size.y * this.transform.scale.y;
     }
 
     GetObjectHeightLinear(xLinear, zLinear) {
-        return this.GetHeightLinear(xLinear, zLinear) * this.size.y * this.transform.lossyScale.y;
+        return this.GetHeightLinear(xLinear, zLinear) * this.size.y * this.transform.scale.y;
     }
 
     GetWorldHeight(x, z) {
@@ -86,8 +86,8 @@ class Terrain extends MonoBehaviour {
         const x = position.x - boundsMin.x;
         const z = position.z - boundsMin.z;
 
-        const xLinear = x / (this.size.x * this.transform.lossyScale.x);
-        const zLinear = z / (this.size.z * this.transform.lossyScale.z);
+        const xLinear = x / (this.size.x * this.transform.scale.x);
+        const zLinear = z / (this.size.z * this.transform.scale.z);
 
         return this.GetWorldHeightLinear(xLinear, zLinear);
     }

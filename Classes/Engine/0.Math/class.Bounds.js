@@ -103,5 +103,16 @@ class Bounds extends Float32Array {
         return Json.ToJson(this);
     }
 
+    Set(center, size) {
+        this[0] = center.x;
+        this[1] = center.y;
+        this[2] = center.z;
+
+        this[3] = size.x;
+        this[4] = size.y;
+        this[5] = size.z;
+    }
+
+    Clear() { this[0] = 0; this[1] = 0; this[2] = 0; this[3] = 0; this[4] = 0; this[5] = 0; }
 
 }

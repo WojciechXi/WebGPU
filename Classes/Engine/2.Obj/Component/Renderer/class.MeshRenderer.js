@@ -1,6 +1,8 @@
 class MeshRenderer extends Renderer {
 
     Init() {
+        super.Init();
+
         this.receiveShadows = true;
         this.castShadows = true;
 
@@ -8,10 +10,58 @@ class MeshRenderer extends Renderer {
         this.mesh = null;
     }
 
-    get bounds() {
+    // Update() {
+    //     if (this.mesh) {
+    //         const meshBounds = this.mesh.bounds;
+    //         const meshBoundsMin = meshBounds.min;
+    //         const meshBoundsMax = meshBounds.max;
+
+    //         const center = Vector3.Add(meshBoundsMin, meshBoundsMax).Divide(2);
+    //         const halfExtents = Vector3.Subtract(meshBoundsMax, meshBoundsMin).Divide(2);
+
+    //         this.localBounds.Set(center.Scale(this.transform.scale), halfExtents.Scale(this.transform.scale).Multiply(2));
+    //     } else {
+    //         this.localBounds.Clear();
+    //         this.bounds.Clear();
+    //     }
+    // }
+
+    get localBounds() {
         if (!this.mesh) return super.bounds;
-        const bounds = this.mesh.bounds;
-        return new Bounds(Vector3.Add(this.transform.position, Vector3.Scale(bounds.center, this.transform.lossyScale)), Vector3.Scale(bounds.size, this.transform.lossyScale));
+        return new Bounds(this.mesh.bounds.center.Clone(), this.mesh.bounds.extents.Clone());
+    }
+    get bounds() {
+        const lb = this.mesh.bounds;
+        const c = lb.center;
+        const hx = lb.extents.x;
+        const hy = lb.extents.y;
+        const hz = lb.extents.z;
+
+        const worldPoints = this.transform.TransformPoints([
+            new Vector3(c.x + hx, c.y + hy, c.z + hz),
+            new Vector3(c.x + hx, c.y + hy, c.z - hz),
+            new Vector3(c.x + hx, c.y - hy, c.z + hz),
+            new Vector3(c.x + hx, c.y - hy, c.z - hz),
+            new Vector3(c.x - hx, c.y + hy, c.z + hz),
+            new Vector3(c.x - hx, c.y + hy, c.z - hz),
+            new Vector3(c.x - hx, c.y - hy, c.z + hz),
+            new Vector3(c.x - hx, c.y - hy, c.z - hz),
+        ]);
+
+        const min = Vector3.positiveInfinity;
+        const max = Vector3.negativeInfinity;
+
+        for (const v of worldPoints) {
+            if (v.x < min.x) min.x = v.x;
+            if (v.y < min.y) min.y = v.y;
+            if (v.z < min.z) min.z = v.z;
+
+            if (v.x > max.x) max.x = v.x;
+            if (v.y > max.y) max.y = v.y;
+            if (v.z > max.z) max.z = v.z;
+        }
+
+        return Bounds.FromMinMax(min, max);
     }
 
     get material() { return this.materials[0]; }
@@ -33,11 +83,22 @@ class MeshRenderer extends Renderer {
         }
     }
 
-    // OnDrawGizmos(renderPass, camera) {
-    //     const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
-    //     const bounds = this.bounds;
-    //     let matrix = Matrix4x4.TRS(bounds.center, this.transform.rotation, bounds.size);
-    //     renderPass.DrawMesh(cube.meshes[0], 0, matrix);
-    // }
+    OnDrawGizmos(renderPass, camera) {
+        return;
+        if (!this.mesh) return;
+        const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
+
+        const meshBounds = this.mesh.bounds;
+        let matrix = Matrix4x4.TRS(meshBounds.center, Quaternion.identity, meshBounds.size);
+        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
+
+        const localBounds = this.localBounds;
+        matrix = Matrix4x4.TRS(localBounds.center, Quaternion.identity, localBounds.size);
+        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
+
+        const bounds = this.bounds;
+        matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
+        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
+    }
 
 }

@@ -33,66 +33,27 @@ class Transform extends Component {
 
     // ---------- World Gettery / Settery ----------
 
-    get localEulerAngles() {
-        return Quaternion.ToEuler(this.localRotation);
-    }
-    set localEulerAngles(localEulerAngles) {
-        this.localRotation = Quaternion.FromEuler(localEulerAngles);
-    }
+    get localEulerAngles() { return Quaternion.ToEuler(this.localRotation); }
+    set localEulerAngles(localEulerAngles) { this.localRotation = Quaternion.FromEuler(localEulerAngles); }
 
-    get position() {
-        if (!this.parent) return this.localPosition.Clone();
-        // uproszczone mnożenie przez rodzica
-        return Transform.TransformPoint(this.parent, this.localPosition);
-    }
-    set position(position) {
-        if (!this.parent) this.localPosition = position.Clone();
-        else this.localPosition = Transform.InverseTransformPoint(this.parent, position);
-    }
-
-    get rotation() {
-        if (!this.parent) return this.localRotation.Clone();
-        return Quaternion.Multiply(this.parent.rotation, this.localRotation);
-    }
-    set rotation(worldRot) {
-        if (!this.parent) this.localRotation = worldRot.Clone();
-        else {
-            const invParent = Quaternion.Inverse(this.parent.rotation);
-            this.localRotation = Quaternion.Multiply(invParent, worldRot);
-        }
-    }
-
-    get eulerAngles() {
-        if (!this.parent) return Quaternion.ToEuler(this.localRotation);
-        return Quaternion.Multiply(this.parent.eulerAngles, this.localRotation);
-    }
+    get eulerAngles() { return this.parent ? Quaternion.Multiply(this.parent.eulerAngles, this.localRotation) : Quaternion.ToEuler(this.localRotation); }
     set eulerAngles(eulerAngles) {
         if (!this.parent) this.localRotation = Quaternion.FromEuler(eulerAngles);
-        else {
-
-        }
     }
 
-    get lossyScale() {
-        if (!this.parent) return this.localScale.Clone();
-        const pScale = this.parent.lossyScale;
-        return new Vector3(
-            this.localScale.x * pScale.x,
-            this.localScale.y * pScale.y,
-            this.localScale.z * pScale.z
-        );
+    get position() { return this.parent ? this.parent.TransformPoint(this.localPosition) : this.localPosition.Clone(); }
+    set position(value) { this.localPosition = this.parent ? this.parent.InverseTransformPoint(value) : value.Clone(); }
+
+    get rotation() { return this.parent ? Quaternion.Multiply(this.parent.rotation, this.localRotation) : this.localRotation.Clone(); }
+    set rotation(value) { this.localRotation = this.parent ? this.localRotation = this.parent.rotation.Inverse().Multiply(value) : value.Clone() }
+
+    get scale() {
+        return this.parent ? this.parent.scale.Scale(this.localScale) : this.localScale.Clone();
     }
 
     get matrix4x4() {
-        // 1. macierz lokalna
         const m = Matrix4x4.TRS(this.localPosition, this.localRotation, this.localScale);
-
-        // 2. jeśli jest rodzic, pomnóż przez jego macierz
-        if (this.parent) {
-            return Matrix4x4.Multiply(this.parent.matrix4x4, m);
-        } else {
-            return m;
-        }
+        return this.parent ? Matrix4x4.Multiply(this.parent.matrix4x4, m) : m;
     }
 
     get forward() {
@@ -100,61 +61,78 @@ class Transform extends Component {
         const v = new Vector3(m[8], m[9], m[10]);
         return v.Normalize();
     }
-
-    get back() { return Vector3.Multiply(this.forward, -1); }
-
     get right() {
         const m = this.matrix4x4;
         const v = new Vector3(m[0], m[1], m[2]); // X kolumna
         return v.Normalize();
     }
-
-    get left() { return Vector3.Multiply(this.right, -1); }
-
     get up() {
         const m = this.matrix4x4;
         const v = new Vector3(m[4], m[5], m[6]); // Y kolumna
         return v.Normalize();
     }
-
+    get back() { return Vector3.Multiply(this.forward, -1); }
+    get left() { return Vector3.Multiply(this.right, -1); }
     get down() { return Vector3.Multiply(this.up, -1); }
 
-    InverseTransformPoint(point) {
-        return Transform.InverseTransformPoint(this.parent, point);
-    }
-
     InverseTransformDirection(direction) {
-        return Transform.InverseTransformDirection(this.parent, direction);
-    }
+        const rotation = this.rotation;
+        const scale = this.scale;
 
-    // ---------- Helper funkcje ----------
-    static TransformPoint(parent, localPos) {
-        const pScale = parent.lossyScale;
-        return new Vector3(
-            localPos.x * pScale.x + parent.position.x,
-            localPos.y * pScale.y + parent.position.y,
-            localPos.z * pScale.z + parent.position.z
-        );
+        const newDirection = Quaternion.MultiplyVector3(rotation.Inverse(), direction);
+        return newDirection.Unscale(scale);
     }
+    InverseTransformDirections(directions) { return directions.map(d => this.InverseTransformDirection(d)); }
 
-    static InverseTransformPoint(parent, point) {
-        //TODO dorobić rotację parenta
-        const pScale = parent.lossyScale;
-        return new Vector3(
-            (point.x - parent.position.x) / pScale.x,
-            (point.y - parent.position.y) / pScale.y,
-            (point.z - parent.position.z) / pScale.z
-        );
+    InverseTransformPoint(point) {
+        //Todo rekurencyjnie
+        const position = this.position;
+        const rotation = this.rotation;
+        const scale = this.scale;
+
+        const newPoint = Vector3.Sub(point, position);
+        Quaternion.MultiplyVector3(rotation.Inverse(), newPoint, newPoint);
+        return newPoint.Unscale(scale);
     }
+    InverseTransformPoints(points) { return points.map(p => this.InverseTransformPoint(p)); }
 
-    static InverseTransformDirection(parent, direction) {
-        //TODO dorobić rotację parenta
-        const pScale = parent.lossyScale;
-        return new Vector3(
-            direction.x / pScale.x,
-            direction.y / pScale.y,
-            direction.z / pScale.z
-        );
+    TransformDirection(direction) {
+        const rotation = this.rotation;
+        const scale = this.scale;
+
+        const newDirection = Vector3.Scale(direction, scale);
+        return Quaternion.MultiplyVector3(rotation, newDirection, newDirection);
+    }
+    TransformDirections(directions) { return directions.map(d => this.TransformDirection(d)); }
+
+    TransformPoint(point) {
+        //Todo rekurencyjnie
+        const position = this.position;
+        const rotation = this.rotation;
+        const scale = this.scale;
+
+        const newPoint = Vector3.Scale(point, scale);
+        Quaternion.MultiplyVector3(rotation, newPoint, newPoint);
+        newPoint.Add(position);
+
+        return this.parent ? this.parent.TransformPoint(newPoint) : newPoint;
+    }
+    TransformPoints(points) { return points.map(p => this.TransformPoint(p)); }
+
+    TransformVector(vector) {
+        const rotation = this.rotation;
+        const scale = this.scale;
+
+        const newVector = Vector3.Scale(vector, scale);
+        return Quaternion.MultiplyVector3(rotation, newVector, newVector);
+    }
+    TransformVectors(vectors) { return vectors.map(v => this.TransformVector(v)); }
+
+    Translate(vector) {
+        const delta = Vector3.Scale(vector, this.parent.scale);
+        Quaternion.MultiplyVector3(this.parent.rotation, delta, delta);
+        this.parent.position.Add(delta);
+        //Todo set new position
     }
 
 }

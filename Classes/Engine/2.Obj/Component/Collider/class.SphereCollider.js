@@ -6,7 +6,7 @@ class SphereCollider extends Collider {
     }
 
     get bounds() {
-        return new Bounds(this.worldCenter, Vector3.Multiply(this.transform.lossyScale, this.radius * 2));
+        return new Bounds(this.worldCenter, Vector3.Multiply(this.transform.scale, this.radius * 2));
     }
 
     Intersects(otherCollider) {

@@ -23,6 +23,12 @@ class Vector3 extends Float32Array {
         return Mathf.Sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     }
 
+    Add(b) {
+        this[0] += b[0];
+        this[1] += b[1];
+        this[2] += b[2];
+        return this;
+    }
     static Add(a, b, dst = null) {
         dst = dst || new Vector3();
 
@@ -33,6 +39,12 @@ class Vector3 extends Float32Array {
         return dst;
     }
 
+    Subtract(b) {
+        this[0] -= b[0];
+        this[1] -= b[1];
+        this[2] -= b[2];
+        return this;
+    }
     static Subtract(a, b, dst = null) {
         dst = dst || new Vector3();
 
@@ -44,6 +56,12 @@ class Vector3 extends Float32Array {
     }
     static Sub(a, b, dst = null) { return this.Subtract(a, b, dst); }
 
+    Multiply(b) {
+        this[0] *= b;
+        this[1] *= b;
+        this[2] *= b;
+        return this;
+    }
     static Multiply(a, b, dst = null) {
         dst = dst || new Vector3();
 
@@ -55,6 +73,12 @@ class Vector3 extends Float32Array {
     }
     static Mul(a, b, dst = null) { return this.Multiply(a, b, dst); }
 
+    Divide(b) {
+        this[0] /= b;
+        this[1] /= b;
+        this[2] /= b;
+        return this;
+    }
     static Divide(a, b, dst = null) {
         dst = dst || new Vector3();
 
@@ -66,6 +90,14 @@ class Vector3 extends Float32Array {
     }
     static Div(a, b, dst = null) { return this.Divide(a, b, dst); }
 
+    Unscale(b) {
+        this[0] /= b[0];
+        this[1] /= b[1];
+        this[2] /= b[2];
+
+        return this;
+    }
+    Scale(b) { return Vector3.Scale(this, b, this); }
     static Scale(a, b, dst = null) {
         dst = dst || new Vector3();
 

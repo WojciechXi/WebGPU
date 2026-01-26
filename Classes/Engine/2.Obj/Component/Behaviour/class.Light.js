@@ -40,7 +40,7 @@ class Light extends Behaviour {
     OnPreRender() { // jak renderować
         this.aspect = 1;
 
-        let matrix = Matrix4x4.TRS(Vector3.Add(Camera.main.transform.position, Vector3.Multiply(this.transform.back, (this.farClipPlane - this.nearClipPlane) * 0.5)), this.transform.rotation, this.transform.lossyScale);
+        let matrix = Matrix4x4.TRS(Vector3.Add(Camera.main.transform.position, Vector3.Multiply(this.transform.back, (this.farClipPlane - this.nearClipPlane) * 0.5)), this.transform.rotation, this.transform.scale);
 
         Matrix4x4.Inverse(matrix, this.viewMatrix);
         Matrix4x4.Inverse(this.viewMatrix, this.inverseViewMatrix);

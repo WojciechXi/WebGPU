@@ -66,6 +66,9 @@ window.addEventListener('DOMContentLoaded', async function (event) {
 
             Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
                 const gameObject = new GameObject('Cube');
+                gameObject.transform.localScale.Scale(new Vector3(1, 2, 3));
+                gameObject.AddComponent(Test2);
+                gameObject.AddComponent(BoxCollider);
 
                 for (const mesh of gltf.meshes) {
                     const meshGameObject = new GameObject(mesh.name);
@@ -74,25 +77,25 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                     meshRenderer.mesh = mesh;
                     meshRenderer.materials = [materials.Default];
 
-                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
+                    // const boxCollider = meshGameObject.AddComponent(BoxCollider);
                 }
             });
 
-            Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
-                const gameObject = new GameObject('Sphere');
-                gameObject.transform.position = new Vector3(0, 3, 0);
+            // Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
+            //     const gameObject = new GameObject('Sphere');
+            //     gameObject.transform.position = new Vector3(0, 3, 0);
 
-                for (const mesh of gltf.meshes) {
-                    const meshGameObject = new GameObject(mesh.name);
-                    meshGameObject.transform.SetParent(gameObject.transform);
-                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [materials.Default];
+            //     for (const mesh of gltf.meshes) {
+            //         const meshGameObject = new GameObject(mesh.name);
+            //         meshGameObject.transform.SetParent(gameObject.transform);
+            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+            //         meshRenderer.mesh = mesh;
+            //         meshRenderer.materials = [materials.Default];
 
-                    const sphereCollider = meshGameObject.AddComponent(SphereCollider);
-                    const rigidbody = meshGameObject.AddComponent(Rigidbody);
-                }
-            });
+            //         const sphereCollider = meshGameObject.AddComponent(SphereCollider);
+            //         const rigidbody = meshGameObject.AddComponent(Rigidbody);
+            //     }
+            // });
 
             return;
 
