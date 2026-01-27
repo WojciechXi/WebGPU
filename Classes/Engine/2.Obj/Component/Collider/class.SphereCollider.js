@@ -68,11 +68,9 @@ class SphereCollider extends Collider {
     }
 
     OnDrawGizmos(renderPass, camera) {
-        const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
-
         let bounds = this.bounds;
         let matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
-        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
+        renderPass.DrawMesh(Graphics.cubeMesh, 0, matrix);
     }
 
 

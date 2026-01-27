@@ -3,6 +3,8 @@ class Test extends MonoBehaviour {
     Init() {
         this.look = Vector2.zero;
         this.move = Vector3.zero;
+        this.ray = null;
+        this.rayDistance = 1;
     }
 
     OnEnable() {
@@ -25,15 +27,22 @@ class Test extends MonoBehaviour {
         this.transform.position = position;
 
         if (Input.GetKeyDown(0)) {
-            const ray = this.camera.ScreenPointToRay(Input.mousePosition);
+            this.ray = this.camera.ScreenPointToRay(Input.mousePosition);
             // const ray = new Ray(this.transform.position, this.transform.forward);
-            const hits = Physics.Raycast(ray, 10);
+            const hits = Physics.Raycast(this.ray, 10);
             if (hits.length) {
                 const meshRenderer = hits[0].GetComponent(MeshRenderer);
                 if (meshRenderer) {
                     meshRenderer.materials[0].color = new Color32(Random.Range(0, 0.5), Random.Range(0, 0.5), Random.Range(0, 0.5));
                 }
             }
+        }
+    }
+
+    OnDrawGizmos(renderPass, camera) {
+        if (this.ray) {
+            let matrix = Matrix4x4.TRS(this.ray.origin, Quaternion.LookRotation(this.ray.direction), Vector3.one.Multiply(10));
+            renderPass.DrawMesh(Graphics.lineMesh, 0, matrix);
         }
     }
 

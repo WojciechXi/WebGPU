@@ -26,6 +26,49 @@ class Quaternion extends Float32Array {
         return out;
     }
 
+    static LookRotation(forward, upwards = Vector3.up, out = null) {
+        out = out || new this();
+
+        forward = forward.normalized;
+
+        let right = upwards.Cross(forward).Normalize();
+        let realUp = forward.Cross(right);
+
+        let m00 = right.x, m01 = realUp.x, m02 = forward.x;
+        let m10 = right.y, m11 = realUp.y, m12 = forward.y;
+        let m20 = right.z, m21 = realUp.z, m22 = forward.z;
+
+        let t = m00 + m11 + m22;
+
+        if (t > 0) {
+            let s = Mathf.Sqrt(t + 1.0) * 2;
+            out.w = 0.25 * s;
+            out.x = (m21 - m12) / s;
+            out.y = (m02 - m20) / s;
+            out.z = (m10 - m01) / s;
+        } else if (m00 > m11 && m00 > m22) {
+            let s = Mathf.Sqrt(1.0 + m00 - m11 - m22) * 2;
+            out.w = (m21 - m12) / s;
+            out.x = 0.25 * s;
+            out.y = (m01 + m10) / s;
+            out.z = (m02 + m20) / s;
+        } else if (m11 > m22) {
+            let s = Mathf.Sqrt(1.0 + m11 - m00 - m22) * 2;
+            out.w = (m02 - m20) / s;
+            out.x = (m01 + m10) / s;
+            out.y = 0.25 * s;
+            out.z = (m12 + m21) / s;
+        } else {
+            let s = Mathf.Sqrt(1.0 + m22 - m00 - m11) * 2;
+            out.w = (m10 - m01) / s;
+            out.x = (m02 + m20) / s;
+            out.y = (m12 + m21) / s;
+            out.z = 0.25 * s;
+        }
+
+        return out;
+    }
+
     MultiplyVector3(v) { return Quaternion.MultiplyVector3(this, v); }
     static MultiplyVector3(q, v, out = null) {
         out = out || new Vector3();
@@ -77,7 +120,7 @@ class Quaternion extends Float32Array {
 
     Normalize(out = this) {
         out = out || this.Clone();
-        const mag = Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+        const mag = Mathf.Sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
         out.x = this.x / mag;
         out.y = this.y / mag;
         out.z = this.z / mag;

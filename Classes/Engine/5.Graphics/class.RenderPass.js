@@ -24,15 +24,6 @@ class RenderPass {
 
     }
 
-    DrawMesh(mesh, subMeshIndex, matrixBuffer) {
-        const subMesh = mesh.subMeshes[subMeshIndex];
-
-        this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
-        this.SetVertexBuffer(1, matrixBuffer);
-        this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
-        this.DrawIndexed(subMesh.triangles.length);
-    }
-
     SetPipeline(renderPipeline) {
         this.renderPass.setPipeline(renderPipeline);
     }
@@ -55,6 +46,15 @@ class RenderPass {
 
     DrawIndexed(count) {
         this.renderPass.drawIndexed(count);
+    }
+
+    DrawMesh(mesh, subMeshIndex, matrixBuffer) {
+        const subMesh = mesh.subMeshes[subMeshIndex];
+
+        this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
+        this.SetVertexBuffer(1, matrixBuffer);
+        this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
+        this.DrawIndexed(subMesh.triangles.length);
     }
 
 }

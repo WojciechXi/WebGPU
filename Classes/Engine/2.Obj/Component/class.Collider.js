@@ -8,6 +8,7 @@ class Collider extends Component {
     get localBounds() { return new Bounds(Vector3.zero, Vector3.zero); }
     get bounds() { return new Bounds(this.transform.position, Vector3.zero); }
     get worldCenter() { return Vector3.zero; }
+    get material() { return PhysicMaterial.Default; }
 
     // Messages
     // OnCollisionEnter(collision) { }

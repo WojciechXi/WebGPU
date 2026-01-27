@@ -1,7 +1,7 @@
 class Mesh extends Obj {
 
     constructor(data = {}) {
-        super();
+        super(data);
         this.name = data.name ?? 'Mesh';
 
         this.bounds = new Bounds(Vector3.zero, Vector3.one);
@@ -196,15 +196,6 @@ class SubMesh {
     Update() {
         this.triangleBuffer.Resize(this.triangles.length);
         this.triangleBuffer.Set(this.triangles);
-
-        const edges = [];
-        for (let i = 0; i < this.triangles.length; i += 3) {
-            const a = this.triangles[i];
-            const b = this.triangles[i + 1];
-            const c = this.triangles[i + 2];
-            edges.push(a, b, b, c, c, a);
-        }
-        this.edges = new Uint32Array(edges);
 
         this.edgeBuffer.Resize(this.edges.length);
         this.edgeBuffer.Set(this.edges);

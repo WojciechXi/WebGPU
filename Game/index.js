@@ -66,11 +66,13 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             // testCamera.rect.width = 0.5;
             testCameraGameObject.AddComponent(Test);
 
-            // const cameraGameObject = new GameObject('Camera');
-            // cameraGameObject.transform.position = new Vector3(-1, 1, -5);
-            // const camera = cameraGameObject.AddComponent(Camera);
-            // camera.rect.x = 0.5;
-            // camera.rect.width = 0.5;
+            const cameraGameObject = new GameObject('Camera');
+            cameraGameObject.transform.position = new Vector3(-1, 1, -5);
+            const camera = cameraGameObject.AddComponent(Camera);
+            camera.rect.x = 0.75;
+            camera.rect.y = 0.75;
+            camera.rect.width = 0.25;
+            camera.rect.height = 0.25;
 
             Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
                 let gameObject = new GameObject('Cube');

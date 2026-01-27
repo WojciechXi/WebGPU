@@ -8,11 +8,11 @@ class Obj {
         this.hideFlags = 0;
         this.name = 'Object';
 
-        this._instanceId = Guid.New();
-
         const object = this;
         Object.keys(data).forEach(function (key) { object[key] = data[key]; });
         this.Init();
+
+        if (!this._instanceId) this._instanceId = Guid.New();
     }
     Init() {
         Obj.objs.push(this);
