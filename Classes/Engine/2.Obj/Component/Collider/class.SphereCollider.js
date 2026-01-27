@@ -66,7 +66,6 @@ class SphereCollider extends Collider {
     }
 
     OnDrawGizmos(renderPass, camera) {
-        let bounds = this.bounds;
         renderPass.DrawSphere(this.worldCenter, this.radius, this.transform.rotation);
         renderPass.DrawRay(new Ray(this.transform.position, this.transform.forward));
     }
