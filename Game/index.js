@@ -150,6 +150,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                 for (let i = 0; i < 10; i++) {
                     const gameObject = new GameObject('Sphere');
                     gameObject.transform.position = new Vector3(Random.Range(-1, 1), Random.Range(1, 4), Random.Range(-1, 1));
+                    gameObject.transform.rotation = Quaternion.Euler(Random.Range(-180, 180), Random.Range(-180, 180), Random.Range(-180, 180));
 
                     for (const mesh of gltf.meshes) {
                         const meshGameObject = new GameObject(mesh.name);
@@ -158,7 +159,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                         meshRenderer.mesh = mesh;
                         meshRenderer.materials = [materials.Default];
 
-                        const sphereCollider = meshGameObject.AddComponent(SphereCollider);
+                        const boxCollider = meshGameObject.AddComponent(BoxCollider);
                         const rigidbody = meshGameObject.AddComponent(Rigidbody);
                     }
                 }

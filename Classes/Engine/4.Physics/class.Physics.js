@@ -1,7 +1,7 @@
 class Physics {
 
     static {
-        this.simulate = false;
+        this.simulate = true;
         this.gravity = new Vector3(0, -9.81, 0);
     }
 
