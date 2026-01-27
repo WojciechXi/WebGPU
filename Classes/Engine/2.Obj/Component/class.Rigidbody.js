@@ -102,7 +102,7 @@ class Rigidbody extends Component {
                         // C. Reakcja (Impuls w punkcie)
                         const vDotN = this.linearVelocity.Dot(contactNormal);
                         if (vDotN < 0) {
-                            const j = -(1 + this.bounce) * vDotN * this.mass;
+                            const j = (1 + this.bounce) * vDotN * this.mass;
                             const impulse = Vector3.Multiply(contactNormal, j);
 
                             this.AddForceAtPosition(impulse, contactPoint, ForceMode.Impulse);
