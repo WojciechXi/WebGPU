@@ -6,7 +6,7 @@ class SphereCollider extends Collider {
         this.radius = 0.5;
     }
 
-    get worldCenter() { return Vector3.Add(this.transform.position, this.center); }
+    get worldCenter() { return this.transform.TransformPoint(this.center); }
     get localBounds() { return new Bounds(this.center.Clone(), new Vector3(this.radius * 2, this.radius * 2, this.radius * 2)); }
     get bounds() {
         const hx = this.radius;

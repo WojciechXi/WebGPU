@@ -33,7 +33,7 @@ class Transform extends Component {
 
     get forward() {
         const m = this.matrix4x4;
-        const v = new Vector3(m[8], m[9], m[10]);
+        const v = new Vector3(m[8], m[9], m[10]); // Z kolumna
         return v.Normalize();
     }
     get right() {

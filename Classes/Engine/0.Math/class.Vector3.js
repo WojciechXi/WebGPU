@@ -134,6 +134,22 @@ class Vector3 extends Float32Array {
     Clone() { return new Vector3(this.x, this.y, this.z); }
     Clear() { this[0] = this[1] = this[2] = 0; }
 
+    Abs(out = this) {
+        out = out || this.Clone();
+        out[0] = Mathf.Abs(out[0]);
+        out[1] = Mathf.Abs(out[1]);
+        out[2] = Mathf.Abs(out[2]);
+        return out;
+    }
+
+    Negate(out = this) {
+        out = out || this.Clone();
+        out[0] = -out[0];
+        out[1] = -out[1];
+        out[2] = -out[2];
+        return out;
+    }
+
     static Add(a, b, out = null) { return a.Add(b, out); }
     static Subtract(a, b, out = null) { return a.Subtract(b, out); }
     static Sub(a, b, out = null) { return a.Subtract(b, out); }

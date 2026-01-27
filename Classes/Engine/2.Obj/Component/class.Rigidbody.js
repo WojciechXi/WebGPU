@@ -1,11 +1,19 @@
 class Rigidbody extends Component {
 
     Init() {
-        this.angularDamping = 0.0;
         this.angularVelocity = Vector3.zero;
+        this.linearVelocity = Vector3.zero;
+        this.acceleration = Vector3.zero;
+
+        this.mass = 0.1;
+        this.inertia = 1.16;
+        this.bounce = 0; // odbicie
+        this.drag = 0.01;
+        this.angularDrag = 0.05;
+
+        this.angularDamping = 0.0;
         this.automaticCenterOfMass = true;
         this.automaticInertiaTensor = false;
-
         this.centerOfMass = Vector3.zero;
         //this.collisionDetectionMode = 0;
         //this.constraints = 0;
@@ -16,24 +24,20 @@ class Rigidbody extends Component {
         //this.inertiaTensor = 0;
         //this.inertiaTensorRotation = 0;
         //this.interpolation = 0;
-        this.isKinematic = false;
         //this.linearDamping = 0;
-        this.linearVelocity = Vector3.zero;
-        this.mass = 1.0;
         //this.maxAngularVelocity = 0;
         //this.maxDepenetrationVelocity = 0;
         //this.maxLinearVelocity = 0;
-        this.position = this.transform.position;
-        this.rotation = this.transform.rotation;
         //this.sleepThreshold = 0;
         //this.solverIterations = 0;
         //this.solverVelocityIterations = 0;
-        this.useGravity = true;
         //this.worldCenterOfMass = 0;
 
-        this.acceleration = Vector3.zero;
-        this.drag = 0.0;
-        this.bounce = 0.5; // odbicie
+        this.isKinematic = false;
+        this.useGravity = true;
+
+        this.position = this.transform.position;
+        this.rotation = this.transform.rotation;
 
         //private
         this._isSleeping = false;
@@ -49,42 +53,74 @@ class Rigidbody extends Component {
     }
 
     FixedUpdate() {
-        if (!Physics.simulate) return;
+        if (!Physics.simulate || this.isKinematic) return;
 
         this.position = this.transform.position;
         this.rotation = this.transform.rotation;
 
-        // --- 1. Grawitacja ---
-        if (this.useGravity) this.acceleration = Vector3.Add(this.acceleration, Physics.gravity);
+        // --- 1. Grawitacja i Opory ---
+        if (this.useGravity) this.acceleration = this.acceleration.Add(Physics.gravity);
 
-        // --- 2. Aktualizacja prędkości ---
-        this.linearVelocity = Vector3.Add(this.linearVelocity, Vector3.Multiply(this.acceleration, Time.fixedDeltaTime));
+        // Tłumienie (Damping)
+        this.linearVelocity = this.linearVelocity.Multiply(1.0 - this.drag);
+        this.angularVelocity = this.angularVelocity.Multiply(1.0 - this.angularDrag);
 
-        // --- 3. Drag ---
-        if (this.drag > 0.0) this.linearVelocity = Vector3.Multiply(this.linearVelocity, 1.0 - this.drag * Time.fixedDeltaTime);
+        // --- 2. Aktualizacja Rotacji ---
+        if (this.angularVelocity.magnitude > 0.001) {
+            const rotationStep = Vector3.Multiply(this.angularVelocity, Time.fixedDeltaTime);
+            this.rotation = Quaternion.Multiply(this.rotation, Quaternion.Euler(
+                rotationStep.x,
+                rotationStep.y,
+                rotationStep.z
+            )).Normalize();
+        }
 
-        // --- 4. Nowa pozycja ---
-        let newPosition = Vector3.Add(this.position, Vector3.Multiply(this.linearVelocity, Time.fixedDeltaTime));
+        // --- 3. Aktualizacja Prędkości i Pozycji ---
+        this.linearVelocity = this.linearVelocity.Add(Vector3.Multiply(this.acceleration, Time.fixedDeltaTime));
+        let nextPosition = this.position.Add(Vector3.Multiply(this.linearVelocity, Time.fixedDeltaTime));
 
-        if (this.collider) { // --- 5. Sprawdzenie kolizji ---
-            for (const other of Engine.Instance.scene.colliders) {
+        if (this.collider) {
+            for (const other of this.scene.colliders) {
                 if (other === this.collider) continue;
 
-                const originalPos = this.position;
-                this.position = newPosition;
+                this.transform.position = this.position;
+                this.transform.rotation = this.rotation;
 
                 if (this.collider.Intersects(other)) {
-                    const mtv = this.collider.ComputePenetration(other); // wektor wypchnięcia
+                    const mtv = this.collider.ComputePenetration(other);
                     if (mtv) {
-                        newPosition = Vector3.Add(newPosition, mtv);
+                        // A. Wypchnięcie
+                        nextPosition = nextPosition.Add(mtv);
 
-                        // normalna = znormalizowany mtv
-                        const contactNormal = mtv.Normalize();
+                        this.transform.position = this.position;
+                        this.transform.rotation = this.rotation;
 
-                        // odbicie prędkości wzdłuż normalnej
+                        // B. Punkt styku i Impuls
+                        const contactNormal = mtv.normalized;
+                        const contactPoint = OBB.GetContactPoint(this.obb, other.obb, contactNormal, mtv);
+
+                        // C. Reakcja (Impuls w punkcie)
                         const vDotN = this.linearVelocity.Dot(contactNormal);
-                        if (vDotN < 0) { // tylko jeśli się zbliża
-                            this.linearVelocity = Vector3.Subtract(this.linearVelocity, Vector3.Multiply(contactNormal, vDotN * (1 + this.bounce)));
+                        if (vDotN < 0) {
+                            const j = -(1 + this.bounce) * vDotN * this.mass;
+                            const impulse = Vector3.Multiply(contactNormal, j);
+
+                            this.AddForceAtPosition(impulse, contactPoint, ForceMode.Impulse);
+
+                            // this.AddForce(this.linearVelocity.Negate(null), ForceMode.Impulse);
+                            // const r = Vector3.Subtract(contactPoint, this.position);
+                            // const vPoint = this.linearVelocity.Add(this.angularVelocity.Cross(r));
+
+                            // const tangent = Vector3.Subtract(vPoint, Vector3.Multiply(contactNormal, vPoint.Dot(contactNormal))).normalized;
+
+                            // if (tangent.sqrMagnitude > 0.0001) {
+                            //     const frictionCoeff = 0.4; // np. 0.4 (statyczne/dynamiczne)
+                            //     const frictionImpulseMag = -vPoint.Dot(tangent) * this.mass * frictionCoeff;
+                            //     const frictionImpulse = Vector3.Multiply(tangent, frictionImpulseMag);
+
+                            //     // Aplikujemy impuls tarcia
+                            //     this.AddForceAtPosition(frictionImpulse, contactPoint, ForceMode.Impulse);
+                            // }
                         }
 
                         // Eventy
@@ -101,30 +137,49 @@ class Rigidbody extends Component {
                         this.SendMessage('OnCollisionExit', other);
                     }
                 }
-
-                this.position = originalPos; // przywróć przed kolejnym sprawdzeniem
             }
         }
 
-        // --- 6. Aktualizacja pozycji końcowej ---
-        this.position = newPosition;
-
-        // --- 7. Reset przyspieszenia ---
+        this.position = nextPosition;
         this.acceleration.Set(0, 0, 0);
 
         this.transform.position = this.position;
         this.transform.rotation = this.rotation;
     }
 
-    AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardsModifier = 0.0, mode = ForceMode.Force) { }
-    AddForce(force, mode = ForceMode.Force) {
-        const a = force.Multiply(1.0 / this.mass);
-        this.acceleration.Add(a);
+    AddExplosionForce(explosionForce, explosionPosition, explosionRadius, upwardsModifier = 0.0, mode = ForceMode.Force) {
+        if (!Physics.simulate || this.isKinematic) return;
     }
-    AddForceAtPosition(force, position, mode = ForceMode.Force) { }
-    AddRelativeForce(force, mode = ForceMode.Force) { }
-    AddRelativeTorque(torque, mode = ForceMode.Force) { }
-    AddTorque(torque, mode = ForceMode.Force) { }
+    AddForce(force, mode = ForceMode.Force) {
+        if (!Physics.simulate || this.isKinematic) return;
+
+        if (mode == ForceMode.Impulse) {
+            const a = force.Multiply(1.0 / this.mass);
+            this.acceleration.Add(a);
+        }
+    }
+    AddForceAtPosition(force, position, mode = ForceMode.Force) {
+        if (!Physics.simulate || this.isKinematic) return;
+        if (mode == ForceMode.Impulse) {
+            this.linearVelocity = this.linearVelocity.Add(Vector3.Multiply(force, 1.0 / this.mass));
+
+            const leverArm = Vector3.Subtract(position, this.position);
+            const torque = leverArm.Cross(force);
+
+            // Zakładając uproszczony moment bezwładności (J)
+            const angularImpulse = Vector3.Multiply(torque, 1.0 / this.inertia);
+            this.angularVelocity = this.angularVelocity.Add(angularImpulse);
+        }
+    }
+    AddRelativeForce(force, mode = ForceMode.Force) {
+        if (!Physics.simulate || this.isKinematic) return;
+    }
+    AddRelativeTorque(torque, mode = ForceMode.Force) {
+        if (!Physics.simulate || this.isKinematic) return;
+    }
+    AddTorque(torque, mode = ForceMode.Force) {
+        if (!Physics.simulate || this.isKinematic) return;
+    }
     ClosestPointOnBounds(position) { }
     GetAccumulatedForce(step = Time.fixedDeltaTime) { }
     GetAccumulatedTorque(step = Time.fixedDeltaTime) { }

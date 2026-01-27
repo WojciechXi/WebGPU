@@ -15,7 +15,7 @@ class BoxCollider extends Collider {
         }
     }
 
-    get worldCenter() { return Vector3.Add(this.transform.position, this.center); }
+    get worldCenter() { return this.transform.TransformPoint(this.center); }
     get localBounds() { return new Bounds(this.center.Clone(), this.size.Clone()); }
     get bounds() {
         const hx = this.size.x / 2;
@@ -33,49 +33,31 @@ class BoxCollider extends Collider {
             new Vector3(this.center.x - hx, this.center.y - hy, this.center.z - hz),
         ], this.transform.matrix4x4);
     }
+    get obb() {
+        return new OBB(this.transform.TransformPoint(this.center), Vector3.Divide(this.size, 2).Scale(this.transform.scale.Abs()), [this.transform.right, this.transform.up, this.transform.forward]);
+    }
 
-    ComputePenetration(otherCollider) {
-        if (otherCollider instanceof BoxCollider) {
-            let bounds = this.bounds;
-            let otherColliderBounds = otherCollider.bounds;
+    Intersects(other) {
+        if (other instanceof BoxCollider) {
+            return this.bounds.Intersects(other.bounds) && OBB.Check(this.obb, other.obb);
+        } else if (other instanceof SphereCollider || other instanceof CapsuleCollider) {
+            return other.Intersects(this);
+        }
+        return false;
+    }
 
-            const aMin = bounds.min;
-            const aMax = bounds.max;
+    ComputePenetration(other) {
+        if (!other) return null;
 
-            const bMin = otherColliderBounds.min;
-            const bMax = otherColliderBounds.max;
+        if (other instanceof BoxCollider) {
+            return OBB.ComputePenetration(this.obb, other.obb);
+        }
 
-            // overlap po osiach
-            const dx = Mathf.Min(aMax.x, bMax.x) - Mathf.Max(aMin.x, bMin.x);
-            const dy = Mathf.Min(aMax.y, bMax.y) - Mathf.Max(aMin.y, bMin.y);
-            const dz = Mathf.Min(aMax.z, bMax.z) - Mathf.Max(aMin.z, bMin.z);
-
-            if (dx > 0 && dy > 0 && dz > 0) {
-                // najmniejszy overlap → to będzie oś korekcji
-                if (dx < dy && dx < dz) {
-                    return new Vector3(aMax.x > bMax.x ? dx : -dx, 0, 0);
-                } else if (dy < dz) {
-                    return new Vector3(0, aMax.y > bMax.y ? dy : -dy, 0);
-                } else {
-                    return new Vector3(0, 0, aMax.z > bMax.z ? dz : -dz);
-                }
-            }
-        } else if (otherCollider instanceof SphereCollider) {
-            return otherCollider.ComputePenetration(this);
+        if (other instanceof SphereCollider) {
+            return other.ComputePenetration(this);
         }
 
         return null;
-    }
-
-    Intersects(otherCollider) {
-        if (otherCollider instanceof BoxCollider) {
-            if (this.bounds.Intersects(otherCollider.bounds)) { //AABB
-                return true; //OBB
-            }
-        } else if (otherCollider instanceof SphereCollider || otherCollider instanceof CapsuleCollider) {
-            return otherCollider.Intersects(this);
-        }
-        return false;
     }
 
     OnDrawGizmos(renderPass, camera) {
@@ -91,6 +73,5 @@ class BoxCollider extends Collider {
 
         // renderPass.DrawLine(Vector3.left, Vector3.right);
     }
-
 
 }

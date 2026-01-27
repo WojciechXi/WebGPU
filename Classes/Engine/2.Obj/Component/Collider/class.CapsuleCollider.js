@@ -5,12 +5,15 @@ class CapsuleCollider extends BoxCollider {
         this.center = Vector3.zero;
         this.radius = 0.5;
         this.height = 2.0; // odległość między końcami kapsuły
+
+        this.size.x = this.size.z = this.radius * 2;
+        this.size.y = this.height;
     }
 
     get bottom() { return Vector3.Sub(this.center, new Vector3(0, this.height / 2 - this.radius, 0)); }
     get top() { return Vector3.Add(this.center, new Vector3(0, this.height / 2 - this.radius, 0)); }
 
-    get worldCenter() { return Vector3.Add(this.transform.position, this.center); }
+    get worldCenter() { return this.transform.TransformPoint(this.center); }
     get localBounds() { return new Bounds(this.center, new Vector3(this.radius * 2, this.height, this.radius * 2)); }
     get bounds() {
         const hx = this.radius;

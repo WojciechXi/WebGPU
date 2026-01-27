@@ -20,8 +20,6 @@ $game = ScanFilesRecursive('/Game', ['js'], [], __DIR__);
     <?php foreach ($game as $script => $mime): ?>
         <script src="<?= $script; ?>"></script>
     <?php endforeach; ?>
-
-    <script src="./index.js"></script>
 </head>
 
 <body>
