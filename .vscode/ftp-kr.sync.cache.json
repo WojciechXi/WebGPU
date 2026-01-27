@@ -2193,6 +2193,7 @@
                     "modified": false
                   }
                 },
+                "Collider": {},
                 "Renderer": {
                   "class.MeshRenderer.js": {
                     "type": "-",
@@ -2201,21 +2202,46 @@
                     "modified": false
                   }
                 },
+                "Transform": {},
                 "class.Behaviour.js": {
                   "type": "-",
                   "size": 222,
                   "lmtime": 0,
                   "modified": false
                 },
+                "class.Cloth.js": {
+                  "type": "-",
+                  "size": 36,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "class.Collider.js": {
+                  "type": "-",
+                  "size": 1081,
+                  "lmtime": 0,
+                  "modified": false
+                },
                 "class.Renderer.js": {
                   "type": "-",
-                  "size": 203,
+                  "size": 161,
                   "lmtime": 1769096097521.568,
+                  "modified": true
+                },
+                "class.Rigidbody.js": {
+                  "type": "-",
+                  "size": 8623,
+                  "lmtime": 1769474464213.9126,
                   "modified": false
                 },
                 "class.Transform.js": {
                   "type": "-",
-                  "size": 4820,
+                  "size": 5182,
+                  "lmtime": 0,
+                  "modified": true
+                },
+                "class.Transform.js.new": {
+                  "type": "-",
+                  "size": 4898,
                   "lmtime": 0,
                   "modified": false
                 }
@@ -2235,7 +2261,57 @@
                 "modified": false
               }
             },
-            "4.Physics": {},
+            "4.Physics": {
+              "Geometry": {},
+              "class.Collision.js": {
+                "type": "-",
+                "size": 652,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.ContactPoint.js": {
+                "type": "-",
+                "size": 246,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.OBB.js": {
+                "type": "-",
+                "size": 3399,
+                "lmtime": 1769473736227.1892,
+                "modified": false
+              },
+              "class.Physics.js": {
+                "type": "-",
+                "size": 406,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.Ray.js": {
+                "type": "-",
+                "size": 284,
+                "lmtime": 0,
+                "modified": false
+              },
+              "class.RaycastHit.js": {
+                "type": "-",
+                "size": 25,
+                "lmtime": 0,
+                "modified": false
+              },
+              "enum.ForceMode.js": {
+                "type": "-",
+                "size": 100,
+                "lmtime": 0,
+                "modified": false
+              },
+              "enum.QueryTriggerInteraction.js": {
+                "type": "-",
+                "size": 89,
+                "lmtime": 0,
+                "modified": false
+              }
+            },
             "5.Engine": {
               "RenderPass": {
                 "class.BloomRenderPass.js": {
@@ -2527,20 +2603,20 @@
         "Game": {
           "class.Test.js": {
             "type": "-",
-            "size": 1510,
+            "size": 1602,
             "lmtime": 0,
             "modified": true
           },
           "class.Test2.js": {
             "type": "-",
-            "size": 758,
+            "size": 777,
             "lmtime": 0,
-            "modified": false
+            "modified": true
           },
           "index.js": {
             "type": "-",
-            "size": 7936,
-            "lmtime": 1769388607978.4736,
+            "size": 10028,
+            "lmtime": 1769474334268.7761,
             "modified": false
           }
         },
@@ -3074,7 +3150,7 @@
         },
         "index.php": {
           "type": "-",
-          "size": 869,
+          "size": 827,
           "lmtime": 1769175159915.3796,
           "modified": true
         },

@@ -8,13 +8,6 @@ class CylinderCollider extends Collider {
     }
 
     OnEnable() {
-        const meshRenderer = this.GetComponent(MeshRenderer);
-        if (meshRenderer) {
-            const bounds = meshRenderer.mesh.bounds;
-            this.center = bounds.center;
-            this.radius = Math.max(bounds.size.x, bounds.size.z) / 2;
-            this.height = bounds.size.y;
-        }
     }
 
     Raycast(ray, maxDistance) {

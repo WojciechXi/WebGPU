@@ -29,12 +29,30 @@ class Graphics {
             subMeshes: [new SubMesh({ edges: [0, 1], }),],
         });
 
+        const cubeVertices = [
+            new Vector3(-0.5, -0.5, -0.5), new Vector3(0.5, -0.5, -0.5), new Vector3(0.5, -0.5, 0.5), new Vector3(-0.5, -0.5, 0.5),
+            new Vector3(-0.5, 0.5, -0.5), new Vector3(0.5, 0.5, -0.5), new Vector3(0.5, 0.5, 0.5), new Vector3(-0.5, 0.5, 0.5),
+        ];
         this.cubeMesh = new Mesh({
-            vertices: [
-                new Vector3(-0.5, -0.5, -0.5), new Vector3(0.5, -0.5, -0.5), new Vector3(0.5, -0.5, 0.5), new Vector3(-0.5, -0.5, 0.5),
-                new Vector3(-0.5, 0.5, -0.5), new Vector3(0.5, 0.5, -0.5), new Vector3(0.5, 0.5, 0.5), new Vector3(-0.5, 0.5, 0.5)
+            vertices: cubeVertices,
+            normals: cubeVertices.map(v => v.normalized),
+            uvs: [
+                new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1),
+                new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1),
             ],
+            tangents: cubeVertices.map(v => {
+                const tangent = (Math.abs(v.y) < 0.9 ? new Vector3(0, 1, 0) : new Vector3(0, 0, 1)).Cross(v).normalized;
+                return new Vector4(tangent.x, tangent.y, tangent.z, 1.0);
+            }),
             subMeshes: [new SubMesh({
+                triangles: [
+                    3, 6, 2, 3, 7, 6,
+                    1, 4, 0, 1, 5, 4,
+                    7, 5, 6, 7, 4, 5,
+                    0, 2, 1, 0, 3, 2,
+                    2, 5, 1, 2, 6, 5,
+                    0, 7, 3, 0, 4, 7
+                ],
                 edges: [
                     0, 1, 1, 2, 2, 3, 3, 0,
                     4, 5, 5, 6, 6, 7, 7, 4,
@@ -42,6 +60,8 @@ class Graphics {
                 ],
             }),],
         });
+        // this.cubeMesh.RecalculateTangents();
+        this.cubeMesh.RecalculateBounds();
 
         this.icoMesh = this.CreateIcoSphere(0.5, 1);
         this.sphereMesh = this.CreateUVSphereMesh(0.5);
@@ -144,28 +164,28 @@ class Graphics {
     static set Preview(value) {
         switch (value) {
             case 1:
-                this.screenRenderPass.renderTexture = this.tonemappingRenderPass.sceneRenderTexture;
+                this.screenRenderPass.renderTexture = this.shadowRenderPass.depthRenderTexture;
                 return;
             case 2:
-                this.screenRenderPass.renderTexture = this.bloomRenderPass.bloomRenderTexture;
-                return;
-            case 3:
-                this.screenRenderPass.renderTexture = this.lightingRenderPass.sceneRenderTexture;
-                return;
-            case 4:
                 this.screenRenderPass.renderTexture = this.gBufferRenderPass.positionRenderTexture;
                 return;
-            case 5:
+            case 3:
                 this.screenRenderPass.renderTexture = this.gBufferRenderPass.normalRenderTexture;
                 return;
-            case 6:
+            case 4:
                 this.screenRenderPass.renderTexture = this.gBufferRenderPass.colorRenderTexture;
                 return;
-            case 7:
+            case 5:
                 this.screenRenderPass.renderTexture = this.gBufferRenderPass.depthRenderTexture;
                 return;
+            case 6:
+                this.screenRenderPass.renderTexture = this.lightingRenderPass.sceneRenderTexture;
+                return;
+            case 7:
+                this.screenRenderPass.renderTexture = this.bloomRenderPass.bloomRenderTexture;
+                return;
             case 8:
-                this.screenRenderPass.renderTexture = this.shadowRenderPass.depthRenderTexture;
+                this.screenRenderPass.renderTexture = this.tonemappingRenderPass.sceneRenderTexture;
                 return;
         }
     }
@@ -204,7 +224,11 @@ class Graphics {
 
     static CreateUVSphereMesh(radius = 0.5, latitudes = 16, longitudes = 16) {
         let vertices = [];
+        let tangents = [];
+        let uvs = [];
+
         let edges = [];
+        let triangles = [];
 
         for (let lat = 0; lat <= latitudes; lat++) {
             let theta = lat * Math.PI / latitudes;
@@ -221,24 +245,39 @@ class Graphics {
                 let z = sinPhi * sinTheta;
 
                 vertices.push(new Vector3(x, y, z).Multiply(radius));
+                tangents.push(new Vector4(-sinPhi, 0, cosPhi, 1.0).normalizedTangent);
+                uvs.push(new Vector2(lon / longitudes, lat / latitudes));
             }
         }
 
-        // Generowanie krawędzi (siatka)
         for (let lat = 0; lat < latitudes; lat++) {
             for (let lon = 0; lon < longitudes; lon++) {
                 let first = (lat * (longitudes + 1)) + lon;
                 let second = first + longitudes + 1;
 
-                edges.push(first, first + 1); // Poziome
-                edges.push(first, second);     // Pionowe
+                edges.push(first, first + 1);
+                edges.push(first, second);
+
+                triangles.push(first, second, first + 1);
+                triangles.push(second, second + 1, first + 1);
             }
         }
 
-        return new Mesh({
+        const mesh = new Mesh({
             vertices: vertices,
-            subMeshes: [new SubMesh({ edges: edges })]
+            normals: vertices.map(v => v.normalized),
+            tangents: tangents,
+            uvs: uvs,
+            subMeshes: [new SubMesh({
+                triangles: triangles,
+                edges: edges,
+            })]
         });
+
+        mesh.RecalculateBounds();
+        mesh.Update();
+
+        return mesh;
     }
 
     static CreateIcoSphere(radius = 0.5, subdivisions = 0) {
@@ -249,15 +288,15 @@ class Graphics {
             new Vector3(t, 0, -1), new Vector3(t, 0, 1), new Vector3(-t, 0, -1), new Vector3(-t, 0, 1)
         ].map(v => v.normalized.Multiply(radius));
 
-        // Definiujemy ściany (trójkąty), bo łatwiej je dzielić niż same krawędzie
+        // Odwrócone wierzchołki w bazowych ścianach (zmienione [a, b, c] na [a, c, b])
         let faces = [
-            [0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11],
-            [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
-            [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9],
-            [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1]
+            [0, 5, 11], [0, 1, 5], [0, 7, 1], [0, 10, 7], [0, 11, 10],
+            [1, 9, 5], [5, 4, 11], [11, 2, 10], [10, 6, 7], [7, 8, 1],
+            [3, 4, 9], [3, 2, 4], [3, 6, 2], [3, 8, 6], [3, 9, 8],
+            [4, 5, 9], [2, 11, 4], [6, 10, 2], [8, 7, 6], [9, 1, 8]
         ];
 
-        const cache = {}; // Aby nie tworzyć dwa razy tego samego wierzchołka na krawędzi
+        const cache = {};
 
         const getMiddlePoint = (p1, p2) => {
             const key = Mathf.Min(p1, p2) + "_" + Mathf.Max(p1, p2);
@@ -284,6 +323,7 @@ class Graphics {
                 const b = getMiddlePoint(tri[1], tri[2]);
                 const c = getMiddlePoint(tri[2], tri[0]);
 
+                // Tutaj również dbamy o kolejność CCW
                 faces2.push([tri[0], a, c]);
                 faces2.push([tri[1], b, a]);
                 faces2.push([tri[2], c, b]);
@@ -292,7 +332,7 @@ class Graphics {
             faces = faces2;
         }
 
-        // Wyciągamy krawędzie z trójkątów (unikalne pary)
+        // Wyciągamy krawędzie
         const edgeSet = new Set();
         const edges = [];
         for (let f of faces) {
@@ -308,10 +348,24 @@ class Graphics {
             addEdge(f[2], f[0]);
         }
 
-        return new Mesh({
+        const mesh = new Mesh({
             vertices: vertices,
-            subMeshes: [new SubMesh({ edges: edges })]
+            normals: vertices.map(v => v.normalized),
+            tangents: vertices.map(v => {
+                const n = v.normalized;
+                let t = new Vector3(-n.z, 0, n.x).normalized;
+                return new Vector4(t.x, t.y, t.z, 1.0);
+            }),
+            subMeshes: [new SubMesh({
+                triangles: faces.flat(),
+                edges: edges
+            })]
         });
+
+        mesh.RecalculateBounds();
+        mesh.Update();
+
+        return mesh;
     }
 
 }

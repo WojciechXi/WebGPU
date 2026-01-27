@@ -77,59 +77,35 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
                 let gameObject = new GameObject('Cube');
                 gameObject.transform.position = new Vector3(0, -1, 0);
-                gameObject.transform.localScale = new Vector3(4, 1, 4);
-
-                for (const mesh of gltf.meshes) {
-                    const meshGameObject = new GameObject(mesh.name);
-                    meshGameObject.transform.SetParent(gameObject.transform);
-                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [materials.Default];
-
-                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
-                }
+                gameObject.transform.localScale = new Vector3(8, 1, 8);
+                let meshRenderer = gameObject.AddComponent(MeshRenderer);
+                meshRenderer.mesh = Graphics.cubeMesh;
+                meshRenderer.materials = [materials.Default];
+                let boxCollider = gameObject.AddComponent(BoxCollider);
 
                 gameObject = new GameObject('Cube');
-                gameObject.transform.position = new Vector3(-2, 1, 0);
-                gameObject.transform.localScale = new Vector3(1, 4, 4);
-
-                for (const mesh of gltf.meshes) {
-                    const meshGameObject = new GameObject(mesh.name);
-                    meshGameObject.transform.SetParent(gameObject.transform);
-                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [materials.Default];
-
-                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
-                }
+                gameObject.transform.position = new Vector3(-4, 2, 0);
+                gameObject.transform.localScale = new Vector3(1, 8, 8);
+                meshRenderer = gameObject.AddComponent(MeshRenderer);
+                meshRenderer.mesh = Graphics.cubeMesh;
+                meshRenderer.materials = [materials.Default];
+                boxCollider = gameObject.AddComponent(BoxCollider);
 
                 gameObject = new GameObject('Cube');
-                gameObject.transform.position = new Vector3(2, 1, 0);
-                gameObject.transform.localScale = new Vector3(1, 4, 4);
-
-                for (const mesh of gltf.meshes) {
-                    const meshGameObject = new GameObject(mesh.name);
-                    meshGameObject.transform.SetParent(gameObject.transform);
-                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [materials.Default];
-
-                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
-                }
+                gameObject.transform.position = new Vector3(4, 2, 0);
+                gameObject.transform.localScale = new Vector3(1, 8, 8);
+                meshRenderer = gameObject.AddComponent(MeshRenderer);
+                meshRenderer.mesh = Graphics.cubeMesh;
+                meshRenderer.materials = [materials.Default];
+                boxCollider = gameObject.AddComponent(BoxCollider);
 
                 gameObject = new GameObject('Cube');
-                gameObject.transform.position = new Vector3(0, 1, 2);
-                gameObject.transform.localScale = new Vector3(4, 4, 1);
-
-                for (const mesh of gltf.meshes) {
-                    const meshGameObject = new GameObject(mesh.name);
-                    meshGameObject.transform.SetParent(gameObject.transform);
-                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-                    meshRenderer.mesh = mesh;
-                    meshRenderer.materials = [materials.Default];
-
-                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
-                }
+                gameObject.transform.position = new Vector3(0, 2, 4);
+                gameObject.transform.localScale = new Vector3(8, 8, 1);
+                meshRenderer = gameObject.AddComponent(MeshRenderer);
+                meshRenderer.mesh = Graphics.cubeMesh;
+                meshRenderer.materials = [materials.Default];
+                boxCollider = gameObject.AddComponent(BoxCollider);
             });
 
             // Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
@@ -148,24 +124,20 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             //     }
             // });
 
-            Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
-                for (let i = 0; i < 10; i++) {
-                    const gameObject = new GameObject('Sphere');
-                    gameObject.transform.position = new Vector3(Random.Range(-1, 1), Random.Range(1, 4), Random.Range(-1, 1));
-                    gameObject.transform.rotation = Quaternion.Euler(Random.Range(-180, 180), Random.Range(-180, 180), Random.Range(-180, 180));
+            for (let i = 0; i < 5; i++) {
+                const isCube = Random.Range(0, 1) > 0.5;
 
-                    for (const mesh of gltf.meshes) {
-                        const meshGameObject = new GameObject(mesh.name);
-                        meshGameObject.transform.SetParent(gameObject.transform);
-                        const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-                        meshRenderer.mesh = mesh;
-                        meshRenderer.materials = [materials.Default];
+                const gameObject = new GameObject('Sphere');
+                gameObject.transform.position = new Vector3(Random.Range(-1, 1), Random.Range(1, 4), Random.Range(-1, 1));
+                gameObject.transform.rotation = Quaternion.Euler(Random.Range(-180, 180), Random.Range(-180, 180), Random.Range(-180, 180));
 
-                        const sphereCollider = meshGameObject.AddComponent(SphereCollider);
-                        const rigidbody = meshGameObject.AddComponent(Rigidbody);
-                    }
-                }
-            });
+                const collider = gameObject.AddComponent(isCube ? BoxCollider : SphereCollider);
+                const rigidbody = gameObject.AddComponent(Rigidbody);
+
+                const meshRenderer = gameObject.AddComponent(MeshRenderer);
+                meshRenderer.mesh = isCube ? Graphics.cubeMesh : Graphics.sphereMesh;
+                meshRenderer.materials = [materials.Default];
+            }
 
             // Resources.Get('/Resources/Primitives/Capsule.gltf', function (gltf) {
             //     const gameObject = new GameObject('Capsule');

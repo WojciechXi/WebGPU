@@ -18,4 +18,19 @@ class Vector4 extends Float32Array {
     get z() { return this[2]; } set z(f) { return this[2] = f; }
     get w() { return this[3]; } set w(f) { return this[3] = f; }
 
+    get sqrMagnitude() { return this[0] * this[0] + this[1] * this[1] + this[2] * this[2] + this[3] * this[3]; }
+    get magnitude() { return Mathf.Sqrt(this[0] * this[0] + this[1] * this[1] + this[2] * this[2] + this[3] * this[3]); }
+
+    get normalized() {
+        const magnitude = this.magnitude;
+        if (magnitude > Mathf.Epsilon) return new Vector4(this.x / magnitude, this.y / magnitude, this.z / magnitude, this.w / magnitude);
+        return new Vector4(0, 0, 0, 0);
+    }
+
+    get normalizedTangent() {
+        const magnitude = this.magnitude;
+        if (magnitude > 0) return new Vector4(this.x / magnitude, this.y / magnitude, this.z / magnitude, this.w);
+        return new Vector4(0, 0, 0, this.w);
+    }
+
 }

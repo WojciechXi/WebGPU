@@ -23,7 +23,12 @@ class Collider extends Component {
     }
 
     ClosestPoint(position) { } // Todo
-    ClosestPointOnBounds(position) { } // Todo
+    ClosestPointOnBounds(position) {
+        const bounds = this.collider.bounds;
+        const min = bounds.min;
+        const max = bounds.max;
+        return new Vector3(Mathf.Clamp(position.x, min.x, max.x), Mathf.Clamp(position.y, min.y, max.y), Mathf.Clamp(position.z, min.z, max.z));
+    }
     GetGeometry() { } // Todo
     Raycast(ray, maxDistance) { return null; }
 

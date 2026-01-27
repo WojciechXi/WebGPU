@@ -31,7 +31,7 @@ class DirectionalLight extends Behaviour {
     Update() {
         this.aspect = 1;
 
-        let matrix = Matrix4x4.TRS(Vector3.Add(Camera.main.transform.position, Vector3.Multiply(this.transform.back, (this.farClipPlane - this.nearClipPlane) * 0.5)), this.transform.rotation, this.transform.scale);
+        let matrix = Matrix4x4.TRS(Vector3.Add(Camera.main.transform.position, this.transform.back.Multiply((this.farClipPlane - this.nearClipPlane) * 0.5)), this.transform.rotation, Vector3.one);
 
         Matrix4x4.Inverse(matrix, this.viewMatrix);
         Matrix4x4.Inverse(this.viewMatrix, this.inverseViewMatrix);

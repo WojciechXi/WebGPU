@@ -7,6 +7,10 @@ class SphereCollider extends Collider {
     }
 
     get worldCenter() { return this.transform.TransformPoint(this.center); }
+    get worldRadius() {
+        const s = this.transform.scale;
+        return this.radius * Mathf.Max(Mathf.Abs(s.x), Mathf.Abs(s.y), Mathf.Abs(s.z));
+    }
     get localBounds() { return new Bounds(this.center.Clone(), new Vector3(this.radius * 2, this.radius * 2, this.radius * 2)); }
     get bounds() {
         const hx = this.radius;
@@ -24,9 +28,7 @@ class SphereCollider extends Collider {
             new Vector3(this.center.x - hx, this.center.y - hy, this.center.z - hz),
         ], this.transform.matrix4x4);
     }
-    get sphere() {
-        return new Sphere(this.transform.TransformPoint(this.center), this.radius);
-    }
+    get sphere() { return new Sphere(this.worldCenter, this.worldRadius); }
 
     Intersects(other) {
         if (!other) return false;
@@ -66,7 +68,7 @@ class SphereCollider extends Collider {
         if (distance < 0 || distance > maxDistance) return null;
 
         const localPoint = localRay.GetPoint(distance);
-        const localNormal = localPoint.normalized;
+        const localNormal = Vector3.Subtract(localPoint, this.center).normalized;
 
         const worldPoint = this.transform.TransformPoint(localPoint);
         const worldNormal = this.transform.TransformDirection(localNormal);

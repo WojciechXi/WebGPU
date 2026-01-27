@@ -11,9 +11,9 @@ class Vector3 extends Float32Array {
     static get up() { return new Vector3(0, 1, 0); }
     static get zero() { return new Vector3(0, 0, 0); }
 
-    get x() { return this[0]; } set x(f) { return this[0] = f; }
-    get y() { return this[1]; } set y(f) { return this[1] = f; }
-    get z() { return this[2]; } set z(f) { return this[2] = f; }
+    get x() { return this[0]; } set x(value) { return this[0] = value; }
+    get y() { return this[1]; } set y(value) { return this[1] = value; }
+    get z() { return this[2]; } set z(value) { return this[2] = value; }
 
     get sqrMagnitude() {
         return this[0] * this[0] + this[1] * this[1] + this[2] * this[2];
@@ -27,7 +27,7 @@ class Vector3 extends Float32Array {
         const out = new Vector3();
 
         const magnitude = this.magnitude;
-        if (magnitude > 0.00001) {
+        if (magnitude > Mathf.Epsilon) {
             out[0] = this[0] / magnitude;
             out[1] = this[1] / magnitude;
             out[2] = this[2] / magnitude;
@@ -55,9 +55,19 @@ class Vector3 extends Float32Array {
         return Vector3.Magnitude(this);
     }
 
-    Normalize() {
-        Vector3.Normalize(this, this);
-        return this;
+    Normalize(out = this) {
+        out = out || this.Clone();
+
+        const magnitude = this.magnitude;
+        if (magnitude > Mathf.Epsilon) {
+            out[0] = this[0] / magnitude;
+            out[1] = this[1] / magnitude;
+            out[2] = this[2] / magnitude;
+        } else {
+            out[0] = out[1] = out[2] = 0;
+        }
+
+        return out;
     }
 
     Cross(other, out = null) {
@@ -179,23 +189,7 @@ class Vector3 extends Float32Array {
     static Magnitude(v) {
         return Mathf.Sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     }
-    static Normalize(v, out = null) {
-        out = out || new Vector3();
-
-        const magnitude = v.magnitude;
-        // make sure we don't divide by 0.
-        if (magnitude > 0.00001) {
-            out[0] = v[0] / magnitude;
-            out[1] = v[1] / magnitude;
-            out[2] = v[2] / magnitude;
-        } else {
-            out[0] = 0;
-            out[1] = 0;
-            out[2] = 0;
-        }
-
-        return out;
-    }
+    static Normalize(v, out = null) { return v.Normalize(out); }
 
     static FromVector3(vector3) {
         return new Vector3(vector3.x, vector3.y, vector3.z);

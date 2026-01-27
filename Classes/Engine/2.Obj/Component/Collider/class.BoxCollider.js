@@ -7,12 +7,6 @@ class BoxCollider extends Collider {
     }
 
     OnEnable() {
-        const meshRenderer = this.GetComponent(MeshRenderer);
-        if (meshRenderer) {
-            const bounds = meshRenderer.mesh.bounds;
-            this.center = bounds.center;
-            this.size = bounds.size;
-        }
     }
 
     get worldCenter() { return this.transform.TransformPoint(this.center); }

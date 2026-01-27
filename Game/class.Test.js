@@ -18,7 +18,7 @@ class Test extends MonoBehaviour {
         this.move.y = Input.GetAxis('Up');
         this.move.z = Input.GetAxis('Vertical');
 
-        this.transform.rotation = Quaternion.FromEuler(this.look.y, this.look.x, 0);
+        this.transform.rotation = Quaternion.Euler(this.look.y, this.look.x, 0);
 
         let position = this.transform.position;
         position = Vector3.Add(position, Vector3.Multiply(this.transform.forward, this.move.z * Time.deltaTime * 5));

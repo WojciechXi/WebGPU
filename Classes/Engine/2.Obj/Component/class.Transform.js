@@ -5,12 +5,10 @@ class Transform extends Component {
     // ---------- World Gettery / Settery ----------
 
     get localEulerAngles() { return Quaternion.ToEuler(this.localRotation); }
-    set localEulerAngles(localEulerAngles) { this.localRotation = Quaternion.FromEuler(localEulerAngles); }
+    set localEulerAngles(localEulerAngles) { this.localRotation = Quaternion.Euler(localEulerAngles); }
 
-    get eulerAngles() { return this.parent ? Quaternion.Multiply(this.parent.eulerAngles, this.localRotation) : Quaternion.ToEuler(this.localRotation); }
-    set eulerAngles(eulerAngles) {
-        if (!this.parent) this.localRotation = Quaternion.FromEuler(eulerAngles);
-    }
+    get eulerAngles() { return Quaternion.ToEuler(this.rotation); }
+    set eulerAngles(value) { this.rotation = Quaternion.Euler(value.x, value.y, value.z); }
 
     get position() {
         if (!this.parent) return this.localPosition.Clone();
@@ -31,24 +29,12 @@ class Transform extends Component {
         return this.parent ? Matrix4x4.Multiply(this.parent.matrix4x4, m) : m;
     }
 
-    get forward() {
-        const m = this.matrix4x4;
-        const v = new Vector3(m[8], m[9], m[10]); // Z kolumna
-        return v.Normalize();
-    }
-    get right() {
-        const m = this.matrix4x4;
-        const v = new Vector3(m[0], m[1], m[2]); // X kolumna
-        return v.Normalize();
-    }
-    get up() {
-        const m = this.matrix4x4;
-        const v = new Vector3(m[4], m[5], m[6]); // Y kolumna
-        return v.Normalize();
-    }
-    get back() { return Vector3.Multiply(this.forward, -1); }
-    get left() { return Vector3.Multiply(this.right, -1); }
-    get down() { return Vector3.Multiply(this.up, -1); }
+    get forward() { return Quaternion.MultiplyVector3(this.rotation, Vector3.forward); }
+    get right() { return Quaternion.MultiplyVector3(this.rotation, Vector3.right); }
+    get up() { return Quaternion.MultiplyVector3(this.rotation, Vector3.up); }
+    get back() { return this.forward.Negate(); }
+    get left() { return this.forward.Negate(); }
+    get down() { return this.forward.Negate(); }
 
     Init() {
         this.localPosition = Vector3.zero;
@@ -111,11 +97,9 @@ class Transform extends Component {
     }
     TransformVectors(vectors) { return vectors.map(v => this.TransformVector(v)); }
 
-    Translate(vector) {
-        const delta = Vector3.Scale(vector, this.parent.scale);
-        Quaternion.MultiplyVector3(this.parent.rotation, delta, delta);
-        this.parent.position.Add(delta);
-        //Todo set new position
+    Translate(translation, relativeTo = "self") {
+        if (relativeTo === "self") this.position = this.TransformPoint(translation);
+        else this.position = Vector3.Add(this.position, translation);
     }
 
     TransformRay(localRay) { return new Ray(this.TransformPoint(localRay.origin), this.TransformDirection(localRay.direction)); }

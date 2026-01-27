@@ -166,8 +166,8 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let color = textureSample(colorTexture, screenSampler, vsOut.uv);
     let emissive = textureSample(emissiveTexture, screenSampler, vsOut.uv);
 
-    if(worldPosition4.r + worldPosition4.g + worldPosition4.b <= 0) {
-        return vec4f(color.rgb,1.0);
+    if(worldPosition4.a == 0) {
+        return vec4f(color.rgb, 1.0);
     }
 
     let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv);

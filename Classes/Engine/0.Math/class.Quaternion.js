@@ -214,73 +214,47 @@ class Quaternion extends Float32Array {
     static Euler(x = 0, y = 0, z = 0, out = null) {
         out = out || new Quaternion();
 
-        const radX = x * Mathf.PI / 360;
-        const radY = y * Mathf.PI / 360;
-        const radZ = z * Mathf.PI / 360;
+        // Konwersja stopni na radiany i dzielenie przez 2
+        const radX = x * (Math.PI / 360);
+        const radY = y * (Math.PI / 360);
+        const radZ = z * (Math.PI / 360);
 
-        const cX = Math.cos(radX);
-        const sX = Math.sin(radX);
-        const cY = Math.cos(radY);
-        const sY = Math.sin(radY);
-        const cZ = Math.cos(radZ);
-        const sZ = Math.sin(radZ);
+        const sx = Math.sin(radX);
+        const cx = Math.cos(radX);
+        const sy = Math.sin(radY);
+        const cy = Math.cos(radY);
+        const sz = Math.sin(radZ);
+        const cz = Math.cos(radZ);
 
-        out.w = cX * cY * cZ + sX * sY * sZ;
-        out.x = sX * cY * cZ + cX * sY * sZ;
-        out.y = cX * sY * cZ - sX * cY * sZ;
-        out.z = cX * cY * sZ - sX * sY * cZ;
+        // Dla kolejności YXZ (najstabilniejsza w Y-up):
+        out.x = sx * cy * cz + cx * sy * sz;
+        out.y = cx * sy * cz - sx * cy * sz;
+        out.z = cx * cy * sz - sx * sy * cz;
+        out.w = cx * cy * cz + sx * sy * sz;
 
         return out;
     }
 
-    /**
-     * Convert quaternion to Euler angles (in radians).
-     * Order: Yaw (Z), Pitch (Y), Roll (X)
-     */
     static ToEuler(q, out = null) {
         out = out || new Vector3();
-        const x = q[0], y = q[1], z = q[2], w = q[3];
+        const [x, y, z, w] = q;
 
-        // roll (X-axis rotation)
-        const sinr_cosp = 2 * (w * x + y * z);
-        const cosr_cosp = 1 - 2 * (x * x + y * y);
-        out[0] = Mathf.Atan2(sinr_cosp, cosr_cosp);
+        // Pitch (X-axis)
+        const sinp = 2 * (w * x - y * z);
+        if (Math.abs(sinp) >= 1)
+            out[0] = (Math.PI / 2) * Math.sign(sinp);
+        else
+            out[0] = Math.asin(sinp);
 
-        // pitch (Y-axis rotation)
-        const sinp = 2 * (w * y - z * x);
-        if (Mathf.Abs(sinp) >= 1) {
-            out[1] = Mathf.Sign(sinp) * Mathf.PI / 2; // clamp to 90° if out of range
-        } else {
-            out[1] = Mathf.Asin(sinp);
-        }
+        // Yaw (Y-axis)
+        out[1] = Math.atan2(2 * (w * y + z * x), 1 - 2 * (x * x + y * y));
 
-        // yaw (Z-axis rotation)
-        const siny_cosp = 2 * (w * z + x * y);
-        const cosy_cosp = 1 - 2 * (y * y + z * z);
-        out[2] = Mathf.Atan2(siny_cosp, cosy_cosp);
+        // Roll (Z-axis)
+        out[2] = Math.atan2(2 * (w * z + x * y), 1 - 2 * (z * z + x * x));
 
         out[0] = Mathf.RadToDeg(out[0]);
         out[1] = Mathf.RadToDeg(out[1]);
         out[2] = Mathf.RadToDeg(out[2]);
-        return out; // [roll, pitch, yaw]
-    }
-
-    static FromEuler(x, y, z, out = null) {
-        out = out || Quaternion.identity;
-
-        x = Mathf.DegToRad(x);
-        y = Mathf.DegToRad(y);
-        z = Mathf.DegToRad(z);
-
-        const c1 = Mathf.Cos(z / 2), s1 = Mathf.Sin(z / 2);
-        const c2 = Mathf.Cos(y / 2), s2 = Mathf.Sin(y / 2);
-        const c3 = Mathf.Cos(x / 2), s3 = Mathf.Sin(x / 2);
-
-        out.w = c1 * c2 * c3 + s1 * s2 * s3;
-        out.x = c1 * c2 * s3 - s1 * s2 * c3;
-        out.y = c1 * s2 * c3 + s1 * c2 * s3;
-        out.z = s1 * c2 * c3 - c1 * s2 * s3;
-
         return out;
     }
 }

@@ -55,11 +55,11 @@ class Mesh extends Obj {
         let lines = new Float32Array(this.vertices.length * 4);
 
         for (let i = 0; i < this.vertices.length; i++) {
-            let vertex = this.vertices[i] ?? new Vector3(0, 0, 0);
-            let normal = this.normals[i] ?? new Vector3(0, 0, 0);
+            let vertex = this.vertices[i] ?? Vector3.zero;
+            let normal = this.normals[i] ?? Vector3.up;
             let tangent = this.tangents[i] ?? new Vector4(0, 0, 0, 1);
-            let color = this.colors[i] ?? new Color(1, 1, 1);
-            let uv = this.uvs[i] ?? new Vector2(0, 0);
+            let color = this.colors[i] ?? Color32.white;
+            let uv = this.uvs[i] ?? Vector2.zero;
 
             vertices.set([
                 vertex.x, vertex.y, vertex.z, 0,
@@ -107,6 +107,8 @@ class Mesh extends Obj {
         for (let i = 0; i < this.normals.length; i++) {
             this.normals[i] = this.normals[i].normalized;
         }
+
+        this.Update();
     }
 
     RecalculateTangents() {
@@ -166,6 +168,8 @@ class Mesh extends Obj {
 
             this.tangents[i] = new Vector4(tangent.x, tangent.y, tangent.z, handedness);
         }
+
+        this.Update();
     }
 
     RecalculateBounds() {

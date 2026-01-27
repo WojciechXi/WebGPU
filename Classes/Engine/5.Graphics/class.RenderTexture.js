@@ -18,7 +18,7 @@ class RenderTexture {
         return { binding: binding, visibility: visibility, texture: texture, };
     }
 
-    GetColorAttachment(loadOp = 'clear', storeOp = 'store', clearValue = { r: 0, g: 0, b: 0, a: 1 }) {
+    GetColorAttachment(loadOp = 'clear', storeOp = 'store', clearValue = { r: 0, g: 0, b: 0, a: 0 }) {
         return { view: this.textureView, loadOp: loadOp, storeOp: storeOp, clearValue: clearValue };
     }
 
