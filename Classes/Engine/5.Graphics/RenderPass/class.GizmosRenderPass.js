@@ -94,7 +94,31 @@ class GizmosRenderPass extends RenderPass {
         this.SetVertexBuffer(1, buffer.buffer);
         this.SetIndexBuffer(subMesh.edgeBuffer.buffer, 'uint32');
         this.DrawIndexed(subMesh.edges.length);
+    }
 
+    DrawLine(start, end) {
+        let distance = Vector3.Distance(start, end);
+        let matrix = Matrix4x4.TRS(start, Quaternion.LookRotation(Vector3.Sub(end, start)), Vector3.one.Multiply(distance));
+        this.DrawMesh(Graphics.lineMesh, 0, matrix);
+    }
+
+    DrawRay(ray) {
+        this.DrawLine(ray.origin, Vector3.Add(ray.origin, ray.direction));
+    }
+
+    DrawCube(position, size = Vector3.one, rotation = Quaternion.identity) {
+        let matrix = Matrix4x4.TRS(position, rotation, Vector3.one.Scale(size));
+        this.DrawMesh(Graphics.cubeMesh, 0, matrix);
+    }
+
+    DrawSphere(position, radius = 0.5, rotation = Quaternion.identity) {
+        let matrix = Matrix4x4.TRS(position, rotation, Vector3.one.Multiply(radius * 2));
+        this.DrawMesh(Graphics.sphereMesh, 0, matrix);
+    }
+
+    DrawIco(position, radius = 0.5, rotation = Quaternion.identity) {
+        let matrix = Matrix4x4.TRS(position, rotation, Vector3.one.Multiply(radius * 2));
+        this.DrawMesh(Graphics.icoMesh, 0, matrix);
     }
 
 }

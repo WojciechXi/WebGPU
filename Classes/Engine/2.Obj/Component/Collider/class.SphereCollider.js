@@ -62,15 +62,13 @@ class SphereCollider extends Collider {
         const t0 = (-b - sqrtD) / (2 * a);
         const t1 = (-b + sqrtD) / (2 * a);
 
-        // maxDistance w world space → lokalny?
-        // jeśli skala ≠ 1, musisz to przeliczyć
         return t0 <= maxDistance && t1 >= 0;
     }
 
     OnDrawGizmos(renderPass, camera) {
         let bounds = this.bounds;
-        let matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
-        renderPass.DrawMesh(Graphics.cubeMesh, 0, matrix);
+        renderPass.DrawSphere(this.worldCenter, this.radius, this.transform.rotation);
+        renderPass.DrawRay(new Ray(this.transform.position, this.transform.forward));
     }
 
 

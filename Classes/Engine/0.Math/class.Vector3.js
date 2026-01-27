@@ -150,6 +150,14 @@ class Vector3 extends Float32Array {
         return out;
     }
 
+    static Distance(a, b) {
+        return Mathf.Sqrt(
+            (b.x - a.x) * (b.x - a.x) +
+            (b.y - a.y) * (b.y - a.y) +
+            (b.z - a.z) * (b.z - a.z)
+        );
+    }
+
     static Lerp(a, b, t, out = null) {
         out = out || new Vector3();
         out[0] = Mathf.Lerp(a[0], b[0], t);

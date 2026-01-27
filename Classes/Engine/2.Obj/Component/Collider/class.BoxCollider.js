@@ -57,10 +57,8 @@ class BoxCollider extends Collider {
 
     OnDrawGizmos(renderPass, camera) {
         let bounds = this.bounds;
-        let matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
-        renderPass.DrawMesh(Graphics.cubeMesh, 0, matrix);
-
-        renderPass.DrawMesh(Graphics.lineMesh, 0, this.transform.matrix4x4);
+        renderPass.DrawCube(bounds.center, bounds.size);
+        renderPass.DrawRay(new Ray(this.transform.position, this.transform.forward));
     }
 
 }

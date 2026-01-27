@@ -3,7 +3,7 @@ class Camera extends Behaviour {
     Init() {
         if (Camera.main == null) Camera.main = this;
 
-        this.drawGizmos = Camera.main == this;
+        this.drawGizmos = true;
         this.parentCamera = Camera.main != this ? Camera.main : null;
 
         this.renderables = [];

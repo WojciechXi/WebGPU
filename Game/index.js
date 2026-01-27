@@ -161,7 +161,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                         meshRenderer.mesh = mesh;
                         meshRenderer.materials = [materials.Default];
 
-                        const boxCollider = meshGameObject.AddComponent(BoxCollider);
+                        const sphereCollider = meshGameObject.AddComponent(SphereCollider);
                         const rigidbody = meshGameObject.AddComponent(Rigidbody);
                     }
                 }

@@ -26,9 +26,8 @@ class Test extends MonoBehaviour {
         position = Vector3.Add(position, Vector3.Multiply(this.transform.right, this.move.x * Time.deltaTime * 5));
         this.transform.position = position;
 
+        this.ray = this.camera.ScreenPointToRay(Input.mousePosition);
         if (Input.GetKeyDown(0)) {
-            this.ray = this.camera.ScreenPointToRay(Input.mousePosition);
-            // const ray = new Ray(this.transform.position, this.transform.forward);
             const hits = Physics.Raycast(this.ray, 10);
             if (hits.length) {
                 const meshRenderer = hits[0].GetComponent(MeshRenderer);
@@ -40,10 +39,7 @@ class Test extends MonoBehaviour {
     }
 
     OnDrawGizmos(renderPass, camera) {
-        if (this.ray) {
-            let matrix = Matrix4x4.TRS(this.ray.origin, Quaternion.LookRotation(this.ray.direction), Vector3.one.Multiply(10));
-            renderPass.DrawMesh(Graphics.lineMesh, 0, matrix);
-        }
+        if (this.ray) renderPass.DrawRay(this.ray);
     }
 
 }
