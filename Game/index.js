@@ -74,166 +74,67 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             camera.rect.width = 0.25;
             camera.rect.height = 0.25;
 
-            Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
-                let gameObject = new GameObject('Cube');
-                gameObject.transform.position = new Vector3(0, -1, 0);
-                gameObject.transform.localScale = new Vector3(8, 1, 8);
-                let meshRenderer = gameObject.AddComponent(MeshRenderer);
-                meshRenderer.mesh = Graphics.cubeMesh;
-                meshRenderer.materials = [materials.Default];
-                let boxCollider = gameObject.AddComponent(BoxCollider);
+            Resources.Get('/Resources/Models/Terrain.gltf', function (gltf) {
+                const gameObject = new GameObject('Terrain');
 
-                gameObject = new GameObject('Cube');
-                gameObject.transform.position = new Vector3(-4, 2, 0);
-                gameObject.transform.localScale = new Vector3(1, 8, 8);
-                meshRenderer = gameObject.AddComponent(MeshRenderer);
-                meshRenderer.mesh = Graphics.cubeMesh;
-                meshRenderer.materials = [materials.Default];
-                boxCollider = gameObject.AddComponent(BoxCollider);
+                for (const mesh of gltf.meshes) {
+                    const meshGameObject = new GameObject(mesh.name);
+                    meshGameObject.transform.SetParent(gameObject.transform);
+                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [];
+                    mesh.subMeshes.forEach(function (subMesh) {
+                        if (subMesh.material == 'Glass') meshRenderer.castShadows = false;
+                        if (materials.hasOwnProperty(subMesh.material)) {
+                            meshRenderer.materials.push(materials[subMesh.material]);
+                        } else {
+                            const m = gltf.materials.find(function (m) { return m.name == subMesh.material; });
 
-                gameObject = new GameObject('Cube');
-                gameObject.transform.position = new Vector3(4, 2, 0);
-                gameObject.transform.localScale = new Vector3(1, 8, 8);
-                meshRenderer = gameObject.AddComponent(MeshRenderer);
-                meshRenderer.mesh = Graphics.cubeMesh;
-                meshRenderer.materials = [materials.Default];
-                boxCollider = gameObject.AddComponent(BoxCollider);
+                            const material = materials[subMesh.material] = new Material({
+                                name: subMesh.material,
+                                shader: litShader,
+                            });
 
-                gameObject = new GameObject('Cube');
-                gameObject.transform.position = new Vector3(0, 2, 4);
-                gameObject.transform.localScale = new Vector3(8, 8, 1);
-                meshRenderer = gameObject.AddComponent(MeshRenderer);
-                meshRenderer.mesh = Graphics.cubeMesh;
-                meshRenderer.materials = [materials.Default];
-                boxCollider = gameObject.AddComponent(BoxCollider);
+                            Resources.Get(`/Resources/Textures/${material.name}/Albedo.webp`, function (texture) {
+                                if (texture) material.SetTexture('albedo', texture);
+                            });
+
+                            Resources.Get(`/Resources/Textures/${material.name}/Normal.webp`, function (texture) {
+                                if (texture) material.SetTexture('normal', texture);
+                            });
+
+                            Resources.Get(`/Resources/Textures/${material.name}/Roughness.webp`, function (texture) {
+                                if (texture) material.SetTexture('roughness', texture);
+                            });
+
+                            Resources.Get(`/Resources/Textures/${material.name}/Metallic.webp`, function (texture) {
+                                if (texture) material.SetTexture('metallic', texture);
+                            });
+
+                            Resources.Get(`/Resources/Textures/${material.name}/Occlusion.webp`, function (texture) {
+                                if (texture) material.SetTexture('occlussion', texture);
+                            });
+
+                            material.Update();
+
+                            if (m && m.pbrMetallicRoughness) {
+                                const pbr = m.pbrMetallicRoughness;
+                                if (pbr.baseColorFactor) {
+                                    const color = pbr.baseColorFactor;
+                                    material.color.Set(color[0], color[1], color[2], color[3]);
+                                }
+
+                                material.metallic = pbr.metallicFactor ?? 0;
+                                material.roughness = pbr.roughnessFactor ?? 0;
+                            }
+
+                            meshRenderer.materials.push(material);
+                        }
+                    });
+
+                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
+                }
             });
-
-            // Resources.Get('/Resources/Primitives/Cube.gltf', function (gltf) {
-            //     const gameObject = new GameObject('Cube');
-            //     gameObject.transform.position = new Vector3(0, 1, 0);
-
-            //     for (const mesh of gltf.meshes) {
-            //         const meshGameObject = new GameObject(mesh.name);
-            //         meshGameObject.transform.SetParent(gameObject.transform);
-            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [materials.Default];
-
-            //         const boxCollider = meshGameObject.AddComponent(BoxCollider);
-            //         const rigidbody = meshGameObject.AddComponent(Rigidbody);
-            //     }
-            // });
-
-            for (let i = 0; i < 5; i++) {
-                const isCube = Random.Range(0, 1) > 0.5;
-
-                const gameObject = new GameObject('Sphere');
-                gameObject.transform.position = new Vector3(Random.Range(-1, 1), Random.Range(1, 4), Random.Range(-1, 1));
-                gameObject.transform.rotation = Quaternion.Euler(Random.Range(-180, 180), Random.Range(-180, 180), Random.Range(-180, 180));
-
-                const collider = gameObject.AddComponent(isCube ? BoxCollider : SphereCollider);
-                const rigidbody = gameObject.AddComponent(Rigidbody);
-
-                const meshRenderer = gameObject.AddComponent(MeshRenderer);
-                meshRenderer.mesh = isCube ? Graphics.cubeMesh : Graphics.sphereMesh;
-                meshRenderer.materials = [materials.Default];
-            }
-
-            // Resources.Get('/Resources/Primitives/Capsule.gltf', function (gltf) {
-            //     const gameObject = new GameObject('Capsule');
-            //     gameObject.transform.position = new Vector3(1, 1, 0);
-            //     // gameObject.AddComponent(Test2);
-
-            //     const capsuleCollider = gameObject.AddComponent(CapsuleCollider);
-            //     const rigidbody = gameObject.AddComponent(Rigidbody);
-
-            //     for (const mesh of gltf.meshes) {
-            //         const meshGameObject = new GameObject(mesh.name);
-            //         meshGameObject.transform.SetParent(gameObject.transform);
-            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [materials.Default];
-            //     }
-            // });
-
-            // Resources.Get('/Resources/Primitives/Sphere.gltf', function (gltf) {
-            //     const gameObject = new GameObject('Sphere');
-            //     gameObject.transform.position = new Vector3(0, 1, 0);
-            //     gameObject.AddComponent(Test2);
-
-            //     const sphereCollider = gameObject.AddComponent(SphereCollider);
-            //     const rigidbody = gameObject.AddComponent(Rigidbody);
-
-            //     for (const mesh of gltf.meshes) {
-            //         const meshGameObject = new GameObject(mesh.name);
-            //         meshGameObject.transform.SetParent(gameObject.transform);
-            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [materials.Default];
-            //     }
-            // });
-
-            // Resources.Get('/Resources/Models/Krakow.gltf', function (gltf) {
-            //     const gameObject = new GameObject('Krakow');
-
-            //     for (const mesh of gltf.meshes) {
-            //         const meshGameObject = new GameObject(mesh.name);
-            //         meshGameObject.transform.SetParent(gameObject.transform);
-            //         const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
-            //         meshRenderer.mesh = mesh;
-            //         meshRenderer.materials = [];
-            //         mesh.subMeshes.forEach(function (subMesh) {
-            //             if (subMesh.material == 'Glass') meshRenderer.castShadows = false;
-            //             if (materials.hasOwnProperty(subMesh.material)) {
-            //                 meshRenderer.materials.push(materials[subMesh.material]);
-            //             } else {
-            //                 const m = gltf.materials.find(function (m) { return m.name == subMesh.material; });
-
-            //                 const material = materials[subMesh.material] = new Material({
-            //                     name: subMesh.material,
-            //                     shader: litShader,
-            //                 });
-
-            //                 Resources.Get(`/Resources/Textures/${material.name}/Albedo.webp`, function (texture) {
-            //                     if (texture) material.SetTexture('albedo', texture);
-            //                 });
-
-            //                 Resources.Get(`/Resources/Textures/${material.name}/Normal.webp`, function (texture) {
-            //                     if (texture) material.SetTexture('normal', texture);
-            //                 });
-
-            //                 Resources.Get(`/Resources/Textures/${material.name}/Roughness.webp`, function (texture) {
-            //                     if (texture) material.SetTexture('roughness', texture);
-            //                 });
-
-            //                 Resources.Get(`/Resources/Textures/${material.name}/Metallic.webp`, function (texture) {
-            //                     if (texture) material.SetTexture('metallic', texture);
-            //                 });
-
-            //                 Resources.Get(`/Resources/Textures/${material.name}/Occlusion.webp`, function (texture) {
-            //                     if (texture) material.SetTexture('occlussion', texture);
-            //                 });
-
-            //                 material.Update();
-
-            //                 if (m && m.pbrMetallicRoughness) {
-            //                     const pbr = m.pbrMetallicRoughness;
-            //                     if (pbr.baseColorFactor) {
-            //                         const color = pbr.baseColorFactor;
-            //                         material.color.Set(color[0], color[1], color[2], color[3]);
-            //                     }
-
-            //                     material.metallic = pbr.metallicFactor ?? 0;
-            //                     material.roughness = pbr.roughnessFactor ?? 0;
-            //                 }
-
-            //                 meshRenderer.materials.push(material);
-            //             }
-            //         });
-
-            //         const boxCollider = meshGameObject.AddComponent(BoxCollider);
-            //     }
-            // });
 
         }, function (index, total, path) {
             console.log(`${index}/${total} - ${path}`);
