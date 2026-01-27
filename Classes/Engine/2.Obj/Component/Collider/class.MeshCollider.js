@@ -6,9 +6,9 @@ class MeshCollider extends Collider {
     }
 
     OnEnable() {
-        const meshFilter = this.GetComponent(MeshFilter);
-        if (meshFilter) {
-            this.mesh = meshFilter.mesh;
+        const meshRenderer = this.GetComponent(MeshRenderer);
+        if (meshRenderer) {
+            this.mesh = meshRenderer.mesh;
         }
     }
 
@@ -32,18 +32,12 @@ class MeshCollider extends Collider {
     }
 
     Intersects(other) {
-        if (!other) return false;
-
-        if (other instanceof BoxCollider) return this.bounds.Intersects(other.bounds);
-        if (other instanceof SphereCollider) return this.bounds.Intersects(other.bounds);
-        if (other instanceof CylinderCollider) return this.bounds.Intersects(other.bounds);
-        if (other instanceof CapsuleCollider) return this.bounds.Intersects(other.bounds);
-
         return false;
     }
 
     Raycast(ray, maxDistance) {
         if (!this.mesh) return null;
+        if (!this.mesh.subMeshes.length) return null;
 
         const localRay = this.transform.InverseTransformRay(ray);
 
@@ -51,7 +45,7 @@ class MeshCollider extends Collider {
         let nearestNormal = null;
 
         const vertices = this.mesh.vertices;
-        const triangles = this.mesh.subMesh[0].triangles;
+        const triangles = this.mesh.subMeshes[0].triangles;
 
         // Iteracja przez trójkąty (co 3 indeksy)
         for (let i = 0; i < triangles.length; i += 3) {
@@ -66,7 +60,7 @@ class MeshCollider extends Collider {
 
                 const edge1 = Vector3.Subtract(v1, v0);
                 const edge2 = Vector3.Subtract(v2, v0);
-                nearestNormal = Vector3.Cross(edge1, edge2).normalize();
+                nearestNormal = edge1.Cross(edge2).Normalize();
             }
         }
 
@@ -85,23 +79,23 @@ class MeshCollider extends Collider {
     IntersectTriangle(ray, v0, v1, v2) {
         const edge1 = Vector3.Subtract(v1, v0);
         const edge2 = Vector3.Subtract(v2, v0);
-        const h = Vector3.Cross(ray.direction, edge2);
-        const a = Vector3.Dot(edge1, h);
+        const h = ray.direction.Cross(edge2);
+        const a = edge1.Dot(h);
 
         if (a > -0.00001 && a < 0.00001) return null; // Promień równoległy
 
         const f = 1.0 / a;
         const s = Vector3.Subtract(ray.origin, v0);
-        const u = f * Vector3.Dot(s, h);
+        const u = f * s.Dot(h);
 
         if (u < 0.0 || u > 1.0) return null;
 
-        const q = Vector3.Cross(s, edge1);
-        const v = f * Vector3.Dot(ray.direction, q);
+        const q = s.Cross(edge1);
+        const v = f * ray.direction.Dot(q);
 
         if (v < 0.0 || u + v > 1.0) return null;
 
-        const t = f * Vector3.Dot(edge2, q);
+        const t = f * edge2.Dot(q);
         return t > 0.00001 ? t : null;
     }
 

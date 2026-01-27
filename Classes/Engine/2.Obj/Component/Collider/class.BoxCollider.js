@@ -34,8 +34,11 @@ class BoxCollider extends Collider {
     Intersects(other) {
         if (!other) return false;
 
-        if (other instanceof BoxCollider) return this.bounds.Intersects(other.bounds) && this.obb.Check(other.obb);
         if (other instanceof SphereCollider) return this.bounds.Intersects(other.bounds) && this.obb.CheckSphere(other.sphere);
+        if (other instanceof BoxCollider) return this.bounds.Intersects(other.bounds) && this.obb.Check(other.obb);
+        if (other instanceof CylinderCollider) return this.bounds.Intersects(other.bounds) && this.obb.CheckCylinder(other.cylinder);
+        if (other instanceof CapsuleCollider) return this.bounds.Intersects(other.bounds) && this.obb.CheckCapsule(other.capsule);
+        if (other instanceof MeshCollider) return this.bounds.Intersects(other.bounds) && this.obb.CheckMesh(other);
 
         return false;
     }
@@ -43,8 +46,11 @@ class BoxCollider extends Collider {
     ComputePenetration(other) {
         if (!other) return null;
 
-        if (other instanceof BoxCollider) return this.obb.ComputePenetration(other.obb);
         if (other instanceof SphereCollider) return this.obb.ComputePenetrationSphere(other.sphere);
+        if (other instanceof BoxCollider) return this.obb.ComputePenetration(other.obb);
+        if (other instanceof CylinderCollider) return this.obb.ComputePenetrationCylinder(other.cylinder);
+        if (other instanceof CapsuleCollider) return this.obb.ComputePenetrationCapsule(other.capsule);
+        if (other instanceof MeshCollider) return this.obb.ComputePenetrationMesh(other.mesh);
 
         return null;
     }

@@ -132,7 +132,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                         }
                     });
 
-                    const boxCollider = meshGameObject.AddComponent(BoxCollider);
+                    const meshCollider = meshGameObject.AddComponent(MeshCollider);
                 }
             });
 
