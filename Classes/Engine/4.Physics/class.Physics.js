@@ -6,13 +6,14 @@ class Physics {
     }
 
     static Raycast(ray, maxDistance) {
-        const hits = [];
+        const raycastHits = [];
+        let raycastHit = null;
         for (let collider of Engine.Instance.scene.colliders) {
-            if (collider.Raycast(ray, maxDistance)) {
-                hits.push(collider);
+            if (raycastHit = collider.Raycast(ray, maxDistance)) {
+                raycastHits.push(raycastHit);
             }
         }
-        return hits;
+        return raycastHits;
     }
 
 }

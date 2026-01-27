@@ -25,10 +25,7 @@ class Collider extends Component {
     ClosestPoint(position) { } // Todo
     ClosestPointOnBounds(position) { } // Todo
     GetGeometry() { } // Todo
-    Raycast(ray, maxDistance) {
-        const localRay = this.transform.InverseTransformRay(ray);
-        return this.localBounds.IntersectRay(localRay);
-    }
+    Raycast(ray, maxDistance) { return null; }
 
     ComputePenetration(otherCollider) {
         return null;

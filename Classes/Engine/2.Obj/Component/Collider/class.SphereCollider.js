@@ -48,21 +48,30 @@ class SphereCollider extends Collider {
 
     Raycast(ray, maxDistance) {
         const localRay = this.transform.InverseTransformRay(ray);
-        // return this.localBounds.IntersectRay(localRay);
 
-        const a = Vector3.Dot(localRay.direction, localRay.direction);
-        const b = 2 * Vector3.Dot(localRay.origin, localRay.direction);
-        const c = Vector3.Dot(localRay.origin, localRay.origin) - this.radius * this.radius;
+        // Równanie kwadratowe: at² + bt + c = 0
+        const a = localRay.direction.sqrMagnitude; // Zwykle 1, jeśli kierunek jest znormalizowany
+        const b = 2 * localRay.origin.Dot(localRay.direction);
+        const c = localRay.origin.sqrMagnitude - this.radius * this.radius;
 
         const discriminant = b * b - 4 * a * c;
-        if (discriminant < 0)
-            return false;
 
-        const sqrtD = Math.sqrt(discriminant);
-        const t0 = (-b - sqrtD) / (2 * a);
-        const t1 = (-b + sqrtD) / (2 * a);
+        if (discriminant < 0) return null;
 
-        return t0 <= maxDistance && t1 >= 0;
+        const sqrtDistance = Mathf.Sqrt(discriminant);
+        let distance = (-b - sqrtDistance) / (2 * a);
+
+        if (distance < 0) distance = (-b + sqrtDistance) / (2 * a);
+
+        if (distance < 0 || distance > maxDistance) return null;
+
+        const localPoint = localRay.GetPoint(distance);
+        const localNormal = localPoint.normalized;
+
+        const worldPoint = this.transform.TransformPoint(localPoint);
+        const worldNormal = this.transform.TransformDirection(localNormal);
+
+        return new RaycastHit(this, worldPoint, worldNormal, distance);
     }
 
     OnDrawGizmos(renderPass, camera) {

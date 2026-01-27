@@ -28,9 +28,9 @@ class Test extends MonoBehaviour {
 
         this.ray = this.camera.ScreenPointToRay(Input.mousePosition);
         if (Input.GetKeyDown(0)) {
-            const hits = Physics.Raycast(this.ray, 10);
-            if (hits.length) {
-                const meshRenderer = hits[0].GetComponent(MeshRenderer);
+            const raycastHits = Physics.Raycast(this.ray, 10);
+            if (raycastHits.length) {
+                const meshRenderer = raycastHits[0].gameObject.GetComponent(MeshRenderer);
                 if (meshRenderer) {
                     meshRenderer.materials[0].color = new Color32(Random.Range(0, 0.5), Random.Range(0, 0.5), Random.Range(0, 0.5));
                 }
