@@ -107,7 +107,7 @@ class Rigidbody extends Component {
                             const j = -(1 + this.bounce) * vDotN * this.mass;
                             const impulse = Vector3.Multiply(mtv.normal, j);
 
-                            this.AddForce(impulse, mtv.point, ForceMode.Impulse);
+                            this.AddForceAtPosition(impulse, mtv.point, ForceMode.Impulse);
                         }
                     } else {
                         // A. Wypchnięcie
