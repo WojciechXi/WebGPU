@@ -38,24 +38,19 @@ class BoxCollider extends Collider {
     }
 
     Intersects(other) {
-        if (other instanceof BoxCollider) {
-            return this.bounds.Intersects(other.bounds) && OBB.Check(this.obb, other.obb);
-        } else if (other instanceof SphereCollider || other instanceof CapsuleCollider) {
-            return other.Intersects(this);
-        }
+        if (!other) return false;
+
+        if (other instanceof BoxCollider) return this.bounds.Intersects(other.bounds) && this.obb.Check(other.obb);
+        if (other instanceof SphereCollider) return this.bounds.Intersects(other.bounds) && this.obb.CheckSphere(other.sphere);
+
         return false;
     }
 
     ComputePenetration(other) {
         if (!other) return null;
 
-        if (other instanceof BoxCollider) {
-            return OBB.ComputePenetration(this.obb, other.obb);
-        }
-
-        if (other instanceof SphereCollider) {
-            return other.ComputePenetration(this);
-        }
+        if (other instanceof BoxCollider) return this.obb.ComputePenetration(other.obb);
+        if (other instanceof SphereCollider) return this.obb.ComputePenetrationSphere(other.sphere);
 
         return null;
     }
@@ -63,15 +58,9 @@ class BoxCollider extends Collider {
     OnDrawGizmos(renderPass, camera) {
         const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
 
-        let localBounds = this.localBounds;
-        let matrix = Matrix4x4.TRS(Vector3.Add(this.transform.position, localBounds.center), this.transform.rotation, localBounds.size);
-        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
-
         let bounds = this.bounds;
-        matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
+        let matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
         renderPass.DrawMesh(cube.meshes[0], 0, matrix);
-
-        // renderPass.DrawLine(Vector3.left, Vector3.right);
     }
 
 }

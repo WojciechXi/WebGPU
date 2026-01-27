@@ -150,6 +150,14 @@ class Vector3 extends Float32Array {
         return out;
     }
 
+    static Lerp(a, b, t, out = null) {
+        out = out || new Vector3();
+        out[0] = Mathf.Lerp(a[0], b[0], t);
+        out[1] = Mathf.Lerp(a[1], b[1], t);
+        out[2] = Mathf.Lerp(a[2], b[2], t);
+        return out;
+    }
+
     static Add(a, b, out = null) { return a.Add(b, out); }
     static Subtract(a, b, out = null) { return a.Subtract(b, out); }
     static Sub(a, b, out = null) { return a.Subtract(b, out); }

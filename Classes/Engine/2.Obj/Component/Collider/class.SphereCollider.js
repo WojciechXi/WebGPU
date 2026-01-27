@@ -24,74 +24,24 @@ class SphereCollider extends Collider {
             new Vector3(this.center.x - hx, this.center.y - hy, this.center.z - hz),
         ], this.transform.matrix4x4);
     }
-
-    Intersects(otherCollider) {
-        if (otherCollider instanceof SphereCollider) {
-            const worldCenter = this.worldCenter;
-            const otherColliderWorldCenter = otherCollider.worldCenter;
-
-            const distSqr = Vector3.Subtract(worldCenter, otherColliderWorldCenter).sqrMagnitude;
-            const rSum = this.radius + otherCollider.radius;
-
-            return distSqr <= rSum * rSum;
-        } else if (otherCollider instanceof BoxCollider) {
-            const worldCenter = this.worldCenter;
-
-            const otherColliderBounds = otherCollider.bounds;
-            const boxMin = otherColliderBounds.min;
-            const boxMax = otherColliderBounds.max;
-
-            const x = Mathf.Max(boxMin.x, Mathf.Min(worldCenter.x, boxMax.x));
-            const y = Mathf.Max(boxMin.y, Mathf.Min(worldCenter.y, boxMax.y));
-            const z = Mathf.Max(boxMin.z, Mathf.Min(worldCenter.z, boxMax.z));
-
-            const closest = new Vector3(x, y, z);
-            const delta = Vector3.Subtract(worldCenter, closest);
-
-            return delta.sqrMagnitude <= this.radius * this.radius;
-        } else if (otherCollider instanceof CapsuleCollider) {
-            return otherCollider.Intersects(this);
-        }
-        return false;
+    get sphere() {
+        return new Sphere(this.transform.TransformPoint(this.center), this.radius);
     }
 
-    ComputePenetration(otherCollider) {
-        if (otherCollider instanceof TerrainCollider) {
-            return otherCollider.ComputePenetration(this);
-        } else if (otherCollider instanceof SphereCollider) {
-            const worldCenter = this.worldCenter;
-            const delta = Vector3.Subtract(worldCenter, otherCollider.worldCenter);
-            const dist = delta.magnitude;
-            const minDist = this.radius + otherCollider.radius;
+    Intersects(other) {
+        if (!other) return false;
 
-            if (dist < minDist) {
-                const normal = dist > 0 ? delta.Normalize() : new Vector3(1, 0, 0);
-                const depth = minDist - dist;
-                return Vector3.Multiply(normal, depth);
-            }
-        } else if (otherCollider instanceof BoxCollider) {
-            const worldCenter = this.worldCenter;
-            const otherColliderBounds = otherCollider.bounds;
+        if (other instanceof BoxCollider) return this.bounds.Intersects(other.bounds) && other.obb.CheckSphere(this.sphere);
+        if (other instanceof SphereCollider) return this.bounds.Intersects(other.bounds) && other.sphere.Check(this.sphere);
 
-            const boxMin = otherColliderBounds.min;
-            const boxMax = otherColliderBounds.max;
+        return null;
+    }
 
-            // clamp sphere center to box
-            const closest = new Vector3(
-                Mathf.Max(boxMin.x, Mathf.Min(worldCenter.x, boxMax.x)),
-                Mathf.Max(boxMin.y, Mathf.Min(worldCenter.y, boxMax.y)),
-                Mathf.Max(boxMin.z, Mathf.Min(worldCenter.z, boxMax.z))
-            );
+    ComputePenetration(other) {
+        if (!other) return null;
 
-            const delta = Vector3.Subtract(worldCenter, closest);
-            const dist = delta.magnitude;
-
-            if (dist < this.radius) {
-                const normal = dist > 0 ? delta.Normalize() : new Vector3(1, 0, 0);
-                const depth = this.radius - dist;
-                return Vector3.Multiply(normal, depth);
-            }
-        }
+        if (other instanceof BoxCollider) return other.obb.ComputePenetrationSphere(this.sphere);
+        if (other instanceof SphereCollider) return other.sphere.ComputePenetration(this.sphere);
 
         return null;
     }
@@ -120,12 +70,8 @@ class SphereCollider extends Collider {
     OnDrawGizmos(renderPass, camera) {
         const cube = Resources.Get('/Resources/Primitives/Cube.gltf');
 
-        let localBounds = this.localBounds;
-        let matrix = Matrix4x4.TRS(Vector3.Add(this.transform.position, localBounds.center), this.transform.rotation, localBounds.size);
-        renderPass.DrawMesh(cube.meshes[0], 0, matrix);
-
         let bounds = this.bounds;
-        matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
+        let matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
         renderPass.DrawMesh(cube.meshes[0], 0, matrix);
     }
 

@@ -5,9 +5,9 @@ class Rigidbody extends Component {
         this.linearVelocity = Vector3.zero;
         this.acceleration = Vector3.zero;
 
-        this.mass = 0.1;
+        this.mass = 1;
         this.inertia = 1.16;
-        this.bounce = 0; // odbicie
+        this.bounce = 1; // odbicie
         this.drag = 0.01;
         this.angularDrag = 0.05;
 
@@ -43,6 +43,8 @@ class Rigidbody extends Component {
         this._isSleeping = false;
     }
 
+    get worldCenterOfMass() { return this.transform.TransformPoint(this.centerOfMass); }
+
     // Messages
     // OnCollisionEnter(collision) { }
     // OnCollisionExit(collision) { }
@@ -50,6 +52,9 @@ class Rigidbody extends Component {
 
     OnEnable() {
         this.collider = this.GetComponent(Collider);
+        if (this.collider) {
+            this.centerOfMass = this.collider.center;
+        }
     }
 
     FixedUpdate() {
@@ -88,7 +93,23 @@ class Rigidbody extends Component {
 
                 if (this.collider.Intersects(other)) {
                     const mtv = this.collider.ComputePenetration(other);
-                    if (mtv) {
+                    if (!mtv) continue;
+
+                    if (mtv.point) {
+                        nextPosition = nextPosition.Add(Vector3.Multiply(mtv.normal, mtv.overlap));
+
+                        this.transform.position = this.position;
+                        this.transform.rotation = this.rotation;
+
+                        // C. Reakcja (Impuls w punkcie)
+                        const vDotN = this.linearVelocity.Dot(mtv.normal);
+                        if (vDotN < 0) {
+                            const j = -(1 + this.bounce) * vDotN * this.mass;
+                            const impulse = Vector3.Multiply(mtv.normal, j);
+
+                            this.AddForce(impulse, mtv.point, ForceMode.Impulse);
+                        }
+                    } else {
                         // A. Wypchnięcie
                         nextPosition = nextPosition.Add(mtv);
 
@@ -97,39 +118,24 @@ class Rigidbody extends Component {
 
                         // B. Punkt styku i Impuls
                         const contactNormal = mtv.normalized;
-                        const contactPoint = OBB.GetContactPoint(this.obb, other.obb, contactNormal, mtv);
+                        const contactPoint = OBB.GetContactPoint(this.collider.obb, other.obb, contactNormal, mtv);
 
                         // C. Reakcja (Impuls w punkcie)
                         const vDotN = this.linearVelocity.Dot(contactNormal);
                         if (vDotN < 0) {
-                            const j = (1 + this.bounce) * vDotN * this.mass;
+                            const j = -(1 + this.bounce) * vDotN * this.mass;
                             const impulse = Vector3.Multiply(contactNormal, j);
 
                             this.AddForceAtPosition(impulse, contactPoint, ForceMode.Impulse);
-
-                            // this.AddForce(this.linearVelocity.Negate(null), ForceMode.Impulse);
-                            // const r = Vector3.Subtract(contactPoint, this.position);
-                            // const vPoint = this.linearVelocity.Add(this.angularVelocity.Cross(r));
-
-                            // const tangent = Vector3.Subtract(vPoint, Vector3.Multiply(contactNormal, vPoint.Dot(contactNormal))).normalized;
-
-                            // if (tangent.sqrMagnitude > 0.0001) {
-                            //     const frictionCoeff = 0.4; // np. 0.4 (statyczne/dynamiczne)
-                            //     const frictionImpulseMag = -vPoint.Dot(tangent) * this.mass * frictionCoeff;
-                            //     const frictionImpulse = Vector3.Multiply(tangent, frictionImpulseMag);
-
-                            //     // Aplikujemy impuls tarcia
-                            //     this.AddForceAtPosition(frictionImpulse, contactPoint, ForceMode.Impulse);
-                            // }
                         }
+                    }
 
-                        // Eventy
-                        if (!this.collider._collidingWith.has(other)) {
-                            this.collider._collidingWith.add(other);
-                            this.SendMessage('OnCollisionEnter', other);
-                        } else {
-                            this.SendMessage('OnCollisionStay', other);
-                        }
+                    // Eventy
+                    if (!this.collider._collidingWith.has(other)) {
+                        this.collider._collidingWith.add(other);
+                        this.SendMessage('OnCollisionEnter', other);
+                    } else {
+                        this.SendMessage('OnCollisionStay', other);
                     }
                 } else {
                     if (this.collider._collidingWith.has(other)) {

@@ -6,6 +6,43 @@ class OBB {
         this.axes = axes;
     }
 
+    Check(obb) {
+        const T = Vector3.Sub(obb.center, this.center);
+        for (let i = 0; i < 3; i++) {
+            if (OBB.IsSeparated(this.axes[i], T, this, obb)) return false;
+            if (OBB.IsSeparated(obb.axes[i], T, this, obb)) return false;
+        }
+
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                const axisToCheck = this.axes[i].Cross(obb.axes[j]);
+                if (axisToCheck.sqrMagnitude < 0.001) continue;
+                if (OBB.IsSeparated(axisToCheck, T, this, obb)) return false;
+            }
+        }
+
+        return true;
+    }
+
+    CheckSphere(sphere) {
+        const d = Vector3.Sub(sphere.center, this.center);
+        let closestPoint = this.center.Clone();
+
+        for (let i = 0; i < 3; i++) {
+            const axis = this.axes[i];
+            const extent = this.extents[i];
+            let distance = d.Dot(axis);
+
+            if (distance > extent) distance = extent;
+            if (distance < -extent) distance = -extent;
+
+            closestPoint = closestPoint.Add(Vector3.Multiply(axis, distance));
+        }
+
+        const collisionVector = Vector3.Sub(sphere.center, closestPoint);
+        return collisionVector.sqrMagnitude < (sphere.radius * sphere.radius);
+    }
+
     GetSupportPoint(direction) {
         let result = this.center.Clone();
 
@@ -18,44 +55,26 @@ class OBB {
         return result;
     }
 
-    static Check(a, b) {
-        const T = Vector3.Sub(b.center, a.center);
-        for (let i = 0; i < 3; i++) {
-            if (OBB.IsSeparated(a.axes[i], T, a, b)) return false;
-            if (OBB.IsSeparated(b.axes[i], T, a, b)) return false;
-        }
-
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
-                const axisToCheck = a.axes[i].Cross(b.axes[j]);
-                if (axisToCheck.sqrMagnitude < 0.001) continue;
-                if (OBB.IsSeparated(axisToCheck, T, a, b)) return false;
-            }
-        }
-
-        return true;
-    }
-
-    static ComputePenetration(a, b) {
-        const T = Vector3.Sub(b.center, a.center);
+    ComputePenetration(obb) {
+        const T = Vector3.Sub(obb.center, this.center);
 
         let minOverlap = Infinity;
         let collisionAxis = null;
 
         const axesToTest = [
-            a.axes[0], a.axes[1], a.axes[2],
-            b.axes[0], b.axes[1], b.axes[2]
+            this.axes[0], this.axes[1], this.axes[2],
+            obb.axes[0], obb.axes[1], obb.axes[2]
         ];
 
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++) {
-                const axis = a.axes[i].Cross(b.axes[j]);
+                const axis = this.axes[i].Cross(obb.axes[j]);
                 if (axis.sqrMagnitude >= 0.001) axesToTest.push(axis.normalized);
             }
         }
 
         for (let axis of axesToTest) {
-            const overlap = OBB.GetOverlap(axis, T, a, b);
+            const overlap = OBB.GetOverlap(axis, T, this, obb);
             if (overlap <= 0) return null;
             if (overlap < minOverlap) {
                 minOverlap = overlap;
@@ -64,8 +83,37 @@ class OBB {
         }
 
         if (collisionAxis.Dot(T) >= 0) collisionAxis = collisionAxis.Negate();
-        // if (collisionAxis.Dot(T) < 0) collisionAxis = collisionAxis.Negate();
         return collisionAxis.Multiply(minOverlap);
+    }
+
+    ComputePenetrationSphere(sphere) {
+        const d = Vector3.Sub(sphere.center, this.center);
+        let closestPoint = this.center.Clone();
+
+        for (let i = 0; i < 3; i++) {
+            const axis = this.axes[i];
+            const extent = this.extents[i];
+            let distance = d.Dot(axis);
+
+            if (distance > extent) distance = extent;
+            if (distance < -extent) distance = -extent;
+
+            closestPoint = closestPoint.Add(Vector3.Multiply(axis, distance));
+        }
+
+        const collisionVector = Vector3.Sub(sphere.center, closestPoint);
+        const dist = collisionVector.magnitude; // Tutaj już potrzebujemy dokładnej odległości
+
+        // Jeśli środek kuli jest idealnie w tym samym miejscu co closestPoint,
+        // wypychamy w stronę pierwszej osi pudełka
+        const normal = dist > 0.0001 ? Vector3.Divide(collisionVector, dist) : this.axes[0];
+        const overlap = sphere.radius - dist;
+
+        return {
+            normal: normal.Normalize(),
+            overlap: overlap,
+            point: closestPoint
+        };
     }
 
     static IsSeparated(L, T, boxA, boxB) {
