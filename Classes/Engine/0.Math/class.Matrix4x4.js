@@ -518,4 +518,11 @@ class Matrix4x4 extends Float32Array {
         }
     }
 
+    toJSON() {
+        return {
+            type: 'Matrix4x4',
+            0: this[0], 1: this[1], 2: this[2], 3: this[3], 4: this[4], 5: this[5], 6: this[6], 7: this[7], 8: this[8], 9: this[9], 10: this[10], 11: this[11], 12: this[12], 14: this[14], 15: this[15],
+        };
+    }
+
 }

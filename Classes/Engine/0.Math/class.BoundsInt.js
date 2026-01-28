@@ -78,5 +78,11 @@ class BoundsInt extends Int16Array {
         return JSON.stringify(this);
     }
 
+    toJSON() {
+        return {
+            type: 'BoundsInt',
+            0: this[0], 1: this[1], 2: this[2], 3: this[3], 4: this[4], 5: this[5],
+        };
+    }
 
 }

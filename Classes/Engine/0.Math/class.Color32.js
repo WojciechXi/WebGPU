@@ -55,4 +55,11 @@ class Color32 extends Float32Array {
     static LerpUnclamped() { }
     static RGBToHSV() { }
 
+    toJSON() {
+        return {
+            type: 'Color32',
+            0: this[0], 1: this[1], 2: this[2], 3: this[3],
+        };
+    }
+
 }
