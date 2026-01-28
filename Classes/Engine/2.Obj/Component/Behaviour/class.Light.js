@@ -23,6 +23,13 @@ class Light extends Behaviour {
         this.range = 100;
         this.renderingLayerMask = 0;
         this.renderMode = null;
+        this.spotAngle = 1;
+        this.type = null;
+        this.useBoundingSphereOverride = false;
+        this.useColorTemperature = false;
+        this.useShadowMatrixOverride = false;
+        this.useViewFrustumForShadowCasterCull = false;
+
         // this.shadowAngle = 0;
         this.shadowBias = 0;
         this.shadowCustomResolution = 0;
@@ -33,13 +40,6 @@ class Light extends Behaviour {
         this.shadowResolution = null;
         this.shadows = null;
         this.shadowStrength = 1;
-        this.spotAngle = 1;
-        this.type = null;
-        this.useBoundingSphereOverride = false;
-        this.useColorTemperature = false;
-        this.useShadowMatrixOverride = false;
-        this.useViewFrustumForShadowCasterCull = false;
-
         this.shadowColor = new Color32(0.5, 0.5, 0.5, 1);
 
         this.aspect = 1;

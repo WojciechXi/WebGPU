@@ -121,6 +121,8 @@ struct DirectionalLight {
     inverseViewProjection : mat4x4f,
     color : vec4f,
     shadowColor : vec4f,
+    shadowBias: f32,
+    shadowRadius: i32,
 };
 
 struct AmbientLight {
@@ -196,7 +198,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     var shadowVal = 1.0;
     if(cameraDistance < 50){
         let shadowFalloff = clamp((cameraDistance) / 50, 0, 1);
-        shadowVal = lerp(sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, 5, 0.002), shadowVal, shadowFalloff) + 0.25;
+        shadowVal = lerp(sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, clamp(directionalLight.shadowRadius, 3, 7), directionalLight.shadowBias), shadowVal, shadowFalloff) + 0.25;
     }
 
     // --- światło ---

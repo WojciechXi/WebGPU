@@ -2,7 +2,10 @@ class DirectionalLight extends Behaviour {
 
     Init() {
         this.color = Color.white;
+
         this.shadowColor = new Color(0.5, 0.5, 0.5, 1);
+        this.shadowRadius = 5;
+        this.shadowBias = 0.003;
 
         this.aspect = 1;
         this.nearClipPlane = 0.1;
@@ -18,7 +21,7 @@ class DirectionalLight extends Behaviour {
         this.inverseViewMatrix = Matrix4x4.Identity();
         this.inverseViewProjectionMatrix = Matrix4x4.Identity();
 
-        this.lightBuffer = new Buffer(16 + 16 + 16 + 16 + 16 + 4 + 4); //view, projection, viewProjection, inverseView, inverseViewProjection, color, shadowColor
+        this.lightBuffer = new Buffer(16 + 16 + 16 + 16 + 16 + 4 + 4 + 4); //view, projection, viewProjection, inverseView, inverseViewProjection, color, shadowColor, shadowRadius, shadowBias
         this.lightBindGroup = GPU.CreateBindGroup({
             label: 'ViewBindGroup',
             layout: Graphics.lightBindGroupLayout,
@@ -47,6 +50,7 @@ class DirectionalLight extends Behaviour {
             64: this.inverseViewProjectionMatrix,
             80: this.color,
             84: this.shadowColor,
+            88: [this.shadowBias, this.shadowRadius],
         });
 
         return this.renderables = this.scene.renderables;
