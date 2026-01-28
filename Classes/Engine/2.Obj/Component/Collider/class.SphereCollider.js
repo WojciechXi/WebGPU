@@ -58,8 +58,8 @@ class SphereCollider extends Collider {
     }
 
     OnDrawGizmos(renderPass, camera) {
-        renderPass.DrawSphere(this.worldCenter, this.radius, this.transform.rotation);
         renderPass.DrawRay(new Ray(this.transform.position, this.transform.forward));
+        renderPass.DrawSphere(this.worldCenter, this.radius, this.transform.rotation);
     }
 
     GetGeometry() { return new SphereGeometry(this.worldCenter, this.worldRadius); }

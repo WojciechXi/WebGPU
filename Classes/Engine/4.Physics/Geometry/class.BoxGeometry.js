@@ -68,12 +68,29 @@ Geometry.check.BoxGeometry = {
         const combinedRadius = box.extents.magnitude + (capLength / 2) + cap.radius;
         return Vector3.Distance(box.center, Vector3.Lerp(cap.start, cap.end, 0.5)) < combinedRadius;
     },
-    TriangleGeometry: function (box, triangle) {
+    TriangleGeometry: function (box, a, b, c) {
         const closest = TriangleGeometry.ClosestPoint(box.center, a, b, c);
         return Geometry.check.BoxGeometry.SphereGeometry(box, { center: closest, radius: 0.001 });
     },
     TriangleMeshGeometry: function (box, mesh) {
-        return Geometry.check.TriangleMeshGeometry.BoxGeometry(mesh, box);
+        const closestOnTri = TriangleGeometry.ClosestPoint(box.center, a, b, c);
+        // Traktujemy punkt na trójkącie jako sferę o promieniu 0
+        const hit = Geometry.compute.BoxGeometry.SphereGeometry(box, { center: closestOnTri, radius: 0 });
+        if (!hit) return null;
+
+        // Obliczamy właściwą normalną trójkąta dla poprawnego wypchnięcia
+        const edge1 = Vector3.Subtract(b, a);
+        const edge2 = Vector3.Subtract(c, a);
+        const triNormal = edge1.Cross(edge2).Normalize();
+
+        // Jeśli środek boxa jest pod trójkątem, odwracamy normalną
+        if (triNormal.Dot(Vector3.Subtract(box.center, a)) < 0) triNormal.Negate();
+
+        return {
+            point: closestOnTri,
+            normal: triNormal,
+            overlap: hit.overlap
+        };
     },
 };
 
@@ -178,7 +195,7 @@ Geometry.compute.BoxGeometry = {
     TriangleMeshGeometry: function (box, mesh) {
         let bestHit = null;
         for (let i = 0; i < mesh.triangles.length; i += 3) {
-            const hit = this.TriangleGeometry(box, mesh.triangles[i], mesh.triangles[i + 1], mesh.triangles[i + 2]);
+            const hit = this.TriangleGeometry(box, mesh.vertices[mesh.triangles[i]], mesh.vertices[mesh.triangles[i + 1]], mesh.vertices[mesh.triangles[i + 2]]);
             if (hit && (!bestHit || hit.overlap > bestHit.overlap)) bestHit = hit;
         }
         return bestHit;

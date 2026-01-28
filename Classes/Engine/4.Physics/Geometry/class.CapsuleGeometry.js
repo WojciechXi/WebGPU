@@ -28,11 +28,17 @@ Geometry.check.CapsuleGeometry = {
     CylinderGeometry: function (capsule, cylinder) {
         return Geometry.check.CylinderGeometry.CapsuleGeometry(cylinder, capsule);
     },
-    TriangleGeometry: function (capsule, triangle) {
-        return Geometry.check.TriangleGeometry.CapsuleGeometry(capsule, triangle);
+    TriangleGeometry: function (capsule, a, b, c) {
+        const capsuleVec = Vector3.Subtract(capsule.end, capsule.start);
+        const t = Mathf.Clamp(Vector3.Subtract(TriangleGeometry.ClosestPoint(capsule.start, a, b, c), capsule.start).Dot(capsuleVec) / capsuleVec.sqrMagnitude, 0, 1);
+        const closestOnSegment = capsule.start.Add(capsuleVec.Multiply(t));
+
+        const closestOnTri = TriangleGeometry.ClosestPoint(closestOnSegment, a, b, c);
+        return Vector3.Distance(closestOnSegment, closestOnTri) < capsule.radius;
     },
     TriangleMeshGeometry: function (capsule, mesh) {
-        return Geometry.check.TriangleMeshGeometry.CapsuleGeometry(mesh, capsule);
+        for (let i = 0; i < mesh.triangles; i += 3) if (this.TriangleGeometry(capsule, mesh.vertices[mesh.triangles[i]], mesh.vertices[mesh.triangles[i + 1]], mesh.vertices[mesh.triangles[i + 2]])) return true;
+        return false;
     },
 };
 
@@ -129,18 +135,21 @@ Geometry.compute.CapsuleGeometry = {
         };
     },
     TriangleGeometry: function (capsule, a, b, c) {
-        // const capsuleVec = Vector3.Subtract(capsule.center2, capsule.center1);
+        const capsuleVec = Vector3.Subtract(capsule.end, capsule.start);
+        // Próbkowanie punktów (start, środek, koniec) dla stabilności
+        const points = [capsule.start, capsule.start.Add(capsuleVec.Multiply(0.5)), capsule.end];
+        let bestHit = null;
 
-        const hit1 = Geometry.compute.SphereGeometry.TriangleGeometry({ center: capsule.center1, radius: capsule.radius }, a, b, c);
-        const hit2 = Geometry.compute.SphereGeometry.TriangleGeometry({ center: capsule.center2, radius: capsule.radius }, a, b, c);
-
-        if (!hit1 && !hit2) return null;
-        return hit1 && hit2 ? (hit1.overlap > hit2.overlap ? hit1 : hit2) : (hit1 || hit2);
+        for (let p of points) {
+            const hit = Geometry.compute.SphereGeometry.TriangleGeometry({ center: p, radius: capsule.radius }, a, b, c);
+            if (hit && (!bestHit || hit.overlap > bestHit.overlap)) bestHit = hit;
+        }
+        return bestHit;
     },
     TriangleMeshGeometry: function (capsule, mesh) {
         let bestHit = null;
         for (let i = 0; i < mesh.triangles.length; i += 3) {
-            const hit = this.TriangleGeometry(capsule, mesh.triangles[i], mesh.triangles[i + 1], mesh.triangles[i + 2]);
+            const hit = this.TriangleGeometry(capsule, mesh.vertices[mesh.triangles[i]], mesh.vertices[mesh.triangles[i + 1]], mesh.vertices[mesh.triangles[i + 2]]);
             if (hit && (!bestHit || hit.overlap > bestHit.overlap)) bestHit = hit;
         }
         return bestHit;

@@ -50,8 +50,12 @@ class CapsuleCollider extends BoxCollider {
     }
 
     OnDrawGizmos(renderPass, camera) {
+        renderPass.DrawRay(new Ray(this.transform.position, this.transform.forward));
+        renderPass.DrawSphere(this.worldCenter.Subtract(new Vector3(0, this.height / 2 - this.radius, 0)), this.radius, this.transform.rotation);
+        renderPass.DrawSphere(this.worldCenter.Add(new Vector3(0, this.height / 2 - this.radius, 0)), this.radius, this.transform.rotation);
+
         let bounds = this.bounds;
-        matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
+        let matrix = Matrix4x4.TRS(bounds.center, Quaternion.identity, bounds.size);
         renderPass.DrawMesh(Graphics.cubeMesh, 0, matrix);
     }
 

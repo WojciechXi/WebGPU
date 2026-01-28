@@ -26,14 +26,12 @@ Geometry.check.CylinderGeometry = {
         return dist < (a.radius + b.radius) && Math.abs(a.center.y - b.center.y) < (a.height + b.height) / 2;
     },
     // CapsuleGeometry: function () { }
-    TriangleGeometry: function (cylinder, triangle) {
-        const closest = triangle.ClosestPoint(cylinder.center);
+    TriangleGeometry: function (cylinder, a, b, c) {
+        const closest = TriangleGeometry.ClosestPoint(cylinder.center, a, b, c);
         return Geometry.check.CylinderGeometry.SphereGeometry(cylinder, { center: closest, radius: 0.001 });
     },
     TriangleMeshGeometry: function (cylinder, mesh) {
-        for (const tri of mesh.triangles) {
-            if (this.TriangleGeometry(cylinder, tri)) return true;
-        }
+        for (let i = 0; i < mesh.triangles; i += 3) if (this.TriangleGeometry(cylinder, mesh.vertices[mesh.triangles[i]], mesh.vertices[mesh.triangles[i + 1]], mesh.vertices[mesh.triangles[i + 2]])) return true;
         return false;
     },
 };
@@ -102,19 +100,18 @@ Geometry.compute.CylinderGeometry = {
         const tempSphere = { center: closestPoint, radius: capsule.radius };
         return this.SphereGeometry(cylinder, tempSphere);
     },
-    TriangleGeometry: function (cylinder, triangle) {
-        // Przybliżamy cylinder jako Box dla kolizji z trójkątem
+    TriangleGeometry: function (cylinder, a, b, c) {
         const tempBox = {
             center: cylinder.center,
             extents: new Vector3(cylinder.radius, cylinder.height / 2, cylinder.radius),
             axes: cylinder.axes || [new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1)]
         };
-        return Geometry.compute.BoxGeometry.TriangleGeometry(tempBox, triangle);
+        return Geometry.compute.BoxGeometry.TriangleGeometry(tempBox, a, b, c);
     },
     TriangleMeshGeometry: function (cylinder, mesh) {
         let bestHit = null;
         for (let i = 0; i < mesh.triangles.length; i += 3) {
-            const hit = this.TriangleGeometry(cylinder, mesh.triangles[i], mesh.triangles[i + 1], mesh.triangles[i + 2]);
+            const hit = this.TriangleGeometry(cylinder, mesh.vertices[mesh.triangles[i]], mesh.vertices[mesh.triangles[i + 1]], mesh.vertices[mesh.triangles[i + 2]]);
             if (hit && (!bestHit || hit.overlap > bestHit.overlap)) bestHit = hit;
         }
         return bestHit;

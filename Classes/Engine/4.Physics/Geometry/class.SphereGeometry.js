@@ -39,12 +39,28 @@ Geometry.check.SphereGeometry = {
 
         return Vector3.Distance(sphere.center, closestPointOnSegment) < (sphere.radius + cap.radius);
     },
-    TriangleGeometry: function (sphere, triangle) {
-        const closest = triangle.ClosestPoint(sphere.center);
-        return Vector3.Distance(sphere.center, closest) < sphere.radius;
+    TriangleGeometry: function (sphere, a, b, c) {
+        const closest = TriangleGeometry.ClosestPoint(sphere.center, a, b, c);
+        const sqrDist = Vector3.Subtract(sphere.center, closest).sqrMagnitude;
+        return sqrDist < (sphere.radius * sphere.radius);
     },
+
     TriangleMeshGeometry: function (sphere, mesh) {
-        return Geometry.check.TriangleMeshGeometry.SphereGeometry(mesh, sphere);
+        const indices = mesh.triangles;
+        const verts = mesh.vertices;
+        const len = indices.length;
+
+        for (let i = 0; i < len; i += 3) {
+            if (this.TriangleGeometry(
+                sphere,
+                verts[indices[i]],
+                verts[indices[i + 1]],
+                verts[indices[i + 2]]
+            )) {
+                return true;
+            }
+        }
+        return false;
     },
 };
 
@@ -148,31 +164,42 @@ Geometry.compute.SphereGeometry = {
         };
     },
     TriangleGeometry: function (sphere, a, b, c) {
+        // Używamy statycznej metody, przekazując bezpośrednio punkty
         const closestPoint = TriangleGeometry.ClosestPoint(sphere.center, a, b, c);
         const collisionVector = Vector3.Subtract(sphere.center, closestPoint);
         const distance = collisionVector.magnitude;
 
         if (distance >= sphere.radius) return null;
 
-        // Normalna trójkąta (płaszczyzny)
+        // Normalna płaszczyzny trójkąta
         const edge1 = Vector3.Subtract(b, a);
         const edge2 = Vector3.Subtract(c, a);
         const triNormal = edge1.Cross(edge2).Normalize();
 
-        // Normalna kolizji - jeśli sfera jest idealnie na powierzchni, użyj normalnej trójkąta
+        // Jeśli środek sfery pokrywa się z najbliższym punktem, wypychamy zgodnie z normalną trójkąta
         const normal = distance > 0.0001 ? collisionVector.Divide(distance) : triNormal;
 
         return {
             point: closestPoint,
-            normal: normal, // Wypycha sferę od trójkąta
+            normal: normal,
             overlap: sphere.radius - distance
         };
     },
     TriangleMeshGeometry: function (sphere, mesh) {
         let bestHit = null;
+        // Zakładamy, że mesh.triangles to tablica indeksów, a mesh.vertices to tablica Vector3
         for (let i = 0; i < mesh.triangles.length; i += 3) {
-            const hit = this.TriangleGeometry(sphere, mesh.triangles[i], mesh.triangles[i + 1], mesh.triangles[i + 2]);
-            if (hit && (!bestHit || hit.overlap > bestHit.overlap)) bestHit = hit;
+            const v0 = mesh.vertices[mesh.triangles[i]];
+            const v1 = mesh.vertices[mesh.triangles[i + 1]];
+            const v2 = mesh.vertices[mesh.triangles[i + 2]];
+
+            const hit = this.TriangleGeometry(sphere, v0, v1, v2);
+
+            if (hit) {
+                if (!bestHit || hit.overlap > bestHit.overlap) {
+                    bestHit = hit;
+                }
+            }
         }
         return bestHit;
     }

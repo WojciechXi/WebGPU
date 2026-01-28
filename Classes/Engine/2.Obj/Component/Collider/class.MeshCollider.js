@@ -14,22 +14,7 @@ class MeshCollider extends Collider {
 
     get worldCenter() { return this.mesh ? this.transform.TransformPoint(this.mesh.bounds.center) : super.worldCenter; }
     get localBounds() { return this.mesh ? new Bounds(this.mesh.bounds.center.Clone(), this.mesh.bounds.size.Clone()) : super.localBounds; }
-    get bounds() {
-        const hx = this.size.x / 2;
-        const hy = this.size.y / 2;
-        const hz = this.size.z / 2;
-
-        return GeometryUtility.CalculateBounds([
-            new Vector3(this.center.x + hx, this.center.y + hy, this.center.z + hz),
-            new Vector3(this.center.x + hx, this.center.y + hy, this.center.z - hz),
-            new Vector3(this.center.x + hx, this.center.y - hy, this.center.z + hz),
-            new Vector3(this.center.x + hx, this.center.y - hy, this.center.z - hz),
-            new Vector3(this.center.x - hx, this.center.y + hy, this.center.z + hz),
-            new Vector3(this.center.x - hx, this.center.y + hy, this.center.z - hz),
-            new Vector3(this.center.x - hx, this.center.y - hy, this.center.z + hz),
-            new Vector3(this.center.x - hx, this.center.y - hy, this.center.z - hz),
-        ], this.transform.matrix4x4);
-    }
+    get bounds() { return this.localBounds; }
 
     Intersects(other) {
         return false;
@@ -98,5 +83,7 @@ class MeshCollider extends Collider {
         const t = f * edge2.Dot(q);
         return t > 0.00001 ? t : null;
     }
+
+    GetGeometry() { return new TriangleMeshGeometry(this.mesh); }
 
 }
