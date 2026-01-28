@@ -128,8 +128,14 @@ Geometry.compute.CapsuleGeometry = {
             overlap: hit.overlap
         };
     },
-    TriangleGeometry: function (capsule, triangle) {
-        return Geometry.compute.TriangleGeometry.CapsuleGeometry(capsule, triangle);
+    TriangleGeometry: function (capsule, a, b, c) {
+        const capsuleVec = Vector3.Subtract(capsule.center2, capsule.center1);
+
+        const hit1 = SphereGeometry.compute.TriangleGeometry({ center: capsule.center1, radius: capsule.radius }, a, b, c);
+        const hit2 = SphereGeometry.compute.TriangleGeometry({ center: capsule.center2, radius: capsule.radius }, a, b, c);
+
+        if (!hit1 && !hit2) return null;
+        return hit1 && hit2 ? (hit1.overlap > hit2.overlap ? hit1 : hit2) : (hit1 || hit2);
     },
     TriangleMeshGeometry: function (capsule, mesh) {
         return Geometry.compute.TriangleMeshGeometry.CapsuleGeometry(mesh, capsule);

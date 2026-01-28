@@ -147,10 +147,28 @@ Geometry.compute.SphereGeometry = {
             overlap: sphere.radius - distance
         };
     },
-    TriangleGeometry: function (sphere, triangle) {
-        return Geometry.compute.TriangleGeometry.SphereGeometry(sphere, triangle);
+    TriangleGeometry: function (sphere, a, b, c) {
+        const closestPoint = TriangleGeometry.ClosestPoint(sphere.center, a, b, c);
+        const collisionVector = Vector3.Subtract(sphere.center, closestPoint);
+        const distance = collisionVector.magnitude;
+
+        if (distance >= sphere.radius) return null;
+
+        // Normalna trójkąta (płaszczyzny)
+        const edge1 = Vector3.Subtract(b, a);
+        const edge2 = Vector3.Subtract(c, a);
+        const triNormal = edge1.Cross(edge2).Normalize();
+
+        // Normalna kolizji - jeśli sfera jest idealnie na powierzchni, użyj normalnej trójkąta
+        const normal = distance > 0.0001 ? collisionVector.Divide(distance) : triNormal;
+
+        return {
+            point: closestPoint,
+            normal: normal, // Wypycha sferę od trójkąta
+            overlap: sphere.radius - distance
+        };
     },
     TriangleMeshGeometry: function (sphere, mesh) {
-        return Geometry.compute.TriangleMeshGeometry.SphereGeometry(mesh, sphere);
+
     },
 };
