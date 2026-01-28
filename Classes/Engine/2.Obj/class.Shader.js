@@ -2,14 +2,60 @@ class Shader extends Obj {
 
     constructor(code, renderPipelineBuffers = null, settings = {}) {
         super();
-        const _this = this;
+        const object = this;
 
-        _this.code = code;
-        _this.shaderModule = null;
-        _this.pipeline = null;
-        _this.renderPipelines = [];
-        _this.renderPipelineBuffers = renderPipelineBuffers ?? [];
+        object.code = code;
+        object.shaderModule = null;
+        // object.renderPipelines = new Map();
+
+        object.pipeline = null;
+        object.renderPipelines = [];
+        object.renderPipelineBuffers = renderPipelineBuffers ?? [];
     }
+
+    // GetPipeline(renderPassName, stateSettings = {}) {
+    //     const stateKey = `${renderPassName}_${stateSettings.cull || 'back'}_${stateSettings.depthWrite ?? true}`;
+
+    //     if (!this.pipelines.has(stateKey)) {
+    //         this.pipelines.set(stateKey, this._createPipeline(renderPassName, stateSettings));
+    //     }
+    //     return this.pipelines.get(stateKey);
+    // }
+
+    // _createPipeline(passName, states) {
+    //     const device = GPU.device;
+
+    //     return device.createRenderPipeline({
+    //         label: `${passName}_pipeline`,
+    //         layout: GPU.CreatePipelineLayout({
+    //             bindGroupLayouts: []
+    //         }),
+    //         vertex: {
+    //             module: this.shaderModule,
+    //             entryPoint: "vs",
+    //             buffers: this._getVertexBufferLayout()
+    //         },
+    //         primitive: {
+    //             topology: "triangle-list",
+    //             cullMode: states.cull || 'back',
+    //             frontFace: 'ccw',
+    //         },
+    //         depthStencil: {
+    //             format: "depth24plus",
+    //             depthWriteEnabled: states.depthWrite ?? true,
+    //             depthCompare: states.depthCompare || "less",
+    //         },
+    //         fragment: {
+    //             module: this.shaderModule,
+    //             entryPoint: passName,
+    //             targets: Graphics.getPassTargets(passName)
+    //         }
+    //     });
+    // }
+
+    // Compile() {
+    //     this.shaderModule = GPU.CreateShaderModule({ code: object.code });
+    // }
 
     Use(renderPass) {
         let renderPipeline = this.renderPipelines[renderPass.name];
@@ -21,16 +67,16 @@ class Shader extends Obj {
     }
 
     Compile() {
-        const _this = this;
+        const object = this;
 
         const device = GPU.device;
         const context = Graphics.context;
 
         // Tworzymy shader module
-        _this.shaderModule = GPU.CreateShaderModule({ code: _this.code });
+        object.shaderModule = GPU.CreateShaderModule({ code: object.code });
 
-        if (_this.code.indexOf('fn gBufferRenderPass') !== -1) {
-            _this.renderPipelines['gBufferRenderPass'] = GPU.CreateRenderPipeline({
+        if (object.code.indexOf('fn gBufferRenderPass') !== -1) {
+            object.renderPipelines['gBufferRenderPass'] = GPU.CreateRenderPipeline({
                 label: 'gBufferRenderPipeline',
                 layout: GPU.CreatePipelineLayout({
                     bindGroupLayouts: [
@@ -40,7 +86,7 @@ class Shader extends Obj {
                     ],
                 }),
                 vertex: {
-                    module: _this.shaderModule,
+                    module: object.shaderModule,
                     entryPoint: "vs",
                     buffers: [
                         {
@@ -66,7 +112,7 @@ class Shader extends Obj {
                     ],
                 },
                 fragment: {
-                    module: _this.shaderModule,
+                    module: object.shaderModule,
                     entryPoint: "gBufferRenderPass",
                     targets: [
                         { format: "rgba16float" }, // viewPositionTexture
