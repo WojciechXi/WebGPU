@@ -129,15 +129,20 @@ Geometry.compute.CapsuleGeometry = {
         };
     },
     TriangleGeometry: function (capsule, a, b, c) {
-        const capsuleVec = Vector3.Subtract(capsule.center2, capsule.center1);
+        // const capsuleVec = Vector3.Subtract(capsule.center2, capsule.center1);
 
-        const hit1 = SphereGeometry.compute.TriangleGeometry({ center: capsule.center1, radius: capsule.radius }, a, b, c);
-        const hit2 = SphereGeometry.compute.TriangleGeometry({ center: capsule.center2, radius: capsule.radius }, a, b, c);
+        const hit1 = Geometry.compute.SphereGeometry.TriangleGeometry({ center: capsule.center1, radius: capsule.radius }, a, b, c);
+        const hit2 = Geometry.compute.SphereGeometry.TriangleGeometry({ center: capsule.center2, radius: capsule.radius }, a, b, c);
 
         if (!hit1 && !hit2) return null;
         return hit1 && hit2 ? (hit1.overlap > hit2.overlap ? hit1 : hit2) : (hit1 || hit2);
     },
     TriangleMeshGeometry: function (capsule, mesh) {
-        return Geometry.compute.TriangleMeshGeometry.CapsuleGeometry(mesh, capsule);
-    },
+        let bestHit = null;
+        for (let i = 0; i < mesh.triangles.length; i += 3) {
+            const hit = this.TriangleGeometry(capsule, mesh.triangles[i], mesh.triangles[i + 1], mesh.triangles[i + 2]);
+            if (hit && (!bestHit || hit.overlap > bestHit.overlap)) bestHit = hit;
+        }
+        return bestHit;
+    }
 };

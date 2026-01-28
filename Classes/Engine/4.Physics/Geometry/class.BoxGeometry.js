@@ -162,22 +162,25 @@ Geometry.compute.BoxGeometry = {
         return this.SphereGeometry(box, tempSphere);
     },
     TriangleGeometry: function (box, a, b, c) {
-        const triNormal = Vector3.Subtract(b, a).Cross(Vector3.Subtract(c, a)).Normalize();
-        const T = Vector3.Subtract(box.center, Vector3.Lerp(a, Vector3.Lerp(b, c, 0.5), 0.5));
+        // const triNormal = Vector3.Subtract(b, a).Cross(Vector3.Subtract(c, a)).Normalize();
+        // const T = Vector3.Subtract(box.center, Vector3.Lerp(a, Vector3.Lerp(b, c, 0.5), 0.5));
 
-        // Dla uproszczenia używamy najbliższego punktu (podobnie jak dla sfery)
-        // Jest to wystarczające dla większości zastosowań, dopóki trójkąty nie są większe od boxa
         const closestOnTri = TriangleGeometry.ClosestPoint(box.center, a, b, c);
         const hit = Geometry.compute.BoxGeometry.SphereGeometry(box, { center: closestOnTri, radius: 0.01 });
 
         if (hit) {
-            // Skoryguj overlap, bo SphereGeometry użyło promienia 0.01
             const dir = Vector3.Subtract(box.center, closestOnTri);
             hit.overlap = Math.max(0, box.extents.magnitude - dir.magnitude); // Uproszczone
         }
+
         return hit;
     },
     TriangleMeshGeometry: function (box, mesh) {
-        return Geometry.compute.TriangleMeshGeometry.BoxGeometry(mesh, box);
+        let bestHit = null;
+        for (let i = 0; i < mesh.triangles.length; i += 3) {
+            const hit = this.TriangleGeometry(box, mesh.triangles[i], mesh.triangles[i + 1], mesh.triangles[i + 2]);
+            if (hit && (!bestHit || hit.overlap > bestHit.overlap)) bestHit = hit;
+        }
+        return bestHit;
     }
 };

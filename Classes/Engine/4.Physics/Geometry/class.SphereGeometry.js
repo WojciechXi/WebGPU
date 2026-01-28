@@ -169,6 +169,11 @@ Geometry.compute.SphereGeometry = {
         };
     },
     TriangleMeshGeometry: function (sphere, mesh) {
-
-    },
+        let bestHit = null;
+        for (let i = 0; i < mesh.triangles.length; i += 3) {
+            const hit = this.TriangleGeometry(sphere, mesh.triangles[i], mesh.triangles[i + 1], mesh.triangles[i + 2]);
+            if (hit && (!bestHit || hit.overlap > bestHit.overlap)) bestHit = hit;
+        }
+        return bestHit;
+    }
 };
