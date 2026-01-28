@@ -13,50 +13,6 @@ class Shader extends Obj {
         object.renderPipelineBuffers = renderPipelineBuffers ?? [];
     }
 
-    // GetPipeline(renderPassName, stateSettings = {}) {
-    //     const stateKey = `${renderPassName}_${stateSettings.cull || 'back'}_${stateSettings.depthWrite ?? true}`;
-
-    //     if (!this.pipelines.has(stateKey)) {
-    //         this.pipelines.set(stateKey, this._createPipeline(renderPassName, stateSettings));
-    //     }
-    //     return this.pipelines.get(stateKey);
-    // }
-
-    // _createPipeline(passName, states) {
-    //     const device = GPU.device;
-
-    //     return device.createRenderPipeline({
-    //         label: `${passName}_pipeline`,
-    //         layout: GPU.CreatePipelineLayout({
-    //             bindGroupLayouts: []
-    //         }),
-    //         vertex: {
-    //             module: this.shaderModule,
-    //             entryPoint: "vs",
-    //             buffers: this._getVertexBufferLayout()
-    //         },
-    //         primitive: {
-    //             topology: "triangle-list",
-    //             cullMode: states.cull || 'back',
-    //             frontFace: 'ccw',
-    //         },
-    //         depthStencil: {
-    //             format: "depth24plus",
-    //             depthWriteEnabled: states.depthWrite ?? true,
-    //             depthCompare: states.depthCompare || "less",
-    //         },
-    //         fragment: {
-    //             module: this.shaderModule,
-    //             entryPoint: passName,
-    //             targets: Graphics.getPassTargets(passName)
-    //         }
-    //     });
-    // }
-
-    // Compile() {
-    //     this.shaderModule = GPU.CreateShaderModule({ code: object.code });
-    // }
-
     Use(renderPass) {
         let renderPipeline = this.renderPipelines[renderPass.name];
         if (renderPipeline) {
@@ -136,5 +92,49 @@ class Shader extends Obj {
             });
         }
     }
+
+    // GetPipeline(renderPassName, stateSettings = {}) {
+    //     const stateKey = `${renderPassName}_${stateSettings.cull || 'back'}_${stateSettings.depthWrite ?? true}`;
+
+    //     if (!this.pipelines.has(stateKey)) {
+    //         this.pipelines.set(stateKey, this._createPipeline(renderPassName, stateSettings));
+    //     }
+    //     return this.pipelines.get(stateKey);
+    // }
+
+    // _createPipeline(passName, states) {
+    //     const device = GPU.device;
+
+    //     return device.createRenderPipeline({
+    //         label: `${passName}_pipeline`,
+    //         layout: GPU.CreatePipelineLayout({
+    //             bindGroupLayouts: []
+    //         }),
+    //         vertex: {
+    //             module: this.shaderModule,
+    //             entryPoint: "vs",
+    //             buffers: this._getVertexBufferLayout()
+    //         },
+    //         primitive: {
+    //             topology: "triangle-list",
+    //             cullMode: states.cull || 'back',
+    //             frontFace: 'ccw',
+    //         },
+    //         depthStencil: {
+    //             format: "depth24plus",
+    //             depthWriteEnabled: states.depthWrite ?? true,
+    //             depthCompare: states.depthCompare || "less",
+    //         },
+    //         fragment: {
+    //             module: this.shaderModule,
+    //             entryPoint: passName,
+    //             targets: Graphics.getPassTargets(passName)
+    //         }
+    //     });
+    // }
+
+    // Compile() {
+    //     this.shaderModule = GPU.CreateShaderModule({ code: object.code });
+    // }
 
 }
