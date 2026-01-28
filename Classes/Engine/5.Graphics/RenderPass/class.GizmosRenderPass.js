@@ -106,8 +106,13 @@ class GizmosRenderPass extends RenderPass {
         this.DrawLine(ray.origin, Vector3.Add(ray.origin, ray.direction));
     }
 
+    DrawPlane(position, size = Vector3.one, rotation = Quaternion.identity) {
+        let matrix = Matrix4x4.TRS(position, rotation, size);
+        this.DrawMesh(Graphics.planeMesh, 0, matrix);
+    }
+
     DrawCube(position, size = Vector3.one, rotation = Quaternion.identity) {
-        let matrix = Matrix4x4.TRS(position, rotation, Vector3.one.Scale(size));
+        let matrix = Matrix4x4.TRS(position, rotation, size);
         this.DrawMesh(Graphics.cubeMesh, 0, matrix);
     }
 

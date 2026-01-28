@@ -19,17 +19,13 @@ class Collider extends Component {
     // OnTriggerStay(collider) { }
 
     Intersects(otherCollider) {
-        return false;
+        if (!otherCollider) return false;
+        return this.bounds.Intersects(otherCollider.bounds);
     }
 
     ClosestPoint(position) { } // Todo
-    ClosestPointOnBounds(position) {
-        const bounds = this.collider.bounds;
-        const min = bounds.min;
-        const max = bounds.max;
-        return new Vector3(Mathf.Clamp(position.x, min.x, max.x), Mathf.Clamp(position.y, min.y, max.y), Mathf.Clamp(position.z, min.z, max.z));
-    }
-    GetGeometry() { } // Todo
+    ClosestPointOnBounds(position) { return this.bounds.ClosestPoint(position); }
+    GetGeometry() { return null; }
     Raycast(ray, maxDistance) { return null; }
 
     ComputePenetration(otherCollider) {

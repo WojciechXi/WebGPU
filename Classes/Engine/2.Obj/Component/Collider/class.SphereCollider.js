@@ -8,8 +8,8 @@ class SphereCollider extends Collider {
 
     get worldCenter() { return this.transform.TransformPoint(this.center); }
     get worldRadius() {
-        const s = this.transform.scale;
-        return this.radius * Mathf.Max(Mathf.Abs(s.x), Mathf.Abs(s.y), Mathf.Abs(s.z));
+        const absScale = this.transform.scale.Abs();
+        return this.radius * Mathf.Max(absScale.x, absScale.y, absScale.z);
     }
     get localBounds() { return new Bounds(this.center.Clone(), new Vector3(this.radius * 2, this.radius * 2, this.radius * 2)); }
     get bounds() {
@@ -27,31 +27,6 @@ class SphereCollider extends Collider {
             new Vector3(this.center.x - hx, this.center.y - hy, this.center.z + hz),
             new Vector3(this.center.x - hx, this.center.y - hy, this.center.z - hz),
         ], this.transform.matrix4x4);
-    }
-    get sphere() { return new Sphere(this.worldCenter, this.worldRadius); }
-
-    Intersects(other) {
-        if (!other) return false;
-
-        if (other instanceof SphereCollider) return this.bounds.Intersects(other.bounds) && this.sphere.Check(other.sphere);
-        if (other instanceof BoxCollider) return this.bounds.Intersects(other.bounds) && this.sphere.CheckOBB(other.obb);
-        if (other instanceof CylinderCollider) return this.bounds.Intersects(other.bounds) && this.sphere.CheckCylinder(other.cylinder);
-        if (other instanceof CapsuleCollider) return this.bounds.Intersects(other.bounds) && this.sphere.CheckCapsule(other.capsule);
-        if (other instanceof MeshCollider) return this.bounds.Intersects(other.bounds) && this.sphere.CheckMeshCollider(other);
-
-        return null;
-    }
-
-    ComputePenetration(other) {
-        if (!other) return null;
-
-        if (other instanceof SphereCollider) return this.sphere.ComputePenetration(other.sphere);
-        if (other instanceof BoxCollider) return this.sphere.ComputePenetrationBox(other.obb);
-        if (other instanceof CylinderCollider) return this.sphere.ComputePenetrationCylinder(other.cylinder);
-        if (other instanceof CapsuleCollider) return this.sphere.ComputePenetrationCapsule(other.capsule);
-        if (other instanceof MeshCollider) return this.sphere.ComputePenetrationMesh(other);
-
-        return null;
     }
 
     Raycast(ray, maxDistance) {
@@ -86,6 +61,8 @@ class SphereCollider extends Collider {
         renderPass.DrawSphere(this.worldCenter, this.radius, this.transform.rotation);
         renderPass.DrawRay(new Ray(this.transform.position, this.transform.forward));
     }
+
+    GetGeometry() { return new SphereGeometry(this.worldCenter, this.worldRadius); }
 
 
 }

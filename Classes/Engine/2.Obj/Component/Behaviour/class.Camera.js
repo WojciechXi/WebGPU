@@ -55,7 +55,7 @@ class Camera extends Behaviour {
             this.SendMessage('OnPreCull')
         } else {
             const planes = GeometryUtility.CalculateFrustumPlanes(this);
-            this.renderables = this.scene.renderables.filter(c => GeometryUtility.TestPlanesAABB(planes, c.bounds));
+            this.renderables = this.scene.renderables.filter(c => c.isVisible && GeometryUtility.TestPlanesAABB(planes, c.bounds));
             this.SendMessage('OnPreCull')
         }
     }

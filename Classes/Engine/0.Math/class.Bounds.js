@@ -29,7 +29,11 @@ class Bounds extends Float32Array {
     }
 
     // Public Methods
-    ClosestPoint(point) { }
+    ClosestPoint(point) {
+        const min = this.min;
+        const max = this.max;
+        return new Vector3(Mathf.Clamp(position.x, min.x, max.x), Mathf.Clamp(position.y, min.y, max.y), Mathf.Clamp(position.z, min.z, max.z));
+    }
 
     Contains(point) {
         const min = this.min;

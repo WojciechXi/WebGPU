@@ -1,11 +1,6 @@
 class ConvexMeshGeometry {
 
-    constructor(scale, scaleAxisRotation) {
-        this.scale = scale;
-        this.scaleAxisRotation = scaleAxisRotation;
+    constructor() {
     }
-
-    get Scale() { return this.scale; }
-    get ScaleAxisRotation() { return this.scaleAxisRotation; }
 
 }

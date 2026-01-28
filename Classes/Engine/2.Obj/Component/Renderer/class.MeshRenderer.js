@@ -10,6 +10,8 @@ class MeshRenderer extends Renderer {
         this.mesh = null;
     }
 
+    get isVisible() { return this.materials.length && this.mesh; }
+
     // Update() {
     //     if (this.mesh) {
     //         const meshBounds = this.mesh.bounds;

@@ -1,12 +1,13 @@
 class ContactPoint {
 
     constructor() {
-        this.impulse = null;
-        this.normal = null;
-        this.otherCollider = null;
         this.point = null;
+        this.normal = null;
+        this.impulse = null;
         this.separation = null;
+
         this.thisCollider = null;
+        this.otherCollider = null;
     }
 
 }

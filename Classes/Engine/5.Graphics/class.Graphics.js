@@ -29,6 +29,21 @@ class Graphics {
             subMeshes: [new SubMesh({ edges: [0, 1], }),],
         });
 
+        this.planeMesh = new Mesh({
+            vertices: [new Vector3(-0.5, 0, -0.5), new Vector3(0.5, 0, -0.5), new Vector3(0.5, 0, 0.5), new Vector3(-0.5, 0, 0.5),],
+            normals: [Vector3.up, Vector3.up, Vector3.up, Vector3.up],
+            uvs: [new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1),],
+            tangents: [new Vector4(0, 1, 0, 1), new Vector4(0, 1, 0, 1), new Vector4(0, 1, 0, 1), new Vector4(0, 1, 0, 1)],
+            subMeshes: [new SubMesh({
+                triangles: [
+                    0, 1, 2, 0, 2, 3,
+                ],
+                edges: [
+                    0, 1, 1, 2, 2, 3, 3, 0,
+                ],
+            }),],
+        });
+
         const cubeVertices = [
             new Vector3(-0.5, -0.5, -0.5), new Vector3(0.5, -0.5, -0.5), new Vector3(0.5, -0.5, 0.5), new Vector3(-0.5, -0.5, 0.5),
             new Vector3(-0.5, 0.5, -0.5), new Vector3(0.5, 0.5, -0.5), new Vector3(0.5, 0.5, 0.5), new Vector3(-0.5, 0.5, 0.5),

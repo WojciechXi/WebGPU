@@ -22,9 +22,10 @@ class GameObject extends Obj {
         this.tag = '';
 
         this.components = new Array();
-        for (let component of components) this.AddComponent(component);
 
         this._transform = this.AddComponent(this.TransformType);
+        for (let component of components) this.AddComponent(component);
+
         this._activeSelf = true;
     }
 
@@ -84,8 +85,8 @@ class GameObject extends Obj {
 
     // Inherited Members
     // Static Methods
-    static Instantiate(original, position = null, rotation = null, parent = null) {
-        const instance = new this(this.name);
+    static Instantiate(original, position = null, rotation = null, parent = null, ...components) {
+        const instance = new this(this.name, ...components);
         if (parent) instance.transform.SetParent(parent);
         if (position) instance.transform.position = position;
         if (rotation) instance.transform.rotation = rotation;

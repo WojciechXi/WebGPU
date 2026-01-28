@@ -10,6 +10,13 @@ class CylinderCollider extends Collider {
     OnEnable() {
     }
 
+    get worldCenter() { return this.transform.TransformPoint(this.center); }
+    get worldRadius() {
+        const absScale = this.transform.scale.Abs();
+        return this.radius * Mathf.Max(absScale.x, absScale.z);
+    }
+    get worldHeight() { return this.height * this.transform.scale.y; }
+
     Raycast(ray, maxDistance) {
         const localRay = this.transform.InverseTransformRay(ray);
 
@@ -62,4 +69,6 @@ class CylinderCollider extends Collider {
 
         return new RaycastHit(this, worldPoint, worldNormal, distance);
     }
+
+    GetGeometry() { return new CylinderGeometry(this.worldCenter, this.worldHeight, this.worldRadius); }
 }

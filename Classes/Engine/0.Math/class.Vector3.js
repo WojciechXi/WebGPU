@@ -199,4 +199,10 @@ class Vector3 extends Float32Array {
         return v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
     }
 
+    VectorTo(b) { return Vector3.Subtract(this, b); }
+    static VectorTo(a, b) { return a.VectorTo(b); }
+
+    DirectionTo(b) { return Vector3.Subtract(this, b).Normalize(); }
+    static DirectionTo(a, b) { return a.DirectionTo(b); }
+
 }

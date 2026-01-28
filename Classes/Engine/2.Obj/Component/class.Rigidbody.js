@@ -6,7 +6,7 @@ class Rigidbody extends Component {
         this.acceleration = Vector3.zero;
 
         this.mass = 1;
-        this.bounce = 0.25; // odbicie
+        this.bounce = 1; // odbicie
         this.drag = 0.01;
         this.angularDrag = 0.05;
 
@@ -40,8 +40,8 @@ class Rigidbody extends Component {
         this.isKinematic = false;
         this.useGravity = true;
 
-        this.position = this.transform.position;
-        this.rotation = this.transform.rotation;
+        this.position = Vector3.zero;
+        this.rotation = Quaternion.identity;
 
         //private
         this._isSleeping = false;
@@ -58,6 +58,9 @@ class Rigidbody extends Component {
     OnEnable() {
         this.collider = this.GetComponent(Collider);
         if (this.collider) this.centerOfMass = this.collider.center;
+
+        this.position = this.transform.position;
+        this.rotation = this.transform.rotation;
     }
 
     FixedUpdate() {
@@ -107,45 +110,23 @@ class Rigidbody extends Component {
                 if (other === this.collider) continue;
 
                 if (this.collider.Intersects(other)) {
-                    const mtv = this.collider.ComputePenetration(other);
-                    if (!mtv) continue;
+                    const collision = Geometry.Compute(this.collider.GetGeometry(), other.GetGeometry());
+                    if (!collision) continue;
 
-                    if (mtv.point) {
-                        if (mtv.overlap > slop) {
-                            const correction = Vector3.Multiply(mtv.normal, (mtv.overlap - slop) * persistence);
-                            nextPosition = nextPosition.Add(correction);
-                        }
+                    if (collision.point) {
+                        const correction = Vector3.Multiply(collision.normal, collision.overlap);
+                        nextPosition = nextPosition.Add(correction);
 
-                        const vDotN = this.linearVelocity.Dot(mtv.normal);
+                        const r = Vector3.Subtract(collision.point, this.worldCenterOfMass);
+                        const velocityAtPoint = Vector3.Add(this.linearVelocity, this.angularVelocity.Cross(r));
+                        const vDotN = velocityAtPoint.Dot(collision.normal);
                         if (vDotN < 0) {
                             const j = -(1 + this.bounce) * vDotN * this.mass;
-                            const impulse = Vector3.Multiply(mtv.normal, j);
+                            const impulse = Vector3.Multiply(collision.normal, j);
 
-                            this.AddForceAtPosition(impulse, mtv.point, ForceMode.Impulse);
+                            this.AddForce(impulse, ForceMode.Impulse);
 
-                            const tangent = Vector3.Subtract(this.linearVelocity, Vector3.Multiply(mtv.normal, vDotN));
-                            if (tangent.magnitude > 0.001) {
-                                const frictionImpulse = tangent.normalized.Multiply(-j * 0.5); // 0.5 to współczynnik tarcia
-                                this.AddForce(frictionImpulse, ForceMode.Impulse);
-                            }
-                        }
-                    } else {
-                        // A. Wypchnięcie
-                        nextPosition = nextPosition.Add(mtv);
-
-                        // B. Punkt styku i Impuls
-                        const contactNormal = mtv.normalized;
-                        const contactPoint = OBB.GetContactPoint(this.collider.obb, other.obb, contactNormal, mtv);
-                        const vDotN = this.linearVelocity.Dot(contactNormal);
-                        if (vDotN < 0) {
-                            const currentBounce = Mathf.Abs(vDotN) < 0.2 ? 0 : this.bounce;
-
-                            const j = -(1 + currentBounce) * vDotN * this.mass;
-                            const impulse = Vector3.Multiply(contactNormal, j);
-
-                            this.AddForceAtPosition(impulse, contactPoint, ForceMode.Impulse);
-
-                            const tangent = Vector3.Subtract(this.linearVelocity, Vector3.Multiply(contactNormal, vDotN));
+                            const tangent = Vector3.Subtract(this.linearVelocity, Vector3.Multiply(collision.normal, vDotN));
                             if (tangent.magnitude > 0.001) {
                                 const frictionImpulse = tangent.normalized.Multiply(-j * 0.5); // 0.5 to współczynnik tarcia
                                 this.AddForce(frictionImpulse, ForceMode.Impulse);

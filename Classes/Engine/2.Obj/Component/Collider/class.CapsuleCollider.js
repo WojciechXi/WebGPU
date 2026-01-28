@@ -45,7 +45,7 @@ class CapsuleCollider extends BoxCollider {
     static ClosestPointOnSegment(top, bottom, position) {
         const ab = Vector3.Subtract(bottom, top);
         const t = (Vector3.Subtract(position, top)).Dot(ab) / ab.Dot(ab);
-        const clampedT = Mathf.Max(0, Mathf.Min(1, t));
+        const clampedT = Mathf.Clamp(t, 0, 1);
         return Vector3.Add(top, Vector3.Multiply(ab, clampedT));
     }
 

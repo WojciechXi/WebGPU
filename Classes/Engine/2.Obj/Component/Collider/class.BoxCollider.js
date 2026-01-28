@@ -27,33 +27,6 @@ class BoxCollider extends Collider {
             new Vector3(this.center.x - hx, this.center.y - hy, this.center.z - hz),
         ], this.transform.matrix4x4);
     }
-    get obb() {
-        return new OBB(this.transform.TransformPoint(this.center), Vector3.Divide(this.size, 2).Scale(this.transform.scale.Abs()), [this.transform.right, this.transform.up, this.transform.forward]);
-    }
-
-    Intersects(other) {
-        if (!other) return false;
-
-        if (other instanceof SphereCollider) return this.bounds.Intersects(other.bounds) && this.obb.CheckSphere(other.sphere);
-        if (other instanceof BoxCollider) return this.bounds.Intersects(other.bounds) && this.obb.Check(other.obb);
-        if (other instanceof CylinderCollider) return this.bounds.Intersects(other.bounds) && this.obb.CheckCylinder(other.cylinder);
-        if (other instanceof CapsuleCollider) return this.bounds.Intersects(other.bounds) && this.obb.CheckCapsule(other.capsule);
-        if (other instanceof MeshCollider) return this.bounds.Intersects(other.bounds) && this.obb.CheckMesh(other);
-
-        return false;
-    }
-
-    ComputePenetration(other) {
-        if (!other) return null;
-
-        if (other instanceof SphereCollider) return this.obb.ComputePenetrationSphere(other.sphere);
-        if (other instanceof BoxCollider) return this.obb.ComputePenetration(other.obb);
-        if (other instanceof CylinderCollider) return this.obb.ComputePenetrationCylinder(other.cylinder);
-        if (other instanceof CapsuleCollider) return this.obb.ComputePenetrationCapsule(other.capsule);
-        if (other instanceof MeshCollider) return this.obb.ComputePenetrationMesh(other.mesh);
-
-        return null;
-    }
 
     Raycast(ray, maxDistance) {
         const localRay = this.transform.InverseTransformRay(ray);
@@ -100,5 +73,7 @@ class BoxCollider extends Collider {
         renderPass.DrawCube(bounds.center, bounds.size);
         renderPass.DrawRay(new Ray(this.transform.position, this.transform.forward));
     }
+
+    GetGeometry() { return new BoxGeometry(this.worldCenter, Vector3.Divide(this.size, 2).Scale(this.transform.scale.Abs()), [this.transform.right, this.transform.up, this.transform.forward]); }
 
 }
