@@ -141,8 +141,8 @@ class Vector3 extends Float32Array {
         return this;
     }
 
-    Clone() { return new Vector3(this.x, this.y, this.z); }
     Clear() { this[0] = this[1] = this[2] = 0; }
+    Clone() { return new Vector3(this.x, this.y, this.z); }
 
     Abs(out = this) {
         out = out || this.Clone();

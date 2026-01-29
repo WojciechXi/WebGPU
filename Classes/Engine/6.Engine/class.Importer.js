@@ -30,6 +30,10 @@ class Importer {
 
         let meshes = [];
         let mesh = null;
+        const meshVertices = [];
+        const meshNormals = [];
+        const meshUVs = [];
+        const subMeshTriangles = [];
 
         for (let line of lines) {
             if (line.startsWith('usemtl')) {
@@ -48,16 +52,24 @@ class Importer {
                     let uvIndex = parseInt(l[1]) - 1;
                     let normalIndex = parseInt(l[2]) - 1;
 
-                    mesh.vertices.push(vertices[vertexIndex]);
-                    mesh.triangles.push(mesh.vertices.length - 1);
-                    if (uvs[uvIndex]) mesh.uvs.push(uvs[uvIndex]);
-                    if (normals[normalIndex]) mesh.normals.push(normals[normalIndex]);
+                    meshVertices.push(vertices[vertexIndex]);
+                    if (normals[normalIndex]) meshNormals.push(normals[normalIndex]);
+                    if (uvs[uvIndex]) meshUVs.push(uvs[uvIndex]);
+                    subMeshTriangles.push(meshVertices.length - 1);
                 }
             }
         }
 
         if (mesh) {
-            mesh.Update();
+            mesh.SetVertices(vertices);
+            mesh.SetNormals(normals);
+            mesh.SetUVs(uvs);
+            mesh.SetSubMeshes([
+                new SubMesh({
+                    triangles: subMeshTriangles,
+                }),
+            ]);
+            mesh.UploadMeshData();
             meshes.push(mesh);
         }
 
@@ -158,10 +170,10 @@ class Importer {
                         uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
                 }
 
-                mesh.vertices = vertices;
-                mesh.normals = normals;
-                mesh.tangents = tangents;
-                mesh.uvs = uvs;
+                mesh.SetVertices(vertices);
+                mesh.SetNormals(normals);
+                mesh.SetTangents(tangents);
+                mesh.SetUVs(uvs);
 
                 let materialName = primitive.material !== undefined && gltf.materials
                     ? gltf.materials[primitive.material]?.name || "default"
@@ -172,12 +184,12 @@ class Importer {
                     material: materialName,
                 });
 
-                mesh.subMeshes.push(subMesh);
+                mesh._subMeshes.push(subMesh);
 
-                mesh.RecalculateNormals?.();
-                mesh.RecalculateTangents?.();
-                mesh.RecalculateBounds?.();
-                mesh.Update?.();
+                // mesh.RecalculateNormals?.();
+                // mesh.RecalculateTangents?.();
+                // mesh.RecalculateBounds?.();
+                mesh.UploadMeshData();
 
                 meshes.push(mesh);
             });

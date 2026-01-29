@@ -36,8 +36,8 @@ Geometry.check.CapsuleGeometry = {
         const closestOnTri = TriangleGeometry.ClosestPoint(closestOnSegment, a, b, c);
         return Vector3.Distance(closestOnSegment, closestOnTri) < capsule.radius;
     },
-    TriangleMeshGeometry: function (capsule, mesh) {
-        for (let i = 0; i < mesh.triangles; i += 3) if (this.TriangleGeometry(capsule, mesh.vertices[mesh.triangles[i]], mesh.vertices[mesh.triangles[i + 1]], mesh.vertices[mesh.triangles[i + 2]])) return true;
+    TriangleMeshGeometry: function (capsule, triangleMesh) {
+        for (let i = 0; i < triangleMesh.triangles; i += 3) if (this.TriangleGeometry(capsule, triangleMesh.vertices[triangleMesh.triangles[i]], triangleMesh.vertices[triangleMesh.triangles[i + 1]], triangleMesh.vertices[triangleMesh.triangles[i + 2]])) return true;
         return false;
     },
 };
@@ -146,10 +146,10 @@ Geometry.compute.CapsuleGeometry = {
         }
         return bestHit;
     },
-    TriangleMeshGeometry: function (capsule, mesh) {
+    TriangleMeshGeometry: function (capsule, triangleMesh) {
         let bestHit = null;
-        for (let i = 0; i < mesh.triangles.length; i += 3) {
-            const hit = this.TriangleGeometry(capsule, mesh.vertices[mesh.triangles[i]], mesh.vertices[mesh.triangles[i + 1]], mesh.vertices[mesh.triangles[i + 2]]);
+        for (let i = 0; i < triangleMesh.triangles.length; i += 3) {
+            const hit = this.TriangleGeometry(capsule, triangleMesh.vertices[triangleMesh.triangles[i]], triangleMesh.vertices[triangleMesh.triangles[i + 1]], triangleMesh.vertices[triangleMesh.triangles[i + 2]]);
             if (hit && (!bestHit || hit.overlap > bestHit.overlap)) bestHit = hit;
         }
         return bestHit;

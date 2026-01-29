@@ -5,7 +5,7 @@ class Mesh extends Obj {
             name: name,
         });
 
-        this.bounds = new Bounds(Vector3.zero, Vector3.one);
+        this._bounds = new Bounds(Vector3.zero, Vector3.one);
 
         this.vertexBuffer = new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST });
         this.lineBuffer = new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST });
@@ -25,7 +25,7 @@ class Mesh extends Obj {
     get bindposes() { } // The bind poses. The bind pose at each index refers to the bone with the same index.
     get blendShapeCount() { } // Returns BlendShape count on this mesh.
     get boneWeights() { } // The BoneWeight for each vertex in the Mesh, which represents 4 bones per vertex.
-    get bounds() { } // The bounding volume of the mesh that contain all vertices of the mesh.
+    get bounds() { return this._bounds.Clone(); } // The bounding volume of the mesh that contain all vertices of the mesh.
     get colors() { } // Vertex colors of the Mesh.
     get colors32() { } // Vertex colors of the Mesh.
     get indexBufferTarget() { } // The intended target usage of the Mesh GPU index buffer.
@@ -84,7 +84,7 @@ class Mesh extends Obj {
     GetNativeIndexBufferPtr() { }
     GetNativeVertexBufferPtr() { }
     GetNormals() { }
-    GetSubMesh() { }
+    GetSubMesh(subMeshIndex) { return this._subMeshes[subMeshIndex]; }
     GetTangents() { }
     GetTopology() { }
     GetTriangles() { }
@@ -105,7 +105,7 @@ class Mesh extends Obj {
     Optimize() { }
     OptimizeIndexBuffers() { }
     OptimizeReorderVertexBuffer() { }
-    RecalculateBounds() { return this.bounds = GeometryUtility.CalculateBounds(this._vertices, Matrix4x4.Identity()); }
+    RecalculateBounds() { return this._bounds = GeometryUtility.CalculateBounds(this._vertices, Matrix4x4.Identity()); }
     RecalculateNormals() {
         this._normals = Array(this._vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
 
@@ -130,8 +130,6 @@ class Mesh extends Obj {
         for (let i = 0; i < this._normals.length; i++) {
             this._normals[i] = this._normals[i].normalized;
         }
-
-        this.UploadMeshData();
     }
     RecalculateTangents() {
         this._tangents = Array(this._vertices.length).fill(0).map(() => new Vector4(0, 0, 0, 1));
@@ -190,8 +188,6 @@ class Mesh extends Obj {
 
             this._tangents[i] = new Vector4(tangent.x, tangent.y, tangent.z, handedness);
         }
-
-        this.UploadMeshData();
     }
     RecalculateUVDistributionMetric() { }
     RecalculateUVDistributionMetrics() { }

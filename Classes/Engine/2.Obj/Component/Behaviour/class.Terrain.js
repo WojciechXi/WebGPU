@@ -47,11 +47,11 @@ class Terrain extends Behaviour {
 
         if (renderPass.name === 'shadowRenderPass') {
             if (!this.castShadows) return;
-            for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
+            for (let i = 0; i < this.materials.length && this.mesh.subMeshCount; i++) {
                 renderPass.DrawMesh(this.mesh, i, this.transform.transformBuffer.buffer);
             }
         } else if (renderPass.name == 'gBufferRenderPass') {
-            for (let i = 0; i < this.materials.length && this.mesh.subMeshes.length; i++) {
+            for (let i = 0; i < this.materials.length && this.mesh.subMeshCount; i++) {
                 this.material.Use(renderPass, camera);
                 renderPass.DrawMesh(this.mesh, i, this.transform.transformBuffer.buffer);
             }

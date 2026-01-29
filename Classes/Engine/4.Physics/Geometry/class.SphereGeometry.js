@@ -45,9 +45,9 @@ Geometry.check.SphereGeometry = {
         return sqrDist < (sphere.radius * sphere.radius);
     },
 
-    TriangleMeshGeometry: function (sphere, mesh) {
-        const indices = mesh.triangles;
-        const verts = mesh.vertices;
+    TriangleMeshGeometry: function (sphere, triangleMesh) {
+        const indices = triangleMesh.triangles;
+        const verts = triangleMesh.vertices;
         const len = indices.length;
 
         for (let i = 0; i < len; i += 3) {
@@ -185,13 +185,13 @@ Geometry.compute.SphereGeometry = {
             overlap: sphere.radius - distance
         };
     },
-    TriangleMeshGeometry: function (sphere, mesh) {
+    TriangleMeshGeometry: function (sphere, triangleMesh) {
         let bestHit = null;
-        // Zakładamy, że mesh.triangles to tablica indeksów, a mesh.vertices to tablica Vector3
-        for (let i = 0; i < mesh.triangles.length; i += 3) {
-            const v0 = mesh.vertices[mesh.triangles[i]];
-            const v1 = mesh.vertices[mesh.triangles[i + 1]];
-            const v2 = mesh.vertices[mesh.triangles[i + 2]];
+        // Zakładamy, że triangleMesh.triangles to tablica indeksów, a triangleMesh.vertices to tablica Vector3
+        for (let i = 0; i < triangleMesh.triangles.length; i += 3) {
+            const v0 = triangleMesh.vertices[triangleMesh.triangles[i]];
+            const v1 = triangleMesh.vertices[triangleMesh.triangles[i + 1]];
+            const v2 = triangleMesh.vertices[triangleMesh.triangles[i + 2]];
 
             const hit = this.TriangleGeometry(sphere, v0, v1, v2);
 

@@ -192,10 +192,10 @@ Geometry.compute.BoxGeometry = {
 
         return hit;
     },
-    TriangleMeshGeometry: function (box, mesh) {
+    TriangleMeshGeometry: function (box, triangleMesh) {
         let bestHit = null;
-        for (let i = 0; i < mesh.triangles.length; i += 3) {
-            const hit = this.TriangleGeometry(box, mesh.vertices[mesh.triangles[i]], mesh.vertices[mesh.triangles[i + 1]], mesh.vertices[mesh.triangles[i + 2]]);
+        for (let i = 0; i < triangleMesh.triangles.length; i += 3) {
+            const hit = this.TriangleGeometry(box, triangleMesh.vertices[triangleMesh.triangles[i]], triangleMesh.vertices[triangleMesh.triangles[i + 1]], triangleMesh.vertices[triangleMesh.triangles[i + 2]]);
             if (hit && (!bestHit || hit.overlap > bestHit.overlap)) bestHit = hit;
         }
         return bestHit;

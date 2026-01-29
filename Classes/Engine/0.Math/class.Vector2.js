@@ -109,6 +109,7 @@ class Vector2 extends Float32Array {
         this[1] = y;
     }
 
+    Clone() { return new Vector2(this.x, this.y); }
     Set(value) {
         if (Number.isFinite(value)) this[0] = this[1] = this[2] = value;
         else if (value instanceof Vector2) {

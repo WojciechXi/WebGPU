@@ -5,15 +5,15 @@ class TriangleMeshGeometry {
     }
 
     get vertices() {
-        return this.mesh.vertices;
+        return this.mesh._vertices;
     }
 
     get triangles() {
-        return this.mesh.subMeshes[0].triangles;
+        return this.mesh._subMeshes[0].triangles;
     }
 
     GetVertex(index) {
-        return this.mesh.vertices[index];
+        return this.mesh._vertices[index];
     }
 
 }

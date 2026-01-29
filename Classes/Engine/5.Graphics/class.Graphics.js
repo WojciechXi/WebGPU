@@ -24,59 +24,43 @@ class Graphics {
             alphaMode: 'premultiplied',
         });
 
-        this.lineMesh = new Mesh({
-            vertices: [Vector3.zero, Vector3.forward,],
-            subMeshes: [new SubMesh({ edges: [0, 1], }),],
-        });
+        this.lineMesh = new Mesh("Line");
+        this.lineMesh.SetVertices([Vector3.zero, Vector3.forward,]);
+        this.lineMesh.SetSubMeshes([new SubMesh({ edges: [0, 1], })]);
+        this.lineMesh.UploadMeshData();
 
-        this.planeMesh = new Mesh({
-            vertices: [new Vector3(-0.5, 0, -0.5), new Vector3(0.5, 0, -0.5), new Vector3(0.5, 0, 0.5), new Vector3(-0.5, 0, 0.5),],
-            normals: [Vector3.up, Vector3.up, Vector3.up, Vector3.up],
-            uvs: [new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1),],
-            tangents: [new Vector4(0, 1, 0, 1), new Vector4(0, 1, 0, 1), new Vector4(0, 1, 0, 1), new Vector4(0, 1, 0, 1)],
-            subMeshes: [new SubMesh({
-                triangles: [
-                    0, 1, 2, 0, 2, 3,
-                ],
-                edges: [
-                    0, 1, 1, 2, 2, 3, 3, 0,
-                ],
-            }),],
-        });
+        this.planeMesh = new Mesh("Plane");
+        this.planeMesh.SetVertices([new Vector3(-0.5, 0, -0.5), new Vector3(0.5, 0, -0.5), new Vector3(0.5, 0, 0.5), new Vector3(-0.5, 0, 0.5)]);
+        this.planeMesh.SetNormals([Vector3.up, Vector3.up, Vector3.up, Vector3.up]);
+        this.planeMesh.SetUVs([new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1)]);
+        this.planeMesh.SetTangents([new Vector4(0, 1, 0, 1), new Vector4(0, 1, 0, 1), new Vector4(0, 1, 0, 1), new Vector4(0, 1, 0, 1)]);
+        this.planeMesh.SetSubMeshes([
+            new SubMesh({
+                triangles: [0, 1, 2, 0, 2, 3,],
+                edges: [0, 1, 1, 2, 2, 3, 3, 0,],
+            })
+        ]);
+        this.planeMesh.UploadMeshData();
 
         const cubeVertices = [
             new Vector3(-0.5, -0.5, -0.5), new Vector3(0.5, -0.5, -0.5), new Vector3(0.5, -0.5, 0.5), new Vector3(-0.5, -0.5, 0.5),
             new Vector3(-0.5, 0.5, -0.5), new Vector3(0.5, 0.5, -0.5), new Vector3(0.5, 0.5, 0.5), new Vector3(-0.5, 0.5, 0.5),
         ];
-        this.cubeMesh = new Mesh({
-            vertices: cubeVertices,
-            normals: cubeVertices.map(v => v.normalized),
-            uvs: [
-                new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1),
-                new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1),
-            ],
-            tangents: cubeVertices.map(v => {
-                const tangent = (Math.abs(v.y) < 0.9 ? new Vector3(0, 1, 0) : new Vector3(0, 0, 1)).Cross(v).normalized;
-                return new Vector4(tangent.x, tangent.y, tangent.z, 1.0);
-            }),
-            subMeshes: [new SubMesh({
-                triangles: [
-                    3, 6, 2, 3, 7, 6,
-                    1, 4, 0, 1, 5, 4,
-                    7, 5, 6, 7, 4, 5,
-                    0, 2, 1, 0, 3, 2,
-                    2, 5, 1, 2, 6, 5,
-                    0, 7, 3, 0, 4, 7
-                ],
-                edges: [
-                    0, 1, 1, 2, 2, 3, 3, 0,
-                    4, 5, 5, 6, 6, 7, 7, 4,
-                    0, 4, 1, 5, 2, 6, 3, 7
-                ],
-            }),],
-        });
-        // this.cubeMesh.RecalculateTangents();
-        this.cubeMesh.RecalculateBounds();
+        this.cubeMesh = new Mesh("Cube");
+        this.cubeMesh.SetVertices(cubeVertices);
+        this.cubeMesh.SetNormals(cubeVertices.map(v => v.normalized));
+        this.cubeMesh.SetUVs([new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1), new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1)]);
+        this.cubeMesh.SetTangents(cubeVertices.map(v => {
+            const tangent = (Math.abs(v.y) < 0.9 ? new Vector3(0, 1, 0) : new Vector3(0, 0, 1)).Cross(v).normalized;
+            return new Vector4(tangent.x, tangent.y, tangent.z, 1.0);
+        }));
+        this.cubeMesh.SetSubMeshes([
+            new SubMesh({
+                triangles: [3, 6, 2, 3, 7, 6, 1, 4, 0, 1, 5, 4, 7, 5, 6, 7, 4, 5, 0, 2, 1, 0, 3, 2, 2, 5, 1, 2, 6, 5, 0, 7, 3, 0, 4, 7],
+                edges: [0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7],
+            })
+        ]);
+        this.cubeMesh.UploadMeshData();
 
         this.icoMesh = this.CreateIcoSphere(0.5, 1);
         this.sphereMesh = this.CreateUVSphereMesh(0.5);
@@ -278,19 +262,18 @@ class Graphics {
             }
         }
 
-        const mesh = new Mesh({
-            vertices: vertices,
-            normals: vertices.map(v => v.normalized),
-            tangents: tangents,
-            uvs: uvs,
-            subMeshes: [new SubMesh({
+        const mesh = new Mesh("Ico");
+        mesh.SetVertices(vertices);
+        mesh.SetNormals(vertices.map(v => v.normalized));
+        mesh.SetTangents(tangents);
+        mesh.SetUVs(uvs);
+        mesh.SetSubMeshes([
+            new SubMesh({
                 triangles: triangles,
                 edges: edges,
-            })]
-        });
-
-        mesh.RecalculateBounds();
-        mesh.Update();
+            })
+        ]);
+        mesh.UploadMeshData();
 
         return mesh;
     }
@@ -363,22 +346,21 @@ class Graphics {
             addEdge(f[2], f[0]);
         }
 
-        const mesh = new Mesh({
-            vertices: vertices,
-            normals: vertices.map(v => v.normalized),
-            tangents: vertices.map(v => {
-                const n = v.normalized;
-                let t = new Vector3(-n.z, 0, n.x).normalized;
-                return new Vector4(t.x, t.y, t.z, 1.0);
-            }),
-            subMeshes: [new SubMesh({
+        const mesh = new Mesh("Sphere");
+        mesh.SetVertices(vertices);
+        mesh.SetNormals(vertices.map(v => v.normalized));
+        mesh.SetTangents(vertices.map(v => {
+            const n = v.normalized;
+            let t = new Vector3(-n.z, 0, n.x).normalized;
+            return new Vector4(t.x, t.y, t.z, 1.0);
+        }));
+        mesh.SetSubMeshes([
+            new SubMesh({
                 triangles: faces.flat(),
                 edges: edges
-            })]
-        });
-
-        mesh.RecalculateBounds();
-        mesh.Update();
+            })
+        ]);
+        mesh.UploadMeshData();
 
         return mesh;
     }

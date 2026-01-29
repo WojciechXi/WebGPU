@@ -22,15 +22,15 @@ class MeshCollider extends Collider {
 
     Raycast(ray, maxDistance) {
         if (!this.mesh) return null;
-        if (!this.mesh.subMeshes.length) return null;
+        if (!this.mesh.subMeshCount) return null;
 
         const localRay = this.transform.InverseTransformRay(ray);
 
         let distance = Infinity;
         let nearestNormal = null;
 
-        const vertices = this.mesh.vertices;
-        const triangles = this.mesh.subMeshes[0].triangles;
+        const vertices = this.mesh._vertices;
+        const triangles = this.mesh.GetSubMesh(0).triangles;
 
         // Iteracja przez trójkąty (co 3 indeksy)
         for (let i = 0; i < triangles.length; i += 3) {

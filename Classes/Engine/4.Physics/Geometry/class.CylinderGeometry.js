@@ -30,8 +30,8 @@ Geometry.check.CylinderGeometry = {
         const closest = TriangleGeometry.ClosestPoint(cylinder.center, a, b, c);
         return Geometry.check.CylinderGeometry.SphereGeometry(cylinder, { center: closest, radius: 0.001 });
     },
-    TriangleMeshGeometry: function (cylinder, mesh) {
-        for (let i = 0; i < mesh.triangles; i += 3) if (this.TriangleGeometry(cylinder, mesh.vertices[mesh.triangles[i]], mesh.vertices[mesh.triangles[i + 1]], mesh.vertices[mesh.triangles[i + 2]])) return true;
+    TriangleMeshGeometry: function (cylinder, triangleMesh) {
+        for (let i = 0; i < triangleMesh.triangles; i += 3) if (this.TriangleGeometry(cylinder, triangleMesh.vertices[triangleMesh.triangles[i]], triangleMesh.vertices[triangleMesh.triangles[i + 1]], triangleMesh.vertices[triangleMesh.triangles[i + 2]])) return true;
         return false;
     },
 };
@@ -108,10 +108,10 @@ Geometry.compute.CylinderGeometry = {
         };
         return Geometry.compute.BoxGeometry.TriangleGeometry(tempBox, a, b, c);
     },
-    TriangleMeshGeometry: function (cylinder, mesh) {
+    TriangleMeshGeometry: function (cylinder, triangleMesh) {
         let bestHit = null;
-        for (let i = 0; i < mesh.triangles.length; i += 3) {
-            const hit = this.TriangleGeometry(cylinder, mesh.vertices[mesh.triangles[i]], mesh.vertices[mesh.triangles[i + 1]], mesh.vertices[mesh.triangles[i + 2]]);
+        for (let i = 0; i < triangleMesh.triangles.length; i += 3) {
+            const hit = this.TriangleGeometry(cylinder, triangleMesh.vertices[triangleMesh.triangles[i]], triangleMesh.vertices[triangleMesh.triangles[i + 1]], triangleMesh.vertices[triangleMesh.triangles[i + 2]]);
             if (hit && (!bestHit || hit.overlap > bestHit.overlap)) bestHit = hit;
         }
         return bestHit;

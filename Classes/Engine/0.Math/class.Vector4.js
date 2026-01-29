@@ -33,4 +33,6 @@ class Vector4 extends Float32Array {
         return new Vector4(0, 0, 0, this.w);
     }
 
+    Clone() { return new Vector4(this.x, this.y, this.z, this.w); }
+
 }

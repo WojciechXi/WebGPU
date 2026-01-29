@@ -88,7 +88,7 @@ class GizmosRenderPass extends RenderPass {
         const buffer = this.buffers[this.bufferIndex];
         this.bufferIndex++;
 
-        const subMesh = mesh.subMeshes[subMeshIndex];
+        const subMesh = mesh.GetSubMesh(subMeshIndex);
 
         this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
         this.SetVertexBuffer(1, buffer.buffer);
