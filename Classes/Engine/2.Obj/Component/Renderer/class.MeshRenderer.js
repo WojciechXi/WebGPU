@@ -3,6 +3,8 @@ class MeshRenderer extends Renderer {
     Init() {
         super.Init();
 
+        this.target = null;
+
         this.receiveShadows = true;
         this.castShadows = true;
 
@@ -10,6 +12,7 @@ class MeshRenderer extends Renderer {
         this.mesh = null;
     }
 
+    get transform() { return this.target ?? super.transform; }
     get isVisible() { return this.materials.length && this.mesh; }
 
     // Update() {
