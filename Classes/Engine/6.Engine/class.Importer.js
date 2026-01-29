@@ -293,17 +293,35 @@ class Importer {
             _mesh.primitives.forEach((primitive) => {
                 let mesh = new Mesh(_mesh.name || "GLB_Mesh");
 
+                const vertices = [];
                 const _positions = getAccessorData(primitive.attributes.POSITION);
+                if (_positions) for (let i = 0; i < _positions.length; i += 3) vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
+                mesh.SetVertices(vertices);
+
+                const normals = [];
                 const _normals = getAccessorData(primitive.attributes.NORMAL);
+                if (_normals) for (let i = 0; i < _normals.length; i += 3) normals.push(new Vector3(_normals[i], _normals[i + 1], _normals[i + 2]));
+                mesh.SetNormals(normals);
+
+                const tangents = [];
+                const _tangents = getAccessorData(gltf, primitive.attributes.TANGENT);
+                if (_tangents) for (let i = 0; i < _tangents.length; i += 4) tangents.push(new Vector3(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
+                mesh.SetNormals(tangents);
+
+                const uvs = [];
                 const _uvs = getAccessorData(primitive.attributes.TEXCOORD_0);
-                const _indices = getAccessorData(primitive.indices);
-                if (_positions) for (let i = 0; i < _positions.length; i += 3) mesh.vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
+                if (_uvs) for (let i = 0; i < _uvs.length; i += 2) uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
+                mesh.SetUVs(uvs);
 
-                if (_indices) mesh.triangles = Array.from(_indices);
+                const triangles = getAccessorData(primitive.indices);
+                mesh.SetSubMeshes([
+                    new SubMesh({
+                        triangles: new Uint32Array(triangles),
+                    }),
+                ]);
 
-                // ... reszta Twojej logiki (normals, uvs, etc.) ...
+                mesh.UploadMeshData();
 
-                mesh.Update?.();
                 meshes.push(mesh);
             });
         });

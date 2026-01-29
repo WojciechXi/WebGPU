@@ -35,19 +35,9 @@ class Color32 extends Float32Array {
     }
 
     // Public Methods
-    Set(r, g, b, a) {
-        this[0] = r;
-        this[1] = g;
-        this[2] = b;
-        this[3] = a;
-    }
-
-    Clear() {
-        this[0] = 0;
-        this[1] = 0;
-        this[2] = 0;
-        this[3] = 0;
-    }
+    Set(r, g, b, a) { this[0] = r; this[1] = g; this[2] = b; this[3] = a; }
+    Clear() { this[0] = 0; this[1] = 0; this[2] = 0; this[3] = 0; }
+    Clone() { return new Color32(this[0], this[1], this[2], this[3], this[4], this[5]); }
 
     // Static Methods
     static HSVToRGB() { }

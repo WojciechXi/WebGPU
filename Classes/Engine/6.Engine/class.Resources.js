@@ -30,6 +30,14 @@ class Resources {
                             materials: gltfMaterials,
                         };
                     });
+                } else if (meta.pathInfo.extension == 'glb') {
+                    await Importer.GLB(meta.pathInfo.dirname, `${meta.pathInfo.filename}.${meta.pathInfo.extension}`, function (meshes, glbMaterials) {
+                        console.log(meshes);
+                        object.resources[path] = {
+                            meshes: meshes,
+                            materials: glbMaterials,
+                        };
+                    });
                 } else if (meta.pathInfo.extension == 'wgsl') {
                     const response = await fetch(path);
                     object.resources[path] = await response.text();
