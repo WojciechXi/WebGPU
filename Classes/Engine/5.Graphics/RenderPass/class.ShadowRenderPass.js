@@ -57,6 +57,8 @@ class ShadowRenderPass extends RenderPass {
     }
 
     Render(cameras, scene, commandEncoder) {
+        if (!scene.directionalLight || !scene.directionalLight.lightBindGroup) return;
+
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [],
             depthStencilAttachment: this.depthRenderTexture.GetDepthStencilAttachment(),

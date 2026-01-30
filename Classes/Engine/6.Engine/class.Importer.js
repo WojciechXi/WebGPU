@@ -248,85 +248,181 @@ class Importer {
 
     // Pomocnicza metoda, aby nie powtarzać kodu w GLTF i GLB
     static _parseFromData(gltf, arrayBuffer, callback) {
-        const intArrayBuffer = [new Uint8Array(arrayBuffer)];
+        const intArrayBuffer = new Uint8Array(arrayBuffer);
 
+        // --- POMOCNIKI ---
         function numComponents(type) {
-            switch (type) {
-                case 'SCALAR': return 1;
-                case 'VEC2': return 2;
-                case 'VEC3': return 3;
-                case 'VEC4': return 4;
-                case 'MAT4': return 16;
-                default: throw new Error('Nieobsługiwany typ: ' + type);
-            }
+            const mapping = { 'SCALAR': 1, 'VEC2': 2, 'VEC3': 3, 'VEC4': 4, 'MAT4': 16 };
+            return mapping[type] || 0;
         }
 
         function getAccessorData(accessorIndex) {
+            if (accessorIndex === undefined || accessorIndex === null) return null;
             const accessor = gltf.accessors[accessorIndex];
-            if (!accessor) return null;
-
             const bufferView = gltf.bufferViews[accessor.bufferView];
-            if (!bufferView) return null;
-
-            const buffer = intArrayBuffer[bufferView.buffer] || intArrayBuffer[0];
             const byteOffset = (bufferView.byteOffset || 0) + (accessor.byteOffset || 0);
-            const length = accessor.count;
-            const nComponents = numComponents(accessor.type);
 
             let TypedArray;
             switch (accessor.componentType) {
+                case 5121: TypedArray = Uint8Array; break;
                 case 5123: TypedArray = Uint16Array; break;
                 case 5125: TypedArray = Uint32Array; break;
                 case 5126: TypedArray = Float32Array; break;
-                default: throw new Error("Unsupported componentType: " + accessor.componentType);
+                default: TypedArray = Float32Array;
             }
 
             return new TypedArray(
-                buffer.buffer,
-                buffer.byteOffset + byteOffset,
-                length * nComponents
+                intArrayBuffer.buffer,
+                intArrayBuffer.byteOffset + byteOffset,
+                accessor.count * numComponents(accessor.type)
             );
         }
 
-        let meshes = [];
-        gltf.meshes.forEach((_mesh) => {
-            _mesh.primitives.forEach((primitive) => {
-                let mesh = new Mesh(_mesh.name || "GLB_Mesh");
+        console.log(gltf);
 
-                const vertices = [];
-                const _positions = getAccessorData(primitive.attributes.POSITION);
-                if (_positions) for (let i = 0; i < _positions.length; i += 3) vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
-                mesh.SetVertices(vertices);
-
-                const normals = [];
-                const _normals = getAccessorData(primitive.attributes.NORMAL);
-                if (_normals) for (let i = 0; i < _normals.length; i += 3) normals.push(new Vector3(_normals[i], _normals[i + 1], _normals[i + 2]));
-                mesh.SetNormals(normals);
-
-                const tangents = [];
-                const _tangents = getAccessorData(gltf, primitive.attributes.TANGENT);
-                if (_tangents) for (let i = 0; i < _tangents.length; i += 4) tangents.push(new Vector3(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
-                mesh.SetNormals(tangents);
-
-                const uvs = [];
-                const _uvs = getAccessorData(primitive.attributes.TEXCOORD_0);
-                if (_uvs) for (let i = 0; i < _uvs.length; i += 2) uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
-                mesh.SetUVs(uvs);
-
-                const triangles = getAccessorData(primitive.indices);
-                mesh.SetSubMeshes([
-                    new SubMesh({
-                        triangles: new Uint32Array(triangles),
-                    }),
-                ]);
-
-                mesh.UploadMeshData();
-
-                meshes.push(mesh);
-            });
+        // --- NODES (Hierarchia i transformacje) ---
+        const gameObjects = gltf.nodes.map((node, index) => {
+            const gameObject = new GameObject(node.name || `Node_${index}`);
+            if (node.translation) gameObject.transform.position = new Vector3(node.translation[0], node.translation[1], node.translation[2]);
+            if (node.rotation) gameObject.transform.rotation = new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
+            return gameObject;
+            return {
+                id: index,
+                name: node.name || `Node_${index}`,
+                children: node.children || [],
+                matrix: node.matrix,
+                skin: node.skin // Indeks skina, jeśli ten node to mesh ze szkieletem
+            };
         });
 
-        if (callback) callback(meshes, gltf.materials);
+        // --- 1. TEKSTURY (IMAGES) ---
+        const textures = [];
+        if (gltf.images) {
+            gltf.images.forEach((img) => {
+                const bufferView = gltf.bufferViews[img.bufferView];
+                const start = bufferView.byteOffset || 0;
+                const end = start + bufferView.byteLength;
+                const imageData = intArrayBuffer.slice(start, end);
+                const blob = new Blob([imageData], { type: img.mimeType });
+                const url = URL.createObjectURL(blob);
+
+                // Tutaj możesz utworzyć swój obiekt Texture(url)
+                textures.push(url);
+            });
+        }
+
+        // --- 2. MATERIAŁY ---
+        const materials = [];
+        if (gltf.materials) {
+            gltf.materials.forEach((mat) => {
+                const materialData = {
+                    name: mat.name,
+                    baseColor: mat.pbrMetallicRoughness?.baseColorFactor || [1, 1, 1, 1],
+                    // Pobieramy index tekstury, jeśli istnieje
+                    diffuseTexture: mat.pbrMetallicRoughness?.baseColorTexture
+                        ? textures[gltf.textures[mat.pbrMetallicRoughness.baseColorTexture.index].source]
+                        : null
+                };
+                materials.push(materialData);
+            });
+        }
+
+        // --- 3. MESHE ---
+        let meshes = [];
+        if (gltf.meshes) {
+            gltf.meshes.forEach((_mesh) => {
+                _mesh.primitives.forEach((primitive) => {
+                    let mesh = new Mesh(_mesh.name || "GLB_Mesh");
+
+                    // Pozycje
+                    const _pos = getAccessorData(primitive.attributes.POSITION);
+                    if (_pos) {
+                        const v = [];
+                        for (let i = 0; i < _pos.length; i += 3) v.push(new Vector3(-_pos[i], _pos[i + 1], _pos[i + 2]));
+                        mesh.SetVertices(v);
+                    }
+
+                    // UV (Tekstury)
+                    const _uvs = getAccessorData(primitive.attributes.TEXCOORD_0);
+                    if (_uvs) {
+                        const u = [];
+                        for (let i = 0; i < _uvs.length; i += 2) u.push(new Vector2(_uvs[i], _uvs[i + 1]));
+                        mesh.SetUVs(u);
+                    }
+
+                    // Indeksy (Triangles)
+                    const triangles = getAccessorData(primitive.indices);
+                    mesh.SetSubMeshes([new SubMesh({ triangles: new Uint32Array(triangles) })]);
+
+                    mesh.UploadMeshData();
+                    meshes.push({
+                        mesh: mesh,
+                        materialIndex: primitive.material // Przypisanie indeksu materiału
+                    });
+                });
+            });
+        }
+
+        // --- 4. ANIMACJE ---
+        const animations = [];
+        if (gltf.animations) {
+            gltf.animations.forEach(anim => {
+                const channels = anim.channels.map(channel => {
+                    const sampler = anim.samplers[channel.sampler];
+                    return {
+                        targetNode: channel.target.node,
+                        path: channel.target.path, // "translation", "rotation", "scale"
+                        times: getAccessorData(sampler.input),
+                        values: getAccessorData(sampler.output)
+                    };
+                });
+                animations.push({ name: anim.name, channels });
+            });
+        }
+
+        // --- SKINS (Dane szkieletu) ---
+        const skins = [];
+        if (gltf.skins) {
+            gltf.skins.forEach(skin => {
+                skins.push({
+                    name: skin.name,
+                    joints: skin.joints, // Indeksy węzłów (nodes), które są kośćmi
+                    // Macierze pomocnicze do obliczeń deformacji
+                    inverseBindMatrices: getAccessorData(skin.inverseBindMatrices)
+                });
+            });
+        }
+
+        // const _joints = getAccessorData(primitive.attributes.JOINTS_0);
+        // if (_joints) {
+        //     const j = [];
+        //     // JOINTS_0 to zazwyczaj VEC4 (4 wartości na wierzchołek)
+        //     for (let i = 0; i < _joints.length; i += 4) {
+        //         j.push([_joints[i], _joints[i + 1], _joints[i + 2], _joints[i + 3]]);
+        //     }
+        //     mesh.SetBoneIndices(j); // Zakładając, że Twoja klasa Mesh to obsługuje
+        // }
+
+        // const _weights = getAccessorData(primitive.attributes.WEIGHTS_0);
+        // if (_weights) {
+        //     const w = [];
+        //     for (let i = 0; i < _weights.length; i += 4) {
+        //         w.push([_weights[i], _weights[i + 1], _weights[i + 2], _weights[i + 3]]);
+        //     }
+        //     mesh.SetBoneWeights(w);
+        // }
+
+        // --- FINALNY CALLBACK ---
+        if (callback) {
+            callback({
+                meshes: meshes,
+                materials: materials,
+                animations: animations,
+                textures: textures,
+                skins: skins,
+                gameObjects: gameObjects,
+            });
+        }
     }
 
 }

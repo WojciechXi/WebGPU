@@ -82,8 +82,8 @@ class LightingRenderPass extends RenderPass {
         });
 
         renderPass.setPipeline(this.renderPipeline);
-        renderPass.setBindGroup(1, scene.directionalLight.lightBindGroup);
-        renderPass.setBindGroup(2, scene.ambientLight.lightBindGroup);
+        if (scene.directionalLight) renderPass.setBindGroup(1, scene.directionalLight.lightBindGroup);
+        if (scene.ambientLight) renderPass.setBindGroup(2, scene.ambientLight.lightBindGroup);
         renderPass.setBindGroup(3, this.bindGroup3);
 
         for (let camera of cameras) {

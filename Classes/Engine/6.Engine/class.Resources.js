@@ -31,12 +31,9 @@ class Resources {
                         };
                     });
                 } else if (meta.pathInfo.extension == 'glb') {
-                    await Importer.GLB(meta.pathInfo.dirname, `${meta.pathInfo.filename}.${meta.pathInfo.extension}`, function (meshes, glbMaterials) {
-                        console.log(meshes);
-                        object.resources[path] = {
-                            meshes: meshes,
-                            materials: glbMaterials,
-                        };
+                    await Importer.GLB(meta.pathInfo.dirname, `${meta.pathInfo.filename}.${meta.pathInfo.extension}`, function (data) {
+                        console.log(data);
+                        object.resources[path] = data;
                     });
                 } else if (meta.pathInfo.extension == 'wgsl') {
                     const response = await fetch(path);

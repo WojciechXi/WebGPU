@@ -19,13 +19,14 @@ class Component extends Obj {
         if (this._enabled === value) return;
         this._enabled = value;
 
-        if (value) {
-            this.scene.AddComponent(this);
-            if (this.OnEnable) this.OnEnable();
-        }
-        else {
-            this.scene.RemoveComponent(this);
-            if (this.OnDisable) this.OnDisable();
+        if (this.scene) {
+            if (value) {
+                this.scene.AddComponent(this);
+                if (this.OnEnable) this.OnEnable();
+            } else {
+                this.scene.RemoveComponent(this);
+                if (this.OnDisable) this.OnDisable();
+            }
         }
     }
 

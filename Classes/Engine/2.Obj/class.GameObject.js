@@ -7,16 +7,18 @@ class GameObject extends Obj {
     get transform() { return this._transform; }
     get transformHandle() { }
 
-    constructor(name = 'GameObject', ...components) {
+    constructor(name = 'GameObject', scene = null, ...components) {
         super({
             name: name,
         });
 
+        if (scene) {
+            this.scene = scene;
+            this.scene.AddGameObject(this);
+        }
+
         this.layer = 0;
         this.isStatic = false;
-
-        this.scene = Engine.Instance.scene;
-        this.scene.AddGameObject(this);
 
         this.sceneCullingMask = 0;
         this.tag = '';
@@ -79,17 +81,19 @@ class GameObject extends Obj {
     static Find() { }
     static FindGameObjectsWithTag() { }
     static FindWithTag() { }
-    static GetScene() { }
+    static GetScene() { return this.scene; }
     static InstantiateGameObjects() { }
     static SetGameObjectsActive() { }
 
     // Inherited Members
     // Static Methods
     static Instantiate(original, position = null, rotation = null, parent = null, ...components) {
-        const instance = new this(this.name, ...components);
+        const instance = new this(this.name, Engine.Instance.scene, ...components);
+
         if (parent) instance.transform.SetParent(parent);
         if (position) instance.transform.position = position;
         if (rotation) instance.transform.rotation = rotation;
+
         return instance;
     }
 
