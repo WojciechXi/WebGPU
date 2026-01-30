@@ -95,6 +95,69 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             capsuleMeshRenderer.material = materials.Default;
             capsuleMeshRenderer.mesh = Graphics.cubeMesh;
 
+            Resources.Get('/Resources/Models/Human.glb', function (gltf) {
+                const gameObject = new GameObject('Human');
+                gameObject.transform.localScale = new Vector3(0.01, 0.01, 0.01);
+
+                for (const mesh of gltf.meshes) {
+                    const meshGameObject = new GameObject(mesh.name);
+                    meshGameObject.transform.SetParent(gameObject.transform);
+                    const meshRenderer = meshGameObject.AddComponent(MeshRenderer);
+                    meshRenderer.mesh = mesh;
+                    meshRenderer.materials = [];
+                    mesh._subMeshes.forEach(function (subMesh) {
+                        if (subMesh.material == 'Glass') meshRenderer.castShadows = false;
+                        if (materials.hasOwnProperty(subMesh.material)) {
+                            meshRenderer.materials.push(materials[subMesh.material]);
+                        } else {
+                            const m = gltf.materials.find(function (m) { return m.name == subMesh.material; });
+
+                            const material = materials[subMesh.material] = new Material({
+                                name: subMesh.material,
+                                shader: litShader,
+                            });
+
+                            Resources.Get(`/Resources/Textures/${material.name}/Albedo.webp`, function (texture) {
+                                if (texture) material.SetTexture('albedo', texture);
+                            });
+
+                            Resources.Get(`/Resources/Textures/${material.name}/Normal.webp`, function (texture) {
+                                if (texture) material.SetTexture('normal', texture);
+                            });
+
+                            Resources.Get(`/Resources/Textures/${material.name}/Roughness.webp`, function (texture) {
+                                if (texture) material.SetTexture('roughness', texture);
+                            });
+
+                            Resources.Get(`/Resources/Textures/${material.name}/Metallic.webp`, function (texture) {
+                                if (texture) material.SetTexture('metallic', texture);
+                            });
+
+                            Resources.Get(`/Resources/Textures/${material.name}/Occlusion.webp`, function (texture) {
+                                if (texture) material.SetTexture('occlussion', texture);
+                            });
+
+                            material.Update();
+
+                            if (m && m.pbrMetallicRoughness) {
+                                const pbr = m.pbrMetallicRoughness;
+                                if (pbr.baseColorFactor) {
+                                    const color = pbr.baseColorFactor;
+                                    material.color.Set(color[0], color[1], color[2], color[3]);
+                                }
+
+                                material.metallic = pbr.metallicFactor ?? 0;
+                                material.roughness = pbr.roughnessFactor ?? 0;
+                            }
+
+                            meshRenderer.materials.push(material);
+                        }
+                    });
+
+                    const meshCollider = meshGameObject.AddComponent(MeshCollider);
+                }
+            });
+
             // Resources.Get('/Resources/Models/Terrain.gltf', function (gltf) {
             //     const gameObject = new GameObject('Terrain');
 
