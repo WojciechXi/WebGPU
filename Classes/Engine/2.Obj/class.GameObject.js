@@ -2,19 +2,16 @@ class GameObject extends Obj {
 
     get TransformType() { return Transform; }
 
-    get activeInHierarchy() { return this.parent ? this.activeSelf && this.parent.activeInHierarchy : this.activeSelf; }
+    get activeInHierarchy() { return this.parent ? this.isActive && this.parent.activeInHierarchy : this.isActive; }
     get transformHandle() { }
 
     constructor(name = 'GameObject', scene = Engine.Instance.scene, ...components) {
         super({
             _name: name,
         }, {
-            scene: {
-                value: scene,
-                set: function (value) {
-                    if (value) value.AddGameObject(this);
-                    return value;
-                }
+            components: {
+                value: [],
+                set: false,
             },
             layer: {
                 value: 0,
@@ -28,17 +25,20 @@ class GameObject extends Obj {
             sceneCullingMask: {
                 value: 0,
             },
-            components: {
-                value: [],
-                set: false,
-            },
             transform: {
                 value: null,
                 set: false,
             },
-            activeSelf: {
+            isActive: {
                 value: true,
                 set: false,
+            },
+            scene: {
+                value: scene,
+                set: function (value) {
+                    if (value) value.AddGameObject(this);
+                    return value;
+                }
             },
         });
 
@@ -89,7 +89,7 @@ class GameObject extends Obj {
         if (this.transform.parent) this.transform.parent.gameObject.SendMessageUpwards(methodName, ...parameters);
     }
     SetActive(value) {
-        this._activeSelf = value;
+        this._isActive = value;
         //set enabled components
     }
     TryGetComponent(type) { return this.components.find(function (c) { return c instanceof type }); }
