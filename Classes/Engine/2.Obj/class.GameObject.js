@@ -7,7 +7,7 @@ class GameObject extends Obj {
     get transform() { return this._transform; }
     get transformHandle() { }
 
-    constructor(name = 'GameObject', scene = null, ...components) {
+    constructor(name = 'GameObject', scene = Engine.Instance.scene, ...components) {
         super({
             name: name,
         });
@@ -87,12 +87,17 @@ class GameObject extends Obj {
 
     // Inherited Members
     // Static Methods
-    static Instantiate(original, position = null, rotation = null, parent = null, ...components) {
-        const instance = new this(this.name, Engine.Instance.scene, ...components);
+    static Instantiate(original, position = null, rotation = null, parent = null) {
+        const instance = new this(original.name, Engine.Instance.scene);
+        for (let component of original.components) {
+            Debug.Log(component.constructor.Instantiate(component, instance));
+        }
 
         if (parent) instance.transform.SetParent(parent);
         if (position) instance.transform.position = position;
         if (rotation) instance.transform.rotation = rotation;
+
+        for (let child of original.transform.children) this.Instantiate(child.gameObject, child.position, child.rotation, instance.transform);
 
         return instance;
     }

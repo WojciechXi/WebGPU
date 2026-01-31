@@ -55,12 +55,19 @@ class Transform extends Component {
 
     // ---------- Hierarchia ----------
     SetParent(newParent) {
+        const position = this.position;
+        const rotation = this.rotation;
+
         if (this.parent) {
             const index = this.parent.children.indexOf(this);
             if (index !== -1) this.parent.children.splice(index, 1);
         }
+
         this.parent = newParent;
         if (newParent) newParent.children.push(this);
+
+        this.position = position;
+        this.rotation = rotation;
     }
 
     ClearParent() { this.SetParent(null); }

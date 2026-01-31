@@ -280,118 +280,84 @@ class Importer {
 
         console.log(gltf);
 
-        // --- NODES (Hierarchia i transformacje) ---
-        const gameObjects = gltf.nodes.map((node, index) => {
-            const gameObject = new GameObject(node.name || `Node_${index}`);
-            if (node.translation) gameObject.transform.position = new Vector3(node.translation[0], node.translation[1], node.translation[2]);
-            if (node.rotation) gameObject.transform.rotation = new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
-            return gameObject;
-            return {
-                id: index,
-                name: node.name || `Node_${index}`,
-                children: node.children || [],
-                matrix: node.matrix,
-                skin: node.skin // Indeks skina, jeśli ten node to mesh ze szkieletem
-            };
-        });
-
         // --- 1. TEKSTURY (IMAGES) ---
-        const textures = [];
-        if (gltf.images) {
-            gltf.images.forEach((img) => {
-                const bufferView = gltf.bufferViews[img.bufferView];
-                const start = bufferView.byteOffset || 0;
-                const end = start + bufferView.byteLength;
-                const imageData = intArrayBuffer.slice(start, end);
-                const blob = new Blob([imageData], { type: img.mimeType });
-                const url = URL.createObjectURL(blob);
-
-                // Tutaj możesz utworzyć swój obiekt Texture(url)
-                textures.push(url);
-            });
-        }
+        const textures = gltf.images ? gltf.images.map(i => {
+            const bufferView = gltf.bufferViews[i.bufferView];
+            const start = bufferView.byteOffset || 0;
+            const end = start + bufferView.byteLength;
+            const imageData = intArrayBuffer.slice(start, end);
+            const blob = new Blob([imageData], { type: i.mimeType });
+            return URL.createObjectURL(blob);
+        }) : [];
 
         // --- 2. MATERIAŁY ---
-        const materials = [];
-        if (gltf.materials) {
-            gltf.materials.forEach((mat) => {
-                const materialData = {
-                    name: mat.name,
-                    baseColor: mat.pbrMetallicRoughness?.baseColorFactor || [1, 1, 1, 1],
-                    // Pobieramy index tekstury, jeśli istnieje
-                    diffuseTexture: mat.pbrMetallicRoughness?.baseColorTexture
-                        ? textures[gltf.textures[mat.pbrMetallicRoughness.baseColorTexture.index].source]
-                        : null
-                };
-                materials.push(materialData);
-            });
-        }
+        const materials = gltf.materials ? gltf.materials.map(m => {
+            // const material = new Material({
+            //     name: m.name,
+            // });
+
+            // baseColor: mat.pbrMetallicRoughness?.baseColorFactor || [1, 1, 1, 1],
+            //     // Pobieramy index tekstury, jeśli istnieje
+            //     diffuseTexture: mat.pbrMetallicRoughness?.baseColorTexture
+            //         ? textures[gltf.textures[mat.pbrMetallicRoughness.baseColorTexture.index].source]
+            //         : null
+
+            return null;
+        }) : [];
 
         // --- 3. MESHE ---
-        let meshes = [];
-        if (gltf.meshes) {
-            gltf.meshes.forEach((_mesh) => {
-                _mesh.primitives.forEach((primitive) => {
-                    let mesh = new Mesh(_mesh.name || "GLB_Mesh");
+        let meshes = gltf.meshes ? gltf.meshes.map(m => {
+            let mesh = new Mesh(m.name || "GLB_Mesh");
 
-                    // Pozycje
-                    const _pos = getAccessorData(primitive.attributes.POSITION);
-                    if (_pos) {
-                        const v = [];
-                        for (let i = 0; i < _pos.length; i += 3) v.push(new Vector3(-_pos[i], _pos[i + 1], _pos[i + 2]));
-                        mesh.SetVertices(v);
-                    }
+            for (let primitive of m.primitives) {
+                const _pos = getAccessorData(primitive.attributes.POSITION);
+                if (_pos) {
+                    const v = [];
+                    for (let i = 0; i < _pos.length; i += 3) v.push(new Vector3(-_pos[i], _pos[i + 1], _pos[i + 2]));
+                    mesh.SetVertices(v);
+                }
 
-                    // UV (Tekstury)
-                    const _uvs = getAccessorData(primitive.attributes.TEXCOORD_0);
-                    if (_uvs) {
-                        const u = [];
-                        for (let i = 0; i < _uvs.length; i += 2) u.push(new Vector2(_uvs[i], _uvs[i + 1]));
-                        mesh.SetUVs(u);
-                    }
+                // UV (Tekstury)
+                const _uvs = getAccessorData(primitive.attributes.TEXCOORD_0);
+                if (_uvs) {
+                    const u = [];
+                    for (let i = 0; i < _uvs.length; i += 2) u.push(new Vector2(_uvs[i], _uvs[i + 1]));
+                    mesh.SetUVs(u);
+                }
 
-                    // Indeksy (Triangles)
-                    const triangles = getAccessorData(primitive.indices);
-                    mesh.SetSubMeshes([new SubMesh({ triangles: new Uint32Array(triangles) })]);
+                // Indeksy (Triangles)
+                const triangles = getAccessorData(primitive.indices);
+                mesh.SetSubMeshes([new SubMesh({ triangles: new Uint32Array(triangles) })]);
 
-                    mesh.UploadMeshData();
-                    meshes.push({
-                        mesh: mesh,
-                        materialIndex: primitive.material // Przypisanie indeksu materiału
-                    });
-                });
-            });
-        }
+                mesh.UploadMeshData();
+            }
+
+            return mesh;
+        }) : [];
 
         // --- 4. ANIMACJE ---
-        const animations = [];
-        if (gltf.animations) {
-            gltf.animations.forEach(anim => {
-                const channels = anim.channels.map(channel => {
-                    const sampler = anim.samplers[channel.sampler];
-                    return {
-                        targetNode: channel.target.node,
-                        path: channel.target.path, // "translation", "rotation", "scale"
-                        times: getAccessorData(sampler.input),
-                        values: getAccessorData(sampler.output)
-                    };
-                });
-                animations.push({ name: anim.name, channels });
+        const animations = gltf.animations ? gltf.animations.map(a => {
+            const channels = a.channels.map(channel => {
+                const sampler = a.samplers[channel.sampler];
+                return {
+                    targetNode: channel.target.node,
+                    path: channel.target.path, // "translation", "rotation", "scale"
+                    times: getAccessorData(sampler.input),
+                    values: getAccessorData(sampler.output)
+                };
             });
-        }
+
+            return { name: a.name, channels };
+        }) : [];
 
         // --- SKINS (Dane szkieletu) ---
-        const skins = [];
-        if (gltf.skins) {
-            gltf.skins.forEach(skin => {
-                skins.push({
-                    name: skin.name,
-                    joints: skin.joints, // Indeksy węzłów (nodes), które są kośćmi
-                    // Macierze pomocnicze do obliczeń deformacji
-                    inverseBindMatrices: getAccessorData(skin.inverseBindMatrices)
-                });
-            });
-        }
+        const skins = gltf.skins ? gltf.skins.map(s => {
+            return {
+                name: s.name,
+                joints: s.joints,
+                inverseBindMatrices: getAccessorData(s.inverseBindMatrices)
+            };
+        }) : [];
 
         // const _joints = getAccessorData(primitive.attributes.JOINTS_0);
         // if (_joints) {
@@ -412,6 +378,29 @@ class Importer {
         //     mesh.SetBoneWeights(w);
         // }
 
+        const rootGameObject = new GameObject("Game Object");
+
+        const gameObjects = gltf.nodes.map((node, index) => {
+            const gameObject = new GameObject(node.name || `Node_${index}`, null, DebugTransform);
+            if (node.translation) gameObject.transform.position = new Vector3(node.translation[0] * 0.01, node.translation[1] * 0.01, node.translation[2] * 0.01);
+            if (node.rotation) gameObject.transform.rotation = new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
+            if (node.skin >= 0 && node.mesh >= 0) {
+                const meshRenderer = gameObject.AddComponent(MeshRenderer);
+                meshRenderer.meh = meshes[node.mesh];
+            }
+            return gameObject;
+        });
+
+        gameObjects.forEach(function (gameObject, index) {
+            const node = gltf.nodes[index];
+            if (node.children) for (let childIndex of node.children) gameObjects[childIndex].transform.SetParent(gameObject.transform);
+        });
+
+        gameObjects.forEach(function (gameObject, index) {
+            if (gameObject.transform.parent) return;
+            gameObject.transform.SetParent(rootGameObject.transform);
+        });
+
         // --- FINALNY CALLBACK ---
         if (callback) {
             callback({
@@ -421,6 +410,7 @@ class Importer {
                 textures: textures,
                 skins: skins,
                 gameObjects: gameObjects,
+                rootGameObject: rootGameObject,
             });
         }
     }

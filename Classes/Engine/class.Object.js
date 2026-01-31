@@ -23,9 +23,7 @@ class Obj {
     GetType() { return this.constructor.name; }
     ToString() { return JSON.stringify(this); }
 
-    Destroy() {
-        Obj.objs.splice(Obj.objs.indexOf(object), 1);
-    }
+    Destroy() { Obj.objs.splice(Obj.objs.indexOf(object), 1); }
 
     // Static Methods
     static Destroy(object, timeout = 0) {
@@ -43,16 +41,7 @@ class Obj {
     static FindAnyObjectByType(type, findObjectsInactive = true) { return Obj.objs.filter(o => o instanceof type); }
     static FindFirstObjectByType(type, findObjectsInactive = true) { return Obj.objs.find(o => o.constructor == type); }
     static FindObjectsByType(type, findObjectsInactive = true, sortMode = false) { return Obj.objs.find(o => o.constructor == type); }
-    static Instantiate(original) {
-        const instance = new this({
-            hideFlags: original.hideFlags,
-            name: original.name,
-        });
-
-        return instance;
-    }
-    static InstantiateAsync(original) {
-
-    }
+    static Instantiate(original) { return new (original.constructor)(original); }
+    static InstantiateAsync(original) { }
 
 }
