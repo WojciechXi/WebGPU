@@ -106,7 +106,6 @@ window.addEventListener('DOMContentLoaded', async function (event) {
 
             Resources.Get('/Resources/Models/Human.glb', function (gltf) {
                 const gameObject = GameObject.Instantiate(gltf.rootGameObject);
-                console.log(gameObject);
             });
 
             // Resources.Get('/Resources/Models/Terrain.gltf', function (gltf) {

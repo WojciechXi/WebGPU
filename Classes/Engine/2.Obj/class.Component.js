@@ -2,10 +2,8 @@ class Component extends Obj {
 
     // Properties
 
-    constructor(gameObject, data = {}) {
-        data.gameObject = gameObject;
-        super(data);
-        this.enabled = data.enabled ?? true;
+    set gameObject(value) {
+        this.gameObject = value;
     }
 
     get tag() { return this.gameObject.tag; }
@@ -43,6 +41,10 @@ class Component extends Obj {
     SendMessageUpwards(methodName, ...parameters) { return this.gameObject.SendMessageUpwards(methodName, ...parameters); }
     TryGetComponent(type) { return this.gameObject.TryGetComponent(type); }
 
-    static Instantiate(original, gameObject) { return new (original.constructor)(gameObject, original); }
+    static Instantiate(original, gameObject) {
+        const instance = new (original.constructor)(original);
+        instance.gameObject = gameObject;
+        return instance;
+    }
 
 }

@@ -90,7 +90,8 @@ class GameObject extends Obj {
     static Instantiate(original, position = null, rotation = null, parent = null) {
         const instance = new this(original.name, Engine.Instance.scene);
         for (let component of original.components) {
-            Debug.Log(component.constructor.Instantiate(component, instance));
+            if (component instanceof Transform) continue;
+            console.log(component.constructor.Instantiate(component, instance));
         }
 
         if (parent) instance.transform.SetParent(parent);

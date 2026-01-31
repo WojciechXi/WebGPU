@@ -9,7 +9,12 @@ class Obj {
         this.name = 'Object';
 
         const object = this;
-        Object.keys(data).forEach(function (key) { object[key] = data[key]; });
+        Object.keys(data).forEach(function (key) {
+            const ownPropertyDescriptor = Object.getOwnPropertyDescriptor(object, key);
+            if (!ownPropertyDescriptor || !ownPropertyDescriptor['set']) return;
+            object[key] = data[key];
+        });
+
         this.Init();
 
         if (!this._instanceId) this._instanceId = Guid.New();
