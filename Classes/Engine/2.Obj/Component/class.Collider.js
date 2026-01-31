@@ -1,8 +1,11 @@
 class Collider extends Component {
 
-    Init() {
-        this.isTrigger = false; // Jeśli true, kolizja nie wpływa fizycznie
-        this._collidingWith = new Set(); // set aktualnych kolizji
+    constructor(data = {}, parameters = {}) {
+        super(data, {
+            ...parameters,
+            isTrigger: { value: data._isTrigger ?? false, },
+            collidingWith: { value: new Set(), get: false, set: false },
+        });
     }
 
     get localBounds() { return new Bounds(Vector3.zero, Vector3.zero); }

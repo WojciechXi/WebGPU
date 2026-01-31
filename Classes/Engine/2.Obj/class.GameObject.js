@@ -7,7 +7,7 @@ class GameObject extends Obj {
 
     constructor(name = 'GameObject', scene = Engine.Instance.scene, ...components) {
         super({
-            name: name,
+            _name: name,
         }, {
             scene: {
                 value: scene,
@@ -107,14 +107,15 @@ class GameObject extends Obj {
     // Static Methods
     static Instantiate(original, position = null, rotation = null, parent = null) {
         const instance = new this(original.name, Engine.Instance.scene);
-        for (let component of original.components) {
-            if (component instanceof Transform) continue;
-            component.constructor.Instantiate(component, instance);
-        }
 
         if (parent) instance.transform.SetParent(parent);
-        if (position) instance.transform.position = position;
         if (rotation) instance.transform.rotation = rotation;
+        if (position) instance.transform.position = position;
+
+        for (let component of original.components) {
+            if (component instanceof Transform) continue;
+            component.constructor.Instantiate(component, instance)
+        }
 
         for (let child of original.transform.children) this.Instantiate(child.gameObject, child.position, child.rotation, instance.transform);
 

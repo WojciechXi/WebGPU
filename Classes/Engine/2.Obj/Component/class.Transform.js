@@ -1,5 +1,26 @@
 class Transform extends Component {
 
+    constructor(data = {}, properties = {}) {
+        super(data, {
+            ...properties,
+            localPosition: { value: data._localPosition ?? Vector3.zero, },
+            localRotation: { value: data._localRotation ?? Quaternion.identity, },
+            localScale: { value: data._localScale ?? Vector3.one, },
+            parent: {
+                value: null,
+                set: false,
+            },
+            children: {
+                value: [],
+                set: false,
+            },
+            transformBuffer: {
+                value: new Buffer(16, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }),
+                set: false,
+            },
+        });
+    }
+
     get childCount() { return this.children.length; }
 
     // ---------- World Gettery / Settery ----------
@@ -36,17 +57,6 @@ class Transform extends Component {
     get left() { return this.forward.Negate(); }
     get down() { return this.forward.Negate(); }
 
-    Init() {
-        this.localPosition = Vector3.zero;
-        this.localRotation = Quaternion.identity;
-        this.localScale = Vector3.one;
-
-        this.parent = null;
-        this.children = [];
-
-        this.transformBuffer = new Buffer(16, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }); //matrix4x4
-    }
-
     Update() {
         this.transformBuffer.Set({
             0: this.matrix4x4,
@@ -63,7 +73,7 @@ class Transform extends Component {
             if (index !== -1) this.parent.children.splice(index, 1);
         }
 
-        this.parent = newParent;
+        this._parent = newParent;
         if (newParent) newParent.children.push(this);
 
         this.position = position;

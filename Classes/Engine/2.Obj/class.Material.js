@@ -6,13 +6,13 @@ class Material extends Obj {
 
     constructor(data = {}) {
         super(data, {
-            shader: { value: data.shader ?? null, },
-            color: { value: data.color ?? Color32.white, },
-            emissive: { value: data.emissive ?? new Color32(0, 0, 0, 0), },
-            roughness: { value: data.roughness ?? 1, },
-            metallic: { value: data.metallic ?? 0.1, },
-            occlusion: { value: data.occlusion ?? 1, },
-            alphaCutoff: { value: data.alphaCutoff ?? 0.5, },
+            shader: { value: data._shader ?? data.shader ?? null, },
+            color: { value: data._color ?? data.color ?? Color32.white, },
+            emissive: { value: data._emissive ?? data.emissive ?? new Color32(0, 0, 0, 0), },
+            roughness: { value: data._roughness ?? data.roughness ?? 1, },
+            metallic: { value: data._metallic ?? data.metallic ?? 0.1, },
+            occlusion: { value: data._occlusion ?? data.occlusion ?? 1, },
+            alphaCutoff: { value: data._alphaCutoff ?? data.alphaCutoff ?? 0.5, },
             sampler: {
                 value: GPU.CreateSampler({
                     addressModeU: 'repeat',
@@ -25,7 +25,7 @@ class Material extends Obj {
                 set: false,
             },
             textures: {
-                value: data.textures ?? {},
+                value: data._textures ?? data.textures ?? {},
                 set: false,
             },
             materialBuffer: {

@@ -28,7 +28,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
 
             let materials = {};
 
-            materials.Default = new Material({
+            engine.defaultMaterial = materials.Default = new Material({
                 name: 'Default',
                 color: Color32.white,
                 shader: litShader,
@@ -105,7 +105,8 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             capsuleMeshRenderer.mesh = Graphics.cubeMesh;
 
             Resources.Get('/Resources/Models/Human.glb', function (gltf) {
-                const gameObject = GameObject.Instantiate(gltf.rootGameObject);
+                const gameObject = GameObject.Instantiate(gltf.rootGameObject, Vector3.up);
+                console.log(gameObject);
             });
 
             // Resources.Get('/Resources/Models/Terrain.gltf', function (gltf) {

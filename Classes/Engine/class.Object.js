@@ -7,13 +7,8 @@ class Obj {
     constructor(data = {}, properties = {}) {
         const object = this;
 
-        object.Property('hideFlags', {
-            value: data.hideFlags ?? 0,
-        });
-
-        object.Property('name', {
-            value: data.name ?? 'Object',
-        });
+        object.Property('hideFlags', { value: data._hideFlags ?? 0 });
+        object.Property('name', { value: data._name ?? object.constructor.name });
 
         Object.keys(properties).forEach(function (property) {
             object.Property(property, properties[property]);
@@ -44,7 +39,7 @@ class Obj {
             if (options.set instanceof Function) settings.set = function (value) {
                 object[`_${property}`] = options.set.call(object, value);
             };
-            else settings.set = function () {
+            else settings.set = function (value) {
                 object[`_${property}`] = value;
             }
         }

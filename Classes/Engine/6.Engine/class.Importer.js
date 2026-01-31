@@ -278,8 +278,6 @@ class Importer {
             );
         }
 
-        console.log(gltf);
-
         // --- 1. TEKSTURY (IMAGES) ---
         const textures = gltf.images ? gltf.images.map(i => {
             const bufferView = gltf.bufferViews[i.bufferView];
@@ -313,7 +311,7 @@ class Importer {
                 const _pos = getAccessorData(primitive.attributes.POSITION);
                 if (_pos) {
                     const v = [];
-                    for (let i = 0; i < _pos.length; i += 3) v.push(new Vector3(-_pos[i], _pos[i + 1], _pos[i + 2]));
+                    for (let i = 0; i < _pos.length; i += 3) v.push(new Vector3(-_pos[i] / 100, _pos[i + 1] / 100, _pos[i + 2] / 100));
                     mesh.SetVertices(v);
                 }
 
@@ -382,11 +380,10 @@ class Importer {
 
         const gameObjects = gltf.nodes.map((node, index) => {
             const gameObject = new GameObject(node.name || `Node_${index}`, null, DebugTransform);
-            if (node.translation) gameObject.transform.position = new Vector3(node.translation[0] * 0.01, node.translation[1] * 0.01, node.translation[2] * 0.01);
-            if (node.rotation) gameObject.transform.rotation = new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
             if (node.skin >= 0 && node.mesh >= 0) {
                 const meshRenderer = gameObject.AddComponent(MeshRenderer);
-                meshRenderer.meh = meshes[node.mesh];
+                meshRenderer.mesh = meshes[node.mesh];
+                console.log(meshRenderer);
             }
             return gameObject;
         });
@@ -394,6 +391,8 @@ class Importer {
         gameObjects.forEach(function (gameObject, index) {
             const node = gltf.nodes[index];
             if (node.children) for (let childIndex of node.children) gameObjects[childIndex].transform.SetParent(gameObject.transform);
+            if (node.rotation) gameObject.transform.localRotation = new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
+            if (node.translation) gameObject.transform.Translate(new Vector3(node.translation[0] * 0.01, node.translation[1] * 0.01, node.translation[2] * 0.01));
         });
 
         gameObjects.forEach(function (gameObject, index) {

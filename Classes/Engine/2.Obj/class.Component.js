@@ -1,9 +1,10 @@
 class Component extends Obj {
 
-    constructor(data = {}) {
+    constructor(data = {}, properties = {}) {
         super(data, {
+            ...properties,
             gameObject: {
-                value: data.gameObject ?? null,
+                value: data._gameObject ?? data.gameObject ?? null,
                 set: false,
             },
             tag: {
@@ -19,7 +20,7 @@ class Component extends Obj {
                 set: false,
             },
             enabled: {
-                value: data.enabled ?? true,
+                value: data._enabled ?? data.enabled ?? true,
                 set: function (value) {
                     if (this._enabled === value) value;
 
@@ -57,10 +58,14 @@ class Component extends Obj {
     TryGetComponent(type) { return this.gameObject.TryGetComponent(type); }
 
     static Instantiate(original, gameObject) {
-        return new (original.constructor)({
+        const instance = new (original.constructor)({
             ...original,
-            gameObject: gameObject,
+            _gameObject: gameObject,
         });
+
+        gameObject.components.push(instance);
+
+        return instance;
     }
 
 }

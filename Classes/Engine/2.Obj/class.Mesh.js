@@ -2,11 +2,11 @@ class Mesh extends Obj {
 
     constructor(name) {
         super({
-            name: name,
+            _name: name,
         }, {
             bounds: {
                 value: new Bounds(Vector3.zero, Vector3.one),
-                get: function () { return this.bounds.Clone(); },
+                get: function () { return this._bounds.Clone(); },
                 set: false,
             },
             vertexBuffer: {
@@ -42,11 +42,14 @@ class Mesh extends Obj {
     get normals() { } // An array of vectors that defines the surface orientation at each vertex of the mesh.
     get skinWeightBufferLayout() { } // The dimension of data in the bone weight buffer.
     get subMeshCount() { return this._subMeshes.length; } set subMeshCount(value) { this._subMeshes = new Array(value); }
+    get tangents() { return this._tangents; } // The tangents of the Mesh.
     get triangles() { } // An array containing all triangles in the Mesh.
+    get uv() { return this._uvs; } // The texture coordinates (UVs) in the first channel.
     get vertexAttributeCount() { } // Returns the number of vertex attributes that the mesh has. (Read Only)
     get vertexBufferCount() { } // Gets the number of vertex buffers present in the Mesh. (Read Only)
     get vertexBufferTarget() { } // The intended target usage of the Mesh GPU vertex buffer.
     get vertexCount() { return this._vertices.length; } // Returns the number of vertices in the Mesh (Read Only).
+    get vertices() { return this._vertices; } // Returns a copy of the vertex positions or assigns a new vertex positions array.
 
     AddBlendShapeFrame() { }
     Clear() {

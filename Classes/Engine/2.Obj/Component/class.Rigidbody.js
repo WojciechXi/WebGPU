@@ -1,5 +1,12 @@
 class Rigidbody extends Component {
 
+    constructor(data = {}, parameters = {}) {
+        super(data, {
+            ...parameters,
+            angularVelocity: { value: Vector3.zero, },
+        });
+    }
+
     Init() {
         this.angularVelocity = Vector3.zero;
         this.linearVelocity = Vector3.zero;

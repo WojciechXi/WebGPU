@@ -1,15 +1,14 @@
 class MeshRenderer extends Renderer {
 
-    Init() {
-        super.Init();
-
-        this.target = null;
-
-        this.receiveShadows = true;
-        this.castShadows = true;
-
-        this.materials = [null];
-        this.mesh = null;
+    constructor(data = {}, properties = {}) {
+        super(data, {
+            ...properties,
+            target: { value: data._target ?? null, },
+            receiveShadows: { value: data._receiveShadows ?? true, },
+            castShadows: { value: data._castShadows ?? true, },
+            materials: { value: data._materials ?? [null], },
+            mesh: { value: data._mesh ?? null },
+        });
     }
 
     get transform() { return this.target ?? super.transform; }
@@ -69,16 +68,16 @@ class MeshRenderer extends Renderer {
     set material(material) { this.materials = [material]; }
 
     OnDraw(renderPass, camera) {
-        if (!this.mesh || !this.material) return;
+        if (!this.mesh) return;
 
         if (renderPass.name === 'shadowRenderPass') {
             if (!this.castShadows) return;
-            for (let i = 0; i < this.materials.length && this.mesh.subMeshCount; i++) {
+            for (let i = 0; i < this.mesh.subMeshCount; i++) {
                 renderPass.DrawMesh(this.mesh, i, this.transform.transformBuffer.buffer);
             }
         } else if (renderPass.name == 'gBufferRenderPass') {
             for (let i = 0; i < this.materials.length && this.mesh.subMeshCount; i++) {
-                this.materials[i].Use(renderPass, camera);
+                (this.materials[i] ?? Engine.Instance.defaultMaterial).Use(renderPass, camera);
                 renderPass.DrawMesh(this.mesh, i, this.transform.transformBuffer.buffer);
             }
         }
