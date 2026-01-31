@@ -6,6 +6,7 @@ class Mesh extends Obj {
         }, {
             bounds: {
                 value: new Bounds(Vector3.zero, Vector3.one),
+                get: function () { return this.bounds.Clone(); },
                 set: false,
             },
             vertexBuffer: {
@@ -31,7 +32,6 @@ class Mesh extends Obj {
     get bindposes() { } // The bind poses. The bind pose at each index refers to the bone with the same index.
     get blendShapeCount() { } // Returns BlendShape count on this mesh.
     get boneWeights() { } // The BoneWeight for each vertex in the Mesh, which represents 4 bones per vertex.
-    get bounds() { return this._bounds.Clone(); } // The bounding volume of the mesh that contain all vertices of the mesh.
     get colors() { } // Vertex colors of the Mesh.
     get colors32() { } // Vertex colors of the Mesh.
     get indexBufferTarget() { } // The intended target usage of the Mesh GPU index buffer.
@@ -42,14 +42,11 @@ class Mesh extends Obj {
     get normals() { } // An array of vectors that defines the surface orientation at each vertex of the mesh.
     get skinWeightBufferLayout() { } // The dimension of data in the bone weight buffer.
     get subMeshCount() { return this._subMeshes.length; } set subMeshCount(value) { this._subMeshes = new Array(value); }
-    get tangents() { return this._tangents; } // The tangents of the Mesh.
     get triangles() { } // An array containing all triangles in the Mesh.
-    get uv() { return this._uvs; } // The texture coordinates (UVs) in the first channel.
     get vertexAttributeCount() { } // Returns the number of vertex attributes that the mesh has. (Read Only)
     get vertexBufferCount() { } // Gets the number of vertex buffers present in the Mesh. (Read Only)
     get vertexBufferTarget() { } // The intended target usage of the Mesh GPU vertex buffer.
     get vertexCount() { return this._vertices.length; } // Returns the number of vertices in the Mesh (Read Only).
-    get vertices() { return this._vertices; } // Returns a copy of the vertex positions or assigns a new vertex positions array.
 
     AddBlendShapeFrame() { }
     Clear() {
