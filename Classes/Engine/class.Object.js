@@ -4,23 +4,53 @@ class Obj {
         this.objs = [];
     }
 
-    constructor(data = {}) {
-        this.hideFlags = 0;
-        this.name = 'Object';
-
+    constructor(data = {}, properties = {}) {
         const object = this;
-        Object.keys(data).forEach(function (key) {
-            const ownPropertyDescriptor = Object.getOwnPropertyDescriptor(object, key);
-            if (!ownPropertyDescriptor || !ownPropertyDescriptor['set']) return;
-            object[key] = data[key];
+
+        object.Property('hideFlags', {
+            value: data.hideFlags ?? 0,
         });
 
-        this.Init();
+        object.Property('name', {
+            value: data.name ?? 'Object',
+        });
 
-        if (!this._instanceId) this._instanceId = Guid.New();
+        Object.keys(properties).forEach(function (property) {
+            object.Property(property, properties[property]);
+        });
+
+        if (!object._instanceId) object._instanceId = Guid.New();
+
+        object.Init();
     }
     Init() {
         Obj.objs.push(this);
+    }
+
+    Property(property, options = {}) {
+        const object = this;
+        object[`_${property}`] = options.value ?? null;
+
+        const settings = {};
+
+        if (options.get !== false) {
+            if (options.get instanceof Function) settings.get = options.get;
+            else settings.get = function () {
+                return object[`_${property}`];
+            }
+        }
+
+        if (options.set !== false) {
+            if (options.set instanceof Function) settings.set = function (value) {
+                object[`_${property}`] = options.set.call(object, value);
+            };
+            else settings.set = function () {
+                object[`_${property}`] = value;
+            }
+        }
+
+        Object.defineProperty(this, property, settings);
+        if (options.set) object[property] = options.value;
     }
 
     // Public Methods

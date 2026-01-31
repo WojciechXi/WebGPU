@@ -5,34 +5,41 @@ class Material extends Obj {
     }
 
     constructor(data = {}) {
-        super();
-        this.name = data.name ?? 'Material';
-        this.shader = data.shader ?? '';
-
-        this.color = data.color ?? Color32.white;
-        this.emissive = data.emissive ?? new Color32(0, 0, 0, 0);
-
-        this.roughness = data.roughness ?? 1;
-        this.metallic = data.metallic ?? 1;
-        this.occlusion = data.occlusion ?? 1;
-        this.alphaCutoff = data.alphaCutoff ?? 0.5;
-
-        this.sampler = GPU.CreateSampler({
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
+        super(data, {
+            shader: { value: data.shader ?? null, },
+            color: { value: data.color ?? Color32.white, },
+            emissive: { value: data.emissive ?? new Color32(0, 0, 0, 0), },
+            roughness: { value: data.roughness ?? 1, },
+            metallic: { value: data.metallic ?? 0.1, },
+            occlusion: { value: data.occlusion ?? 1, },
+            alphaCutoff: { value: data.alphaCutoff ?? 0.5, },
+            sampler: {
+                value: GPU.CreateSampler({
+                    addressModeU: 'repeat',
+                    addressModeV: 'repeat',
+                    magFilter: 'linear',
+                    minFilter: 'linear',
+                    mipmapFilter: 'linear',
+                }),
+                get: false,
+                set: false,
+            },
+            textures: {
+                value: data.textures ?? {},
+                set: false,
+            },
+            materialBuffer: {
+                value: new Buffer(4 + 4 + 4),
+                set: false,
+            },
         });
 
-        this.textures = {};
         this.SetTexture('albedo', data.albedo ?? Color32.white);
         this.SetTexture('normal', new Color32(0.5, 0.5, 1, 1));
         this.SetTexture('roughness', Color32.white);
         this.SetTexture('metallic', Color32.black);
         this.SetTexture('occlusion', Color32.white);
 
-        this.materialBuffer = new Buffer(4 + 4 + 4); //color, pbr
         this.materialBindGroup = GPU.CreateBindGroup({
             label: 'MaterialBindGroup',
             layout: Graphics.materialBindGroupLayout,
@@ -44,7 +51,7 @@ class Material extends Obj {
             label: 'gBufferBindGroup',
             layout: Graphics.pbrBindGroupLayout,
             entries: [
-                { binding: 0, resource: this.sampler },
+                { binding: 0, resource: this._sampler },
                 { binding: 1, resource: this.textures.albedo.createView() },
                 { binding: 2, resource: this.textures.normal.createView() },
                 { binding: 3, resource: this.textures.roughness.createView() },
@@ -94,7 +101,7 @@ class Material extends Obj {
             label: 'gBufferBindGroup',
             layout: Graphics.pbrBindGroupLayout,
             entries: [
-                { binding: 0, resource: this.sampler },
+                { binding: 0, resource: this._sampler },
                 { binding: 1, resource: this.textures.albedo.createView() },
                 { binding: 2, resource: this.textures.normal.createView() },
                 { binding: 3, resource: this.textures.roughness.createView() },

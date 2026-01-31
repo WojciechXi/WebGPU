@@ -3,36 +3,54 @@ class GameObject extends Obj {
     get TransformType() { return Transform; }
 
     get activeInHierarchy() { return this.parent ? this.activeSelf && this.parent.activeInHierarchy : this.activeSelf; }
-    get activeSelf() { return this._activeSelf; }
-    get transform() { return this._transform; }
     get transformHandle() { }
 
     constructor(name = 'GameObject', scene = Engine.Instance.scene, ...components) {
         super({
             name: name,
+        }, {
+            scene: {
+                value: scene,
+                set: function (value) {
+                    if (value) value.AddGameObject(this);
+                    return value;
+                }
+            },
+            layer: {
+                value: 0,
+            },
+            tag: {
+                value: 'Default',
+            },
+            isStatic: {
+                value: false,
+            },
+            sceneCullingMask: {
+                value: 0,
+            },
+            components: {
+                value: [],
+                set: false,
+            },
+            transform: {
+                value: null,
+                set: false,
+            },
+            activeSelf: {
+                value: true,
+                set: false,
+            },
         });
 
-        if (scene) {
-            this.scene = scene;
-            this.scene.AddGameObject(this);
-        }
-
-        this.layer = 0;
-        this.isStatic = false;
-
-        this.sceneCullingMask = 0;
-        this.tag = '';
-
-        this.components = new Array();
-
-        this._transform = this.AddComponent(this.TransformType);
-        for (let component of components) this.AddComponent(component);
-
-        this._activeSelf = true;
+        const object = this;
+        object._transform = this.AddComponent(this.TransformType);
+        for (let component of components) object.AddComponent(component);
     }
 
     AddComponent(type) {
-        let component = new type(this);
+        let component = new type({
+            gameObject: this,
+        });
         this.components.push(component);
 
         if (component.Awake) component.Awake();
@@ -91,7 +109,7 @@ class GameObject extends Obj {
         const instance = new this(original.name, Engine.Instance.scene);
         for (let component of original.components) {
             if (component instanceof Transform) continue;
-            console.log(component.constructor.Instantiate(component, instance));
+            component.constructor.Instantiate(component, instance);
         }
 
         if (parent) instance.transform.SetParent(parent);

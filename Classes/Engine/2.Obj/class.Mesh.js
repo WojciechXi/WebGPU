@@ -3,22 +3,28 @@ class Mesh extends Obj {
     constructor(name) {
         super({
             name: name,
+        }, {
+            bounds: {
+                value: new Bounds(Vector3.zero, Vector3.one),
+                set: false,
+            },
+            vertexBuffer: {
+                value: new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }),
+                set: false,
+            },
+            lineBuffer: {
+                value: new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }),
+                set: false,
+            },
+            vertices: { value: [], set: false, },
+            normals: { value: [], set: false, },
+            tangents: { value: [], set: false, },
+            colors: { value: [], set: false, },
+            uvs: { value: [], set: false, },
+            joints: { value: [], set: false, },
+            weights: { value: [], set: false, },
+            subMeshes: { value: [], set: false, },
         });
-
-        this._bounds = new Bounds(Vector3.zero, Vector3.one);
-
-        this.vertexBuffer = new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST });
-        this.lineBuffer = new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST });
-
-        this._vertices = [];
-        this._normals = [];
-        this._tangents = [];
-        this._colors = [];
-        this._uvs = [];
-        this._joints = [];
-        this._weights = [];
-
-        this._subMeshes = [];
     }
 
     get bindposeCount() { } // The number of bind poses in the Mesh.

@@ -1,30 +1,45 @@
 class Component extends Obj {
 
-    // Properties
+    constructor(data = {}) {
+        super(data, {
+            gameObject: {
+                value: data.gameObject ?? null,
+                set: false,
+            },
+            tag: {
+                get: function () { return this.gameObject.tag },
+                set: false,
+            },
+            scene: {
+                get: function () { return this.gameObject.scene },
+                set: false,
+            },
+            transform: {
+                get: function () { return this.gameObject.transform },
+                set: false,
+            },
+            enabled: {
+                value: data.enabled ?? true,
+                set: function (value) {
+                    if (this._enabled === value) value;
 
-    set gameObject(value) {
-        this.gameObject = value;
-    }
+                    if (this.scene) {
+                        if (value) {
+                            this.scene.AddComponent(this);
+                            if (this.OnEnable) this.OnEnable();
+                        } else {
+                            this.scene.RemoveComponent(this);
+                            if (this.OnDisable) this.OnDisable();
+                        }
+                    }
 
-    get tag() { return this.gameObject.tag; }
-    get transform() { return this.gameObject.transform; }
-    get scene() { return this.gameObject.scene; }
-
-    get enabled() { return this._enabled; }
-    set enabled(value) {
-        if (this._enabled === value) return;
-        this._enabled = value;
-
-        if (this.scene) {
-            if (value) {
-                this.scene.AddComponent(this);
-                if (this.OnEnable) this.OnEnable();
-            } else {
-                this.scene.RemoveComponent(this);
-                if (this.OnDisable) this.OnDisable();
+                    return value;
+                },
             }
-        }
+        });
     }
+
+    // Properties
 
     // Public Methods
     AddComponent(type) { return this.gameObject.AddComponent(type); }
@@ -42,9 +57,10 @@ class Component extends Obj {
     TryGetComponent(type) { return this.gameObject.TryGetComponent(type); }
 
     static Instantiate(original, gameObject) {
-        const instance = new (original.constructor)(original);
-        instance.gameObject = gameObject;
-        return instance;
+        return new (original.constructor)({
+            ...original,
+            gameObject: gameObject,
+        });
     }
 
 }
