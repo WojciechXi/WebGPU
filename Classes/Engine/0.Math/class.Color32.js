@@ -6,6 +6,7 @@ class Color32 extends Float32Array {
     static get zero() { return new Color(0, 0, 0, 0); }
 
     static get white() { return new Color(1, 1, 1, 1); }
+    static get gray() { return new Color(0.5, 0.5, 0.5, 1); }
     static get black() { return new Color(0, 0, 0, 1); }
 
     static get red() { return new Color(1, 0, 0, 1); }

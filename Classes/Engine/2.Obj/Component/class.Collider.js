@@ -3,7 +3,10 @@ class Collider extends Component {
     constructor(data = {}, parameters = {}) {
         super(data, {
             ...parameters,
-            isTrigger: { value: data._isTrigger ?? false, },
+            material: { value: data._material ?? data.material ?? null, },
+            isTrigger: { value: data._isTrigger ?? data.isTrigger ?? false, },
+            provideContact: { value: data._provideContact ?? data.provideContact ?? false, },
+
             collidingWith: { value: new Set(), get: false, set: false },
         });
     }

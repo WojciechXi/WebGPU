@@ -1,5 +1,15 @@
 class Scene extends Obj {
 
+    constructor(data = {}, parameters = {}) {
+        super(data, {
+            ...parameters,
+            renderSettings: {
+                value: data._renderSettings ?? data.renderSettings ?? new RenderSettings(),
+                set: false,
+            },
+        });
+    }
+
     Init() {
         this.gameObjects = [];
         this.fixedUpdateables = [];

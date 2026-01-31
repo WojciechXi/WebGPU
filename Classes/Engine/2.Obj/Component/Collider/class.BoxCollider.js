@@ -1,12 +1,11 @@
 class BoxCollider extends Collider {
 
-    Init() {
-        super.Init();
-        this.center = Vector3.zero;
-        this.size = Vector3.one; // rozmiar boxa w lokalnej skali
-    }
-
-    OnEnable() {
+    constructor(data = {}, parameters = {}) {
+        super(data, {
+            ...parameters,
+            center: { value: data._center ?? data.center ?? Vector3.zero, },
+            size: { value: data._size ?? data.size ?? Vector3.one, },
+        });
     }
 
     get worldCenter() { return this.transform.TransformPoint(this.center); }

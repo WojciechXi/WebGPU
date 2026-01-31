@@ -7,8 +7,8 @@ class Obj {
     constructor(data = {}, properties = {}) {
         const object = this;
 
-        object.Property('hideFlags', { value: data._hideFlags ?? 0 });
         object.Property('name', { value: data._name ?? object.constructor.name });
+        object.Property('hideFlags', { value: data._hideFlags ?? 0 });
 
         Object.keys(properties).forEach(function (property) {
             object.Property(property, properties[property]);
