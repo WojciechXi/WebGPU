@@ -51,6 +51,7 @@ class GameObject extends Obj {
         let component = new type({
             gameObject: this,
         });
+
         this.components.push(component);
 
         if (component.Awake) component.Awake();
@@ -93,6 +94,14 @@ class GameObject extends Obj {
         //set enabled components
     }
     TryGetComponent(type) { return this.components.find(function (c) { return c instanceof type }); }
+
+    toJSON() {
+        const object = this;
+        return {
+            ...super.toJSON(),
+            _components: object.components.map(c => new ObjectReference(0, c.GetInstanceID(), ObjectReferenceType.Component)),
+        };
+    }
 
     // Static Methods
     static CreatePrimitive() { }

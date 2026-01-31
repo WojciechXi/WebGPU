@@ -2049,8 +2049,8 @@
               },
               "class.Color32.js": {
                 "type": "-",
-                "size": 1650,
-                "lmtime": 1769682162136.2893,
+                "size": 1713,
+                "lmtime": 1769896650908.0654,
                 "modified": false
               },
               "class.Matrix4x4.js": {
@@ -2211,13 +2211,13 @@
                   "BoxCollider": {},
                   "class.BoxCollider.js": {
                     "type": "-",
-                    "size": 3084,
-                    "lmtime": 0,
+                    "size": 3176,
+                    "lmtime": 1769897624986.597,
                     "modified": false
                   },
                   "class.CapsuleCollider.js": {
                     "type": "-",
-                    "size": 2950,
+                    "size": 2961,
                     "lmtime": 0,
                     "modified": true
                   },
@@ -2281,9 +2281,9 @@
                 },
                 "class.Collider.js": {
                   "type": "-",
-                  "size": 1228,
-                  "lmtime": 0,
-                  "modified": true
+                  "size": 1419,
+                  "lmtime": 1769897745641.5776,
+                  "modified": false
                 },
                 "class.Renderer.js": {
                   "type": "-",
@@ -2317,17 +2317,23 @@
                 "lmtime": 1769892143259.6233,
                 "modified": false
               },
+              "class.Asset.js": {
+                "type": "-",
+                "size": 596,
+                "lmtime": 1769898732201.376,
+                "modified": false
+              },
               "class.Component.js": {
                 "type": "-",
-                "size": 3022,
-                "lmtime": 1769767774556.6924,
-                "modified": true
+                "size": 3162,
+                "lmtime": 1769900071996.6187,
+                "modified": false
               },
               "class.GameObject.js": {
                 "type": "-",
-                "size": 5178,
-                "lmtime": 1769768490479.6404,
-                "modified": true
+                "size": 5170,
+                "lmtime": 1769899542519.0664,
+                "modified": false
               },
               "class.Material.js": {
                 "type": "-",
@@ -2341,10 +2347,22 @@
                 "lmtime": 1769681707097.0894,
                 "modified": true
               },
+              "class.Prefab.js": {
+                "type": "-",
+                "size": 151,
+                "lmtime": 1769899003314.3376,
+                "modified": false
+              },
+              "class.RenderSettings.js": {
+                "type": "-",
+                "size": 1346,
+                "lmtime": 1769896925000.9758,
+                "modified": false
+              },
               "class.Scene.js": {
                 "type": "-",
-                "size": 1901,
-                "lmtime": 0,
+                "size": 2439,
+                "lmtime": 1769899147811.0752,
                 "modified": false
               },
               "class.Shader.js": {
@@ -2401,6 +2419,12 @@
                 "type": "-",
                 "size": 226,
                 "lmtime": 0,
+                "modified": false
+              },
+              "class.ObjectReference.js": {
+                "type": "-",
+                "size": 333,
+                "lmtime": 1769898865306.2397,
                 "modified": false
               }
             },
@@ -2503,142 +2527,6 @@
                 "lmtime": 0,
                 "modified": false
               }
-            },
-            "5.Engine": {
-              "RenderPass": {
-                "class.BloomRenderPass.js": {
-                  "type": "-",
-                  "size": 7721,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.ClearRenderPass.js": {
-                  "type": "-",
-                  "size": 1966,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.ScreenRenderPass.js": {
-                  "type": "-",
-                  "size": 2770,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.FinalRenderPass.js": {
-                  "type": "-",
-                  "size": 4472,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.ForwardRenderPass.js": {
-                  "type": "-",
-                  "size": 1789,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.GBufferRenderPass.js": {
-                  "type": "-",
-                  "size": 3297,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.GizmosRenderPass.js": {
-                  "type": "-",
-                  "size": 4345,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.LightingRenderPass.js": {
-                  "type": "-",
-                  "size": 4690,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.SSAORenderPass.js": {
-                  "type": "-",
-                  "size": 9811,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.ScreenSpaceReflectionRenderPass.js": {
-                  "type": "-",
-                  "size": 2705,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "class.ShadowRenderPass.js": {
-                  "type": "-",
-                  "size": 1471,
-                  "lmtime": 1769097011344.1765,
-                  "modified": false
-                },
-                "class.TonemappingRenderPass.js": {
-                  "type": "-",
-                  "size": 2641,
-                  "lmtime": 0,
-                  "modified": false
-                }
-              },
-              "class.Engine.js": {
-                "type": "-",
-                "size": 816,
-                "lmtime": 1769088692237.5962,
-                "modified": false
-              },
-              "class.GPU.js": {
-                "type": "-",
-                "size": 3850,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Graphics.js": {
-                "type": "-",
-                "size": 8498,
-                "lmtime": 1769100798888.9912,
-                "modified": false
-              },
-              "class.Importer.js": {
-                "type": "-",
-                "size": 7033,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Input.js": {
-                "type": "-",
-                "size": 2851,
-                "lmtime": 1769101194054.5642,
-                "modified": false
-              },
-              "class.Material.js": {
-                "type": "-",
-                "size": 4869,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.RenderPass.js": {
-                "type": "-",
-                "size": 1473,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Shader.js": {
-                "type": "-",
-                "size": 5537,
-                "lmtime": 0,
-                "modified": false
-              },
-              "class.Time.js": {
-                "type": "-",
-                "size": 323,
-                "lmtime": 0,
-                "modified": false
-              }
-            },
-            "class.Object.js": {
-              "type": "-",
-              "size": 716,
-              "lmtime": 0,
-              "modified": false
             },
             "5.Graphics": {
               "RenderPass": {
@@ -2755,8 +2643,8 @@
               },
               "class.Importer.js": {
                 "type": "-",
-                "size": 18895,
-                "lmtime": 1769892962023.9624,
+                "size": 18891,
+                "lmtime": 1769898714188.4326,
                 "modified": false
               },
               "class.Input.js": {
@@ -2767,9 +2655,9 @@
               },
               "class.Resources.js": {
                 "type": "-",
-                "size": 2007,
-                "lmtime": 1769682355466.328,
-                "modified": true
+                "size": 2224,
+                "lmtime": 1769898691804.454,
+                "modified": false
               },
               "class.Time.js": {
                 "type": "-",
@@ -2777,6 +2665,12 @@
                 "lmtime": 0,
                 "modified": true
               }
+            },
+            "class.Object.js": {
+              "type": "-",
+              "size": 3599,
+              "lmtime": 1769900064059.7217,
+              "modified": false
             }
           }
         },
@@ -2815,8 +2709,8 @@
           },
           "index.js": {
             "type": "-",
-            "size": 5633,
-            "lmtime": 1769893136536.4321,
+            "size": 5699,
+            "lmtime": 1769899480582.688,
             "modified": false
           }
         },
@@ -3359,6 +3253,12 @@
           "size": 253,
           "lmtime": 0,
           "modified": false
+        },
+        "test.json": {
+          "type": "-",
+          "size": 1891,
+          "lmtime": 1769899503213.7246,
+          "modified": true
         }
       },
       "przewodniktarnow.pl": {},

@@ -1,0 +1,65 @@
+{
+    "_name": "Scene",
+    "_hideFlags": 0,
+    "_renderSettings": {
+        "_name": "RenderSettings",
+        "_hideFlags": 0,
+        "_fog": 0,
+        "_fogColor": {
+            "0": 0.5,
+            "1": 0.5,
+            "2": 0.5,
+            "3": 1,
+            "type": "Color"
+        },
+        "_fogDensity": 0.01,
+        "_linearFogStart": 0,
+        "_linearFogEnd": 300,
+        "_ambientSkyColor": {
+            "0": 0.21199999749660492,
+            "1": 0.22699999809265137,
+            "2": 0.2590000033378601,
+            "3": 1,
+            "type": "Color32"
+        },
+        "_ambientEquatorColor": {
+            "0": 0.11400000005960464,
+            "1": 0.125,
+            "2": 0.13300000131130219,
+            "3": 1,
+            "type": "Color32"
+        },
+        "_ambientGroundColor": {
+            "0": 0.04699999839067459,
+            "1": 0.0430000014603138,
+            "2": 0.03500000014901161,
+            "3": 1,
+            "type": "Color32"
+        },
+        "_ambientIntensity": 1,
+        "_ambientMode": 0,
+        "_subtractiveShadowColor": {
+            "0": 0.41999998688697815,
+            "1": 0.4779999852180481,
+            "2": 0.6269999742507935,
+            "3": 1,
+            "type": "Color32"
+        },
+        "_skyboxMaterial": null,
+        "_haloStrenth": 0.5,
+        "_flareStrength": 1,
+        "_flareFadeSpeed": 3,
+        "_haloTexture": null,
+        "_spotCookie": null,
+        "_defaultReflectionMode": 0,
+        "_defaultReflectionResolution": 128,
+        "_reflectionBounces": 1,
+        "_reflectionIntensity": 1,
+        "_sun": null,
+        "_useRadianceAmbientProbe": 0,
+        "_instanceId": "a9983e2d-7d1c-9985-ffa7-f8d6fd6f132c"
+    },
+    "_gameObjects": [],
+    "_components": [],
+    "_instanceId": "0204d411-09f1-bfaa-1296-727731508cf4"
+}

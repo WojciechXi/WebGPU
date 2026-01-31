@@ -358,7 +358,7 @@ class Importer {
             return mesh;
         }) : [];
 
-        const rootGameObject = new GameObject("Game Object");
+        const rootGameObject = new GameObject("Game Object", null);
 
         //Tu generuję gameObjects
 
@@ -430,13 +430,13 @@ class Importer {
         // --- FINALNY CALLBACK ---
         if (callback) {
             callback({
-                meshes: meshes,
-                materials: materials,
+                gameObject: rootGameObject,
                 animations: animations,
+                materials: materials,
                 textures: textures,
+                meshes: meshes,
                 skins: skins,
                 gameObjects: gameObjects,
-                rootGameObject: rootGameObject,
             });
         }
     }

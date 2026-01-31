@@ -7,14 +7,13 @@ class Obj {
     constructor(data = {}, properties = {}) {
         const object = this;
 
+        object.Property('instanceID', { value: data._instanceID ?? Guid.New(), set: false, get: false });
         object.Property('name', { value: data._name ?? object.constructor.name });
         object.Property('hideFlags', { value: data._hideFlags ?? 0 });
 
         Object.keys(properties).forEach(function (property) {
             object.Property(property, properties[property]);
         });
-
-        if (!object._instanceId) object._instanceId = Guid.New();
 
         object.Init();
     }
@@ -24,34 +23,52 @@ class Obj {
 
     Property(property, options = {}) {
         const object = this;
-        object[`_${property}`] = options.value ?? null;
+        const propertyName = `_${property}`;
+
+        let container = null;
+        if (options.serialize !== false) object[propertyName] = container;
 
         const settings = {};
 
         if (options.get !== false) {
             if (options.get instanceof Function) settings.get = options.get;
             else settings.get = function () {
-                return object[`_${property}`];
+                return options.serialize !== false ? object[propertyName] : container;
             }
         }
 
         if (options.set !== false) {
             if (options.set instanceof Function) settings.set = function (value) {
-                object[`_${property}`] = options.set.call(object, value);
+                if (options.serialize !== false) object[propertyName] = options.set.call(object, value);
+                else container = options.set.call(object, value);
             };
             else settings.set = function (value) {
-                object[`_${property}`] = value;
+                if (options.serialize !== false) object[propertyName] = value;
+                else container = value;
             }
         }
 
         Object.defineProperty(this, property, settings);
-        if (options.set) object[property] = options.value;
+        if (settings.set) {
+            settings.set(options.value ?? null);
+        } else {
+            if (options.serialize !== false) object[propertyName] = options.value ?? null;
+            else container = options.value ?? null;
+        }
     }
 
     // Public Methods
-    GetInstanceID() { return this._instanceId; }
+    GetInstanceID() { return this._instanceID; }
     GetType() { return this.constructor.name; }
     ToString() { return JSON.stringify(this); }
+    toJSON() {
+        return {
+            type: this.constructor.name,
+            _instanceID: this._instanceID,
+            _hideFlags: this._hideFlags,
+            _name: this._name,
+        };
+    }
 
     Destroy() { Obj.objs.splice(Obj.objs.indexOf(object), 1); }
 

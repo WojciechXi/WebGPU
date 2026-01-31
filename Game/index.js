@@ -52,24 +52,24 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             engine.scene.ambientLight = ambientLight;
             ambientLight.color.Set(0.8, 0.9, 1, 0.25);
 
-            const directionalLightGameObject = new GameObject('Directional Light');
-            directionalLightGameObject.transform.eulerAngles = new Vector3(60, -45, 0);
-            const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
-            engine.scene.directionalLight = directionalLight;
-            directionalLight.color.Set(1, 1, 1, 0.75);
-            directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
+            // const directionalLightGameObject = new GameObject('Directional Light');
+            // directionalLightGameObject.transform.eulerAngles = new Vector3(60, -45, 0);
+            // const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
+            // engine.scene.directionalLight = directionalLight;
+            // directionalLight.color.Set(1, 1, 1, 0.75);
+            // directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
 
-            const mainCameraGameObject = new GameObject('Main Camera');
-            mainCameraGameObject.transform.position = new Vector3(0, 1, -2);
-            const mainCamera = mainCameraGameObject.AddComponent(Camera);
+            // const mainCameraGameObject = new GameObject('Main Camera');
+            // mainCameraGameObject.transform.position = new Vector3(0, 1, -2);
+            // const mainCamera = mainCameraGameObject.AddComponent(Camera);
 
-            const cameraGameObject = new GameObject('Test Camera');
-            cameraGameObject.transform.position = new Vector3(-1, 1, -5);
-            const camera = cameraGameObject.AddComponent(Camera);
-            camera.rect.x = 0.75;
-            camera.rect.y = 0.75;
-            camera.rect.width = 0.25;
-            camera.rect.height = 0.25;
+            // const cameraGameObject = new GameObject('Test Camera');
+            // cameraGameObject.transform.position = new Vector3(-1, 1, -5);
+            // const camera = cameraGameObject.AddComponent(Camera);
+            // camera.rect.x = 0.75;
+            // camera.rect.y = 0.75;
+            // camera.rect.width = 0.25;
+            // camera.rect.height = 0.25;
 
             // const planeGameObject = new GameObject("Plane");
             // const planeMeshRenderer = planeGameObject.AddComponent(MeshRenderer);
@@ -102,13 +102,13 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             // capsuleMeshRenderer.material = materials.Default;
             // capsuleMeshRenderer.mesh = Graphics.cubeMesh;
 
-            Resources.Get('/Resources/Models/Wolf.glb', function (asset) {
-                const gameObject = GameObject.Instantiate(asset.rootGameObject, Vector3.up.Multiply(0.5));
-                const skinnedMeshRenderer = gameObject.GetComponent(SkinnedMeshRenderer);
-                // const capsuleCollider = gameObject.AddComponent(CapsuleCollider);
-                // gameObject.AddComponent(Rigidbody);
-                // gameObject.AddComponent(PlayerController);
-            });
+            // Resources.Get('/Resources/Models/Human.glb', function (asset) {
+            //     const gameObject = GameObject.Instantiate(asset.gameObject, Vector3.up.Multiply(0.5));
+            //     const skinnedMeshRenderer = gameObject.GetComponent(SkinnedMeshRenderer);
+            //     // const capsuleCollider = gameObject.AddComponent(CapsuleCollider);
+            //     // gameObject.AddComponent(Rigidbody);
+            //     // gameObject.AddComponent(PlayerController);
+            // });
 
             Physics.simulate = true;
         }, function (index, total, path) {

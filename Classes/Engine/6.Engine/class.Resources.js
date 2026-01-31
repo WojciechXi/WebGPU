@@ -32,8 +32,12 @@ class Resources {
                     });
                 } else if (meta.pathInfo.extension == 'glb') {
                     await Importer.GLB(meta.pathInfo.dirname, `${meta.pathInfo.filename}.${meta.pathInfo.extension}`, function (data) {
-                        console.log(data);
-                        object.resources[path] = data;
+                        object.resources[path] = new Asset({
+                            _gameObject: data.gameObject,
+                            _animations: data.animations,
+                            _materials: data.materials,
+                            _meshes: data.meshes,
+                        });
                     });
                 } else if (meta.pathInfo.extension == 'wgsl') {
                     const response = await fetch(path);
