@@ -102,6 +102,13 @@ class Graphics {
             ],
         });
 
+        this.jointsBindGroupLayout = GPU.CreateBindGroupLayout({
+            label: 'JointBindGroupLayout',
+            entries: [
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
+            ],
+        });
+
         const sceneRenderTexture = new RenderTexture(this.canvas.width, this.canvas.height, { format: 'rgba16float', });
 
         this.shadowRenderPass = new ShadowRenderPass({

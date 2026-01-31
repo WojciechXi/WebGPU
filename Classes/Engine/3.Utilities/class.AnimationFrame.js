@@ -1,4 +1,0 @@
-class AnimationFrame extends Obj {
-
-
-}

@@ -26,7 +26,7 @@ class Transform extends Component {
     // ---------- World Gettery / Settery ----------
 
     get localEulerAngles() { return Quaternion.ToEuler(this.localRotation); }
-    set localEulerAngles(localEulerAngles) { this.localRotation = Quaternion.Euler(localEulerAngles); }
+    set localEulerAngles(value) { this.localRotation = Quaternion.Euler(value.x, value.y, value.z); }
 
     get eulerAngles() { return Quaternion.ToEuler(this.rotation); }
     set eulerAngles(value) { this.rotation = Quaternion.Euler(value.x, value.y, value.z); }
@@ -45,6 +45,9 @@ class Transform extends Component {
 
     get scale() { return this.parent ? this.parent.scale.Scale(this.localScale) : this.localScale.Clone(); }
 
+    get localMatrix4x4() {
+        return Matrix4x4.TRS(this.localPosition, this.localRotation, this.localScale);
+    }
     get matrix4x4() {
         const m = Matrix4x4.TRS(this.localPosition, this.localRotation, this.localScale);
         return this.parent ? Matrix4x4.Multiply(this.parent.matrix4x4, m) : m;

@@ -14,22 +14,6 @@ class MeshRenderer extends Renderer {
     get transform() { return this.target ?? super.transform; }
     get isVisible() { return this.materials.length && this.mesh; }
 
-    // Update() {
-    //     if (this.mesh) {
-    //         const meshBounds = this.mesh.bounds;
-    //         const meshBoundsMin = meshBounds.min;
-    //         const meshBoundsMax = meshBounds.max;
-
-    //         const center = Vector3.Add(meshBoundsMin, meshBoundsMax).Divide(2);
-    //         const halfExtents = Vector3.Subtract(meshBoundsMax, meshBoundsMin).Divide(2);
-
-    //         this.localBounds.Set(center.Scale(this.transform.scale), halfExtents.Scale(this.transform.scale).Multiply(2));
-    //     } else {
-    //         this.localBounds.Clear();
-    //         this.bounds.Clear();
-    //     }
-    // }
-
     get localBounds() {
         if (!this.mesh) return super.bounds;
         return new Bounds(this.mesh.bounds.center.Clone(), this.mesh.bounds.size);
@@ -76,7 +60,7 @@ class MeshRenderer extends Renderer {
                 renderPass.DrawMesh(this.mesh, i, this.transform.transformBuffer.buffer);
             }
         } else if (renderPass.name == 'gBufferRenderPass') {
-            for (let i = 0; i < this.materials.length && this.mesh.subMeshCount; i++) {
+            for (let i = 0; i < this.mesh.subMeshCount; i++) {
                 (this.materials[i] ?? Engine.Instance.defaultMaterial).Use(renderPass, camera);
                 renderPass.DrawMesh(this.mesh, i, this.transform.transformBuffer.buffer);
             }

@@ -143,37 +143,31 @@ class Importer {
                 const _normals = safeGetAccessorData(gltf, primitive.attributes.NORMAL);
                 const _tangents = safeGetAccessorData(gltf, primitive.attributes.TANGENT);
                 const _uvs = safeGetAccessorData(gltf, primitive.attributes.TEXCOORD_0);
+                const _joints = safeGetAccessorData(gltf, primitive.attributes.JOINTS_0);
+                const _weights = safeGetAccessorData(gltf, primitive.attributes.WEIGHTS_0);
                 const _indices = safeGetAccessorData(gltf, primitive.indices);
 
                 let vertices = [];
                 let normals = [];
                 let tangents = [];
                 let uvs = [];
+                let joints = [];
+                let weights = [];
 
-                if (_positions) {
-                    for (let i = 0; i < _positions.length; i += 3)
-                        vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
-                }
+                if (_positions) for (let i = 0; i < _positions.length; i += 3)vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
+                if (_normals) for (let i = 0; i < _normals.length; i += 3)normals.push(new Vector3(_normals[i], _normals[i + 1], _normals[i + 2]));
+                if (_tangents) for (let i = 0; i < _tangents.length; i += 4)tangents.push(new Vector4(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
+                if (_uvs) for (let i = 0; i < _uvs.length; i += 2) uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
 
-                if (_normals) {
-                    for (let i = 0; i < _normals.length; i += 3)
-                        normals.push(new Vector3(_normals[i], _normals[i + 1], _normals[i + 2]));
-                }
-
-                if (_tangents) {
-                    for (let i = 0; i < _tangents.length; i += 4)
-                        tangents.push(new Vector4(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
-                }
-
-                if (_uvs) {
-                    for (let i = 0; i < _uvs.length; i += 2)
-                        uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
-                }
+                if (_joints) for (let i = 0; i < _joints.length; i += 4) joints.push(new Vector4(_joints[i], _joints[i + 1], _joints[i + 2], _joints[i + 3]));
+                if (_weights) for (let i = 0; i < _weights.length; i += 4) weights.push(new Vector4(_weights[i], _weights[i + 1], _weights[i + 2], _weights[i + 3]));
 
                 mesh.SetVertices(vertices);
                 mesh.SetNormals(normals);
                 mesh.SetTangents(tangents);
                 mesh.SetUVs(uvs);
+                mesh.joints = joints;
+                mesh.weights = weights;
 
                 let materialName = primitive.material !== undefined && gltf.materials
                     ? gltf.materials[primitive.material]?.name || "default"
@@ -241,14 +235,30 @@ class Importer {
             return;
         }
 
-        // 3. Przekazujemy dane do uniwersalnego parsera
-        // Musimy lekko zmodyfikować logikę, aby akceptowała gotowy buffer
         this._parseFromData(gltfJson, binaryBuffer, callback);
     }
 
     // Pomocnicza metoda, aby nie powtarzać kodu w GLTF i GLB
     static _parseFromData(gltf, arrayBuffer, callback) {
         const intArrayBuffer = new Uint8Array(arrayBuffer);
+
+        function getHierarchyPath(nodes, targetIdx, rootIdx) {
+            if (targetIdx === rootIdx) return [];
+
+            let path = [];
+            let current = targetIdx;
+
+            while (current !== rootIdx) {
+                let parentIdx = nodes.findIndex(n => n.children && n.children.includes(current));
+                if (parentIdx === -1) return null; // Nie znaleziono połączenia z rootem
+
+                let childPosition = nodes[parentIdx].children.indexOf(current);
+                path.unshift(childPosition); // Dodaj na początek tablicy
+                current = parentIdx;
+            }
+
+            return path;
+        }
 
         // --- POMOCNIKI ---
         function numComponents(type) {
@@ -308,24 +318,39 @@ class Importer {
             let mesh = new Mesh(m.name || "GLB_Mesh");
 
             for (let primitive of m.primitives) {
-                const _pos = getAccessorData(primitive.attributes.POSITION);
-                if (_pos) {
-                    const v = [];
-                    for (let i = 0; i < _pos.length; i += 3) v.push(new Vector3(-_pos[i] / 100, _pos[i + 1] / 100, _pos[i + 2] / 100));
-                    mesh.SetVertices(v);
-                }
-
-                // UV (Tekstury)
+                const _positions = getAccessorData(primitive.attributes.POSITION);
+                const _normals = getAccessorData(primitive.attributes.NORMAL);
+                const _tangents = getAccessorData(primitive.attributes.TANGENT);
                 const _uvs = getAccessorData(primitive.attributes.TEXCOORD_0);
-                if (_uvs) {
-                    const u = [];
-                    for (let i = 0; i < _uvs.length; i += 2) u.push(new Vector2(_uvs[i], _uvs[i + 1]));
-                    mesh.SetUVs(u);
-                }
+                const _joints = getAccessorData(primitive.attributes.JOINTS_0);
+                const _weights = getAccessorData(primitive.attributes.WEIGHTS_0);
+                const _indices = getAccessorData(primitive.indices);
+
+                let vertices = [];
+                let normals = [];
+                let tangents = [];
+                let uvs = [];
+                let joints = [];
+                let weights = [];
+
+                // if (_positions) for (let i = 0; i < _positions.length; i += 3) vertices.push(new Vector3(-_positions[i] / 100, _positions[i + 1] / 100, _positions[i + 2] / 100));
+                if (_positions) for (let i = 0; i < _positions.length; i += 3) vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
+                if (_normals) for (let i = 0; i < _normals.length; i += 3) normals.push(new Vector3(_normals[i], _normals[i + 1], _normals[i + 2]));
+                if (_tangents) for (let i = 0; i < _tangents.length; i += 4) tangents.push(new Vector4(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
+                if (_uvs) for (let i = 0; i < _uvs.length; i += 2) uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
+
+                if (_joints) for (let i = 0; i < _joints.length; i += 4) joints.push(new Vector4(_joints[i], _joints[i + 1], _joints[i + 2], _joints[i + 3]));
+                if (_weights) for (let i = 0; i < _weights.length; i += 4) weights.push(new Vector4(_weights[i], _weights[i + 1], _weights[i + 2], _weights[i + 3]));
+
+                mesh.SetVertices(vertices);
+                mesh.SetNormals(normals);
+                mesh.SetTangents(tangents);
+                mesh.SetUVs(uvs);
+                mesh.joints = joints;
+                mesh.weights = weights;
 
                 // Indeksy (Triangles)
-                const triangles = getAccessorData(primitive.indices);
-                mesh.SetSubMeshes([new SubMesh({ triangles: new Uint32Array(triangles) })]);
+                mesh.SetSubMeshes([new SubMesh({ triangles: new Uint32Array(_indices) })]);
 
                 mesh.UploadMeshData();
             }
@@ -333,58 +358,13 @@ class Importer {
             return mesh;
         }) : [];
 
-        // --- 4. ANIMACJE ---
-        const animations = gltf.animations ? gltf.animations.map(a => {
-            const channels = a.channels.map(channel => {
-                const sampler = a.samplers[channel.sampler];
-                return {
-                    targetNode: channel.target.node,
-                    path: channel.target.path, // "translation", "rotation", "scale"
-                    times: getAccessorData(sampler.input),
-                    values: getAccessorData(sampler.output)
-                };
-            });
-
-            return { name: a.name, channels };
-        }) : [];
-
-        // --- SKINS (Dane szkieletu) ---
-        const skins = gltf.skins ? gltf.skins.map(s => {
-            return {
-                name: s.name,
-                joints: s.joints,
-                inverseBindMatrices: getAccessorData(s.inverseBindMatrices)
-            };
-        }) : [];
-
-        // const _joints = getAccessorData(primitive.attributes.JOINTS_0);
-        // if (_joints) {
-        //     const j = [];
-        //     // JOINTS_0 to zazwyczaj VEC4 (4 wartości na wierzchołek)
-        //     for (let i = 0; i < _joints.length; i += 4) {
-        //         j.push([_joints[i], _joints[i + 1], _joints[i + 2], _joints[i + 3]]);
-        //     }
-        //     mesh.SetBoneIndices(j); // Zakładając, że Twoja klasa Mesh to obsługuje
-        // }
-
-        // const _weights = getAccessorData(primitive.attributes.WEIGHTS_0);
-        // if (_weights) {
-        //     const w = [];
-        //     for (let i = 0; i < _weights.length; i += 4) {
-        //         w.push([_weights[i], _weights[i + 1], _weights[i + 2], _weights[i + 3]]);
-        //     }
-        //     mesh.SetBoneWeights(w);
-        // }
-
         const rootGameObject = new GameObject("Game Object");
 
+        //Tu generuję gameObjects
+
         const gameObjects = gltf.nodes.map((node, index) => {
-            const gameObject = new GameObject(node.name || `Node_${index}`, null, DebugTransform);
-            if (node.skin >= 0 && node.mesh >= 0) {
-                const meshRenderer = gameObject.AddComponent(MeshRenderer);
-                meshRenderer.mesh = meshes[node.mesh];
-                console.log(meshRenderer);
-            }
+            const gameObject = new GameObject(node.name || `Node_${index}`, null);
+            gameObject.transform.SetParent(rootGameObject.transform);
             return gameObject;
         });
 
@@ -395,9 +375,56 @@ class Importer {
             if (node.translation) gameObject.transform.localPosition = new Vector3(node.translation[0] * 0.01, node.translation[1] * 0.01, node.translation[2] * 0.01);
         });
 
+        //Tu generuję szkielet i animacje
+        const skins = gltf.skins ? gltf.skins.map(s => {
+            const skin = new Skin(s.name);
+
+            const ibmData = getAccessorData(s.inverseBindMatrices);
+            if (ibmData) {
+                for (let i = 0; i < s.joints.length; i++) {
+                    const matrixArray = ibmData.subarray(i * 16, i * 16 + 16);
+                    const matrix = new Matrix4x4();
+                    for (let m = 0; m < matrixArray.length; m++) matrix[m] = matrixArray[m];
+                    matrix[12] /= 100;
+                    matrix[13] /= 100;
+                    matrix[14] /= 100;
+                    skin.inverseBindMatrices.push(matrix);
+                }
+            }
+
+            const rootNodeIndex = s.skeleton ?? gltf.nodes.findIndex(n => n.name == skin.name);
+            skin.jointPaths = s.joints.map(jointIndex => getHierarchyPath(gltf.nodes, jointIndex, rootNodeIndex));
+
+            return skin;
+        }) : [];
+
+        const animations = gltf.animations ? gltf.animations.map(a => {
+            return new Animation({
+                _name: a.name,
+                _animationPaths: a.channels.map(channel => {
+                    const sampler = a.samplers[channel.sampler];
+                    return new AnimationPath({
+                        _joint: channel.target.node,
+                        _path: channel.target.path,
+                        _times: getAccessorData(sampler.input),
+                        _values: getAccessorData(sampler.output),
+                    });
+                })
+            });
+        }) : [];
+
+        //Tu przypisuję skiny/meshe/componenty
+
         gameObjects.forEach(function (gameObject, index) {
-            if (gameObject.transform.parent) return;
-            gameObject.transform.SetParent(rootGameObject.transform);
+            const node = gltf.nodes[index];
+            if (node.skin >= 0 && node.mesh >= 0) {
+                // const meshRenderer = gameObject.AddComponent(MeshRenderer);
+                // meshRenderer.mesh = meshes[node.mesh];
+                const skinnedMeshRenderer = gameObject.transform.parent.AddComponent(SkinnedMeshRenderer);
+                skinnedMeshRenderer.mesh = meshes[node.mesh];
+                skinnedMeshRenderer.skin = skins[node.skin];
+                skinnedMeshRenderer.Bind();
+            }
         });
 
         // --- FINALNY CALLBACK ---

@@ -122,7 +122,7 @@ struct DirectionalLight {
     color : vec4f,
     shadowColor : vec4f,
     shadowBias: f32,
-    shadowRadius: i32,
+    shadowRadius: f32,
 };
 
 struct AmbientLight {
@@ -198,7 +198,7 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     var shadowVal = 1.0;
     if(cameraDistance < 50){
         let shadowFalloff = clamp((cameraDistance) / 50, 0, 1);
-        shadowVal = lerp(sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, clamp(directionalLight.shadowRadius, 3, 7), directionalLight.shadowBias), shadowVal, shadowFalloff) + 0.25;
+        shadowVal = lerp(sampleShadow(vec2f(shadowUV.x, 1.0 - shadowUV.y), lightDepth, i32(clamp(directionalLight.shadowRadius, 1, 7)), directionalLight.shadowBias), shadowVal, shadowFalloff) + 0.25;
     }
 
     // --- światło ---

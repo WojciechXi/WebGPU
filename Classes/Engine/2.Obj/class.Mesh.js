@@ -22,8 +22,8 @@ class Mesh extends Obj {
             tangents: { value: [], set: false, },
             colors: { value: [], set: false, },
             uvs: { value: [], set: false, },
-            joints: { value: [], set: false, },
-            weights: { value: [], set: false, },
+            joints: { value: [], },
+            weights: { value: [], },
             subMeshes: { value: [], set: false, },
         });
     }
@@ -221,7 +221,7 @@ class Mesh extends Obj {
         if (calculateBounds) this.RecalculateBounds();
     }
     UploadMeshData() {
-        let offset = 4 + 4 + 4 + 4 + 4; // position + normal + tangent + color + uv
+        let offset = 4 + 4 + 4 + 4 + 4 + 4 + 4; // position + normal + tangent + color + uv + joints + weights
 
         let vertices = new Float32Array(this._vertices.length * offset);
         let lines = new Float32Array(this._vertices.length * 4);
@@ -232,13 +232,17 @@ class Mesh extends Obj {
             let tangent = this._tangents[i] ?? new Vector4(0, 0, 0, 1);
             let color = this._colors[i] ?? Color32.white;
             let uv = this._uvs[i] ?? Vector2.zero;
+            let joints = this._joints[i] ?? new Vector4(-1, -1, -1, -1);
+            let weights = this._weights[i] ?? new Vector4(0, 0, 0, 0);
 
             vertices.set([
                 vertex.x, vertex.y, vertex.z, 0,
                 normal.x, normal.y, normal.z, 0,
                 tangent.x, tangent.y, tangent.z, tangent.w,
                 color.r, color.g, color.b, color.a,
-                uv.x, uv.y, 0, 0
+                uv.x, uv.y, 0, 0,
+                joints.x, joints.y, joints.z, joints.w,
+                weights.x, weights.y, weights.z, weights.w,
             ], i * offset);
 
             lines.set([

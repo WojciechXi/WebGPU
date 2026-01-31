@@ -60,6 +60,13 @@ struct Vertex {
     @location(2) tangent: vec4f,
     @location(3) color: vec4f,
     @location(4) uv: vec2f,
+    @location(5) joints: vec4f,
+    @location(6) weights: vec4f,
+
+    @location(7) m0 : vec4<f32>,
+    @location(8) m1 : vec4<f32>,
+    @location(9) m2 : vec4<f32>,
+    @location(10) m3 : vec4<f32>,
 };
 
 @group(0) @binding(0) var<uniform> view : View;

@@ -9,10 +9,10 @@ struct View {
 struct Vertex {
     @location(0) position: vec3f,
 
-    @location(5) m0 : vec4<f32>,
-    @location(6) m1 : vec4<f32>,
-    @location(7) m2 : vec4<f32>,
-    @location(8) m3 : vec4<f32>,
+    @location(7) m0 : vec4<f32>,
+    @location(8) m1 : vec4<f32>,
+    @location(9) m2 : vec4<f32>,
+    @location(10) m3 : vec4<f32>,
 };
 
 struct VSOut {

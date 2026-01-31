@@ -4,7 +4,7 @@ class DirectionalLight extends Behaviour {
         this.color = Color.white;
 
         this.shadowColor = new Color(0.5, 0.5, 0.5, 1);
-        this.shadowRadius = 5;
+        this.shadowRadius = 0;
         this.shadowBias = 0.003;
 
         this.aspect = 1;

@@ -25,7 +25,7 @@ class PlayerController extends MonoBehaviour {
         this.look.x = Mathf.Clamp(this.look.x, -75, 75);
 
         this.camera.transform.eulerAngles = this.look;
-        this.camera.transform.position = this.transform.position.Add(this.camera.transform.back.Multiply(3.5).Add(Vector3.up));
+        this.camera.transform.position = this.transform.position.Add(this.camera.transform.back.Multiply(5).Add(Vector3.up));
 
         if (this.move.magnitude > 0) this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(Quaternion.Euler(0, this.look.y, 0).MultiplyVector3(this.move)), 360 * Time.deltaTime);
         this.rigidbody.AddForce(Quaternion.Euler(0, this.look.y, 0).MultiplyVector3(this.move).Multiply(3.5 * 4), ForceMode.Force);

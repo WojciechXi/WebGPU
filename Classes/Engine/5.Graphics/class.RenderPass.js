@@ -13,6 +13,15 @@ class RenderPass {
         });
         this.renderPipeline = null;
 
+        this.emptyBuffer = new Buffer(64 * 16, { usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, });
+        this.emptyBindGroup = GPU.CreateBindGroup({
+            label: 'EmptyBindGroup',
+            layout: Graphics.jointsBindGroupLayout,
+            entries: [
+                this.emptyBuffer.GetBindGroupEntry(0),
+            ],
+        });
+
         this.Init(data);
     }
 
@@ -53,6 +62,18 @@ class RenderPass {
 
         this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
         this.SetVertexBuffer(1, matrixBuffer);
+        this.SetBindGroup(3, this.emptyBindGroup);
+        this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
+        this.DrawIndexed(subMesh.triangles.length);
+    }
+
+    DrawSkinnedMesh(mesh, subMeshIndex, matrixBuffer, jointsBindGroup) {
+        const subMesh = mesh.GetSubMesh(subMeshIndex);
+
+        this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
+        this.SetVertexBuffer(1, matrixBuffer);
+        this.SetBindGroup(3, jointsBindGroup);
+
         this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
         this.DrawIndexed(subMesh.triangles.length);
     }

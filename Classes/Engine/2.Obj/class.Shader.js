@@ -39,6 +39,7 @@ class Shader extends Obj {
                         Graphics.viewBindGroupLayout,
                         Graphics.materialBindGroupLayout,
                         Graphics.pbrBindGroupLayout,
+                        Graphics.jointsBindGroupLayout,
                     ],
                 }),
                 vertex: {
@@ -46,23 +47,25 @@ class Shader extends Obj {
                     entryPoint: "vs",
                     buffers: [
                         {
-                            arrayStride: (4 + 4 + 4 + 4 + 4) * 4, // position + normal + tangent + color + uv
+                            arrayStride: (4 + 4 + 4 + 4 + 4 + 4 + 4) * 4, // position + normal + tangent + color + uv + joints + weights
                             attributes: [
                                 { shaderLocation: 0, offset: 0 * 4, format: 'float32x3' }, // position
                                 { shaderLocation: 1, offset: 4 * 4, format: 'float32x3' }, // normal
                                 { shaderLocation: 2, offset: 8 * 4, format: 'float32x4' }, // tangent
                                 { shaderLocation: 3, offset: 12 * 4, format: 'float32x4' }, // color
                                 { shaderLocation: 4, offset: 16 * 4, format: 'float32x2' }, // uv
+                                { shaderLocation: 5, offset: 20 * 4, format: 'float32x4' }, // joints
+                                { shaderLocation: 6, offset: 24 * 4, format: 'float32x4' }, // weights
                             ],
                         },
                         {
                             arrayStride: (16) * 4, // matrix4x4
                             stepMode: 'instance',
                             attributes: [
-                                { shaderLocation: 5, offset: 0 * 4, format: 'float32x4' },
-                                { shaderLocation: 6, offset: 4 * 4, format: 'float32x4' },
-                                { shaderLocation: 7, offset: 8 * 4, format: 'float32x4' },
-                                { shaderLocation: 8, offset: 12 * 4, format: 'float32x4' },
+                                { shaderLocation: 7, offset: 0 * 4, format: 'float32x4' },
+                                { shaderLocation: 8, offset: 4 * 4, format: 'float32x4' },
+                                { shaderLocation: 9, offset: 8 * 4, format: 'float32x4' },
+                                { shaderLocation: 10, offset: 12 * 4, format: 'float32x4' },
                             ],
                         },
                     ],

@@ -60,11 +60,13 @@ struct Vertex {
     @location(2) tangent: vec4f,
     @location(3) color: vec4f,
     @location(4) uv: vec2f,
+    @location(5) joints: vec4f,
+    @location(6) weights: vec4f,
 
-    @location(5) m0 : vec4<f32>,
-    @location(6) m1 : vec4<f32>,
-    @location(7) m2 : vec4<f32>,
-    @location(8) m3 : vec4<f32>,
+    @location(7) m0 : vec4<f32>,
+    @location(8) m1 : vec4<f32>,
+    @location(9) m2 : vec4<f32>,
+    @location(10) m3 : vec4<f32>,
 };
 
 @group(0) @binding(0) var<uniform> view : View;
@@ -76,6 +78,8 @@ struct Vertex {
 @group(2) @binding(3) var roughnessTexture : texture_2d<f32>;
 @group(2) @binding(4) var metallicTexture : texture_2d<f32>;
 @group(2) @binding(5) var occlusionTexture : texture_2d<f32>;
+
+@group(3) @binding(0) var<uniform> jointMatrices : array<mat4x4f, 64>;
 
 struct VSOut {
   @builtin(position) clipPosition : vec4f,
@@ -92,14 +96,23 @@ fn vs(vert: Vertex) -> VSOut {
   let matrix = mat4x4<f32>(vert.m0, vert.m1, vert.m2, vert.m3);
 
   var objectPosition = vert.position;
-  let worldPosition = (matrix * vec4f(objectPosition, 1.0)).xyz;
-  let clipPosition = view.viewProjection * vec4f(worldPosition, 1.0);
-
   var objectNormal = vert.normal;
   var objectTangent = vert.tangent;
+  var worldPosition : vec3f;
 
-  vsOut.clipPosition = clipPosition;
+  if(vert.weights.x > 0.001) {
+    let skinMatrix = jointMatrices[u32(vert.joints.x)];
+    worldPosition = (skinMatrix * vec4f(objectPosition, 1.0)).xyz;
+
+    let skinMatrix3 = mat3x3f(skinMatrix[0].xyz, skinMatrix[1].xyz, skinMatrix[2].xyz);
+    objectNormal = skinMatrix3 * objectNormal;
+    objectTangent = vec4f(skinMatrix3 * objectTangent.xyz, objectTangent.w);
+  } else {
+    worldPosition = (matrix * vec4f(objectPosition, 1.0)).xyz;
+  }
+
   vsOut.worldPosition = worldPosition;
+  vsOut.clipPosition = view.viewProjection * vec4f(worldPosition, 1.0);
 
   let normalMatrix = getNormalMatrix(matrix);
   

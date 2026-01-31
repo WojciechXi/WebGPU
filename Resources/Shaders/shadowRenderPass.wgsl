@@ -61,14 +61,18 @@ struct Vertex {
     @location(2) tangent: vec4f,
     @location(3) color: vec4f,
     @location(4) uv: vec2f,
+    @location(5) joints: vec4f,
+    @location(6) weights: vec4f,
 
-    @location(5) m0 : vec4<f32>,
-    @location(6) m1 : vec4<f32>,
-    @location(7) m2 : vec4<f32>,
-    @location(8) m3 : vec4<f32>,
+    @location(7) m0 : vec4<f32>,
+    @location(8) m1 : vec4<f32>,
+    @location(9) m2 : vec4<f32>,
+    @location(10) m3 : vec4<f32>,
 };
 
 @group(0) @binding(0) var<uniform> view : View;
+
+@group(1) @binding(0) var<uniform> jointMatrices : array<mat4x4f, 64>;
 
 // ----------------------
 // Vertex Shader
@@ -81,7 +85,17 @@ struct VSOut {
 fn vs(vert: Vertex) -> VSOut {
   var vsOut: VSOut;
   let matrix = mat4x4<f32>(vert.m0, vert.m1, vert.m2, vert.m3);
-  let worldPosition = (matrix * vec4f(vert.position, 1.0)).xyz;
+  
+  var objectPosition = vert.position;
+  var worldPosition : vec3f;
+
+  if(vert.weights.x > 0.001) {
+    let skinMatrix = jointMatrices[u32(vert.joints.x)];
+    worldPosition = (skinMatrix * vec4f(objectPosition, 1.0)).xyz;
+  } else {
+    worldPosition = (matrix * vec4f(objectPosition, 1.0)).xyz;
+  }
+
   vsOut.clipPosition = view.viewProjection * vec4f(worldPosition, 1.0);
   return vsOut;
 }
