@@ -109,15 +109,14 @@ class GameObject extends Obj {
         const instance = new this(original.name, Engine.Instance.scene);
 
         if (parent) instance.transform.SetParent(parent);
-        if (rotation) instance.transform.rotation = rotation;
-        if (position) instance.transform.position = position;
+        for (let child of original.transform.children) this.Instantiate(child.gameObject, child.localPosition, child.localRotation, instance.transform);
+        if (rotation) instance.transform.localRotation = rotation;
+        if (position) instance.transform.localPosition = position;
 
         for (let component of original.components) {
             if (component instanceof Transform) continue;
             component.constructor.Instantiate(component, instance)
         }
-
-        for (let child of original.transform.children) this.Instantiate(child.gameObject, child.position, child.rotation, instance.transform);
 
         return instance;
     }

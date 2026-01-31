@@ -29,38 +29,48 @@ class Quaternion extends Float32Array {
     static LookRotation(forward, upwards = Vector3.up, out = null) {
         out = out || new this();
 
-        forward = forward.normalized;
+        // 1. Kierunek Forward (oś Z)
+        const f = forward.normalized;
 
-        let right = upwards.Cross(forward).Normalize();
-        let realUp = forward.Cross(right);
+        // 2. LH: Right = Up x Forward (oś X)
+        let r = Vector3.Cross(upwards, f).normalized;
 
-        let m00 = right.x, m01 = realUp.x, m02 = forward.x;
-        let m10 = right.y, m11 = realUp.y, m12 = forward.y;
-        let m20 = right.z, m21 = realUp.z, m22 = forward.z;
+        // Obsługa przypadku, gdy patrzymy pionowo w górę (f || upwards)
+        if (r.sqrMagnitude < 0.001) {
+            r = Vector3.Cross(Vector3.right, f).normalized;
+        }
 
-        let t = m00 + m11 + m22;
+        // 3. Up = Forward x Right (oś Y)
+        const u = Vector3.Cross(f, r);
 
-        if (t > 0) {
-            let s = Mathf.Sqrt(t + 1.0) * 2;
+        // Macierz rotacji LH (DirectX / Unity style)
+        const m00 = r.x; const m01 = r.y; const m02 = r.z;
+        const m10 = u.x; const m11 = u.y; const m12 = u.z;
+        const m20 = f.x; const m21 = f.y; const m22 = f.z;
+
+        const tr = m00 + m11 + m22;
+
+        if (tr > 0) {
+            const s = Math.sqrt(tr + 1.0) * 2;
             out.w = 0.25 * s;
-            out.x = (m21 - m12) / s;
-            out.y = (m02 - m20) / s;
-            out.z = (m10 - m01) / s;
-        } else if (m00 > m11 && m00 > m22) {
-            let s = Mathf.Sqrt(1.0 + m00 - m11 - m22) * 2;
-            out.w = (m21 - m12) / s;
+            out.x = (m12 - m21) / s;
+            out.y = (m20 - m02) / s;
+            out.z = (m01 - m10) / s;
+        } else if ((m00 > m11) && (m00 > m22)) {
+            const s = Math.sqrt(1.0 + m00 - m11 - m22) * 2;
+            out.w = (m12 - m21) / s;
             out.x = 0.25 * s;
             out.y = (m01 + m10) / s;
             out.z = (m02 + m20) / s;
         } else if (m11 > m22) {
-            let s = Mathf.Sqrt(1.0 + m11 - m00 - m22) * 2;
-            out.w = (m02 - m20) / s;
+            const s = Math.sqrt(1.0 + m11 - m00 - m22) * 2;
+            out.w = (m20 - m02) / s;
             out.x = (m01 + m10) / s;
             out.y = 0.25 * s;
             out.z = (m12 + m21) / s;
         } else {
-            let s = Mathf.Sqrt(1.0 + m22 - m00 - m11) * 2;
-            out.w = (m10 - m01) / s;
+            const s = Math.sqrt(1.0 + m22 - m00 - m11) * 2;
+            out.w = (m01 - m10) / s;
             out.x = (m02 + m20) / s;
             out.y = (m12 + m21) / s;
             out.z = 0.25 * s;
@@ -256,5 +266,33 @@ class Quaternion extends Float32Array {
         out[1] = Mathf.RadToDeg(out[1]);
         out[2] = Mathf.RadToDeg(out[2]);
         return out;
+    }
+
+    static Angle(a, b) {
+        const dot = Mathf.Min(Mathf.Abs(a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]), 1.0);
+        if (dot > 0.999999) return 0;
+        return Mathf.Acos(dot) * 2.0 * (180 / Math.PI);
+    }
+
+    static RotateTowards(from, to, maxDegreesDelta, out = null) {
+        out = out || new Quaternion();
+
+        const angle = Quaternion.Angle(from, to);
+
+        // Jeśli rotacja jest już blisko celu lub cel jest identyczny
+        if (angle === 0 || angle <= maxDegreesDelta) {
+            out[0] = to[0];
+            out[1] = to[1];
+            out[2] = to[2];
+            out[3] = to[3];
+            return out;
+        }
+
+        // Obliczamy t (ułamek drogi do przebycia)
+        const t = maxDegreesDelta / angle;
+
+        // Musimy wywołać Slerp, ale upewnij się, że Twój Slerp 
+        // poprawnie obsługuje ujemny dot (najkrótszą drogę).
+        return Quaternion.Slerp(from, to, t, out);
     }
 }

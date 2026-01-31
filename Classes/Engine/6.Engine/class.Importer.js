@@ -392,7 +392,7 @@ class Importer {
             const node = gltf.nodes[index];
             if (node.children) for (let childIndex of node.children) gameObjects[childIndex].transform.SetParent(gameObject.transform);
             if (node.rotation) gameObject.transform.localRotation = new Quaternion(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]);
-            if (node.translation) gameObject.transform.Translate(new Vector3(node.translation[0] * 0.01, node.translation[1] * 0.01, node.translation[2] * 0.01));
+            if (node.translation) gameObject.transform.localPosition = new Vector3(node.translation[0] * 0.01, node.translation[1] * 0.01, node.translation[2] * 0.01);
         });
 
         gameObjects.forEach(function (gameObject, index) {

@@ -61,9 +61,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             test2.turn.x = 30;
 
             const testCameraGameObject = new GameObject('Test Camera');
-            testCameraGameObject.transform.position = new Vector3(0, 1, -5);
             const testCamera = testCameraGameObject.AddComponent(Camera);
-            const test = testCameraGameObject.AddComponent(Test);
 
             const cameraGameObject = new GameObject('Camera');
             cameraGameObject.transform.position = new Vector3(-1, 1, -5);
@@ -81,7 +79,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             planeMeshRenderer.mesh = Graphics.cubeMesh;
 
             const sphereGameObject = new GameObject("Sphere");
-            sphereGameObject.transform.position = new Vector3(0, 2, 0);
+            sphereGameObject.transform.position = new Vector3(2, 2, 0);
             const sphereMeshRenderer = sphereGameObject.AddComponent(MeshRenderer);
             const sphereSphereCollider = sphereGameObject.AddComponent(SphereCollider);
             const sphereRigidbody = sphereGameObject.AddComponent(Rigidbody);
@@ -89,7 +87,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             sphereMeshRenderer.mesh = Graphics.sphereMesh;
 
             const cubeGameObject = new GameObject("Cube");
-            cubeGameObject.transform.position = new Vector3(2, 2, 0);
+            cubeGameObject.transform.position = new Vector3(4, 2, 0);
             const cubeMeshRenderer = cubeGameObject.AddComponent(MeshRenderer);
             const cubeBoxCollider = cubeGameObject.AddComponent(BoxCollider);
             const cubeRigidbody = cubeGameObject.AddComponent(Rigidbody);
@@ -105,8 +103,10 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             capsuleMeshRenderer.mesh = Graphics.cubeMesh;
 
             Resources.Get('/Resources/Models/Human.glb', function (gltf) {
-                const gameObject = GameObject.Instantiate(gltf.rootGameObject, Vector3.up);
-                console.log(gameObject);
+                const gameObject = GameObject.Instantiate(gltf.rootGameObject, Vector3.up.Multiply(0.5));
+                const capsuleCollider = gameObject.AddComponent(CapsuleCollider);
+                gameObject.AddComponent(Rigidbody);
+                gameObject.AddComponent(PlayerController);
             });
 
             // Resources.Get('/Resources/Models/Terrain.gltf', function (gltf) {
@@ -171,6 +171,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             //     }
             // });
 
+            Physics.simulate = true;
         }, function (index, total, path) {
             console.log(`${index}/${total} - ${path}`);
         });

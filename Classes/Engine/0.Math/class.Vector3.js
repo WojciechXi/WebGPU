@@ -77,6 +77,7 @@ class Vector3 extends Float32Array {
         out[2] = this[0] * other[1] - this[1] * other[0];
         return out;
     }
+    static Cross(a, b, out = null) { return a.Cross(b, out); }
 
     Dot(other) { return this[0] * other[0] + this[1] * other[1] + this[2] * other[2]; }
 

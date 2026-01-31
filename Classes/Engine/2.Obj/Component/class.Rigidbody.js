@@ -3,15 +3,14 @@ class Rigidbody extends Component {
     constructor(data = {}, parameters = {}) {
         super(data, {
             ...parameters,
-            angularVelocity: { value: Vector3.zero, },
+            angularVelocity: { value: data._angularVelocity ?? data.angularVelocity ?? Vector3.zero, },
+            linearVelocity: { value: data._linearVelocity ?? data.linearVelocity ?? Vector3.zero, },
+            acceleration: { value: data._acceleration ?? data.acceleration ?? Vector3.zero, },
+            centerOfMass: { value: data._centerOfMass ?? data.centerOfMass ?? Vector3.zero, },
         });
     }
 
     Init() {
-        this.angularVelocity = Vector3.zero;
-        this.linearVelocity = Vector3.zero;
-        this.acceleration = Vector3.zero;
-
         this.mass = 1;
         this.bounce = 1; // odbicie
         this.drag = 0.01;
@@ -20,7 +19,6 @@ class Rigidbody extends Component {
         this.angularDamping = 0.0;
         this.automaticCenterOfMass = true;
         this.automaticInertiaTensor = false;
-        this.centerOfMass = Vector3.zero;
         //this.collisionDetectionMode = 0;
         //this.constraints = 0;
         //this.detectCollisions = 0;
@@ -64,10 +62,11 @@ class Rigidbody extends Component {
 
     OnEnable() {
         this.collider = this.GetComponent(Collider);
-        if (this.collider) this.centerOfMass = this.collider.center;
 
         this.position = this.transform.position;
         this.rotation = this.transform.rotation;
+
+        this.ResetCenterOfMass();
     }
 
     FixedUpdate() {
@@ -96,8 +95,10 @@ class Rigidbody extends Component {
         const dampingMultiplier = (this.linearVelocity.magnitude < 0.1) ? 0.8 : (1.0 - this.drag);
         this.linearVelocity = this.linearVelocity.Multiply(dampingMultiplier);
         this.angularVelocity = this.angularVelocity.Multiply(1.0 - this.angularDrag);
+
         if (this.linearVelocity.magnitude < 0.005) this.linearVelocity.Set(0, 0, 0);
         if (this.angularVelocity.magnitude < 0.005) this.angularVelocity.Set(0, 0, 0);
+
         if (this.freezeRotationX) this.angularVelocity.x = 0;
         if (this.freezeRotationY) this.angularVelocity.y = 0;
         if (this.freezeRotationZ) this.angularVelocity.z = 0;
@@ -159,17 +160,18 @@ class Rigidbody extends Component {
 
         this.position = nextPosition;
         this.acceleration.Set(0, 0, 0);
+    }
 
-        this.transform.position = this.position;
-        this.transform.rotation = this.rotation;
+    Update() {
+        this.PublishTransform();
     }
 
     AddForce(force, mode = ForceMode.Force) {
         if (!Physics.simulate || this.isKinematic) return;
 
-        if (mode == ForceMode.Force) return this.linearVelocity = this.linearVelocity.Add(Vector3.Multiply(force, Time.fixedDeltaTime / this.mass));
-        else if (mode == ForceMode.Acceleration) return this.linearVelocity = this.linearVelocity.Add(Vector3.Multiply(force, Time.fixedDeltaTime));
-        else if (mode == ForceMode.Impulse) return this.linearVelocity = this.linearVelocity.Add(Vector3.Multiply(force, 1.0 / this.mass));
+        if (mode == ForceMode.Force) return this.linearVelocity = this.linearVelocity.Add(force.Multiply(Time.fixedDeltaTime / this.mass));
+        else if (mode == ForceMode.Acceleration) return this.linearVelocity = this.linearVelocity.Add(force.Multiply(Time.fixedDeltaTime));
+        else if (mode == ForceMode.Impulse) return this.linearVelocity = this.linearVelocity.Add(force.Multiply(1.0 / this.mass));
         else if (mode == ForceMode.VelocityChange) return this.linearVelocity = this.linearVelocity.Add(force);
     }
     AddRelativeForce(force, mode = ForceMode.Force) {
@@ -244,7 +246,13 @@ class Rigidbody extends Component {
         this.transform.position = this.position;
         this.transform.rotation = this.rotation;
     }
-    ResetCenterOfMass() { this.centerOfMass.Clear(); }
+    ResetCenterOfMass() {
+        this.centerOfMass.Clear();
+        if (this.collider) {
+            const worldCenter = this.collider.worldCenter;
+            this.centerOfMass.Set(worldCenter.x, worldCenter.y, worldCenter.z)
+        }
+    }
     ResetInertiaTensor() { this.inertiaTensor = (2 / 5) * this.mass * 0.5; }
     Sleep() { this._isSleeping = true; }
     SweepTest(direction, maxDistance = Mathf.Infinity, queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, raycastHit = null) {
