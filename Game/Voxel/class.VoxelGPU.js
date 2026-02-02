@@ -120,7 +120,7 @@ class VoxelGPU extends MonoBehaviour {
 
     async Generate(voxelChunkComponent) {
         const position = voxelChunkComponent.transform.position;
-        this.paramsBuffer.Set([position.x, position.y, position.z, 0, this.seed, this.frequency, this.strength, this.top]);
+        this.paramsBuffer.Set([position.x, position.y, position.z, 0, this.seed]);
 
         const commandEncoder = GPU.device.createCommandEncoder();
         const passEncoder = commandEncoder.beginComputePass();

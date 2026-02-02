@@ -21,6 +21,7 @@ class Engine {
         let object = this;
 
         requestAnimationFrame(function (time) {
+            Input.Start();
             object.Loop(time);
         });
     }

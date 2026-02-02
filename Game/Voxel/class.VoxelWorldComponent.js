@@ -28,6 +28,15 @@ class VoxelWorldComponent extends MonoBehaviour {
         return voxelChunkComponent.GetVoxel(chunkLocalPosition);
     }
 
+    GetVoxelWorldPosition(position) {
+        const chunkPosition = Vector3.Divide(position, 16).Floor();
+        if (!this.chunks.has(chunkPosition.toString())) return null;
+
+        const voxelChunkComponent = this.chunks.get(chunkPosition.toString());
+        const gridPosition = Vector3.Subtract(position, Vector3.Multiply(chunkCoord, 16)).Multiply(2).Floor();
+        return voxelChunkComponent.transform.position.Add(gridPosition.Divide(2));
+    }
+
     FixedUpdate() {
         if (!this.position.Equals(this.lastPosition)) {
             this.lastPosition = this.position;

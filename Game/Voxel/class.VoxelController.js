@@ -15,7 +15,8 @@ class VoxelController extends MonoBehaviour {
     }
 
     Update() {
-        this.look = this.look.Add(Vector2.Multiply(Input.mouseMove, Time.deltaTime * 5));
+        this.look = this.look.Add(Vector2.Multiply(Input.mouseMove, Time.deltaTime * 10));
+        this.look.y = Mathf.Clamp(this.look.y, -75, 75);
 
         this.move.x = Input.GetAxis('Horizontal');
         this.move.z = Input.GetAxis('Vertical');
@@ -42,17 +43,19 @@ class VoxelController extends MonoBehaviour {
 
         // KOLIZJA Z PODŁOGĄ (Uwzględniając ISO)
         // Sprawdzamy punkt pod stopami gracza
-        const feetPosition = Vector3.Subtract(nextPos, new Vector3(0, 0.5, 0)); // mały offset w dół
+        const feetPosition = Vector3.Subtract(nextPos, new Vector3(0, 0.1, 0)); // mały offset w dół
 
-        if (VoxelWorldComponent.Instance.IsSolid(feetPosition)) {
-            // Jeśli pod stopami jest teren (iso >= 0.5):
-            // 1. Zerujemy prędkość opadania
+        const voxel = VoxelWorldComponent.Instance.GetVoxel(feetPosition);
+        if (voxel == null) {
+            this.transform.position = position;
+        } else if (voxel.isSolid) {
             this.velocity.y = Math.max(0, this.velocity.y);
-            // 2. Nie pozwalamy opaść niżej (zostajemy na obecnym Y lub lekko korygujemy)
-            nextPos.y = position.y + 0.1;
+            nextPos.y = position.y + Time.fixedDeltaTime;
         }
 
         this.transform.position = nextPos;
+
+        this.inspector.innerHTML = voxel;
     }
 
 }

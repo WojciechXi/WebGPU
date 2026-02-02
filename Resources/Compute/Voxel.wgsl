@@ -1,15 +1,11 @@
 struct Voxel {
     blockId: u32,
     iso: f32,
-    light: f32,
 };
 
 struct Params {
     chunkPos: vec3<f32>,
     seed: f32,
-    frequency: f32,
-    strength: f32,
-    top: f32,
 };
 
 @group(0) @binding(0) var<uniform> params: Params;
@@ -192,11 +188,9 @@ fn main(@builtin(global_invocation_id) grid: vec3<u32>) {
     if(worldPos.y == 0){
         voxelData[index].iso = 0.0;
         voxelData[index].blockId = 0u;
-        voxelData[index].light = worldPos.y;
     } else {
         let iso = get_iso(worldPos);
-        voxelData[index].iso = select(iso, 0.0, iso < isoLevel);
+        voxelData[index].iso = iso;
         voxelData[index].blockId = select(1u, 0u, iso < isoLevel);
-        voxelData[index].light = worldPos.y;
     }
 }

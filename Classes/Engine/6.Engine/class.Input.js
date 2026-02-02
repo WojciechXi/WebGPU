@@ -1,7 +1,7 @@
 class Input {
 
     static {
-        let object = this;
+        const object = this;
 
         object.lastMousePosition = new Vector2(0.5, 0.5);
         object.mousePosition = new Vector2(0.5, 0.5);
@@ -76,8 +76,15 @@ class Input {
         return this.axis[key] ? this.axis[key].value : 0;
     }
 
+    static Start() {
+        const object = this;
+
+        object.lastMousePosition.Set(object.mousePosition.x, object.mousePosition.y);
+        object.mouseMove.Set(0, 0);
+    }
+
     static Update() {
-        let object = this;
+        const object = this;
 
         object.mouseMove.SetXY(object.mousePosition.x - object.lastMousePosition.x, object.mousePosition.y - object.lastMousePosition.y);
         object.lastMousePosition.SetXY(object.mousePosition.x, object.mousePosition.y);

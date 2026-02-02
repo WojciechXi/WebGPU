@@ -1,7 +1,6 @@
 struct Voxel {
     blockId: u32,
     iso: f32,
-    light: f32,
 };
 
 struct Vertex {
