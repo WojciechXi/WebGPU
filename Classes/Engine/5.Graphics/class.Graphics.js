@@ -197,8 +197,8 @@ class Graphics {
     }
 
     static Render(scene) {
-        this.canvas.width = this.canvas.clientWidth;
-        this.canvas.height = this.canvas.clientHeight;
+        // this.canvas.width = this.canvas.clientWidth;
+        // this.canvas.height = this.canvas.clientHeight;
 
         for (let camera of scene.cameras) camera.SendMessage("OnPreRender");
 

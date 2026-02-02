@@ -144,6 +144,20 @@ class Vector3 extends Float32Array {
 
     Clear() { this[0] = this[1] = this[2] = 0; }
     Clone() { return new Vector3(this.x, this.y, this.z); }
+    toString() { return JSON.stringify(this); }
+
+    Equals(other) {
+        if (!other || typeof this != typeof other) return false;
+        return this[0] == other[0] && this[1] == other[1] && this[2] == other[2];
+    }
+
+    Round(out = this) {
+        out = out || this.Clone();
+        out[0] = Mathf.Round(out[0]);
+        out[1] = Mathf.Round(out[1]);
+        out[2] = Mathf.Round(out[2]);
+        return out;
+    }
 
     Abs(out = this) {
         out = out || this.Clone();

@@ -7,7 +7,6 @@ class VoxelChunkComponent extends MonoBehaviour {
             meshRenderer: { value: null, },
             mesh: { value: new Mesh(), set: false, },
         });
-
     }
 
     OnEnable() {

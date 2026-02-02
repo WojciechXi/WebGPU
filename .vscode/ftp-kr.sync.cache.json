@@ -2050,7 +2050,7 @@
               "class.Color32.js": {
                 "type": "-",
                 "size": 1713,
-                "lmtime": 1769896650908.0654,
+                "lmtime": 1770032426680.6658,
                 "modified": false
               },
               "class.Matrix4x4.js": {
@@ -2185,7 +2185,7 @@
                   "class.DirectionalLight.js": {
                     "type": "-",
                     "size": 2548,
-                    "lmtime": 1769889568203.5537,
+                    "lmtime": 1770032426680.6658,
                     "modified": false
                   },
                   "class.Light.js": {
@@ -2212,7 +2212,7 @@
                   "class.BoxCollider.js": {
                     "type": "-",
                     "size": 3176,
-                    "lmtime": 1769897624986.597,
+                    "lmtime": 1770032426680.6658,
                     "modified": false
                   },
                   "class.CapsuleCollider.js": {
@@ -2256,7 +2256,7 @@
                   "class.MeshRenderer.js": {
                     "type": "-",
                     "size": 3724,
-                    "lmtime": 1769892459608.9053,
+                    "lmtime": 1770032426689.0198,
                     "modified": false
                   },
                   "class.SkinnedMeshRenderer.js": {
@@ -2282,7 +2282,7 @@
                 "class.Collider.js": {
                   "type": "-",
                   "size": 1419,
-                  "lmtime": 1769897745641.5776,
+                  "lmtime": 1770032426690.045,
                   "modified": false
                 },
                 "class.Renderer.js": {
@@ -2300,7 +2300,7 @@
                 "class.Transform.js": {
                   "type": "-",
                   "size": 5452,
-                  "lmtime": 1769889304089.3154,
+                  "lmtime": 1770032426691.5217,
                   "modified": false
                 }
               },
@@ -2326,7 +2326,7 @@
               "class.Component.js": {
                 "type": "-",
                 "size": 3364,
-                "lmtime": 1769901855923.2747,
+                "lmtime": 1770032426691.5217,
                 "modified": false
               },
               "class.ComputeShader.js": {
@@ -2338,7 +2338,7 @@
               "class.GameObject.js": {
                 "type": "-",
                 "size": 5417,
-                "lmtime": 1769901786961.3955,
+                "lmtime": 1770032426691.5217,
                 "modified": false
               },
               "class.Material.js": {
@@ -2349,8 +2349,8 @@
               },
               "class.Mesh.js": {
                 "type": "-",
-                "size": 12887,
-                "lmtime": 1769989267505.9011,
+                "size": 13521,
+                "lmtime": 1770033344112.9421,
                 "modified": false
               },
               "class.Prefab.js": {
@@ -2368,14 +2368,14 @@
               "class.Scene.js": {
                 "type": "-",
                 "size": 2730,
-                "lmtime": 1769901596139.963,
+                "lmtime": 1770032426691.5217,
                 "modified": false
               },
               "class.Shader.js": {
                 "type": "-",
-                "size": 5865,
+                "size": 5924,
                 "lmtime": 1769992642402.8552,
-                "modified": false
+                "modified": true
               },
               "class.Skin.js": {
                 "type": "-",
@@ -2551,7 +2551,7 @@
                 "class.GBufferRenderPass.js": {
                   "type": "-",
                   "size": 2343,
-                  "lmtime": 1769768063358.1404,
+                  "lmtime": 1770032426697.642,
                   "modified": false
                 },
                 "class.GizmosRenderPass.js": {
@@ -2563,7 +2563,7 @@
                 "class.LightingRenderPass.js": {
                   "type": "-",
                   "size": 5204,
-                  "lmtime": 1769768087761.1484,
+                  "lmtime": 1770032426697.642,
                   "modified": false
                 },
                 "class.SSAORenderPass.js": {
@@ -2586,9 +2586,9 @@
                 },
                 "class.ShadowRenderPass.js": {
                   "type": "-",
-                  "size": 4169,
+                  "size": 4177,
                   "lmtime": 1769889908113.4944,
-                  "modified": false
+                  "modified": true
                 },
                 "class.TonemappingRenderPass.js": {
                   "type": "-",
@@ -2629,7 +2629,7 @@
               },
               "class.RenderPass.js": {
                 "type": "-",
-                "size": 2384,
+                "size": 2392,
                 "lmtime": 1769681734317.0703,
                 "modified": true
               },
@@ -2662,7 +2662,7 @@
               "class.Importer.js": {
                 "type": "-",
                 "size": 18897,
-                "lmtime": 1769900797352.661,
+                "lmtime": 1770032426697.642,
                 "modified": false
               },
               "class.Input.js": {
@@ -2674,7 +2674,7 @@
               "class.Resources.js": {
                 "type": "-",
                 "size": 2467,
-                "lmtime": 1769987167142.005,
+                "lmtime": 1770032426697.642,
                 "modified": false
               },
               "class.Time.js": {
@@ -2687,7 +2687,7 @@
             "class.Object.js": {
               "type": "-",
               "size": 3337,
-              "lmtime": 1769901820199.5774,
+              "lmtime": 1770032426697.642,
               "modified": false
             }
           },
@@ -2730,8 +2730,8 @@
           "Voxel": {
             "class.Voxel.js": {
               "type": "-",
-              "size": 126,
-              "lmtime": 1769983757776.9185,
+              "size": 166,
+              "lmtime": 1770032468036.4187,
               "modified": false
             },
             "class.VoxelChunk.js": {
@@ -2742,8 +2742,14 @@
             },
             "class.VoxelChunkComponent.js": {
               "type": "-",
-              "size": 7364,
+              "size": 497,
               "lmtime": 1769993441381.7297,
+              "modified": true
+            },
+            "class.VoxelGPU.js": {
+              "type": "-",
+              "size": 8922,
+              "lmtime": 1770036266037.1873,
               "modified": false
             },
             "const.js": {
@@ -2768,7 +2774,7 @@
           "class.Test.js": {
             "type": "-",
             "size": 1829,
-            "lmtime": 1769993698156.5288,
+            "lmtime": 1770032426697.642,
             "modified": false
           },
           "class.Test2.js": {
@@ -2779,8 +2785,8 @@
           },
           "index.js": {
             "type": "-",
-            "size": 6244,
-            "lmtime": 1769993688514.9646,
+            "size": 6885,
+            "lmtime": 1770034215569.8572,
             "modified": false
           }
         },
@@ -2841,16 +2847,22 @@
             "modified": true
           },
           "Compute": {
+            "Color.wgsl": {
+              "type": "-",
+              "size": 995,
+              "lmtime": 1770036393561.123,
+              "modified": false
+            },
             "MarchingCubes.wgsl": {
               "type": "-",
-              "size": 5092,
-              "lmtime": 1769993451080.157,
+              "size": 6737,
+              "lmtime": 1770036163182.896,
               "modified": false
             },
             "Voxel.wgsl": {
               "type": "-",
-              "size": 4600,
-              "lmtime": 1769993510615.9597,
+              "size": 6878,
+              "lmtime": 1770035654013.0134,
               "modified": false
             }
           },
@@ -3062,7 +3074,7 @@
             "Human.glb": {
               "type": "-",
               "size": 136004,
-              "lmtime": 1769887060895.2583,
+              "lmtime": 1770032426711.7976,
               "modified": false
             },
             "Krakow.bin": {
@@ -3167,19 +3179,19 @@
             "Glass.wgsl": {
               "type": "-",
               "size": 5454,
-              "lmtime": 1769886084895.41,
+              "lmtime": 1770032426724.9287,
               "modified": false
             },
             "Lit.wgsl": {
               "type": "-",
               "size": 5775,
-              "lmtime": 1769889761514.3794,
+              "lmtime": 1770032426726.024,
               "modified": false
             },
-            "TerrainLit.wgsl": {
+            "Voxel.wgsl": {
               "type": "-",
-              "size": 5728,
-              "lmtime": 1769886094221.2742,
+              "size": 5456,
+              "lmtime": 1770036538679.5166,
               "modified": false
             },
             "bloomRenderPass.wgsl": {
@@ -3197,7 +3209,7 @@
             "lightingRenderPass.wgsl": {
               "type": "-",
               "size": 8270,
-              "lmtime": 1769889723970.6165,
+              "lmtime": 1770032426727.0273,
               "modified": false
             },
             "screenRenderPass.wgsl": {
@@ -3215,7 +3227,7 @@
             "shadowRenderPass.wgsl": {
               "type": "-",
               "size": 2593,
-              "lmtime": 1769889927409.8083,
+              "lmtime": 1770032426727.0273,
               "modified": false
             },
             "ssaoRenderPass.wgsl": {
@@ -3357,7 +3369,7 @@
         "index.css": {
           "type": "-",
           "size": 1089,
-          "lmtime": 1769993629023.88,
+          "lmtime": 1770032426729.1199,
           "modified": false
         },
         "index.php": {

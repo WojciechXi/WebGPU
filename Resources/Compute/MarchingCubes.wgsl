@@ -124,7 +124,7 @@ fn interpolate_edge(edgeIndex: i32, gridPos: vec3<u32>, corners: array<f32, 8>) 
     v.normal = vec4<f32>(normal, 0.0);
     v.uv = vec4<f32>(pos.xz * 0.5, 0.0, 0.0);
     v.tangent = calculate_tangent(normal);
-    v.color = get_block_color(select(block1, block2, block1 == 0u));
+    v.color = vec4<f32>(f32(select(block1, block2, block1 == 0u)), 0.0, 0.0, 1.0);
     return v;
 }
 

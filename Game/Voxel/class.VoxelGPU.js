@@ -5,6 +5,18 @@ class VoxelGPU extends MonoBehaviour {
         const voxelCount = (VoxelResolution + 1) ** 3;
         const bytesPerVoxel = 8;
 
+        this.seed = 6.62589278;
+        this.frequency = 0.02;
+        this.strength = 8;
+        this.top = 16;
+
+        this.voxels = {
+            0: new VoxelBase(0, new Color32(0.0, 0.0, 0.5, 0.5)),
+            1: new VoxelBase(1, new Color32(0.5, 0.0, 0.5, 0.5)),
+            2: new VoxelBase(2, new Color32(0.0, 0.5, 0.5, 0.5)),
+            3: new VoxelBase(3, new Color32(0.5, 0.5, 0.5, 0.5)),
+        };
+
         this.working = false;
         this.queue = [];
 
@@ -105,9 +117,9 @@ class VoxelGPU extends MonoBehaviour {
         this.Generate(voxelChunkComponent);
     }
 
-    async Generate(voxelChunkComponent, seed = 6.62589278) {
+    async Generate(voxelChunkComponent) {
         const position = voxelChunkComponent.transform.position;
-        this.paramsBuffer.Set([position.x, position.y, position.z, 0, seed]);
+        this.paramsBuffer.Set([position.x, position.y, position.z, 0, this.seed, this.frequency, this.strength, this.top]);
 
         const commandEncoder = GPU.device.createCommandEncoder();
         const passEncoder = commandEncoder.beginComputePass();
@@ -177,7 +189,7 @@ class VoxelGPU extends MonoBehaviour {
                 normals.push(new Vector3(floatData[offset + 4], floatData[offset + 5], floatData[offset + 6]));
                 uvs.push(new Vector2(floatData[offset + 8], floatData[offset + 9]));
                 tangents.push(new Vector4(floatData[offset + 12], floatData[offset + 13], floatData[offset + 14], floatData[offset + 15]));
-                colors.push(new Color32(floatData[offset + 16], floatData[offset + 17], floatData[offset + 18], floatData[offset + 19]));
+                colors.push(this.voxels[parseInt(floatData[offset + 16]).toString()].coord);
             }
 
             voxelChunkComponent.mesh.SetVertices(vertices);

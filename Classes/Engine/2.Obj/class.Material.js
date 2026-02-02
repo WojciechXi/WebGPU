@@ -17,9 +17,9 @@ class Material extends Obj {
                 value: GPU.CreateSampler({
                     addressModeU: 'repeat',
                     addressModeV: 'repeat',
-                    magFilter: 'linear',
-                    minFilter: 'linear',
-                    mipmapFilter: 'linear',
+                    magFilter: 'nearest',
+                    minFilter: 'nearest',
+                    mipmapFilter: 'nearest',
                 }),
                 get: false,
                 set: false,

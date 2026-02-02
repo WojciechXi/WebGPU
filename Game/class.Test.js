@@ -23,9 +23,9 @@ class Test extends MonoBehaviour {
         this.transform.rotation = Quaternion.Euler(this.look.y, this.look.x, 0);
 
         let position = this.transform.position;
-        position = Vector3.Add(position, Vector3.Multiply(this.transform.forward, this.move.z * Time.deltaTime * 5));
-        position = Vector3.Add(position, Vector3.Multiply(this.transform.up, this.move.y * Time.deltaTime * 5));
-        position = Vector3.Add(position, Vector3.Multiply(this.transform.right, this.move.x * Time.deltaTime * 5));
+        position = Vector3.Add(position, Vector3.Multiply(this.transform.forward, this.move.z * Time.deltaTime * 15));
+        position = Vector3.Add(position, Vector3.Multiply(this.transform.up, this.move.y * Time.deltaTime * 15));
+        position = Vector3.Add(position, Vector3.Multiply(this.transform.right, this.move.x * Time.deltaTime * 15));
         this.transform.position = position;
 
         this.ray = this.camera.ScreenPointToRay(Input.mousePosition);

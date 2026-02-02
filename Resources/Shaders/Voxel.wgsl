@@ -40,6 +40,10 @@ fn getNormalMatrix(modelMatrix: mat4x4f) -> mat3x3f {
     return transpose3(inverse3(m3));
 }
 
+fn lerp(a:f32, b:f32, t:f32) -> f32{
+  return clamp(a + (b-a) * t, a, b);
+}
+
 struct View {
     matrix : mat4x4f,
     projection : mat4x4f,
@@ -154,7 +158,24 @@ struct GBufferRenderPass {
 fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   var gBufferRenderPass: GBufferRenderPass;
 
-  let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
+  var blending = abs(vsOut.worldNormal);
+  blending = blending / (blending.x + blending.y + blending.z);
+
+  let scale = 1;
+  let worldCoords = vsOut.worldPosition;
+
+  let atlasOffset = vsOut.color.xy;
+  let atlasSize = vsOut.color.zw;
+
+  let uvX = atlasOffset + fract(worldCoords.yz) * atlasSize;
+  let uvY = atlasOffset + fract(worldCoords.xz) * atlasSize;
+  let uvZ = atlasOffset + fract(worldCoords.xy) * atlasSize;
+
+  let texX = textureSample(albedoTexture, textureSampler, uvX).rgba;
+  let texY = textureSample(albedoTexture, textureSampler, uvY).rgba;
+  let texZ = textureSample(albedoTexture, textureSampler, uvZ).rgba;
+
+  let albedo = texX * blending.x + texY * blending.y + texZ * blending.z;
   
   let _roughness = material.pbr.r;
   let _metallic = material.pbr.g;
@@ -170,7 +191,7 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   let TBN = mat3x3f(vsOut.worldTangent, vsOut.worldBitangent, vsOut.worldNormal);
   gBufferRenderPass.normalOut = vec4<f32>(normalize(TBN * normal) * 0.5 + 0.5, 0.0);
 
-  gBufferRenderPass.colorOut = albedo * material.color * vsOut.color;
+  gBufferRenderPass.colorOut = material.color * albedo;
   gBufferRenderPass.emissiveOut = material.emissive;
   gBufferRenderPass.pbrOut = vec4<f32>(roughness.r * _roughness, metallic.r * _metallic, occlusion.r * _occlusion, 0);
 

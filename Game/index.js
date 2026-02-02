@@ -13,7 +13,8 @@ async function loadBitmap(src, callback) {
 
 window.addEventListener('DOMContentLoaded', async function (event) {
     const device = await GPU.Request();
-    const engine = new Engine();
+    const engine = new Engine(); this.queueMicrotask
+    const inspector = this.document.querySelector('#inspector');
 
     engine.Init(function (engine) {
         Resources.Init(function () {
@@ -47,6 +48,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             materials.Voxel = new Material({
                 name: 'Voxel',
                 shader: voxelShader,
+                albedo: Resources.Get('/Resources/Textures/Atlas.webp'),
             });
 
             materials.Glass = new Material({
@@ -76,18 +78,10 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             const mainCamera = mainCameraGameObject.AddComponent(Camera);
             const test = mainCameraGameObject.AddComponent(Test);
 
-            for (let x = 0; x < 8; x++) {
-                for (let z = 0; z < 8; z++) {
-                    for (let y = 0; y < 2; y++) {
-                        let gameObject = new GameObject("Voxel Chunk");
-                        gameObject.transform.position = new Vector3(x * 16, y * 16, z * 16);
-                        let meshRenderer = gameObject.AddComponent(MeshRenderer);
-                        meshRenderer.material = materials.Voxel;
-                        let voxelChunkComponent = gameObject.AddComponent(VoxelChunkComponent);
-                        voxelGPU.AddToQueue(voxelChunkComponent);
-                    }
-                }
-            }
+            let gameObject = new GameObject("Voxel World");
+            gameObject.AddComponent(VoxelGPU);
+            let voxelWorldComponent = gameObject.AddComponent(VoxelWorldComponent);
+            voxelWorldComponent.material = materials.Voxel;
 
             // const cameraGameObject = new GameObject('Test Camera');
             // cameraGameObject.transform.position = new Vector3(-1, 1, -5);
@@ -137,8 +131,9 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             // });
 
             Physics.simulate = true;
+            inspector.innerHTML = ``;
         }, function (index, total, path) {
-            console.log(`${index}/${total} - ${path}`);
+            inspector.innerHTML = `${index}/${total} - ${path}`;
         });
     });
 });

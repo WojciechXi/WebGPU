@@ -7,6 +7,9 @@ struct Voxel {
 struct Params {
     chunkPos: vec3<f32>,
     seed: f32,
+    frequency: f32,
+    strength: f32,
+    top: f32,
 };
 
 @group(0) @binding(0) var<uniform> params: Params;
@@ -162,10 +165,10 @@ fn perlinNoise3d(P: vec3<f32>) -> f32 {
 fn get_iso(p: vec3<f32>) -> f32 {
     // 1. Skalowanie pozycji (im mniejsza liczba, tym większe formacje terenu)
     
-    let height_gradient = 16 - p.y;
+    let height_gradient : f32 = 16 - p.y;
 
     var frequency : f32 = 0.04;
-    var strength : f32 = 4.0;
+    var strength : f32 = 4;
     var density : f32 = 0.0;
 
     for(var i = 0u; i < 4u; i += 1u){
