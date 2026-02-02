@@ -49,8 +49,9 @@ class VoxelController extends MonoBehaviour {
         if (voxel == null) {
             this.transform.position = position;
         } else if (voxel.isSolid) {
+            const voxelWorldPosition = VoxelWorldComponent.Instance.GetVoxelWorldPosition(feetPosition);
             this.velocity.y = Math.max(0, this.velocity.y);
-            nextPos.y = position.y + Time.fixedDeltaTime;
+            nextPos.y = voxelWorldPosition.y + voxel.iso + Time.fixedDeltaTime;
         }
 
         this.transform.position = nextPos;
