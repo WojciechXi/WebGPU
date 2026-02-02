@@ -1,6 +1,7 @@
 struct Voxel {
     blockId: u32,
     iso: f32,
+    light: f32,
 };
 
 struct Params {
@@ -187,8 +188,10 @@ fn main(@builtin(global_invocation_id) grid: vec3<u32>) {
     if(worldPos.y == 0){
         voxelData[index].blockId = 0;
         voxelData[index].iso = 1000;
+        voxelData[index].light = worldPos.y;
     } else {
         voxelData[index].blockId = 1;
         voxelData[index].iso = get_iso(worldPos);
+        voxelData[index].light = worldPos.y;
     }
 }

@@ -8,8 +8,8 @@ class VoxelGPU extends MonoBehaviour {
         let triTable = Resources.Get('/Resources/json/MarchingCubes.json');
 
         this.paramsBuffer = new GraphicsBuffer(GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 8, 4);
-        this.voxelBuffer = new GraphicsBuffer(GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC, voxelCount, 8);
-        this.stagingBuffer = new GraphicsBuffer(GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ, voxelCount, 8);
+        this.voxelBuffer = new GraphicsBuffer(GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC, voxelCount, 3 * 4);
+        this.stagingBuffer = new GraphicsBuffer(GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ, voxelCount, 3 * 4);
 
         this.triTableBuffer = new GraphicsBuffer(GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST, triTable.triTable.length, 4, Int32Array);
         this.triTableBuffer.Set(triTable.triTable);
