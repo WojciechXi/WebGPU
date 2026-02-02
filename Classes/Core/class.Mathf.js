@@ -18,14 +18,24 @@ class Mathf {
 
     //Unity
 
+    static Floor(x) { return Math.floor(x); }
+    static FloorToInt(x) { return Math.floor(x); }
+
+    static Round(x, decimals = 0) {
+        const p = Math.pow(10, decimals);
+        return Math.round(x * p) / p;
+    }
+    static RoundToInt(x) { return Math.round(x); }
+
+    static Ceil(x) { return Math.ceil(x); }
+    static CeilToInt(x) { return Math.ceil(x); }
+
     static Abs(x) { return Math.abs(x); }
     static Acos(x) { return Math.acos(x); }
     static Approximately() { }
     static Asin(x) { return Math.asin(x); }
     static Atan(x) { return Math.atan(x); }
     static Atan2(y, x) { return Math.atan2(y, x); }
-    static Ceil() { }
-    static CeilToInt() { }
     static Clamp(value, min, max) { return value < min ? min : (value > max ? max : value); }
     static Clamp01(value) { return value < 0 ? 0 : (value > 1 ? 1 : value); }
     static ClosestPowerOfTwo() { }
@@ -34,8 +44,6 @@ class Mathf {
     static DeltaAngle() { }
     static Exp(x) { return Math.exp(x); }
     static FloatToHalf() { }
-    static Floor() { }
-    static FloorToInt() { }
     static GammaToLinearSpace() { }
     static HalfToFloat() { }
     static InverseLerp(a, b, v) { return a === b ? 0 : (v - a) / (b - a); }
@@ -55,11 +63,6 @@ class Mathf {
     static PingPong() { }
     static Pow(x, y) { return Math.pow(x, y); }
     static Repeat() { }
-    static Round(x, decimals = 0) {
-        const p = Math.pow(10, decimals);
-        return Math.round(x * p) / p;
-    }
-    static RoundToInt() { }
     static Sign(x) { return Math.sign(x); }
     static Sin(x) { return Math.sin(x); }
     static SmoothDamp() { }

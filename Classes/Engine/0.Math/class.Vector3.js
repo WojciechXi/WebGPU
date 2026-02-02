@@ -151,6 +151,22 @@ class Vector3 extends Float32Array {
         return this[0] == other[0] && this[1] == other[1] && this[2] == other[2];
     }
 
+    Floor(out = this) {
+        out = out || this.Clone();
+        out[0] = Mathf.Floor(out[0]);
+        out[1] = Mathf.Floor(out[1]);
+        out[2] = Mathf.Floor(out[2]);
+        return out;
+    }
+
+    Ceil(out = this) {
+        out = out || this.Clone();
+        out[0] = Mathf.Ceil(out[0]);
+        out[1] = Mathf.Ceil(out[1]);
+        out[2] = Mathf.Ceil(out[2]);
+        return out;
+    }
+
     Round(out = this) {
         out = out || this.Clone();
         out[0] = Mathf.Round(out[0]);

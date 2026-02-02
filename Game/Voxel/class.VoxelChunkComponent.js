@@ -18,4 +18,8 @@ class VoxelChunkComponent extends MonoBehaviour {
 
     }
 
+    GetVoxel(localPosition) {
+        return this.voxelChunk.GetVoxel(localPosition);
+    }
+
 }

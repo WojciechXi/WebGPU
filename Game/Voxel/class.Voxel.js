@@ -6,4 +6,10 @@ class Voxel {
         this.light = light;
     }
 
+    get isSolid() {
+        return this.blockId && this.iso >= 0.5;
+    }
+
+    toString() { return JSON.stringify(this); }
+
 }

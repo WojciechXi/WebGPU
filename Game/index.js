@@ -57,10 +57,6 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                 shader: glassShader,
             });
 
-            const voxelGPUGameObject = new GameObject("Voxel GPU");
-            const voxelGPU = voxelGPUGameObject.AddComponent(VoxelGPU);
-            voxelGPU.Init();
-
             const ambientLightGameObject = new GameObject("Ambient Light");
             const ambientLight = ambientLightGameObject.AddComponent(AmbientLight);
             engine.scene.ambientLight = ambientLight;
@@ -73,15 +69,16 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             directionalLight.color.Set(1, 1, 1, 0.75);
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
 
-            const mainCameraGameObject = new GameObject('Main Camera');
-            mainCameraGameObject.transform.position = new Vector3(0, 20, -2);
-            const mainCamera = mainCameraGameObject.AddComponent(Camera);
-            const test = mainCameraGameObject.AddComponent(Test);
-
             let gameObject = new GameObject("Voxel World");
-            gameObject.AddComponent(VoxelGPU);
+            let voxelGPU = gameObject.AddComponent(VoxelGPU);
             let voxelWorldComponent = gameObject.AddComponent(VoxelWorldComponent);
             voxelWorldComponent.material = materials.Voxel;
+
+            const mainCameraGameObject = new GameObject('Main Camera');
+            mainCameraGameObject.transform.position = new Vector3(0, 31, 0);
+            const mainCamera = mainCameraGameObject.AddComponent(Camera);
+            // const test = mainCameraGameObject.AddComponent(Test);
+            const voxelController = mainCameraGameObject.AddComponent(VoxelController);
 
             // const cameraGameObject = new GameObject('Test Camera');
             // cameraGameObject.transform.position = new Vector3(-1, 1, -5);

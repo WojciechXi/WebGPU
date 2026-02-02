@@ -190,8 +190,8 @@ fn main(@builtin(global_invocation_id) grid: vec3<u32>) {
     let worldPos = (params.chunkPos + vec3<f32>(grid) * voxelSize);
     
     if(worldPos.y == 0){
-        voxelData[index].iso = 0;
-        voxelData[index].blockId = 0;
+        voxelData[index].iso = 0.0;
+        voxelData[index].blockId = 0u;
         voxelData[index].light = worldPos.y;
     } else {
         let iso = get_iso(worldPos);

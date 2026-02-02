@@ -1,7 +1,8 @@
 class VoxelGPU extends MonoBehaviour {
 
-    Init() {
+    OnEnable() {
         VoxelGPU.Instance = this;
+
         const voxelCount = (VoxelResolution + 1) ** 3;
         const bytesPerVoxel = 8;
 
