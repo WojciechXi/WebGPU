@@ -7,7 +7,7 @@ struct Voxel {
 struct Vertex {
     @location(0) position: vec4<f32>,
     @location(1) normal: vec4<f32>,
-    @location(2) uv: vec2<f32>,
+    @location(2) uv: vec4<f32>,
     @location(3) tangent: vec4<f32>,
     @location(4) color: vec4<f32>,
 };
@@ -118,21 +118,13 @@ fn interpolate_edge(edgeIndex: i32, gridPos: vec3<u32>, corners: array<f32, 8>) 
 
     let block1 = get_block_at_grid(p1_u);
     let block2 = get_block_at_grid(p2_u);
-    var finalBlock: u32;
-    if (block1 == 0u) {
-        finalBlock = block2;
-    } else if (block2 == 0u) {
-        finalBlock = block1;
-    } else {
-        finalBlock = select(block1, block2, t > 0.5);
-    }
 
     var v: Vertex;
     v.position = vec4<f32>(pos * voxelSize, 1.0);
     v.normal = vec4<f32>(normal, 0.0);
-    v.uv = pos.xz * 0.5;
+    v.uv = vec4<f32>(pos.xz * 0.5, 0.0, 0.0);
     v.tangent = calculate_tangent(normal);
-    v.color = get_block_color(finalBlock);
+    v.color = get_block_color(select(block1, block2, block1 == 0u));
     return v;
 }
 
