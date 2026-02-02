@@ -1,8 +1,11 @@
 class Shader extends Obj {
 
-    constructor(code, renderPipelineBuffers = null, settings = {}) {
-        super();
+    constructor(name, code, renderPipelineBuffers = null) {
+        super({
+            _name: name,
+        });
         const object = this;
+        console.log(object);
 
         object.code = code;
         object.shaderModule = null;

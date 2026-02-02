@@ -20,13 +20,13 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             engine.Awake();
             engine.Start();
 
-            const litShader = new Shader(Resources.Get('/Resources/Shaders/Lit.wgsl'));
+            const litShader = new Shader('Lit', Resources.Get('/Resources/Shaders/Lit.wgsl'));
             litShader.Compile();
 
-            const voxelShader = new Shader(Resources.Get('/Resources/Shaders/Voxel.wgsl'));
+            const voxelShader = new Shader('Voxel', Resources.Get('/Resources/Shaders/Voxel.wgsl'));
             voxelShader.Compile();
 
-            const glassShader = new Shader(Resources.Get('/Resources/Shaders/Glass.wgsl'));
+            const glassShader = new Shader('Glass', Resources.Get('/Resources/Shaders/Glass.wgsl'));
             glassShader.Compile();
 
             let materials = {};
