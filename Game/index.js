@@ -44,7 +44,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                 shader: litShader,
             });
 
-            window.voxel = materials.Voxel = new Material({
+            materials.Voxel = new Material({
                 name: 'Voxel',
                 shader: voxelShader,
             });
@@ -82,7 +82,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                         let gameObject = new GameObject("Voxel Chunk");
                         gameObject.transform.position = new Vector3(x * 16, y * 16, z * 16);
                         let meshRenderer = gameObject.AddComponent(MeshRenderer);
-                        meshRenderer.material = materials.voxel;
+                        meshRenderer.material = materials.Voxel;
                         let voxelChunkComponent = gameObject.AddComponent(VoxelChunkComponent);
                         voxelGPU.AddToQueue(voxelChunkComponent);
                     }

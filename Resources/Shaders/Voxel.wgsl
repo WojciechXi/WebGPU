@@ -88,6 +88,7 @@ struct VSOut {
   @location(2) worldBitangent  : vec3f,
   @location(3) worldNormal  : vec3f,
   @location(4) uv : vec2f,
+  @location(5) color : vec4f,
 };
 
 @vertex
@@ -113,6 +114,7 @@ fn vs(vert: Vertex) -> VSOut {
   vsOut.worldBitangent = B;
   vsOut.worldNormal = N;
   vsOut.uv = vert.uv; 
+  vsOut.color = vert.color;
   
   return vsOut;
 }
@@ -152,13 +154,7 @@ struct GBufferRenderPass {
 fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   var gBufferRenderPass: GBufferRenderPass;
 
-  let _alphaCutoff = material.pbr.a;
-
   let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
-  let color = albedo * material.color;
-  if(color.a < _alphaCutoff) {
-    discard;
-  }
   
   let _roughness = material.pbr.r;
   let _metallic = material.pbr.g;
@@ -174,7 +170,7 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   let TBN = mat3x3f(vsOut.worldTangent, vsOut.worldBitangent, vsOut.worldNormal);
   gBufferRenderPass.normalOut = vec4f(normalize(TBN * normal) * 0.5 + 0.5, 0.0);
 
-  gBufferRenderPass.colorOut = albedo * material.color;
+  gBufferRenderPass.colorOut = albedo * material.color * vsOut.color;
   gBufferRenderPass.emissiveOut = material.emissive;
   gBufferRenderPass.pbrOut = vec4f(roughness.r * _roughness, metallic.r * _metallic, occlusion.r * _occlusion, 0);
 

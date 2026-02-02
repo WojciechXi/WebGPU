@@ -9,6 +9,7 @@ struct Vertex {
     @location(1) normal: vec4<f32>,
     @location(2) uv: vec2<f32>,
     @location(3) tangent: vec4<f32>,
+    @location(4) color: vec4<f32>,
 };
 
 // --- BINDINGI ---
@@ -19,8 +20,8 @@ struct Vertex {
 @group(0) @binding(3) var<storage, read_write> outIndices: array<u32>;
 @group(0) @binding(4) var<storage, read_write> vertexCount: atomic<u32>;
 
-const isoLevel: f32 = 0.5;
 const size: u32 = 33u;
+const isoLevel: f32 = 0.5;
 const voxelSize: f32 = 0.5;
 
 fn get_iso(p: vec3<u32>) -> f32 {
@@ -71,6 +72,22 @@ fn get_voxel_normal(p: vec3<u32>) -> vec3<f32> {
     return -normalize(vec3<f32>(nx, ny, nz));
 }
 
+fn get_block_at_grid(p: vec3<u32>) -> u32 {
+    let safe_p = clamp(p, vec3<u32>(0u), vec3<u32>(size - 1u));
+    let index = safe_p.x + (safe_p.y * size) + (safe_p.z * size * size);
+    return voxelData[index].blockId; // Zakładam, że blockId to Biome ID
+}
+
+// Przykładowa paleta kolorów (możesz ją też przesłać w Uniformach)
+fn get_block_color(id: u32) -> vec4<f32> {
+    switch(id) {
+        case 1u: { return vec4<f32>(1.0, 1.0, 1.0, 1.0); } // Skała
+        case 2u: { return vec4<f32>(0.0, 0.5, 0.0, 1.0); } // Trawa
+        case 3u: { return vec4<f32>(0.5, 0.0, 0.0, 1.0); } // Ziemia
+        default: { return vec4<f32>(0.0, 0.0, 0.0, 1.0); }
+    }
+}
+
 // Zaktualizowana funkcja interpolująca
 fn interpolate_edge(edgeIndex: i32, gridPos: vec3<u32>, corners: array<f32, 8>) -> Vertex {
     var edgeToCorners = array<vec2<u32>, 12>(
@@ -99,11 +116,23 @@ fn interpolate_edge(edgeIndex: i32, gridPos: vec3<u32>, corners: array<f32, 8>) 
     let n2 = get_voxel_normal(p2_u);
     let normal = normalize(n1 + t * (n2 - n1));
 
+    let block1 = get_block_at_grid(p1_u);
+    let block2 = get_block_at_grid(p2_u);
+    var finalBlock: u32;
+    if (block1 == 0u) {
+        finalBlock = block2;
+    } else if (block2 == 0u) {
+        finalBlock = block1;
+    } else {
+        finalBlock = select(block1, block2, t > 0.5);
+    }
+
     var v: Vertex;
     v.position = vec4<f32>(pos * voxelSize, 1.0);
     v.normal = vec4<f32>(normal, 0.0);
     v.uv = pos.xz * 0.5;
     v.tangent = calculate_tangent(normal);
+    v.color = get_block_color(finalBlock);
     return v;
 }
 

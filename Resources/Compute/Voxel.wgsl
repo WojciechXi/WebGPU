@@ -13,6 +13,7 @@ struct Params {
 @group(0) @binding(1) var<storage, read_write> voxelData: array<Voxel>;
 
 const size: u32 = 33u;
+const isoLevel: f32 = 0.5;
 const voxelSize: f32 = 0.5;
 
 // --- FUNKCJE SZUMU (PERLIN 3D) ---
@@ -186,12 +187,13 @@ fn main(@builtin(global_invocation_id) grid: vec3<u32>) {
     let worldPos = (params.chunkPos + vec3<f32>(grid) * voxelSize);
     
     if(worldPos.y == 0){
+        voxelData[index].iso = 0;
         voxelData[index].blockId = 0;
-        voxelData[index].iso = 1000;
         voxelData[index].light = worldPos.y;
     } else {
-        voxelData[index].blockId = 1;
-        voxelData[index].iso = get_iso(worldPos);
+        let iso = get_iso(worldPos);
+        voxelData[index].iso = select(iso, 0.0, iso < isoLevel);
+        voxelData[index].blockId = select(1u, 0u, iso < isoLevel);
         voxelData[index].light = worldPos.y;
     }
 }

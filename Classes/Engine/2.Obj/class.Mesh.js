@@ -17,7 +17,9 @@ class Mesh extends Obj {
                 value: new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }),
                 set: false,
             },
-            vertices: { value: [], set: false, },
+            vertices: {
+                value: [], set: false,
+            },
             normals: { value: [], set: false, },
             tangents: { value: [], set: false, },
             colors: { value: [], set: false, },
@@ -206,14 +208,26 @@ class Mesh extends Obj {
     SetLod(subMesh, level, levelRange, flags = 0) { }
     SetLods(levels, subMesh, flags) { }
     SetNormals(inNormals) { this._normals = inNormals.map(n => n.Clone()); }
+    SetFlatNormals(inNormals, stride = 4) {
+        this._normals = [];
+        for (let i = 0; i < inNormals.length; i += stride) this._normals.push(new Vector3(inNormals[i], inNormals[i + 1], inNormals[i + 2]));
+    }
     SetSubMesh(index, subMesh) { this._subMeshes[index] = subMesh; }
     SetSubMeshes(subMeshes) { this._subMeshes = subMeshes; }
     SetTangents(inTangents) { this._tangents = inTangents.map(t => t.Clone()); }
+    SetFlatTangents(inTangents, stride = 4) {
+        this._tangents = [];
+        for (let i = 0; i < inTangents.length; i += stride) this._tangents.push(new Vector4(inTangents[i], inTangents[i + 1], inTangents[i + 2], inTangents[i + 3]));
+    }
     SetTriangles(triangles, subMeshIndex, calculateBounds = true, baseVertex = 0) {
         this._subMeshes[subMeshIndex].SetTriangles(triangles, baseVertex);
         // if (calculateBounds) this.RecalculateBounds();
     }
     SetUVs(uvs) { this._uvs = uvs.map(u => u.Clone()); }
+    SetFlatUvs(inUvs, stride = 4) {
+        this._uvs = [];
+        for (let i = 0; i < inUvs.length; i += stride) this._uvs.push(new Vector2(inUvs[i], inUvs[i + 1]));
+    }
     SetVertexBufferData(data, dataStart, meshBufferStart, count, stream, flags = 0) { }
     SetVertexBufferParams(vertexCount, attributes) { }
     SetVertices(inVertices, calculateBounds = true) {
