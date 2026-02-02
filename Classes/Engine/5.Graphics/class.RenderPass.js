@@ -64,7 +64,7 @@ class RenderPass {
         this.SetVertexBuffer(1, matrixBuffer);
         this.SetBindGroup(3, this.emptyBindGroup);
         this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
-        this.DrawIndexed(subMesh.triangles.length);
+        this.DrawIndexed(subMesh.triangleBuffer.count);
     }
 
     DrawSkinnedMesh(mesh, subMeshIndex, matrixBuffer, jointsBindGroup) {
@@ -75,7 +75,7 @@ class RenderPass {
         this.SetBindGroup(3, jointsBindGroup);
 
         this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
-        this.DrawIndexed(subMesh.triangles.length);
+        this.DrawIndexed(subMesh.triangleBuffer.count);
     }
 
 }

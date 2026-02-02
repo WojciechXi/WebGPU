@@ -79,7 +79,7 @@ class ShadowRenderPass extends RenderPass {
         this.SetVertexBuffer(1, matrixBuffer);
         this.SetBindGroup(1, this.emptyBindGroup);
         this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
-        this.DrawIndexed(subMesh.triangles.length);
+        this.DrawIndexed(subMesh.triangleBuffer.count);
     }
 
     DrawSkinnedMesh(mesh, subMeshIndex, matrixBuffer, jointsBindGroup) {
@@ -90,7 +90,7 @@ class ShadowRenderPass extends RenderPass {
         this.SetBindGroup(1, jointsBindGroup);
 
         this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
-        this.DrawIndexed(subMesh.triangles.length);
+        this.DrawIndexed(subMesh.triangleBuffer.count);
     }
 
 }

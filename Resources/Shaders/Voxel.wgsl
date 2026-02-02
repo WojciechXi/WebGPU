@@ -79,6 +79,8 @@ struct Vertex {
 @group(2) @binding(4) var metallicTexture : texture_2d<f32>;
 @group(2) @binding(5) var occlusionTexture : texture_2d<f32>;
 
+@group(3) @binding(0) var<uniform> jointMatrices : array<mat4x4f, 64>;
+
 struct VSOut {
   @builtin(position) clipPosition : vec4f,
   @location(0) worldPosition : vec3f,
@@ -94,14 +96,12 @@ fn vs(vert: Vertex) -> VSOut {
   let matrix = mat4x4<f32>(vert.m0, vert.m1, vert.m2, vert.m3);
 
   var objectPosition = vert.position;
-  let worldPosition = (matrix * vec4f(objectPosition, 1.0)).xyz;
-  let clipPosition = view.viewProjection * vec4f(worldPosition, 1.0);
-
   var objectNormal = vert.normal;
   var objectTangent = vert.tangent;
+  var worldPosition = (matrix * vec4f(objectPosition, 1.0)).xyz;
 
-  vsOut.clipPosition = clipPosition;
   vsOut.worldPosition = worldPosition;
+  vsOut.clipPosition = view.viewProjection * vec4f(worldPosition, 1.0);
 
   let normalMatrix = getNormalMatrix(matrix);
   
@@ -112,7 +112,7 @@ fn vs(vert: Vertex) -> VSOut {
   vsOut.worldTangent = T;
   vsOut.worldBitangent = B;
   vsOut.worldNormal = N;
-  vsOut.uv = vec2f(worldPosition.x, worldPosition.z); 
+  vsOut.uv = vert.uv; 
   
   return vsOut;
 }
@@ -126,12 +126,6 @@ struct ShadowRenderPass {
 @fragment
 fn shadowRenderPass(vsOut: VSOut) -> ShadowRenderPass {
   var shadowRenderPass: ShadowRenderPass;
-
-  let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
-  let normal = textureSample(normalTexture, textureSampler, vsOut.uv);
-  let roughness = textureSample(roughnessTexture, textureSampler, vsOut.uv);
-  let metallic = textureSample(metallicTexture, textureSampler, vsOut.uv);
-  let occlusion = textureSample(occlusionTexture, textureSampler, vsOut.uv);
 
   let clipPosition = vsOut.clipPosition;
   let ndc = (clipPosition.xyz / clipPosition.w);

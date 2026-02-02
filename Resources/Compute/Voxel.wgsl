@@ -12,30 +12,86 @@ struct Params {
 @group(0) @binding(1) var<storage, read_write> voxelData: array<Voxel>;
 
 const size: u32 = 33u;
+const voxelSize: f32 = 0.5;
 
 // --- FUNKCJE SZUMU (PERLIN 3D) ---
 
-fn mod289_3(x: vec3<f32>) -> vec3<f32> {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
+fn mod289_vec3(x: vec3<f32>) -> vec3<f32> { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+fn mod289_vec4(x: vec4<f32>) -> vec4<f32> { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+fn permute_vec4(x: vec4<f32>) -> vec4<f32> { return mod289_vec4(((x * 34.0) + 1.0) * x); }
+fn taylorInvSqrt_vec4(r: vec4<f32>) -> vec4<f32> { return 1.79284291400159 - 0.85373472095314 * r; }
 
-fn mod289_4(x: vec4<f32>) -> vec4<f32> {
-    return x - floor(x * (1.0 / 289.0)) * 289.0;
-}
+fn simplexNoise3d(v: vec3<f32>) -> f32 {
+    let C = vec2<f32>(1.0/6.0, 1.0/3.0);
+    let D = vec4<f32>(0.0, 0.5, 1.0, 2.0);
 
-fn permute(x: vec4<f32>) -> vec4<f32> {
-    return mod289_4(((x * 34.0) + 1.0) * x);
-}
+    // Pierwszy wierzchołek
+    var i  = floor(v + dot(v, C.yyy));
+    let x0 = v - i + dot(i, C.xxx);
 
-fn taylorInvSqrt(r: vec4<f32>) -> vec4<f32> {
-    return 1.79284291400159 - 0.85373472095314 * r;
+    // Pozostałe wierzchołki
+    let g = step(x0.yzx, x0.xyz);
+    let l = 1.0 - g;
+    let i1 = min(g.xyz, l.zxy);
+    let i2 = max(g.xyz, l.zxy);
+
+    let x1 = x0 - i1 + C.xxx;
+    let x2 = x0 - i2 + C.yyy;
+    let x3 = x0 - D.yyy;
+
+    // Permutacje
+    i = mod289_vec3(i);
+    let p = permute_vec4(permute_vec4(permute_vec4(
+              i.z + vec4<f32>(0.0, i1.z, i2.z, 1.0))
+            + i.y + vec4<f32>(0.0, i1.y, i2.y, 1.0))
+            + i.x + vec4<f32>(0.0, i1.x, i2.x, 1.0));
+
+    // Gradienty (4 wierzchołki na siatce simplexu)
+    let n_ = 0.142857142857; // 1.0/7.0
+    let ns = n_ * D.wyz - D.xzx;
+
+    let j = p - 49.0 * floor(p * ns.z * ns.z);
+
+    let x_ = floor(j * ns.z);
+    let y_ = floor(j - 7.0 * x_);
+
+    let x = x_ * ns.x + ns.yyyy;
+    let y = y_ * ns.x + ns.yyyy;
+    let h = 1.0 - abs(x) - abs(y);
+
+    let b0 = vec4<f32>(x.xy, y.xy);
+    let b1 = vec4<f32>(x.zw, y.zw);
+
+    let s0 = floor(b0) * 2.0 + 1.0;
+    let s1 = floor(b1) * 2.0 + 1.0;
+    let sh = -step(h, vec4<f32>(0.0));
+
+    let a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+    let a1 = b1.xzyw + s1.xzyw * sh.zzww;
+
+    var p0 = vec3<f32>(a0.xy, h.x);
+    var p1 = vec3<f32>(a0.zw, h.y);
+    var p2 = vec3<f32>(a1.xy, h.z);
+    var p3 = vec3<f32>(a1.zw, h.w);
+
+    // Normalizacja
+    let norm = taylorInvSqrt_vec4(vec4<f32>(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+    p0 = p0 * norm.x;
+    p1 = p1 * norm.y;
+    p2 = p2 * norm.z;
+    p3 = p3 * norm.w;
+
+    // Miksowanie końcowe
+    var m = max(0.6 - vec4<f32>(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), vec4<f32>(0.0));
+    m = m * m;
+    return 42.0 * dot(m * m, vec4<f32>(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
 }
 
 fn perlinNoise3d(P: vec3<f32>) -> f32 {
     var Pi0 = floor(P);
     var Pi1 = Pi0 + vec3<f32>(1.0);
-    Pi0 = mod289_3(Pi0);
-    Pi1 = mod289_3(Pi1);
+    Pi0 = mod289_vec3(Pi0);
+    Pi1 = mod289_vec3(Pi1);
     let Pf0 = fract(P);
     let Pf1 = Pf0 - vec3<f32>(1.0);
     let ix = vec4<f32>(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
@@ -43,9 +99,9 @@ fn perlinNoise3d(P: vec3<f32>) -> f32 {
     let iz0 = Pi0.zzzz;
     let iz1 = Pi1.zzzz;
 
-    let ixy = permute(permute(ix) + iy);
-    let ixy0 = permute(ixy + iz0);
-    let ixy1 = permute(ixy + iz1);
+    let ixy = permute_vec4(permute_vec4(ix) + iy);
+    let ixy0 = permute_vec4(ixy + iz0);
+    let ixy1 = permute_vec4(ixy + iz1);
 
     var gx0 = ixy0 * (1.0 / 7.0);
     var gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
@@ -72,12 +128,12 @@ fn perlinNoise3d(P: vec3<f32>) -> f32 {
     var g011 = vec3<f32>(gx1.z, gy1.z, gz1.z);
     var g111 = vec3<f32>(gx1.w, gy1.w, gz1.w);
 
-    let norm0 = taylorInvSqrt(vec4<f32>(dot(g000, g000), dot(g100, g100), dot(g010, g010), dot(g110, g110)));
+    let norm0 = taylorInvSqrt_vec4(vec4<f32>(dot(g000, g000), dot(g100, g100), dot(g010, g010), dot(g110, g110)));
     g000 = g000 * norm0.x;
     g100 = g100 * norm0.y;
     g010 = g010 * norm0.z;
     g110 = g110 * norm0.w;
-    let norm1 = taylorInvSqrt(vec4<f32>(dot(g001, g001), dot(g101, g101), dot(g011, g011), dot(g111, g111)));
+    let norm1 = taylorInvSqrt_vec4(vec4<f32>(dot(g001, g001), dot(g101, g101), dot(g011, g011), dot(g111, g111)));
     g001 = g001 * norm1.x;
     g101 = g101 * norm1.y;
     g011 = g011 * norm1.z;
@@ -103,29 +159,36 @@ fn perlinNoise3d(P: vec3<f32>) -> f32 {
 
 fn get_iso(p: vec3<f32>) -> f32 {
     // 1. Skalowanie pozycji (im mniejsza liczba, tym większe formacje terenu)
-    let frequency = 0.08;
     
-    // 2. Pobieramy szum (zwraca wartości w okolicach -1.0 do 1.0)
-    let noise = perlinNoise3d(p * frequency + params.seed);
+    let height_gradient = 16 - p.y;
+
+    var frequency : f32 = 0.04;
+    var strength : f32 = 4.0;
+    var density : f32 = 0.0;
+
+    for(var i = 0u; i < 4u; i += 1u){
+        let noise = simplexNoise3d(p * frequency + params.seed);
+        density = density + noise * strength;
+
+        strength = strength / 2;
+        frequency = frequency * 2.0;
+    }
     
-    // 3. Dodajemy gradient wysokości (ziemia na dole, powietrze na górze)
-    // p.y / size daje 0.0 na dole i 1.0 na górze
-    let height_gradient = p.y / f32(size * 2);
-    
-    // Finalna gęstość: szum + baza - wysokość
-    // Dzięki temu teren będzie miał "podłogę"
-    let density = noise * 0.5 + 0.5 - height_gradient;
-    
-    return density;
+    return height_gradient + density;
 }
 
-@compute @workgroup_size(8, 4, 4)
+@compute @workgroup_size(4, 4, 4)
 fn main(@builtin(global_invocation_id) grid: vec3<u32>) {
     if (grid.x >= size || grid.y >= size || grid.z >= size) { return; }
 
     let index = grid.x + (grid.y * size) + (grid.z * size * size);
-    let worldPos = params.chunkPos + vec3<f32>(grid);
-
-    voxelData[index].blockId = 1;
-    voxelData[index].iso = get_iso(worldPos);
+    let worldPos = (params.chunkPos + vec3<f32>(grid) * voxelSize);
+    
+    if(worldPos.y == 0){
+        voxelData[index].blockId = 0;
+        voxelData[index].iso = 1000;
+    } else {
+        voxelData[index].blockId = 1;
+        voxelData[index].iso = get_iso(worldPos);
+    }
 }

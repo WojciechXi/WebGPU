@@ -6,6 +6,8 @@ struct Voxel {
 struct Vertex {
     @location(0) position: vec4<f32>,
     @location(1) normal: vec4<f32>,
+    @location(2) uv: vec2<f32>,
+    @location(3) tangent: vec4<f32>,
 };
 
 // --- BINDINGI ---
@@ -18,6 +20,7 @@ struct Vertex {
 
 const isoLevel: f32 = 0.5;
 const size: u32 = 33u;
+const voxelSize: f32 = 0.5;
 
 fn get_iso(p: vec3<u32>) -> f32 {
     let index = p.x + (p.y * size) + (p.z * size * size);
@@ -31,6 +34,21 @@ fn get_corner_pos(cornerIndex: u32, gridPos: vec3<u32>) -> vec3<f32> {
         vec3<f32>(0.,1.,0.), vec3<f32>(1.,1.,0.), vec3<f32>(1.,1.,1.), vec3<f32>(0.,1.,1.)
     );
     return vec3<f32>(gridPos) + offsets[cornerIndex];
+}
+
+fn calculate_tangent(normal: vec3<f32>) -> vec4<f32> {
+    // Wybieramy wektor pomocniczy, który nie jest równoległy do normalnej
+    var helper = vec3<f32>(1.0, 0.0, 0.0);
+    if (abs(normal.x) > 0.9) {
+        helper = vec3<f32>(0.0, 1.0, 0.0);
+    }
+    
+    // Gram-Schmidt orthogonalization
+    let tangent = normalize(cross(normal, helper));
+    let bitangent = cross(normal, tangent);
+    
+    // Zwracamy tangent z 'w' jako 1.0 (sign), potrzebne do przeliczeń bitangentu w shaderze
+    return vec4<f32>(tangent, 1.0);
 }
 
 // Funkcja obliczająca gradient (normalną) w konkretnym punkcie siatki
@@ -81,12 +99,14 @@ fn interpolate_edge(edgeIndex: i32, gridPos: vec3<u32>, corners: array<f32, 8>) 
     let normal = normalize(n1 + t * (n2 - n1));
 
     var v: Vertex;
-    v.position = vec4<f32>(pos, 1.0);
-    v.normal = vec4<f32>(normal, 0.0); 
+    v.position = vec4<f32>(pos * voxelSize, 1.0);
+    v.normal = vec4<f32>(normal, 0.0);
+    v.uv = pos.xz * 0.5;
+    v.tangent = calculate_tangent(normal);
     return v;
 }
 
-@compute @workgroup_size(8, 4, 4)
+@compute @workgroup_size(4, 4, 4)
 fn marching_cubes(@builtin(global_invocation_id) grid: vec3<u32>) {
     if (grid.x >= size - 1u || grid.y >= size - 1u || grid.z >= size - 1u) { return; }
 

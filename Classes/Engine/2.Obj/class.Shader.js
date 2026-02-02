@@ -89,7 +89,7 @@ class Shader extends Obj {
                 },
                 primitive: {
                     topology: "triangle-list",
-                    cullMode: 'none',
+                    cullMode: 'back',
                     frontFace: 'ccw',
                 },
             });

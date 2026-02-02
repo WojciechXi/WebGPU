@@ -23,6 +23,9 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             const litShader = new Shader(Resources.Get('/Resources/Shaders/Lit.wgsl'));
             litShader.Compile();
 
+            const voxelShader = new Shader(Resources.Get('/Resources/Shaders/Voxel.wgsl'));
+            voxelShader.Compile();
+
             const glassShader = new Shader(Resources.Get('/Resources/Shaders/Glass.wgsl'));
             glassShader.Compile();
 
@@ -41,11 +44,20 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                 shader: litShader,
             });
 
+            window.voxel = materials.Voxel = new Material({
+                name: 'Voxel',
+                shader: voxelShader,
+            });
+
             materials.Glass = new Material({
                 name: 'Glass',
                 color: Color32.red,
                 shader: glassShader,
             });
+
+            const voxelGPUGameObject = new GameObject("Voxel GPU");
+            const voxelGPU = voxelGPUGameObject.AddComponent(VoxelGPU);
+            voxelGPU.Init();
 
             const ambientLightGameObject = new GameObject("Ambient Light");
             const ambientLight = ambientLightGameObject.AddComponent(AmbientLight);
@@ -60,17 +72,20 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
 
             const mainCameraGameObject = new GameObject('Main Camera');
-            mainCameraGameObject.transform.position = new Vector3(0, 1, -2);
+            mainCameraGameObject.transform.position = new Vector3(0, 20, -2);
             const mainCamera = mainCameraGameObject.AddComponent(Camera);
             const test = mainCameraGameObject.AddComponent(Test);
 
             for (let x = 0; x < 8; x++) {
                 for (let z = 0; z < 8; z++) {
-                    let gameObject = new GameObject("Voxel Chunk");
-                    gameObject.transform.position = new Vector3(x * 16, 0, z * 16);
-                    let meshRenderer = gameObject.AddComponent(MeshRenderer);
-                    let voxelChunkComponent = gameObject.AddComponent(VoxelChunkComponent);
-                    voxelChunkComponent.Generate();
+                    for (let y = 0; y < 2; y++) {
+                        let gameObject = new GameObject("Voxel Chunk");
+                        gameObject.transform.position = new Vector3(x * 16, y * 16, z * 16);
+                        let meshRenderer = gameObject.AddComponent(MeshRenderer);
+                        meshRenderer.material = materials.voxel;
+                        let voxelChunkComponent = gameObject.AddComponent(VoxelChunkComponent);
+                        voxelGPU.AddToQueue(voxelChunkComponent);
+                    }
                 }
             }
 

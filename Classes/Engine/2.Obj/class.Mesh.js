@@ -271,34 +271,31 @@ class SubMesh {
     constructor(data = {}) {
         this.material = data.material ?? null;
 
-        this.triangles = new Uint32Array(data.triangles ?? 0);
-        this.edges = new Uint32Array(data.edges ?? 0);
-
         this.triangleBuffer = new GraphicsBuffer(GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST, 0, 4, Uint32Array);
         this.edgeBuffer = new GraphicsBuffer(GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST, 0, 4, Uint32Array);
+
+        if (data.triangles) this.SetTriangles(data.triangles);
+        if (data.edges) this.SetEdges(data.edges);
     }
 
     Clear() {
-        this.triangles = new Uint32Array(0);
-        this.edges = new Uint32Array(0);
-
         this.triangleBuffer.Resize(0);
         this.edgeBuffer.Resize(0);
     }
 
-    SetTriangles(triangles, baseVertex = 0) {
-        this.triangles = triangles;
+    SetTriangles(triangles, baseVertex = 0, autoWriteBuffer = false) {
+        this.triangleBuffer.Resize(triangles.length);
+        this.triangleBuffer.Set(triangles, baseVertex, autoWriteBuffer);
+    }
 
-        this.triangleBuffer.Resize(this.triangles.length);
-        this.triangleBuffer.Set(new Uint32Array(triangles), baseVertex);
+    SetEdges(edges, baseVertex = 0, autoWriteBuffer = false) {
+        this.edgeBuffer.Resize(edges.length);
+        this.edgeBuffer.Set(edges, baseVertex, autoWriteBuffer);
     }
 
     UploadMeshData() {
-        this.triangleBuffer.Resize(this.triangles.length);
-        this.triangleBuffer.Set(this.triangles);
-
-        this.edgeBuffer.Resize(this.edges.length);
-        this.edgeBuffer.Set(this.edges);
+        this.triangleBuffer.WriteBuffer();
+        this.edgeBuffer.WriteBuffer();
     }
 
 }
