@@ -9,9 +9,11 @@ class Test extends MonoBehaviour {
 
     OnEnable() {
         this.camera = this.GetComponent(Camera);
+        this.hierarchy = document.querySelector('#hierarchy');
     }
 
     Update() {
+        this.hierarchy.innerHTML = Mathf.Round(Time.frames);
         if (Input.GetKey(0)) this.look = Vector2.Add(this.look, Input.mouseMove.Multiply(Time.deltaTime * 2));
 
         this.move.x = Input.GetAxis('Horizontal');

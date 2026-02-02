@@ -52,16 +52,27 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             engine.scene.ambientLight = ambientLight;
             ambientLight.color.Set(0.8, 0.9, 1, 0.25);
 
-            // const directionalLightGameObject = new GameObject('Directional Light');
-            // directionalLightGameObject.transform.eulerAngles = new Vector3(60, -45, 0);
-            // const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
-            // engine.scene.directionalLight = directionalLight;
-            // directionalLight.color.Set(1, 1, 1, 0.75);
-            // directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
+            const directionalLightGameObject = new GameObject('Directional Light');
+            directionalLightGameObject.transform.eulerAngles = new Vector3(60, -45, 0);
+            const directionalLight = directionalLightGameObject.AddComponent(DirectionalLight);
+            engine.scene.directionalLight = directionalLight;
+            directionalLight.color.Set(1, 1, 1, 0.75);
+            directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
 
-            // const mainCameraGameObject = new GameObject('Main Camera');
-            // mainCameraGameObject.transform.position = new Vector3(0, 1, -2);
-            // const mainCamera = mainCameraGameObject.AddComponent(Camera);
+            const mainCameraGameObject = new GameObject('Main Camera');
+            mainCameraGameObject.transform.position = new Vector3(0, 1, -2);
+            const mainCamera = mainCameraGameObject.AddComponent(Camera);
+            const test = mainCameraGameObject.AddComponent(Test);
+
+            for (let x = 0; x < 8; x++) {
+                for (let z = 0; z < 8; z++) {
+                    let gameObject = new GameObject("Voxel Chunk");
+                    gameObject.transform.position = new Vector3(x * 16, 0, z * 16);
+                    let meshRenderer = gameObject.AddComponent(MeshRenderer);
+                    let voxelChunkComponent = gameObject.AddComponent(VoxelChunkComponent);
+                    voxelChunkComponent.Generate();
+                }
+            }
 
             // const cameraGameObject = new GameObject('Test Camera');
             // cameraGameObject.transform.position = new Vector3(-1, 1, -5);

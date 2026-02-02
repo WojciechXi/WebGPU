@@ -2325,14 +2325,14 @@
               },
               "class.Component.js": {
                 "type": "-",
-                "size": 3162,
-                "lmtime": 1769900071996.6187,
+                "size": 3364,
+                "lmtime": 1769901855923.2747,
                 "modified": false
               },
               "class.GameObject.js": {
                 "type": "-",
-                "size": 5170,
-                "lmtime": 1769899542519.0664,
+                "size": 5417,
+                "lmtime": 1769901786961.3955,
                 "modified": false
               },
               "class.Material.js": {
@@ -2361,8 +2361,8 @@
               },
               "class.Scene.js": {
                 "type": "-",
-                "size": 2439,
-                "lmtime": 1769899147811.0752,
+                "size": 2730,
+                "lmtime": 1769901596139.963,
                 "modified": false
               },
               "class.Shader.js": {
@@ -2643,8 +2643,8 @@
               },
               "class.Importer.js": {
                 "type": "-",
-                "size": 18891,
-                "lmtime": 1769898714188.4326,
+                "size": 18897,
+                "lmtime": 1769900797352.661,
                 "modified": false
               },
               "class.Input.js": {
@@ -2668,8 +2668,8 @@
             },
             "class.Object.js": {
               "type": "-",
-              "size": 3599,
-              "lmtime": 1769900064059.7217,
+              "size": 3337,
+              "lmtime": 1769901820199.5774,
               "modified": false
             }
           }
@@ -2710,7 +2710,7 @@
           "index.js": {
             "type": "-",
             "size": 5699,
-            "lmtime": 1769899480582.688,
+            "lmtime": 1769900879978.7214,
             "modified": false
           }
         },
@@ -3254,11 +3254,11 @@
           "lmtime": 0,
           "modified": false
         },
-        "test.json": {
+        "scene.json": {
           "type": "-",
-          "size": 1891,
-          "lmtime": 1769899503213.7246,
-          "modified": true
+          "size": 1826,
+          "lmtime": 0,
+          "modified": false
         }
       },
       "przewodniktarnow.pl": {},

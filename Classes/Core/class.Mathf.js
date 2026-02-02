@@ -55,7 +55,10 @@ class Mathf {
     static PingPong() { }
     static Pow(x, y) { return Math.pow(x, y); }
     static Repeat() { }
-    static Round() { }
+    static Round(x, decimals = 0) {
+        const p = Math.pow(10, decimals);
+        return Math.round(x * p) / p;
+    }
     static RoundToInt() { }
     static Sign(x) { return Math.sign(x); }
     static Sin(x) { return Math.sin(x); }

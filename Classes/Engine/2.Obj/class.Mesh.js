@@ -24,7 +24,7 @@ class Mesh extends Obj {
             uvs: { value: [], set: false, },
             joints: { value: [], },
             weights: { value: [], },
-            subMeshes: { value: [], set: false, },
+            subMeshes: { value: [new SubMesh()], set: false, },
         });
     }
 
@@ -220,6 +220,11 @@ class Mesh extends Obj {
         this._vertices = inVertices.map(v => v.Clone());
         if (calculateBounds) this.RecalculateBounds();
     }
+    SetFlatVertices(inVertices, stride = 4, calculateBounds = true) {
+        this._vertices = [];
+        for (let i = 0; i < inVertices.length; i += stride) this._vertices.push(new Vector3(inVertices[i], inVertices[i + 1], inVertices[i + 2]));
+        if (calculateBounds) this.RecalculateBounds();
+    }
     UploadMeshData() {
         let offset = 4 + 4 + 4 + 4 + 4 + 4 + 4; // position + normal + tangent + color + uv + joints + weights
 
@@ -269,19 +274,25 @@ class SubMesh {
         this.triangles = new Uint32Array(data.triangles ?? 0);
         this.edges = new Uint32Array(data.edges ?? 0);
 
-        this.triangleBuffer = new Buffer(0, { usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST }, Uint32Array);
-        this.edgeBuffer = new Buffer(0, { usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST }, Uint32Array);
+        this.triangleBuffer = new GraphicsBuffer(GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST, 0, 4, Uint32Array);
+        this.edgeBuffer = new GraphicsBuffer(GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST, 0, 4, Uint32Array);
     }
 
     Clear() {
         this.triangles = new Uint32Array(0);
         this.edges = new Uint32Array(0);
+
         this.triangleBuffer.Resize(0);
         this.edgeBuffer.Resize(0);
     }
+
     SetTriangles(triangles, baseVertex = 0) {
-        this.triangleBuffer = new Uint32Array(triangles);
+        this.triangles = triangles;
+
+        this.triangleBuffer.Resize(this.triangles.length);
+        this.triangleBuffer.Set(new Uint32Array(triangles), baseVertex);
     }
+
     UploadMeshData() {
         this.triangleBuffer.Resize(this.triangles.length);
         this.triangleBuffer.Set(this.triangles);

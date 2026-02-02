@@ -39,6 +39,10 @@ class Resources {
                             _meshes: data.meshes,
                         });
                     });
+                } else if (meta.pathInfo.extension == 'json') {
+                    const response = await fetch(path);
+                    const json = await response.text();
+                    object.resources[path] = JSON.parse(json);
                 } else if (meta.pathInfo.extension == 'wgsl') {
                     const response = await fetch(path);
                     object.resources[path] = await response.text();

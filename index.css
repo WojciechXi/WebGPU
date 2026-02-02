@@ -50,6 +50,7 @@ canvas {
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     position: fixed;
+    padding: 0.5rem;
     left: 1rem;
     top: 1rem;
     z-index: 1;
@@ -62,6 +63,7 @@ canvas {
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     position: fixed;
+    padding: 0.5rem;
     right: 1rem;
     top: 1rem;
     z-index: 1;
