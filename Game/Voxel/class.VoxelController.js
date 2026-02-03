@@ -30,6 +30,10 @@ class VoxelController extends MonoBehaviour {
 
         this.camera.transform.position = this.transform.position.Add(Vector3.up);
         this.camera.transform.rotation = Quaternion.Euler(this.look.y, this.look.x, 0);
+
+        if (Input.GetKey(0)) {
+            VoxelWorldComponent.Instance.Remove(this.camera.transform.position.Add(this.camera.transform.forward.Multiply(2)), 2);
+        }
     }
 
     FixedUpdate() {

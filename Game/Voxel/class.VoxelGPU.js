@@ -3,8 +3,7 @@ class VoxelGPU extends MonoBehaviour {
     OnEnable() {
         VoxelGPU.Instance = this;
 
-        const voxelCount = (VoxelResolution + 1) ** 3;
-        const bytesPerVoxel = 8;
+        const voxelCount = VoxelChunkVolume;
 
         this.seed = 6.62589278;
         this.frequency = 0.02;
@@ -30,7 +29,7 @@ class VoxelGPU extends MonoBehaviour {
         this.triTableBuffer = new GraphicsBuffer(GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST, triTable.triTable.length, 4, Int32Array);
         this.triTableBuffer.Set(triTable.triTable);
 
-        const maxVertices = (VoxelResolution + 1) ** 3 * 15;
+        const maxVertices = VoxelChunkVolume * 15;
 
         this.verticesBuffer = new GraphicsBuffer(GPUBufferUsage.STORAGE | GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_SRC, maxVertices, 16 * 5);
         this.indicesBuffer = new GraphicsBuffer(GPUBufferUsage.STORAGE | GPUBufferUsage.INDEX, maxVertices, 4, Uint32Array);
@@ -115,7 +114,15 @@ class VoxelGPU extends MonoBehaviour {
         if (!voxelChunkComponent) return;
 
         this.working = true;
-        this.Generate(voxelChunkComponent);
+        if (!voxelChunkComponent.generated) this.Generate(voxelChunkComponent);
+        else {
+            for (let i = 0; i < VoxelChunkVolume; i++) {
+                let voxel = voxelChunkComponent.voxelChunk.voxels[i];
+                this.voxelBuffer.Set([voxel.blockId, voxel.iso], i * 5, false);
+            }
+            this.voxelBuffer.WriteBuffer();
+            this.GenerateMesh(voxelChunkComponent);
+        }
     }
 
     async Generate(voxelChunkComponent) {
@@ -127,11 +134,11 @@ class VoxelGPU extends MonoBehaviour {
 
         passEncoder.setPipeline(this.computePipeline);
         passEncoder.setBindGroup(0, this.bindGroup);
-        passEncoder.dispatchWorkgroups(Math.ceil(33 / 4), Math.ceil(33 / 4), Math.ceil(33 / 4));
+        passEncoder.dispatchWorkgroups(Math.ceil(VoxelResolutionOne / 4), Math.ceil(VoxelResolutionOne / 4), Math.ceil(VoxelResolutionOne / 4));
 
         passEncoder.setPipeline(this.colorPipeline);
         passEncoder.setBindGroup(0, this.colorBindGroup);
-        passEncoder.dispatchWorkgroups(Math.ceil(33 / 4), Math.ceil(33 / 4), Math.ceil(33 / 4));
+        passEncoder.dispatchWorkgroups(Math.ceil(VoxelResolutionOne / 4), Math.ceil(VoxelResolutionOne / 4), Math.ceil(VoxelResolutionOne / 4));
 
         passEncoder.end();
 
@@ -142,7 +149,7 @@ class VoxelGPU extends MonoBehaviour {
         const copyArrayBuffer = this.stagingBuffer.GetMappedRange();
         const data = new DataView(copyArrayBuffer);
 
-        for (let i = 0; i < (VoxelResolution + 1) ** 3; i++) {
+        for (let i = 0; i < VoxelChunkVolume; i++) {
             const offset = i * 8;
             const blockId = data.getUint32(offset, true);
             const iso = data.getFloat32(offset + 4, true);
@@ -150,6 +157,8 @@ class VoxelGPU extends MonoBehaviour {
         }
 
         this.stagingBuffer.Unmap();
+
+        voxelChunkComponent.voxelChunk.generated = true;
 
         this.GenerateMesh(voxelChunkComponent);
     }
@@ -161,7 +170,7 @@ class VoxelGPU extends MonoBehaviour {
         const passEncoder = commandEncoder.beginComputePass();
         passEncoder.setPipeline(this.meshPipeline);
         passEncoder.setBindGroup(0, this.meshBindGroup);
-        passEncoder.dispatchWorkgroups(Math.ceil(33 / 4), Math.ceil(33 / 4), Math.ceil(33 / 4))
+        passEncoder.dispatchWorkgroups(Math.ceil(VoxelResolutionOne / 4), Math.ceil(VoxelResolutionOne / 4), Math.ceil(VoxelResolutionOne / 4))
         passEncoder.end();
         commandEncoder.copyBufferToBuffer(this.counterBuffer.buffer, 0, this.counterStagingBuffer.buffer, 0, this.counterStagingBuffer.ByteLength);
         commandEncoder.copyBufferToBuffer(this.verticesBuffer.buffer, 0, this.verticesStagingBuffer.buffer, 0, this.verticesStagingBuffer.ByteLength);
