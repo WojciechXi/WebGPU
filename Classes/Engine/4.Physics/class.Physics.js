@@ -2,7 +2,11 @@ class Physics {
 
     static {
         this.simulate = false;
-        this.gravity = new Vector3(0, -9.81, 0);
+        this._gravity = new Vector3(0, -9.81, 0);
+    }
+
+    static get gravity() {
+        return this._gravity.Clone();
     }
 
     static Raycast(ray, maxDistance) {

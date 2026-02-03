@@ -69,16 +69,18 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             directionalLight.color.Set(1, 1, 1, 0.75);
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
 
-            let gameObject = new GameObject("Voxel World");
-            let voxelGPU = gameObject.AddComponent(VoxelGPU);
-            let voxelWorldComponent = gameObject.AddComponent(VoxelWorldComponent);
+            const voxelWorldGameObject = new GameObject("Voxel World");
+            const voxelGPU = voxelWorldGameObject.AddComponent(VoxelGPU);
+            const voxelWorldComponent = voxelWorldGameObject.AddComponent(VoxelWorldComponent);
             voxelWorldComponent.material = materials.Voxel;
 
             const mainCameraGameObject = new GameObject('Main Camera');
-            mainCameraGameObject.transform.position = new Vector3(0, 31, 0);
             const mainCamera = mainCameraGameObject.AddComponent(Camera);
+
+            const voxelControllerGameObject = new GameObject("Voxel Controller");
+            voxelControllerGameObject.transform.position = new Vector3(0, 31, 0);
+            const voxelController = voxelControllerGameObject.AddComponent(VoxelController);
             // const test = mainCameraGameObject.AddComponent(Test);
-            const voxelController = mainCameraGameObject.AddComponent(VoxelController);
 
             // const cameraGameObject = new GameObject('Test Camera');
             // cameraGameObject.transform.position = new Vector3(-1, 1, -5);

@@ -7,7 +7,7 @@ class VoxelWorldComponent extends MonoBehaviour {
         this.camera = Camera.main;
         this.material = null;
 
-        this.position = this.transform.position;
+        this.position = Vector3.zero;
         this.lastPosition = null;
         this.radius = 1;
 
@@ -33,8 +33,8 @@ class VoxelWorldComponent extends MonoBehaviour {
         if (!this.chunks.has(chunkPosition.toString())) return null;
 
         const voxelChunkComponent = this.chunks.get(chunkPosition.toString());
-        const gridPosition = Vector3.Subtract(position, chunkPosition.Multiply(16)).Multiply(2).Floor();
-        return voxelChunkComponent.transform.position.Add(gridPosition.Divide(2));
+        const chunkLocalPosition = Vector3.Subtract(position, Vector3.Multiply(chunkPosition, 16)).Multiply(2).Floor();
+        return voxelChunkComponent.transform.position.Add(chunkLocalPosition.Divide(2));
     }
 
     FixedUpdate() {
