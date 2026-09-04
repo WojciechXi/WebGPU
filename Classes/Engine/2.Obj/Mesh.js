@@ -1,33 +1,20 @@
 class Mesh extends Obj {
 
-    constructor(name) {
-        super({
-            _name: name,
-        }, {
-            bounds: {
-                value: new Bounds(Vector3.zero, Vector3.one),
-                get: function () { return this._bounds.Clone(); },
-                set: false,
-            },
-            vertexBuffer: {
-                value: new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }),
-                set: false,
-            },
-            lineBuffer: {
-                value: new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }),
-                set: false,
-            },
-            vertices: {
-                value: [], set: false,
-            },
-            normals: { value: [], set: false, },
-            tangents: { value: [], set: false, },
-            colors: { value: [], set: false, },
-            uvs: { value: [], set: false, },
-            joints: { value: [], },
-            weights: { value: [], },
-            subMeshes: { value: [new SubMesh()], set: false, },
-        });
+    constructor() {
+        super();
+        const object = this;
+
+        new Property(object, 'bounds', new Bounds());
+        new Property(object, 'vertexBuffer', new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }));
+        new Property(object, 'lineBuffer', new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }));
+        new Property(object, 'vertices', []);
+        new Property(object, 'normals', []);
+        new Property(object, 'tangents', []);
+        new Property(object, 'colors', []);
+        new Property(object, 'uvs', []);
+        new Property(object, 'joints', []);
+        new Property(object, 'weights', []);
+        new Property(object, 'subMeshes', []);
     }
 
     get bindposeCount() { } // The number of bind poses in the Mesh.
