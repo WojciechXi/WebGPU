@@ -178,7 +178,7 @@ class Importer {
                     material: materialName,
                 });
 
-                mesh._subMeshes.push(subMesh);
+                mesh.subMeshes.push(subMesh);
 
                 // mesh.RecalculateNormals?.();
                 // mesh.RecalculateTangents?.();

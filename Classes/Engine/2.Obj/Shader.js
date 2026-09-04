@@ -5,7 +5,13 @@ class Shader extends Obj {
         const object = this;
 
         new Property(object, 'renderQueue', 2000);
-        new Property(object, 'code', code);
+        new Property(object, 'code', '', {
+            set: function (value, oldValue) {
+                if (value == oldValue) return value;
+                this.shaderModule = null;
+                return value;
+            },
+        });
         new Property(object, 'shaderModule', null);
 
         new Property(object, 'renderPipelines', new Map());
@@ -13,42 +19,38 @@ class Shader extends Obj {
     }
 
     Compile() {
-        const object = this;
-        if (object.shaderModule) return;
-        object.shaderModule = GPU.CreateShaderModule({ code: object.code, });
+        if (this.shaderModule) return;
+        this.shaderModule = GPU.CreateShaderModule({ code: this.code, });
     }
 
-    GetPipeline(renderPassName, stateSettings = {}) {
-        const object = this;
-        if (!object.shaderModule) object.Compile();
+    GetPipeline(renderPass, stateSettings = {}) {
+        if (!this.shaderModule) this.Compile();
 
+        const depthCompare = stateSettings.depthCompare || 'less';
         const cull = stateSettings.cull || 'back';
         const depthWrite = stateSettings.depthWrite ?? true;
-        const stateKey = `${renderPassName}_${cull}_${depthWrite}`;
 
-        if (!object.renderPipelines.has(stateKey)) {
-            const pipeline = this._createPipeline(renderPassName, { cull, depthWrite });
-            object.renderPipelines.set(stateKey, pipeline);
+        const stateKey = `${renderPass.name}_${depthCompare}_${cull}_${depthWrite}`;
+
+        if (!this.renderPipelines.has(stateKey)) {
+            const pipeline = this._createPipeline(renderPass, { cull: cull, depthCompare: depthCompare, depthWrite: depthWrite });
+            this.renderPipelines.set(stateKey, pipeline);
         }
 
-        return object.renderPipelines.get(stateKey);
+        return this.renderPipelines.get(stateKey);
     }
 
     Use(renderPass) {
-        const object = this;
-
-        let renderPipeline = object.renderPipelines[renderPass.name];
+        let renderPipeline = this.GetPipeline(renderPass);
         if (!renderPipeline) return null;
 
         renderPass.SetPipeline(renderPipeline);
         return renderPipeline;
     }
 
-    _createPipeline(passName, states) {
-        const object = this;
-
+    _createPipeline(renderPass, states) {
         return GPU.CreateRenderPipeline({
-            label: `${object._name}_${passName}_pipeline`,
+            label: `${this.name}_${renderPass.name}_pipeline`,
             layout: GPU.CreatePipelineLayout({
                 bindGroupLayouts: [
                     Graphics.viewBindGroupLayout,
@@ -58,7 +60,7 @@ class Shader extends Obj {
                 ]
             }),
             vertex: {
-                module: object.shaderModule,
+                module: this.shaderModule,
                 entryPoint: "vs",
                 buffers: [
                     {
@@ -86,9 +88,9 @@ class Shader extends Obj {
                 ]
             },
             fragment: {
-                module: object.shaderModule,
-                entryPoint: passName,
-                targets: Graphics.getPassTargets(passName)
+                module: this.shaderModule,
+                entryPoint: renderPass.name,
+                targets: renderPass.GetTargets(),
             },
             primitive: {
                 topology: "triangle-list",
@@ -98,7 +100,7 @@ class Shader extends Obj {
             depthStencil: {
                 format: "depth24plus",
                 depthWriteEnabled: states.depthWrite,
-                depthCompare: "less"
+                depthCompare: states.depthCompare,
             }
         });
     }

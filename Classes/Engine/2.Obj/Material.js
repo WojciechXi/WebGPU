@@ -1,0 +1,133 @@
+class Material extends Obj {
+
+    static {
+        console.log('Material class loaded');
+    }
+
+    constructor(shaderOrMaterial) {
+        super();
+        const object = this;
+
+        let shader = null;
+        if (shaderOrMaterial instanceof Shader) shader = shaderOrMaterial;
+        else if (shaderOrMaterial instanceof Material) shader = shaderOrMaterial.shader;
+
+        new Property(object, 'shader', shader);
+        new Property(object, 'color', Color32.white);
+        new Property(object, 'roughness', 1);
+        new Property(object, 'metallic', 0.1);
+        new Property(object, 'occlusion', 1);
+        new Property(object, 'alphaCutoff', 0.5);
+        new Property(object, 'textures', {});
+        new Property(object, 'materialBuffer', new Buffer(4 + 4));
+        new Property(object, 'sampler', GPU.CreateSampler({
+            addressModeU: 'repeat',
+            addressModeV: 'repeat',
+            magFilter: 'nearest',
+            minFilter: 'nearest',
+            mipmapFilter: 'nearest',
+        }));
+
+        object.SetTexture('albedo', Color32.white);
+        object.SetTexture('normal', new Color32(0.5, 0.5, 1, 1));
+        object.SetTexture('roughness', Color32.white);
+        object.SetTexture('metallic', Color32.black);
+        object.SetTexture('occlusion', Color32.white);
+
+        object.materialBindGroup = GPU.CreateBindGroup({
+            label: 'MaterialBindGroup',
+            layout: Graphics.materialBindGroupLayout,
+            entries: [
+                object.materialBuffer.GetBindGroupEntry(0),
+            ],
+        });
+
+        object.pbrBindGroup = GPU.CreateBindGroup({
+            label: 'gBufferBindGroup',
+            layout: Graphics.pbrBindGroupLayout,
+            entries: [
+                { binding: 0, resource: object.sampler },
+                { binding: 1, resource: object.textures.albedo.createView() },
+                { binding: 2, resource: object.textures.normal.createView() },
+                { binding: 3, resource: object.textures.roughness.createView() },
+                { binding: 4, resource: object.textures.metallic.createView() },
+                { binding: 5, resource: object.textures.occlusion.createView() },
+            ],
+        });
+
+        object.cull = 'back';
+        object.depthWrite = true;
+    }
+
+    SetTexture(name, texture) {
+        if (texture instanceof Color || texture instanceof Color32) {
+            const width = 1;
+            const height = 1;
+
+            this.textures[name] = GPU.CreateTexture({
+                size: [width, height, 1],
+                format: 'rgba8unorm',
+                usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+            });
+
+            GPU.Queue.writeTexture(
+                { texture: this.textures[name] },
+                new Uint8Array([texture.r * 255, texture.g * 255, texture.b * 255, texture.a * 255]),
+                { bytesPerRow: 4 * 4 },
+                { width, height, depthOrArrayLayers: 1 }
+            );
+        } else {
+            const width = texture.width;
+            const height = texture.height;
+
+            this.textures[name] = GPU.CreateTexture({
+                size: [width, height, 1],
+                format: 'rgba8unorm',
+                usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+            });
+
+            GPU.Queue.copyExternalImageToTexture(
+                { source: texture },
+                { texture: this.textures[name] },
+                [width, height, 1]
+            );
+        }
+    }
+
+    Update() {
+        this.pbrBindGroup = GPU.CreateBindGroup({
+            label: 'gBufferBindGroup',
+            layout: Graphics.pbrBindGroupLayout,
+            entries: [
+                { binding: 0, resource: this.sampler },
+                { binding: 1, resource: this.textures.albedo.createView() },
+                { binding: 2, resource: this.textures.normal.createView() },
+                { binding: 3, resource: this.textures.roughness.createView() },
+                { binding: 4, resource: this.textures.metallic.createView() },
+                { binding: 5, resource: this.textures.occlusion.createView() },
+            ],
+        });
+    }
+
+    Use(renderPass) {
+        let renderPipeline = this.shader.Use(renderPass, {
+            cull: this.cull,
+            depthWrite: this.depthWrite,
+        });
+
+        if (renderPipeline) {
+            this.materialBuffer.Set({
+                0: this.color,
+                4: [this.roughness, this.metallic, this.occlusion, this.alphaCutoff],
+            });
+
+            renderPass.SetBindGroup(1, this.materialBindGroup);
+            renderPass.SetBindGroup(2, this.pbrBindGroup);
+
+            return true;
+        }
+
+        return false;
+    }
+
+}

@@ -13,5 +13,5 @@ const ObjectReferenceType = {
     Component: 1,
     Asset: 2,
     Prefab: 3,
-    MonoBehaviour: 4,
+    GameBehaviour: 4,
 };

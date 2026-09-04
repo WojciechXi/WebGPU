@@ -137,9 +137,8 @@ struct AmbientLight {
 @group(3) @binding(1) var worldPositionTexture : texture_2d<f32>;
 @group(3) @binding(2) var worldNormalTexture : texture_2d<f32>;
 @group(3) @binding(3) var colorTexture : texture_2d<f32>;
-@group(3) @binding(4) var emissiveTexture : texture_2d<f32>;
-@group(3) @binding(5) var pbrTexture : texture_2d<f32>;
-@group(3) @binding(6) var shadowTexture : texture_2d<f32>;
+@group(3) @binding(4) var pbrTexture : texture_2d<f32>;
+@group(3) @binding(5) var shadowTexture : texture_2d<f32>;
 
 struct VSOut {
   @builtin(position) pos : vec4f,
@@ -166,7 +165,6 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let worldPosition4 = textureSample(worldPositionTexture, screenSampler, vsOut.uv);
     let worldNormal = normalize(textureSample(worldNormalTexture, screenSampler, vsOut.uv).xyz * 2.0 - 1.0);
     let color = textureSample(colorTexture, screenSampler, vsOut.uv);
-    let emissive = textureSample(emissiveTexture, screenSampler, vsOut.uv);
 
     if(worldPosition4.a == 0) {
         return vec4f(color.rgb, 1.0);
@@ -225,5 +223,5 @@ fn fs(vsOut: VSOut) -> @location(0) vec4f {
     let specular = F0 * spec * (1.0 - roughness) * shadowVal;
     let ambient  = ambientColor * color.rgb * occlusion;
 
-    return vec4f(ambient + diffuse + specular + emissive.rgb, 1.0);
+    return vec4f(ambient + diffuse + specular, 1.0);
 }

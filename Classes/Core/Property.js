@@ -3,18 +3,21 @@ class Property {
     constructor(target, propertyKey, defaultValue = null, options = {}) {
         const object = this;
         object.target = target;
-        object.value = defaultValue;
+        object.value = null;
+
         Object.defineProperty(target, propertyKey, {
-            writable: true,
             get: function () {
                 if (options.get) return options.get();
                 return object.value;
             },
             set: function (value) {
-                if (options.set) return object.value = options.set(value);
-                return object.value = value;
+                if (options.set) value = options.set(value, object.value);
+                object.value = value;
+                if (options.assigned) options.assigned(value);
             },
         });
+
+        target[propertyKey] = defaultValue;
     }
 
 }

@@ -8,11 +8,12 @@ class Scene extends Obj {
         new Property(object, 'gameObjects', []);
         new Property(object, 'components', []);
 
+        new Property(object, 'ambientLight', null);
+        new Property(object, 'directionalLight', null);
+
         new Property(object, 'fixedUpdateables', []);
         new Property(object, 'updateables', []);
         new Property(object, 'renderables', []);
-        new Property(object, 'ambientLight', []);
-        new Property(object, 'directionalLight', []);
         new Property(object, 'directionalLights', []);
         new Property(object, 'colliders', []);
         new Property(object, 'cameras', []);

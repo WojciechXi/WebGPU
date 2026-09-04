@@ -4,7 +4,9 @@ class PhysicMaterial extends Obj {
         return this.default ?? (this.default = new PhysicMaterial());
     }
 
-    Init() {
+    constructor() {
+        super();
+
         this.bounceCombine = 0;
         this.bounciness = 0;
         this.dynamicFriction = 0;

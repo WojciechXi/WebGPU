@@ -54,7 +54,6 @@ struct View {
 
 struct Material {
     color : vec4<f32>,
-    emissive: vec4<f32>,
     pbr : vec4<f32>,
 };
 
@@ -148,10 +147,9 @@ struct GBufferRenderPass {
   @location(1) normalOut : vec4<f32>,
   
   @location(2) colorOut : vec4<f32>, // Color
-  @location(3) emissiveOut : vec4<f32>, // Emission
-  @location(4) pbrOut : vec4<f32>, // Smoothness / Metallic / Ambient Occlusion
+  @location(3) pbrOut : vec4<f32>, // Smoothness / Metallic / Ambient Occlusion
   
-  @location(5) depthOut : vec4<f32>,
+  @location(4) depthOut : vec4<f32>,
 }
 
 @fragment
@@ -192,7 +190,6 @@ fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
   gBufferRenderPass.normalOut = vec4<f32>(normalize(TBN * normal) * 0.5 + 0.5, 0.0);
 
   gBufferRenderPass.colorOut = material.color * albedo;
-  gBufferRenderPass.emissiveOut = material.emissive;
   gBufferRenderPass.pbrOut = vec4<f32>(roughness.r * _roughness, metallic.r * _metallic, occlusion.r * _occlusion, 0);
 
   gBufferRenderPass.depthOut = vec4<f32>(vsOut.clipPosition.z / vsOut.clipPosition.w, 0.0, 0.0, 1.0);

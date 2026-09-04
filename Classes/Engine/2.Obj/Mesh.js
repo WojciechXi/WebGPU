@@ -4,7 +4,7 @@ class Mesh extends Obj {
         super();
         const object = this;
 
-        new Property(object, 'bounds', new Bounds());
+        new Property(object, 'bounds', new Bounds(Vector3.zero, Vector3.zero));
         new Property(object, 'vertexBuffer', new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }));
         new Property(object, 'lineBuffer', new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }));
         new Property(object, 'vertices', []);
@@ -30,29 +30,29 @@ class Mesh extends Obj {
     get lodSelectionCurve() { } // This struct represents the parameters that Unity uses to calculate which Mesh LOD level to select. It contains the lodBias and lodSlope properties, which scale logarithmically using screen space pixel area.
     get normals() { } // An array of vectors that defines the surface orientation at each vertex of the mesh.
     get skinWeightBufferLayout() { } // The dimension of data in the bone weight buffer.
-    get subMeshCount() { return this._subMeshes.length; } set subMeshCount(value) { this._subMeshes = new Array(value); }
-    get tangents() { return this._tangents; } // The tangents of the Mesh.
+    get subMeshCount() { return this.subMeshes.length; } set subMeshCount(value) { this.subMeshes = new Array(value); }
+    get tangents() { return this.tangents; } // The tangents of the Mesh.
     get triangles() { } // An array containing all triangles in the Mesh.
-    get uv() { return this._uvs; } // The texture coordinates (UVs) in the first channel.
+    get uv() { return this.uvs; } // The texture coordinates (UVs) in the first channel.
     get vertexAttributeCount() { } // Returns the number of vertex attributes that the mesh has. (Read Only)
     get vertexBufferCount() { } // Gets the number of vertex buffers present in the Mesh. (Read Only)
     get vertexBufferTarget() { } // The intended target usage of the Mesh GPU vertex buffer.
-    get vertexCount() { return this._vertices.length; } // Returns the number of vertices in the Mesh (Read Only).
-    get vertices() { return this._vertices; } // Returns a copy of the vertex positions or assigns a new vertex positions array.
+    get vertexCount() { return this.vertices.length; } // Returns the number of vertices in the Mesh (Read Only).
+    get vertices() { return this.vertices; } // Returns a copy of the vertex positions or assigns a new vertex positions array.
 
     AddBlendShapeFrame() { }
     Clear() {
-        this._vertices = [];
-        this._normals = [];
-        this._tangents = [];
-        this._colors = [];
-        this._uvs = [];
+        this.vertices = [];
+        this.normals = [];
+        this.tangents = [];
+        this.colors = [];
+        this.uvs = [];
 
         this.lineBuffer.Resize(0);
         this.vertexBuffer.Resize(0);
 
-        for (let subMesh of this._subMeshes) subMesh.Clear();
-        this._subMeshes = [];
+        for (let subMesh of this.subMeshes) subMesh.Clear();
+        this.subMeshes = [];
     }
     ClearBlendShapes() { }
     CombineMeshes() { }
@@ -79,7 +79,7 @@ class Mesh extends Obj {
     GetNativeIndexBufferPtr() { }
     GetNativeVertexBufferPtr() { }
     GetNormals() { }
-    GetSubMesh(subMeshIndex) { return this._subMeshes[subMeshIndex]; }
+    GetSubMesh(subMeshIndex) { return this.subMeshes[subMeshIndex]; }
     GetTangents() { }
     GetTopology() { }
     GetTriangles() { }
@@ -100,49 +100,49 @@ class Mesh extends Obj {
     Optimize() { }
     OptimizeIndexBuffers() { }
     OptimizeReorderVertexBuffer() { }
-    RecalculateBounds() { return this._bounds = GeometryUtility.CalculateBounds(this._vertices, Matrix4x4.Identity()); }
+    RecalculateBounds() { return this.bounds = GeometryUtility.CalculateBounds(this.vertices, Matrix4x4.Identity()); }
     RecalculateNormals() {
-        this._normals = Array(this._vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
+        this.normals = Array(this.vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
 
-        for (let subMesh of this._subMeshes) {
+        for (let subMesh of this.subMeshes) {
             let tris = subMesh.triangles;
             for (let i = 0; i < tris.length; i += 3) {
                 let i0 = tris[i], i1 = tris[i + 1], i2 = tris[i + 2];
-                let v0 = this._vertices[i0];
-                let v1 = this._vertices[i1];
-                let v2 = this._vertices[i2];
+                let v0 = this.vertices[i0];
+                let v1 = this.vertices[i1];
+                let v2 = this.vertices[i2];
 
                 let e1 = Vector3.Subtract(v1, v0);
                 let e2 = Vector3.Subtract(v2, v0);
                 let n = e2.Cross(e1).normalized;
 
-                this._normals[i0] = Vector3.Add(this._normals[i0], n);
-                this._normals[i1] = Vector3.Add(this._normals[i1], n);
-                this._normals[i2] = Vector3.Add(this._normals[i2], n);
+                this.normals[i0] = Vector3.Add(this.normals[i0], n);
+                this.normals[i1] = Vector3.Add(this.normals[i1], n);
+                this.normals[i2] = Vector3.Add(this.normals[i2], n);
             }
         }
 
-        for (let i = 0; i < this._normals.length; i++) {
-            this._normals[i] = this._normals[i].normalized;
+        for (let i = 0; i < this.normals.length; i++) {
+            this.normals[i] = this.normals[i].normalized;
         }
     }
     RecalculateTangents() {
-        this._tangents = Array(this._vertices.length).fill(0).map(() => new Vector4(0, 0, 0, 1));
-        let tan1 = Array(this._vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
-        let tan2 = Array(this._vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
+        this.tangents = Array(this.vertices.length).fill(0).map(() => new Vector4(0, 0, 0, 1));
+        let tan1 = Array(this.vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
+        let tan2 = Array(this.vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
 
-        for (let subMesh of this._subMeshes) {
+        for (let subMesh of this.subMeshes) {
             let tris = subMesh.triangles;
             for (let i = 0; i < tris.length; i += 3) {
                 let i0 = tris[i], i1 = tris[i + 1], i2 = tris[i + 2];
 
-                let v0 = this._vertices[i0];
-                let v1 = this._vertices[i1];
-                let v2 = this._vertices[i2];
+                let v0 = this.vertices[i0];
+                let v1 = this.vertices[i1];
+                let v2 = this.vertices[i2];
 
-                let uv0 = this._uvs[i0];
-                let uv1 = this._uvs[i1];
-                let uv2 = this._uvs[i2];
+                let uv0 = this.uvs[i0];
+                let uv1 = this.uvs[i1];
+                let uv2 = this.uvs[i2];
 
                 let e1 = Vector3.Subtract(v1, v0);
                 let e2 = Vector3.Subtract(v2, v0);
@@ -173,73 +173,73 @@ class Mesh extends Obj {
             }
         }
 
-        for (let i = 0; i < this._vertices.length; i++) {
-            let n = this._normals[i];
+        for (let i = 0; i < this.vertices.length; i++) {
+            let n = this.normals[i];
             let t = tan1[i];
 
             let tangent = (Vector3.Subtract(t, Vector3.Multiply(n, n.Dot(t)))).normalized;
 
             let handedness = (n.Cross(t).Dot(tan2[i]) < 0.0) ? -1.0 : 1.0;
 
-            this._tangents[i] = new Vector4(tangent.x, tangent.y, tangent.z, handedness);
+            this.tangents[i] = new Vector4(tangent.x, tangent.y, tangent.z, handedness);
         }
     }
     RecalculateUVDistributionMetric() { }
     RecalculateUVDistributionMetrics() { }
     SetBindposes(matrices) { }
     SetBoneWeights(bonesPerVertex, weights) { }
-    SetColors(inColors) { this._colors = inColors.map(c => c.Clone()); }
+    SetColors(inColors) { this.colors = inColors.map(c => c.Clone()); }
     SetIndexBufferData(data, dataStart, meshBufferStart, count, flags = 0) { }
     SetIndexBufferParams(indexCount, format) { }
     SetIndices(indices, topology, subMesh, calculateBounds = true, baseVertex = 0) { }
     SetLod(subMesh, level, levelRange, flags = 0) { }
     SetLods(levels, subMesh, flags) { }
-    SetNormals(inNormals) { this._normals = inNormals.map(n => n.Clone()); }
+    SetNormals(inNormals) { this.normals = inNormals.map(n => n.Clone()); }
     SetFlatNormals(inNormals, stride = 4) {
-        this._normals = [];
-        for (let i = 0; i < inNormals.length; i += stride) this._normals.push(new Vector3(inNormals[i], inNormals[i + 1], inNormals[i + 2]));
+        this.normals = [];
+        for (let i = 0; i < inNormals.length; i += stride) this.normals.push(new Vector3(inNormals[i], inNormals[i + 1], inNormals[i + 2]));
     }
-    SetSubMesh(index, subMesh) { this._subMeshes[index] = subMesh; }
-    SetSubMeshes(subMeshes) { this._subMeshes = subMeshes; }
-    SetTangents(inTangents) { this._tangents = inTangents.map(t => t.Clone()); }
+    SetSubMesh(index, subMesh) { this.subMeshes[index] = subMesh; }
+    SetSubMeshes(subMeshes) { this.subMeshes = subMeshes; }
+    SetTangents(inTangents) { this.tangents = inTangents.map(t => t.Clone()); }
     SetFlatTangents(inTangents, stride = 4) {
-        this._tangents = [];
-        for (let i = 0; i < inTangents.length; i += stride) this._tangents.push(new Vector4(inTangents[i], inTangents[i + 1], inTangents[i + 2], inTangents[i + 3]));
+        this.tangents = [];
+        for (let i = 0; i < inTangents.length; i += stride) this.tangents.push(new Vector4(inTangents[i], inTangents[i + 1], inTangents[i + 2], inTangents[i + 3]));
     }
     SetTriangles(triangles, subMeshIndex, calculateBounds = true, baseVertex = 0) {
-        this._subMeshes[subMeshIndex].SetTriangles(triangles, baseVertex);
+        this.subMeshes[subMeshIndex].SetTriangles(triangles, baseVertex);
         // if (calculateBounds) this.RecalculateBounds();
     }
-    SetUVs(uvs) { this._uvs = uvs.map(u => u.Clone()); }
+    SetUVs(uvs) { this.uvs = uvs.map(u => u.Clone()); }
     SetFlatUvs(inUvs, stride = 4) {
-        this._uvs = [];
-        for (let i = 0; i < inUvs.length; i += stride) this._uvs.push(new Vector2(inUvs[i], inUvs[i + 1]));
+        this.uvs = [];
+        for (let i = 0; i < inUvs.length; i += stride) this.uvs.push(new Vector2(inUvs[i], inUvs[i + 1]));
     }
     SetVertexBufferData(data, dataStart, meshBufferStart, count, stream, flags = 0) { }
     SetVertexBufferParams(vertexCount, attributes) { }
     SetVertices(inVertices, calculateBounds = true) {
-        this._vertices = inVertices.map(v => v.Clone());
+        this.vertices = inVertices.map(v => v.Clone());
         if (calculateBounds) this.RecalculateBounds();
     }
     SetFlatVertices(inVertices, stride = 4, calculateBounds = true) {
-        this._vertices = [];
-        for (let i = 0; i < inVertices.length; i += stride) this._vertices.push(new Vector3(inVertices[i], inVertices[i + 1], inVertices[i + 2]));
+        this.vertices = [];
+        for (let i = 0; i < inVertices.length; i += stride) this.vertices.push(new Vector3(inVertices[i], inVertices[i + 1], inVertices[i + 2]));
         if (calculateBounds) this.RecalculateBounds();
     }
     UploadMeshData() {
         let offset = 4 + 4 + 4 + 4 + 4 + 4 + 4; // position + normal + tangent + color + uv + joints + weights
 
-        let vertices = new Float32Array(this._vertices.length * offset);
-        let lines = new Float32Array(this._vertices.length * 4);
+        let vertices = new Float32Array(this.vertices.length * offset);
+        let lines = new Float32Array(this.vertices.length * 4);
 
-        for (let i = 0; i < this._vertices.length; i++) {
-            let vertex = this._vertices[i] ?? Vector3.zero;
-            let normal = this._normals[i] ?? Vector3.up;
-            let tangent = this._tangents[i] ?? new Vector4(0, 0, 0, 1);
-            let color = this._colors[i] ?? Color32.white;
-            let uv = this._uvs[i] ?? Vector2.zero;
-            let joints = this._joints[i] ?? new Vector4(-1, -1, -1, -1);
-            let weights = this._weights[i] ?? new Vector4(0, 0, 0, 0);
+        for (let i = 0; i < this.vertices.length; i++) {
+            let vertex = this.vertices[i] ?? Vector3.zero;
+            let normal = this.normals[i] ?? Vector3.up;
+            let tangent = this.tangents[i] ?? new Vector4(0, 0, 0, 1);
+            let color = this.colors[i] ?? Color32.white;
+            let uv = this.uvs[i] ?? Vector2.zero;
+            let joints = this.joints[i] ?? new Vector4(-1, -1, -1, -1);
+            let weights = this.weights[i] ?? new Vector4(0, 0, 0, 0);
 
             vertices.set([
                 vertex.x, vertex.y, vertex.z, 0,
@@ -262,7 +262,7 @@ class Mesh extends Obj {
         this.lineBuffer.Resize(lines.length);
         this.lineBuffer.Set(lines);
 
-        for (let subMesh of this._subMeshes) subMesh.UploadMeshData();
+        for (let subMesh of this.subMeshes) subMesh.UploadMeshData();
     }
 
 }

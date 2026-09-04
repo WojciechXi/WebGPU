@@ -2,7 +2,8 @@ class Engine {
 
     constructor() {
         Engine.Instance = this;
-        this.scene = new Scene();
+
+        new Property(this, 'scene', null);
     }
 
     Init(callback) {
@@ -11,10 +12,6 @@ class Engine {
         Graphics.Init(function () {
             callback(object);
         });
-    }
-
-    Awake() {
-        Graphics.Awake();
     }
 
     Start() {
@@ -32,13 +29,16 @@ class Engine {
         Time.Update(time / 1000);
         Input.Update();
 
-        if (Time.fixedTime > Time.fixedDeltaTime) {
-            Time.fixedTime -= Time.fixedDeltaTime;
-            if (this.scene) for (let c of this.scene.fixedUpdateables) c.FixedUpdate();
-        }
-        if (this.scene) for (let c of this.scene.updateables) c.Update();
+        if (this.scene) {
+            if (Time.fixedTime > Time.fixedDeltaTime) {
+                Time.fixedTime -= Time.fixedDeltaTime;
+                for (let c of this.scene.fixedUpdateables) c.FixedUpdate();
+            }
 
-        Graphics.Render(this.scene);
+            for (let c of this.scene.updateables) c.Update();
+
+            Graphics.Render(this.scene);
+        }
 
         requestAnimationFrame(function (time) {
             object.Loop(time);

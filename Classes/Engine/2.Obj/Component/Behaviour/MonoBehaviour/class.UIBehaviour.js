@@ -1,3 +1,0 @@
-class UIBehaviour extends MonoBehaviour {
-
-}
