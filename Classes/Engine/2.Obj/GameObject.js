@@ -6,44 +6,25 @@ class GameObject extends Obj {
     get transformHandle() { }
 
     constructor(name = 'GameObject', scene = Engine.Instance.scene, ...components) {
-        super({
-            _name: name,
-        }, {
-            components: {
-                value: [],
-                set: false,
-            },
-            layer: {
-                value: 0,
-            },
-            tag: {
-                value: 'Default',
-            },
-            isStatic: {
-                value: false,
-            },
-            sceneCullingMask: {
-                value: 0,
-            },
-            transform: {
-                value: null,
-                set: false,
-            },
-            isActive: {
-                value: true,
-                set: false,
-            },
-            scene: {
-                value: scene,
-                set: function (value) {
-                    if (value) value.AddGameObject(this);
-                    return value;
-                }
+        super();
+        const object = this;
+
+        object.name = name;
+
+        new Property(object, 'components', []);
+        new Property(object, 'layer', 0);
+        new Property(object, 'tag', 'Default');
+        new Property(object, 'isStatic', false);
+        new Property(object, 'isActive', true);
+        new Property(object, 'sceneCullingMask', 0);
+        new Property(object, 'scene', scene, {
+            set: function (value) {
+                if (value) value.AddGameObject(this);
+                return value;
             },
         });
+        new Property(object, 'transform', this.AddComponent(this.TransformType));
 
-        const object = this;
-        object._transform = this.AddComponent(this.TransformType);
         for (let component of components) object.AddComponent(component);
     }
 

@@ -1,33 +1,22 @@
 class Scene extends Obj {
 
-    constructor(data = {}, parameters = {}) {
-        super(data, {
-            ...parameters,
-            renderSettings: {
-                value: data._renderSettings ?? data.renderSettings ?? new RenderSettings(),
-                set: false,
-            },
-            gameObjects: {
-                value: data._gameObjects ?? data.gameObjects ?? [],
-                set: false,
-            },
-            components: {
-                value: data._components ?? data.components ?? [],
-                set: false,
-            },
-        });
-    }
+    constructor() {
+        super();
+        const object = this;
 
-    Init() {
-        this.fixedUpdateables = [];
-        this.updateables = [];
-        this.renderables = [];
-        this.ambientLight = null;
-        this.directionalLight = null;
-        this.directionalLights = [];
-        this.colliders = [];
-        this.cameras = [];
-        this.gizmos = [];
+        new Property(object, 'renderSettings', new RenderSettings());
+        new Property(object, 'gameObjects', []);
+        new Property(object, 'components', []);
+
+        new Property(object, 'fixedUpdateables', []);
+        new Property(object, 'updateables', []);
+        new Property(object, 'renderables', []);
+        new Property(object, 'ambientLight', []);
+        new Property(object, 'directionalLight', []);
+        new Property(object, 'directionalLights', []);
+        new Property(object, 'colliders', []);
+        new Property(object, 'cameras', []);
+        new Property(object, 'gizmos', []);
     }
 
     AddGameObject(gameObject) {

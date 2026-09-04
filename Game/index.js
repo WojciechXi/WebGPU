@@ -69,17 +69,17 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             directionalLight.color.Set(1, 1, 1, 0.75);
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
 
-            const voxelWorldGameObject = new GameObject("Voxel World");
-            const voxelGPU = voxelWorldGameObject.AddComponent(VoxelGPU);
-            const voxelWorldComponent = voxelWorldGameObject.AddComponent(VoxelWorldComponent);
-            voxelWorldComponent.material = materials.Voxel;
-
             const mainCameraGameObject = new GameObject('Main Camera');
             const mainCamera = mainCameraGameObject.AddComponent(Camera);
 
-            const voxelControllerGameObject = new GameObject("Voxel Controller");
-            voxelControllerGameObject.transform.position = new Vector3(0, 31, 0);
-            const voxelController = voxelControllerGameObject.AddComponent(VoxelController);
+            // const voxelWorldGameObject = new GameObject("Voxel World");
+            // const voxelGPU = voxelWorldGameObject.AddComponent(VoxelGPU);
+            // const voxelWorldComponent = voxelWorldGameObject.AddComponent(VoxelWorldComponent);
+            // voxelWorldComponent.material = materials.Voxel;
+
+            // const voxelControllerGameObject = new GameObject("Voxel Controller");
+            // voxelControllerGameObject.transform.position = new Vector3(0, 31, 0);
+            // const voxelController = voxelControllerGameObject.AddComponent(VoxelController);
             // const test = mainCameraGameObject.AddComponent(Test);
 
             // const cameraGameObject = new GameObject('Test Camera');
@@ -90,36 +90,36 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             // camera.rect.width = 0.25;
             // camera.rect.height = 0.25;
 
-            // const planeGameObject = new GameObject("Plane");
-            // const planeMeshRenderer = planeGameObject.AddComponent(MeshRenderer);
-            // const planeBoxCollider = planeGameObject.AddComponent(BoxCollider);
-            // planeGameObject.transform.localScale = new Vector3(10, 1, 10);
-            // planeMeshRenderer.material = materials.Default;
-            // planeMeshRenderer.mesh = Graphics.cubeMesh;
+            const planeGameObject = new GameObject("Plane");
+            const planeMeshRenderer = planeGameObject.AddComponent(MeshRenderer);
+            const planeBoxCollider = planeGameObject.AddComponent(BoxCollider);
+            planeGameObject.transform.localScale = new Vector3(10, 1, 10);
+            planeMeshRenderer.material = materials.Default;
+            planeMeshRenderer.mesh = Graphics.cubeMesh;
 
-            // const sphereGameObject = new GameObject("Sphere");
-            // sphereGameObject.transform.position = new Vector3(2, 2, 0);
-            // const sphereMeshRenderer = sphereGameObject.AddComponent(MeshRenderer);
-            // const sphereSphereCollider = sphereGameObject.AddComponent(SphereCollider);
-            // const sphereRigidbody = sphereGameObject.AddComponent(Rigidbody);
-            // sphereMeshRenderer.material = materials.Default;
-            // sphereMeshRenderer.mesh = Graphics.sphereMesh;
+            const sphereGameObject = new GameObject("Sphere");
+            sphereGameObject.transform.position = new Vector3(2, 2, 0);
+            const sphereMeshRenderer = sphereGameObject.AddComponent(MeshRenderer);
+            const sphereSphereCollider = sphereGameObject.AddComponent(SphereCollider);
+            const sphereRigidbody = sphereGameObject.AddComponent(Rigidbody);
+            sphereMeshRenderer.material = materials.Default;
+            sphereMeshRenderer.mesh = Graphics.sphereMesh;
 
-            // const cubeGameObject = new GameObject("Cube");
-            // cubeGameObject.transform.position = new Vector3(4, 2, 0);
-            // const cubeMeshRenderer = cubeGameObject.AddComponent(MeshRenderer);
-            // const cubeBoxCollider = cubeGameObject.AddComponent(BoxCollider);
-            // const cubeRigidbody = cubeGameObject.AddComponent(Rigidbody);
-            // cubeMeshRenderer.material = materials.Default;
-            // cubeMeshRenderer.mesh = Graphics.cubeMesh;
+            const cubeGameObject = new GameObject("Cube");
+            cubeGameObject.transform.position = new Vector3(4, 2, 0);
+            const cubeMeshRenderer = cubeGameObject.AddComponent(MeshRenderer);
+            const cubeBoxCollider = cubeGameObject.AddComponent(BoxCollider);
+            const cubeRigidbody = cubeGameObject.AddComponent(Rigidbody);
+            cubeMeshRenderer.material = materials.Default;
+            cubeMeshRenderer.mesh = Graphics.cubeMesh;
 
-            // const capsuleGameObject = new GameObject("Capsule");
-            // capsuleGameObject.transform.position = new Vector3(-2, 2, 0);
-            // const capsuleMeshRenderer = capsuleGameObject.AddComponent(MeshRenderer);
-            // const capsuleCapsuleCollider = capsuleGameObject.AddComponent(CapsuleCollider);
-            // const capsuleRigidbody = capsuleGameObject.AddComponent(Rigidbody);
-            // capsuleMeshRenderer.material = materials.Default;
-            // capsuleMeshRenderer.mesh = Graphics.cubeMesh;
+            const capsuleGameObject = new GameObject("Capsule");
+            capsuleGameObject.transform.position = new Vector3(-2, 2, 0);
+            const capsuleMeshRenderer = capsuleGameObject.AddComponent(MeshRenderer);
+            const capsuleCapsuleCollider = capsuleGameObject.AddComponent(CapsuleCollider);
+            const capsuleRigidbody = capsuleGameObject.AddComponent(Rigidbody);
+            capsuleMeshRenderer.material = materials.Default;
+            capsuleMeshRenderer.mesh = Graphics.cubeMesh;
 
             // Resources.Get('/Resources/Models/Human.glb', function (asset) {
             //     const gameObject = GameObject.Instantiate(asset.gameObject, Vector3.up.Multiply(0.5));
@@ -129,7 +129,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             //     // gameObject.AddComponent(PlayerController);
             // });
 
-            Physics.simulate = true;
+            // Physics.simulate = true;
             inspector.innerHTML = ``;
         }, function (index, total, path) {
             inspector.innerHTML = `${index}/${total} - ${path}`;
