@@ -77,9 +77,9 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             const mainCameraGameObject = new GameObject('Main Camera');
             const mainCamera = mainCameraGameObject.AddComponent(Camera);
 
-            const voxelControllerGameObject = new GameObject("Voxel Controller");
-            voxelControllerGameObject.transform.position = new Vector3(0, 31, 0);
-            const voxelController = voxelControllerGameObject.AddComponent(VoxelController);
+            // const voxelControllerGameObject = new GameObject("Voxel Controller");
+            // voxelControllerGameObject.transform.position = new Vector3(0, 31, 0);
+            // const voxelController = voxelControllerGameObject.AddComponent(VoxelController);
             // const test = mainCameraGameObject.AddComponent(Test);
 
             // const cameraGameObject = new GameObject('Test Camera');
