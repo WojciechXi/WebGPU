@@ -1,6 +1,6 @@
 class RenderPipeline {
 
-    constructor() {
+    async Init() {
         this.inputRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
             format: 'rgba8unorm',
         });
@@ -11,7 +11,7 @@ class RenderPipeline {
 
         this.screenRenderPass = new ScreenRenderPass({
             name: 'screenRenderPass',
-            code: Resources.Load('/Resources/Shaders/screenRenderPass.wgsl'),
+            code: await Resources.Load('Shaders/screenRenderPass.wgsl'),
             canvas: this.canvas,
         });
 
@@ -58,12 +58,12 @@ class RenderPipeline {
             name: 'preDepthRenderPass',
 
             depthRenderTexture: this.depthRenderTexture,
-            code: Resources.Load('/Resources/Shaders/depthRenderPass.wgsl'),
+            code: await Resources.Load('Shaders/depthRenderPass.wgsl'),
         });
 
         this.shadowRenderPass = new ShadowRenderPass({
             name: 'shadowRenderPass',
-            code: Resources.Load('/Resources/Shaders/depthRenderPass.wgsl'),
+            code: await Resources.Load('Shaders/depthRenderPass.wgsl'),
         });
 
         this.gBufferRenderPass = new GBufferRenderPass({
@@ -78,7 +78,7 @@ class RenderPipeline {
 
         // this.ssaoRenderPass = new SSAORenderPass({
         //     name: 'ssaoRenderPass',
-        //     code: Resources.Load('/Resources/Shaders/ssaoRenderPass.wgsl'),
+        //     code: await Resources.Load('Shaders/ssaoRenderPass.wgsl'),
 
         //     depthRenderTexture: this.depthRenderTexture,
         //     worldNormalRenderTexture: this.worldNormalRenderTexture,
@@ -88,7 +88,7 @@ class RenderPipeline {
 
         this.lightingRenderPass = new LightingRenderPass({
             name: 'lightingRenderPass',
-            code: Resources.Load('/Resources/Shaders/lightingRenderPass.wgsl'),
+            code: await Resources.Load('Shaders/lightingRenderPass.wgsl'),
             shadowRenderPass: this.shadowRenderPass,
 
             depthRenderTexture: this.depthRenderTexture,
@@ -103,7 +103,7 @@ class RenderPipeline {
 
         this.bloomRenderPass = new BloomRenderPass({
             name: 'bloomRenderPass',
-            code: Resources.Load('/Resources/Shaders/bloomRenderPass.wgsl'),
+            code: await Resources.Load('Shaders/bloomRenderPass.wgsl'),
 
             inputRenderTexture: this.lightingRenderTexture,
             resultRenderTexture: this.bloomRenderTexture,
@@ -111,7 +111,7 @@ class RenderPipeline {
 
         this.tonemappingRenderPass = new TonemappingRenderPass({
             name: 'tonemappingRenderPass',
-            code: Resources.Load('/Resources/Shaders/tonemappingRenderPass.wgsl'),
+            code: await Resources.Load('Shaders/tonemappingRenderPass.wgsl'),
 
             inputRenderTexture: this.bloomRenderTexture,
             resultRenderTexture: this.tonemappingRenderTexture,
@@ -119,7 +119,7 @@ class RenderPipeline {
 
         // this.gizmosRenderPass = new GizmosRenderPass({
         //     name: 'gizmosRenderPass',
-        //     code: Resources.Load('/Resources/Shaders/gizmosRenderPass.wgsl'),
+        //     code: await Resources.Load('Shaders/gizmosRenderPass.wgsl'),
         //     canvas: this.canvas,
         // });
 

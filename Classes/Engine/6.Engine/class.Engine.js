@@ -5,11 +5,14 @@ class Engine {
         this._isLooping = false;
         this._lastFrameTime = performance.now();
 
+        Engine.cpuWorkTime = 0;
+        Engine.gpuSubmitTime = 0;
+
         new Property(this, 'scene', null);
     }
 
-    Init(callback) {
-        Graphics.Init(() => callback(this));
+    async Init(callback) {
+        await Graphics.Init(() => callback(this));
     }
 
     Start() {

@@ -4,59 +4,46 @@ class Resources {
         this.resources = {};
     }
 
-    static Load(path, callback = null) {
-        const resource = this.resources[path] ?? null
-        if (callback) callback(resource);
-        return resource;
-    }
-
-    static Sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    static Init(callback, onStep) {
+    static async Load(path) {
         const object = this;
-        Ajax.Get('/resources.php', async function (paths) {
-            paths = JSON.parse(paths);
-            const keys = Object.keys(paths);
-            for (const index in keys) {
-                const path = keys[index];
-                const meta = paths[path];
+        if (object.resources[path]) return object.resources[path];
 
-                if (meta.pathInfo.extension == 'gltf') {
-                    await Importer.GLTF(meta.pathInfo.dirname, `${meta.pathInfo.filename}.${meta.pathInfo.extension}`, function (meshes, gltfMaterials) {
-                        object.resources[path] = {
-                            meshes: meshes,
-                            materials: gltfMaterials,
-                        };
-                    });
-                } else if (meta.pathInfo.extension == 'glb') {
-                    await Importer.GLB(meta.pathInfo.dirname, `${meta.pathInfo.filename}.${meta.pathInfo.extension}`, function (data) {
-                        object.resources[path] = new Asset({
-                            _gameObject: data.gameObject,
-                            _animations: data.animations,
-                            _materials: data.materials,
-                            _meshes: data.meshes,
-                        });
-                    });
-                } else if (meta.pathInfo.extension == 'json') {
-                    const response = await fetch(path);
-                    const json = await response.text();
-                    object.resources[path] = JSON.parse(json);
-                } else if (meta.pathInfo.extension == 'wgsl') {
-                    const response = await fetch(path);
-                    object.resources[path] = await response.text();
-                } else if (meta.mimeType.startsWith('image/')) {
-                    await loadBitmap(path, function (bitmap, image) {
-                        object.resources[path] = bitmap;
-                    });
-                }
+        if (path.endsWith('webp')) {
+            await loadBitmap(`/Resources/${path}`, function (bitmap, image) {
+                object.resources[path] = bitmap;
+            });
 
-                if (onStep) onStep(parseInt(index) + 1, keys.length, path);
-            }
+            return object.resources[path];
+        }
 
-            callback();
-        });
+        if (path.endsWith('gltf')) {
+            await Importer.GLTF(`/Resources/${path}`, function (meshes, gltfMaterials) {
+                object.resources[path] = {
+                    meshes: meshes,
+                    materials: gltfMaterials,
+                };
+            });
+
+            return object.resources[path];
+        }
+
+        const response = await fetch(`/Resources/${path}`);
+        object.resources[path] = await response.text();
+
+        if (path.endsWith('json')) {
+            object.resources[path] = JSON.parse(object.resources[path]);
+        } else if (path.endsWith('glb')) {
+            // await Importer.GLB(meta.pathInfo.dirname, `${meta.pathInfo.filename}.${meta.pathInfo.extension}`, function (data) {
+            //     object.resources[path] = new Asset({
+            //         _gameObject: data.gameObject,
+            //         _animations: data.animations,
+            //         _materials: data.materials,
+            //         _meshes: data.meshes,
+            //     });
+            // });
+        }
+
+        return object.resources[path];
     }
 
 }

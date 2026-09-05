@@ -101,7 +101,7 @@ class Camera extends Behaviour {
 
     OnDrawGizmos(renderPass, camera) {
         if (camera == this) return;
-        const cameraMesh = Resources.Load('/Resources/Primitives/Camera.gltf');
+        const cameraMesh = Resources.Load('Primitives/Camera.gltf');
         renderPass.DrawMesh(cameraMesh.meshes[0], 0, this.transform.matrix4x4);
     }
 

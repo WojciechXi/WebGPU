@@ -419,14 +419,14 @@
               },
               "Material.js": {
                 "type": "-",
-                "size": 5380,
-                "lmtime": 1788570408086.8423,
+                "size": 5170,
+                "lmtime": 1788635879063.6748,
                 "modified": false
               },
               "Mesh.js": {
                 "type": "-",
-                "size": 13218,
-                "lmtime": 1788566065454.5002,
+                "size": 12998,
+                "lmtime": 1788636052007.4597,
                 "modified": false
               },
               "Prefab.js": {
@@ -456,7 +456,7 @@
               "Shader.js": {
                 "type": "-",
                 "size": 4209,
-                "lmtime": 1788564309023.641,
+                "lmtime": 1788636116648.4458,
                 "modified": false
               },
               "Skin.js": {
@@ -595,8 +595,8 @@
               },
               "Graphics.js": {
                 "type": "-",
-                "size": 4171,
-                "lmtime": 1788570154758.868,
+                "size": 4100,
+                "lmtime": 1788635640333.1865,
                 "modified": false
               },
               "GraphicsBuffer.js": {
@@ -608,8 +608,8 @@
               "RenderPass": {
                 "BloomRenderPass.js": {
                   "type": "-",
-                  "size": 6751,
-                  "lmtime": 1788554988781.9314,
+                  "size": 6668,
+                  "lmtime": 1788638538111.843,
                   "modified": false
                 },
                 "ForwardRenderPass.js": {
@@ -620,8 +620,8 @@
                 },
                 "GBufferRenderPass.js": {
                   "type": "-",
-                  "size": 2307,
-                  "lmtime": 1788570570606.2927,
+                  "size": 1868,
+                  "lmtime": 1788635468286.1768,
                   "modified": false
                 },
                 "GizmosRenderPass.js": {
@@ -632,14 +632,20 @@
                 },
                 "LightingRenderPass.js": {
                   "type": "-",
-                  "size": 4827,
-                  "lmtime": 1788568087697.64,
+                  "size": 4840,
+                  "lmtime": 1788638323660.3599,
+                  "modified": false
+                },
+                "PreDepthRenderPass.js": {
+                  "type": "-",
+                  "size": 1012,
+                  "lmtime": 1788630475757.56,
                   "modified": false
                 },
                 "SSAORenderPass.js": {
                   "type": "-",
-                  "size": 10710,
-                  "lmtime": 1788568246179.413,
+                  "size": 10570,
+                  "lmtime": 1788638951756.982,
                   "modified": false
                 },
                 "ScreenRenderPass.js": {
@@ -657,13 +663,13 @@
                 "ShadowRenderPass.js": {
                   "type": "-",
                   "size": 3345,
-                  "lmtime": 1788568511772.3997,
+                  "lmtime": 1788630285831.0754,
                   "modified": false
                 },
                 "TonemappingRenderPass.js": {
                   "type": "-",
-                  "size": 2349,
-                  "lmtime": 1788568250286.8457,
+                  "size": 2218,
+                  "lmtime": 1788638347769.397,
                   "modified": false
                 }
               },
@@ -675,8 +681,8 @@
               },
               "RenderPipeline.js": {
                 "type": "-",
-                "size": 2770,
-                "lmtime": 1788569984821.181,
+                "size": 5598,
+                "lmtime": 1788638935676.8618,
                 "modified": false
               },
               "RenderQueue.js": {
@@ -701,14 +707,14 @@
             "6.Engine": {
               "class.Engine.js": {
                 "type": "-",
-                "size": 1166,
-                "lmtime": 1788565435807.368,
+                "size": 2061,
+                "lmtime": 1788629681808.9724,
                 "modified": false
               },
               "class.Importer.js": {
                 "type": "-",
-                "size": 18896,
-                "lmtime": 1788544855470.7524,
+                "size": 18902,
+                "lmtime": 1788636013753.3809,
                 "modified": false
               },
               "class.Input.js": {
@@ -740,6 +746,12 @@
         },
         "Editor": {},
         "Game": {
+          "AutoRotator.js": {
+            "type": "-",
+            "size": 270,
+            "lmtime": 1788638426217.9692,
+            "modified": false
+          },
           "FreeCamera.js": {
             "type": "-",
             "size": 779,
@@ -748,8 +760,8 @@
           },
           "index.js": {
             "type": "-",
-            "size": 3427,
-            "lmtime": 1788570681981.8804,
+            "size": 5310,
+            "lmtime": 1788639403472.2786,
             "modified": false
           }
         },
@@ -810,26 +822,50 @@
               "size": 71429,
               "lmtime": 1788569123962.6392,
               "modified": false
+            },
+            "Monkeys.bin": {
+              "type": "-",
+              "size": 2901992,
+              "lmtime": 1788639214431.2822,
+              "modified": false
+            },
+            "Monkeys.glb": {
+              "type": "-",
+              "size": 106248,
+              "lmtime": 1788639189474.0037,
+              "modified": false
+            },
+            "Monkeys.gltf": {
+              "type": "-",
+              "size": 29505,
+              "lmtime": 1788639214443.2727,
+              "modified": false
             }
+          },
+          "Monkeys.blend": {
+            "type": "-",
+            "size": 129060,
+            "lmtime": 1788639215760.5388,
+            "modified": false
           },
           "Primitives": {},
           "Shaders": {
-            "Glass.wgsl": {
-              "type": "-",
-              "size": 5327,
-              "lmtime": 1788557841215.6401,
-              "modified": false
-            },
             "Lit.wgsl": {
               "type": "-",
-              "size": 5575,
-              "lmtime": 1788570653056.466,
+              "size": 5943,
+              "lmtime": 1788636805086.6924,
               "modified": false
             },
             "bloomRenderPass.wgsl": {
               "type": "-",
               "size": 2973,
               "lmtime": 0,
+              "modified": false
+            },
+            "depthRenderPass.wgsl": {
+              "type": "-",
+              "size": 2449,
+              "lmtime": 1788630302990.44,
               "modified": false
             },
             "gizmosRenderPass.wgsl": {
@@ -840,8 +876,8 @@
             },
             "lightingRenderPass.wgsl": {
               "type": "-",
-              "size": 8168,
-              "lmtime": 1788568124189.52,
+              "size": 4878,
+              "lmtime": 1788637372345.9387,
               "modified": false
             },
             "screenRenderPass.wgsl": {
@@ -853,12 +889,6 @@
             "screenSpaceReflectionRenderPass.wgsl": {
               "type": "-",
               "size": 2576,
-              "lmtime": 0,
-              "modified": false
-            },
-            "shadowRenderPass.wgsl": {
-              "type": "-",
-              "size": 2593,
               "lmtime": 0,
               "modified": false
             },
@@ -875,7 +905,76 @@
               "modified": false
             }
           },
-          "Textures": {},
+          "Textures": {
+            "Floor": {
+              "512_Albedo.webp": {
+                "type": "-",
+                "size": 71108,
+                "lmtime": 1788636282984.444,
+                "modified": false
+              },
+              "512_Height.png": {
+                "type": "-",
+                "size": 77834,
+                "lmtime": 1788636346296.7917,
+                "modified": false
+              },
+              "512_Metallic.png": {
+                "type": "-",
+                "size": 216199,
+                "lmtime": 1788636340473.515,
+                "modified": false
+              },
+              "512_Normal.webp": {
+                "type": "-",
+                "size": 100378,
+                "lmtime": 1788636490836.1826,
+                "modified": false
+              },
+              "512_Occlussion.png": {
+                "type": "-",
+                "size": 274402,
+                "lmtime": 1788636372662.4097,
+                "modified": false
+              },
+              "512_Roughness.png": {
+                "type": "-",
+                "size": 345412,
+                "lmtime": 1788636361797.9746,
+                "modified": false
+              },
+              "Albedo.webp": {
+                "type": "-",
+                "size": 255112,
+                "lmtime": 0,
+                "modified": false
+              },
+              "Normal.webp": {
+                "type": "-",
+                "size": 154614,
+                "lmtime": 0,
+                "modified": false
+              },
+              "Occlussion.webp": {
+                "type": "-",
+                "size": 200992,
+                "lmtime": 0,
+                "modified": false
+              },
+              "Roughness.webp": {
+                "type": "-",
+                "size": 85442,
+                "lmtime": 0,
+                "modified": false
+              },
+              "512_PBR.webp": {
+                "type": "-",
+                "size": 193120,
+                "lmtime": 1788636661025.1436,
+                "modified": false
+              }
+            }
+          },
           "json": {}
         },
         "assets.php": {
@@ -886,7 +985,7 @@
         },
         "engine.js": {
           "type": "-",
-          "size": 298455,
+          "size": 302276,
           "lmtime": 0,
           "modified": true
         },
@@ -898,14 +997,14 @@
         },
         "game.js": {
           "type": "-",
-          "size": 4205,
+          "size": 6363,
           "lmtime": 0,
           "modified": true
         },
         "index.css": {
           "type": "-",
-          "size": 1089,
-          "lmtime": 0,
+          "size": 1207,
+          "lmtime": 1788639423203.3926,
           "modified": false
         },
         "index.php": {

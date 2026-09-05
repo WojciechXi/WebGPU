@@ -3,7 +3,7 @@ class AutoRotator extends GameBehaviour {
     constructor() {
         super();
 
-        this.eulerAngles = new Vector3(180, 0, 0);
+        this.eulerAngles = new Vector3(0, 0, 0);
     }
 
     Update() {

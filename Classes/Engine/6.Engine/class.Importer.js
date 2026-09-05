@@ -76,14 +76,16 @@ class Importer {
         callback(meshes);
     }
 
-    static async GLTF(path, file, callback) {
-        // 1. Pobieramy plik JSON glTF
-        const res = await fetch(`${path}/${file}`);
+    static async GLTF(gltfPath, callback) {
+        const binPath = gltfPath.replace('gltf', 'bin');
+        console.log(gltfPath, binPath);
+
+        const res = await fetch(gltfPath);
         const gltf = await res.json();
 
         // 2. Wczytujemy plik binarny
         const bufferUri = gltf.buffers[0].uri;
-        const bufferRes = await fetch(`${path}/${bufferUri}`);
+        const bufferRes = await fetch(binPath);
         const arrayBuffer = await bufferRes.arrayBuffer();
         const intArrayBuffer = [new Uint8Array(arrayBuffer)];
 
