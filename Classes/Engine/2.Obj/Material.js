@@ -4,22 +4,22 @@ class Material extends Obj {
         console.log('Material class loaded');
     }
 
+    static _nextId = 0;
+
     constructor(shaderOrMaterial) {
         super();
         const object = this;
 
+        object.id = Material._nextId++;
         let shader = null;
         if (shaderOrMaterial instanceof Shader) shader = shaderOrMaterial;
         else if (shaderOrMaterial instanceof Material) shader = shaderOrMaterial.shader;
 
+        new Property(object, 'renderQueue', 2000);
         new Property(object, 'shader', shader);
-        new Property(object, 'color', Color32.white);
-        new Property(object, 'roughness', 1);
-        new Property(object, 'metallic', 0.1);
-        new Property(object, 'occlusion', 1);
-        new Property(object, 'alphaCutoff', 0.5);
-        new Property(object, 'textures', {});
         new Property(object, 'materialBuffer', new Buffer(4 + 4));
+
+        new Property(object, 'textures', {});
         new Property(object, 'sampler', GPU.CreateSampler({
             addressModeU: 'repeat',
             addressModeV: 'repeat',
@@ -55,11 +55,48 @@ class Material extends Obj {
             ],
         });
 
+        new Property(object, 'color', Color32.white, {
+            assigned: function (color) {
+                object.materialBuffer.Set({
+                    0: color,
+                });
+            },
+        });
+
+        new Property(object, 'roughness', 1, {
+            assigned: function (roughness) {
+                object.materialBuffer.Set({
+                    4: [roughness],
+                });
+            },
+        });
+        new Property(object, 'metallic', 0.1, {
+            assigned: function (roughness) {
+                object.materialBuffer.Set({
+                    5: [roughness],
+                });
+            },
+        });
+        new Property(object, 'occlusion', 1, {
+            assigned: function (occlusion) {
+                object.materialBuffer.Set({
+                    6: [occlusion],
+                });
+            },
+        });
+        new Property(object, 'alphaCutoff', 0.5, {
+            assigned: function (alphaCutoff) {
+                object.materialBuffer.Set({
+                    7: [alphaCutoff],
+                });
+            },
+        });
+
         object.cull = 'back';
         object.depthWrite = true;
     }
 
-    SetTexture(name, texture) {
+    SetTexture(name, texture, autoUpdate = false) {
         if (texture instanceof Color || texture instanceof Color32) {
             const width = 1;
             const height = 1;
@@ -92,6 +129,8 @@ class Material extends Obj {
                 [width, height, 1]
             );
         }
+
+        if (autoUpdate) this.Update();
     }
 
     Update() {
@@ -107,27 +146,6 @@ class Material extends Obj {
                 { binding: 5, resource: this.textures.occlusion.createView() },
             ],
         });
-    }
-
-    Use(renderPass) {
-        let renderPipeline = this.shader.Use(renderPass, {
-            cull: this.cull,
-            depthWrite: this.depthWrite,
-        });
-
-        if (renderPipeline) {
-            this.materialBuffer.Set({
-                0: this.color,
-                4: [this.roughness, this.metallic, this.occlusion, this.alphaCutoff],
-            });
-
-            renderPass.SetBindGroup(1, this.materialBindGroup);
-            renderPass.SetBindGroup(2, this.pbrBindGroup);
-
-            return true;
-        }
-
-        return false;
     }
 
 }

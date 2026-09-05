@@ -6,10 +6,9 @@ class Transform extends Component {
 
         new Property(object, 'localPosition', Vector3.zero);
         new Property(object, 'localRotation', Quaternion.identity);
-        new Property(object, 'localScale', Vector3.zero);
+        new Property(object, 'localScale', Vector3.one);
         new Property(object, 'parent', null);
         new Property(object, 'children', []);
-        new Property(object, 'transformBuffer', new Buffer(16, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }));
     }
 
     get childCount() { return this.children.length; }
@@ -50,12 +49,6 @@ class Transform extends Component {
     get back() { return this.forward.Negate(); }
     get left() { return this.forward.Negate(); }
     get down() { return this.forward.Negate(); }
-
-    Update() {
-        this.transformBuffer.Set({
-            0: this.matrix4x4,
-        });
-    }
 
     // ---------- Hierarchia ----------
     SetParent(newParent) {

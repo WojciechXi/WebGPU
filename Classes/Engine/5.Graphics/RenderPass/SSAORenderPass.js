@@ -11,10 +11,10 @@ class SSAORenderPass extends RenderPass {
         this.blurRadius = data.blurRadius ?? 4;
         this.sigmaDepth = data.sigmaDepth ?? 0.3;
 
-        this.ssaoRenderTexture = new RenderTexture(canvas.width / 2, canvas.height / 2, { format: 'r16float', });
-        this.blurHorizontalRenderTexture = new RenderTexture(canvas.width / 2, canvas.height / 2, { format: 'r16float', });
-        this.blurVerticalRenderTexture = new RenderTexture(canvas.width / 2, canvas.height / 2, { format: 'r16float', });
-        this.sceneRenderTexture = new RenderTexture(canvas.width, canvas.height, { format: 'rgba16float', });
+        this.ssaoRenderTexture = new RenderTexture(Graphics.Width / 2, Graphics.Height / 2, { format: 'r16float', });
+        this.blurHorizontalRenderTexture = new RenderTexture(Graphics.Width / 2, Graphics.Height / 2, { format: 'r16float', });
+        this.blurVerticalRenderTexture = new RenderTexture(Graphics.Width / 2, Graphics.Height / 2, { format: 'r16float', });
+        this.sceneRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, { format: 'rgba16float', });
 
         const noise = new Float32Array(16 * 4);
         for (let i = 0; i < 16; i++) {

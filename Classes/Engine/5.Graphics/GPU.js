@@ -76,7 +76,6 @@ class GPU {
     }
 
     static CreateTexture(data, callback = null) {
-        console.log(data);
         const texture = this.device.createTexture(data);
         if (callback) callback(texture);
         return texture;

@@ -4,7 +4,7 @@ class Resources {
         this.resources = {};
     }
 
-    static Get(path, callback = null) {
+    static Load(path, callback = null) {
         const resource = this.resources[path] ?? null
         if (callback) callback(resource);
         return resource;

@@ -1,9 +1,7 @@
 class ForwardRenderPass extends RenderPass {
 
     Init(data) {
-        const canvas = data.canvas;
-
-        this.sceneRenderTexture = new RenderTexture(canvas.width, canvas.height, { format: 'rgba16float', });
+        this.sceneRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, { format: 'rgba16float', });
         this.depthRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, { format: 'depth24plus', });
     }
 

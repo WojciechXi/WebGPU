@@ -30,20 +30,4 @@ class MeshRenderer extends Renderer {
         return Bounds.FromMinMax(min, max);
     }
 
-    OnDraw(renderPass, camera) {
-        if (!this.sharedMesh) return;
-
-        if (renderPass.name === 'shadowRenderPass') {
-            if (!this.castShadows) return;
-            for (let i = 0; i < this.sharedMesh.subMeshCount; i++) {
-                renderPass.DrawMesh(this.sharedMesh, i, this.transform.transformBuffer.buffer);
-            }
-        } else if (renderPass.name == 'gBufferRenderPass') {
-            for (let i = 0; i < this.sharedMesh.subMeshCount; i++) {
-                (this.materials[i] ?? Engine.defaultMaterial).Use(renderPass);
-                renderPass.DrawMesh(this.sharedMesh, i, this.transform.transformBuffer.buffer);
-            }
-        }
-    }
-
 }

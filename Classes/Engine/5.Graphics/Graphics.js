@@ -65,27 +65,7 @@ class Graphics {
             ],
         });
 
-        this.renderPipeline = null;
-
         callback();
-    }
-
-    static Render(scene) {
-        if (!this.renderPipeline) return;
-
-        // this.canvas.width = this.canvas.clientWidth;
-        // this.canvas.height = this.canvas.clientHeight;
-
-        for (let camera of scene.cameras) {
-            camera.SendMessage("OnPreRender");
-            const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
-
-            this.renderPipeline.Render(camera, scene, commandEncoder);
-
-            GPU.Queue.submit([commandEncoder.finish()]);
-
-            camera.SendMessage("OnPostRender");
-        }
     }
 
     static Blit() { }
@@ -96,7 +76,9 @@ class Graphics {
     static CopyTexture() { }
     static CreateAsyncGraphicsFence() { }
     static CreateGraphicsFence() { }
-    static DrawMesh(mesh, matrix, material, layer, camera = null, subMeshIndex = 0, castShadows = true, receiveShadows = true) { }
+    static DrawMesh(mesh, matrix, material, layer, camera = null, subMeshIndex = 0, castShadows = true, receiveShadows = true) {
+
+    }
     static DrawMeshInstanced() { }
     static DrawMeshInstancedIndirect() { }
     static DrawMeshInstancedProcedural() { }

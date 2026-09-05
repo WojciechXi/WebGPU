@@ -120,6 +120,6 @@ class Bounds extends Float32Array {
     }
 
     Clear() { this[0] = 0; this[1] = 0; this[2] = 0; this[3] = 0; this[4] = 0; this[5] = 0; }
-    Clone() { return new Bounds(this.center.Clone(), this.size.Clone()); }
+    Clone() { return new Bounds(this.center, this.size); }
 
 }

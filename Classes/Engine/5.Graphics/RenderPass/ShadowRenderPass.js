@@ -2,9 +2,8 @@ class ShadowRenderPass extends RenderPass {
 
     Init(data) {
         this.resolution = data.resolution ?? 2048;
-        this.canvas = data.canvas;
 
-        this.depthRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, { format: 'depth24plus', });
+        this.depthRenderTexture = new RenderTexture(this.resolution, this.resolution, { format: 'depth24plus', });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
             layout: GPU.CreatePipelineLayout({
@@ -66,31 +65,14 @@ class ShadowRenderPass extends RenderPass {
             colorAttachments: [],
             depthStencilAttachment: this.depthRenderTexture.GetDepthStencilAttachment(),
         });
+
         renderPass.setPipeline(this.renderPipeline);
         renderPass.setBindGroup(0, scene.directionalLight.lightBindGroup);
-        for (let component of scene.renderables) component.OnDraw(this);
+
+        renderPass.setBindGroup(0, camera.cameraBindGroup);
+        RenderQueue.FlushShadows(this, camera);
+
         renderPass.end();
-    }
-
-    DrawMesh(mesh, subMeshIndex, matrixBuffer) {
-        const subMesh = mesh.GetSubMesh(subMeshIndex);
-
-        this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
-        this.SetVertexBuffer(1, matrixBuffer);
-        this.SetBindGroup(1, this.emptyBindGroup);
-        this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
-        this.DrawIndexed(subMesh.triangleBuffer.count);
-    }
-
-    DrawSkinnedMesh(mesh, subMeshIndex, matrixBuffer, jointsBindGroup) {
-        const subMesh = mesh.GetSubMesh(subMeshIndex);
-
-        this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
-        this.SetVertexBuffer(1, matrixBuffer);
-        this.SetBindGroup(1, jointsBindGroup);
-
-        this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
-        this.DrawIndexed(subMesh.triangleBuffer.count);
     }
 
 }

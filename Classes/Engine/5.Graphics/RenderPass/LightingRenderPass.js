@@ -1,11 +1,10 @@
 class LightingRenderPass extends RenderPass {
 
     Init(data) {
-        const canvas = data.canvas;
         const shadowRenderPass = this.shadowRenderPass = data.shadowRenderPass;
         const gBufferRenderPass = this.gBufferRenderPass = data.gBufferRenderPass;
 
-        this.sceneRenderTexture = new RenderTexture(canvas.width, canvas.height, { format: 'rgba16float', });
+        this.sceneRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, { format: 'rgba16float', });
 
         this.renderPipeline = GPU.CreateRenderPipeline({
             label: 'lightingRenderPipeline',
@@ -34,7 +33,6 @@ class LightingRenderPass extends RenderPass {
                             { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
                             { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
                             { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                            { binding: 6, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
                         ],
                     }),
                 ],

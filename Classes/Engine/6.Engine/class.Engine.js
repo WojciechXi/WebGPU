@@ -37,7 +37,11 @@ class Engine {
 
             for (let c of this.scene.updateables) c.Update();
 
-            Graphics.Render(this.scene);
+            if (this.renderPipeline) {
+                for (let camera of this.scene.cameras) this.renderPipeline.Render(camera, this.scene);
+            }
+
+            RenderQueue.Clear();
         }
 
         requestAnimationFrame(function (time) {

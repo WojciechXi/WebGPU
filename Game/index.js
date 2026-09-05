@@ -18,7 +18,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
     });
 
     const engine = new Engine();
-    const inspector = this.document.querySelector('#inspector');
+    const inspector = window.inspector = this.document.querySelector('#inspector');
 
     engine.Init(function (engine) {
         Gizmos.Init();
@@ -26,13 +26,19 @@ window.addEventListener('DOMContentLoaded', async function (event) {
         Resources.Init(function () {
             engine.Start();
 
-            Graphics.renderPipeline = new RenderPipeline();
-
             const litShader = new Shader();
             litShader.name = 'Lit';
-            litShader.code = Resources.Get('/Resources/Shaders/Lit.wgsl');
+            litShader.code = Resources.Load('/Resources/Shaders/Lit.wgsl');
 
-            const defaultMaterial = Engine.defaultMaterial = new Material(litShader);
+            Engine.emptyMaterial = new Material(litShader);
+            Engine.emptyMaterial.color = new Color32(1, 0.5, 0.25, 1.0);
+
+            engine.renderPipeline = new RenderPipeline();
+
+            const defaultMaterial = new Material(litShader);
+            Resources.Load('/Resources/181_black concrete bare PBR texture-seamless.jpg', function (texture) {
+                defaultMaterial.SetTexture('albedo', texture, true);
+            });
 
             const scene = new Scene();
             engine.scene = scene;
@@ -50,18 +56,19 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
 
             const mainCameraGameObject = new GameObject('Main Camera');
-            mainCameraGameObject.transform.position = new Vector3(0, 0, 0);
+            mainCameraGameObject.transform.localPosition.z = -5;
             const mainCamera = mainCameraGameObject.AddComponent(Camera);
+            const freeCamera = mainCameraGameObject.AddComponent(FreeCamera);
 
-            for (let i = 0; i < 10; i++) {
-                let t = (i / 10) * Mathf.PI;
-
-                let cubeGameObject = new GameObject("Cube");
-                cubeGameObject.transform.position = new Vector3(Mathf.Sin(t) * 10.0, 0, Mathf.Cos(t) * 10.0);
-                let cubeMeshRenderer = cubeGameObject.AddComponent(MeshRenderer);
-                cubeMeshRenderer.material = defaultMaterial;
-                cubeMeshRenderer.sharedMesh = Gizmos.cubeMesh;
-            }
+            Resources.Load('/Resources/Primitives/Monkey.gltf', function (object) {
+                const gameObject = new GameObject("Cube");
+                for (let mesh of object.meshes) {
+                    const childGameObject = new GameObject(mesh.name);
+                    let meshRenderer = childGameObject.AddComponent(MeshRenderer);
+                    meshRenderer.sharedMaterial = defaultMaterial;
+                    meshRenderer.sharedMesh = mesh;
+                }
+            });
 
             // Physics.simulate = true;
             inspector.innerHTML = ``;

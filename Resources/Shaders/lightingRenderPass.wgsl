@@ -140,37 +140,37 @@ struct AmbientLight {
 @group(3) @binding(4) var pbrTexture : texture_2d<f32>;
 @group(3) @binding(5) var shadowTexture : texture_2d<f32>;
 
-struct VSOut {
+struct VertexOut {
   @builtin(position) pos : vec4f,
   @location(0) uv : vec2f,
 };
 
 @vertex
-fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
-  var vsOut: VSOut;
+fn vs(@builtin(vertex_index) vid: u32) -> VertexOut {
+  var vertexOut: VertexOut;
   let pos = array<vec2f,6>(
     vec2f(-1.0,-1.0), vec2f( 1.0,-1.0), vec2f(-1.0, 1.0),
     vec2f(-1.0, 1.0), vec2f( 1.0,-1.0), vec2f( 1.0, 1.0)
   );
 
-  vsOut.uv = (pos[vid] + vec2f(1.0)) * 0.5;
-  vsOut.pos = vec4f(pos[vid].x, -pos[vid].y, 0.0, 1.0);
+  vertexOut.uv = (pos[vid] + vec2f(1.0)) * 0.5;
+  vertexOut.pos = vec4f(pos[vid].x, -pos[vid].y, 0.0, 1.0);
 
-  return vsOut;
+  return vertexOut;
 }
 
 @fragment
-fn fs(vsOut: VSOut) -> @location(0) vec4f {
+fn fs(vertexOut: VertexOut) -> @location(0) vec4f {
     // --- world space dane z GBuffer ---
-    let worldPosition4 = textureSample(worldPositionTexture, screenSampler, vsOut.uv);
-    let worldNormal = normalize(textureSample(worldNormalTexture, screenSampler, vsOut.uv).xyz * 2.0 - 1.0);
-    let color = textureSample(colorTexture, screenSampler, vsOut.uv);
+    let worldPosition4 = textureSample(worldPositionTexture, screenSampler, vertexOut.uv);
+    let worldNormal = normalize(textureSample(worldNormalTexture, screenSampler, vertexOut.uv).xyz * 2.0 - 1.0);
+    let color = textureSample(colorTexture, screenSampler, vertexOut.uv);
 
     if(worldPosition4.a == 0) {
         return vec4f(color.rgb, 1.0);
     }
 
-    let pbr = textureSample(pbrTexture, screenSampler, vsOut.uv);
+    let pbr = textureSample(pbrTexture, screenSampler, vertexOut.uv);
     let roughness = clamp(pbr.r, 0.01, 0.5);
     let metallic  = clamp(pbr.g, 0.0, 1.0);
     let occlusion = clamp(pbr.b, 0.0, 1.0);

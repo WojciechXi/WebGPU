@@ -37,10 +37,6 @@ class RenderPass {
 
     }
 
-    SetPipeline(renderPipeline) {
-        this.renderPass.setPipeline(renderPipeline);
-    }
-
     SetBindGroup(index, bindGroup) {
         this.renderPass.setBindGroup(index, bindGroup);
     }
@@ -53,33 +49,32 @@ class RenderPass {
         this.renderPass.setIndexBuffer(buffer, format);
     }
 
+    SetShader(shader, state) {
+        const renderPipeline = shader.GetPipeline(this, state);
+        if (renderPipeline) this.renderPass.setPipeline(renderPipeline);
+        return renderPipeline;
+    }
+
+    SetMaterial(material) {
+        const renderPipeline = this.SetShader(material.shader, {
+            cull: material.cull,
+            depthWrite: material.depthWrite,
+        });
+
+        if (renderPipeline) {
+            this.SetBindGroup(1, material.materialBindGroup);
+            this.SetBindGroup(2, material.pbrBindGroup);
+        }
+
+        return renderPipeline;
+    }
+
     Draw(count) {
         this.renderPass.draw(count);
     }
 
     DrawIndexed(count) {
         this.renderPass.drawIndexed(count);
-    }
-
-    DrawMesh(mesh, subMeshIndex, matrixBuffer) {
-        const subMesh = mesh.GetSubMesh(subMeshIndex);
-
-        this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
-        this.SetVertexBuffer(1, matrixBuffer);
-        this.SetBindGroup(3, this.emptyBindGroup);
-        this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
-        this.DrawIndexed(subMesh.triangleBuffer.count);
-    }
-
-    DrawSkinnedMesh(mesh, subMeshIndex, matrixBuffer, jointsBindGroup) {
-        const subMesh = mesh.GetSubMesh(subMeshIndex);
-
-        this.SetVertexBuffer(0, mesh.vertexBuffer.buffer);
-        this.SetVertexBuffer(1, matrixBuffer);
-        this.SetBindGroup(3, jointsBindGroup);
-
-        this.SetIndexBuffer(subMesh.triangleBuffer.buffer, 'uint32');
-        this.DrawIndexed(subMesh.triangleBuffer.count);
     }
 
 }

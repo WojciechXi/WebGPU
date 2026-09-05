@@ -10,7 +10,7 @@ class Renderer extends Component {
         new Property(object, 'enabled', true); //Makes the rendered 3D object visible if enabled.
         new Property(object, 'isVisible', true); //Is this renderer visible in any camera? (Read Only)
         new Property(object, 'localBounds', new Bounds(Vector3.zero, Vector3.zero)); //The bounding box of the renderer in local space.
-        new Property(object, 'localToWorldMatrix', Matrix4x4.identity); //Matrix that transforms a point from local space into world space (Read Only).
+        new Property(object, 'localToWorldMatrix', Matrix4x4.Identity()); //Matrix that transforms a point from local space into world space (Read Only).
         new Property(object, 'receiveShadows', true); //Does this object receive shadows?
         new Property(object, 'rendererPriority', 0); //This value sorts renderers by priority. Lower values are rendered first and higher values are rendered last.
         new Property(object, 'renderingLayerMask', 0); //Determines which rendering layer this renderer lives on, if you use a scriptable render pipeline.
@@ -18,12 +18,13 @@ class Renderer extends Component {
         new Property(object, 'sortingLayerID', 0); //Unique ID of the Renderer's sorting layer.
         new Property(object, 'sortingOrder', 0); //Renderer's order within a sorting layer.
         new Property(object, 'staticShadowCaster', false); //Is this renderer a static shadow caster?
-        new Property(object, 'worldToLocalMatrix', Matrix4x4.identity); //Matrix that transforms a point from world space into local space (Read Only).
+        new Property(object, 'worldToLocalMatrix', Matrix4x4.Identity()); //Matrix that transforms a point from world space into local space (Read Only).
 
         new Property(object, 'mesh', null);
         new Property(object, 'sharedMesh', null, {
             assigned: function () {
                 object.ResetLocalBounds();
+                object.ResetBounds();
             },
         });
 
@@ -38,12 +39,14 @@ class Renderer extends Component {
             get: function () { return object.sharedMaterials[0] ?? null; },
             set: function (value) { return object.sharedMaterials[0] = value; },
         }); //The shared material of this object.
+
+        new Property(object, 'matrixBuffer', new Buffer(16, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }));
     }
 
     get isVisible() { return this.materials.length && this.sharedMesh; }
 
     ResetLocalBounds() { this.localBounds = this.sharedMesh ? this.sharedMesh.bounds.Clone() : new Bounds(Vector3.zero, Vector3.zero); }
-    ResetBounds() { }
+    ResetBounds() { this.bounds = this.localBounds.Clone(); }
 
     GetMaterials() { }
     GetPropertyBlock() { }
@@ -56,5 +59,13 @@ class Renderer extends Component {
     // Messages
     // OnBecameInvisible() { }
     // OnBecameVisible() { }
+
+    Update() {
+        if (!this.sharedMesh) return;
+        this.matrixBuffer.Set({ 0: this.transform.matrix4x4, });
+        for (let i = 0; i < this.sharedMaterials.length; i++) {
+            RenderQueue.Submit(this.sharedMesh, this.matrixBuffer.buffer, this.sharedMaterials[i] ?? Engine.emptyMaterial, this.gameObject.layer, null, i, this.shadowCastingMode, this.receiveShadows, this.bounds);
+        }
+    }
 
 }

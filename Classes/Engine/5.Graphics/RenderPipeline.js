@@ -1,70 +1,60 @@
 class RenderPipeline {
 
     constructor() {
-        // this.shadowRenderPass = new ShadowRenderPass({
-        //     name: 'shadowRenderPass',
-        //     code: Resources.Get('/Resources/Shaders/shadowRenderPass.wgsl'),
-        //     canvas: this.canvas,
-        // });
+        this.shadowRenderPass = new ShadowRenderPass({
+            name: 'shadowRenderPass',
+            code: Resources.Load('/Resources/Shaders/shadowRenderPass.wgsl'),
+        });
 
         this.gBufferRenderPass = new GBufferRenderPass({
             name: 'gBufferRenderPass',
-            canvas: this.canvas,
         });
 
-        // this.lightingRenderPass = new LightingRenderPass({
-        //     name: 'lightingRenderPass',
-        //     code: Resources.Get('/Resources/Shaders/lightingRenderPass.wgsl'),
-        //     shadowRenderPass: this.shadowRenderPass,
-        //     gBufferRenderPass: this.gBufferRenderPass,
-        //     canvas: this.canvas,
-        // });
+        this.lightingRenderPass = new LightingRenderPass({
+            name: 'lightingRenderPass',
+            code: Resources.Load('/Resources/Shaders/lightingRenderPass.wgsl'),
+            shadowRenderPass: this.shadowRenderPass,
+            gBufferRenderPass: this.gBufferRenderPass,
+        });
 
         // this.ssaoRenderPass = new SSAORenderPass({
         //     name: 'ssaoRenderPass',
-        //     code: Resources.Get('/Resources/Shaders/ssaoRenderPass.wgsl'),
+        //     code: Resources.Load('/Resources/Shaders/ssaoRenderPass.wgsl'),
         //     gBufferRenderPass: this.gBufferRenderPass,
         //     inputRenderTexture: this.lightingRenderPass.sceneRenderTexture,
-        //     canvas: this.canvas,
         // });
 
         // this.bloomRenderPass = new BloomRenderPass({
         //     name: 'bloomRenderPass',
-        //     code: Resources.Get('/Resources/Shaders/bloomRenderPass.wgsl'),
+        //     code: Resources.Load('/Resources/Shaders/bloomRenderPass.wgsl'),
         //     inputRenderTexture: this.lightingRenderPass.sceneRenderTexture,
-        //     canvas: this.canvas,
         // });
 
         // this.tonemappingRenderPass = new TonemappingRenderPass({
         //     name: 'tonemappingRenderPass',
-        //     code: Resources.Get('/Resources/Shaders/tonemappingRenderPass.wgsl'),
+        //     code: Resources.Load('/Resources/Shaders/tonemappingRenderPass.wgsl'),
         //     inputRenderTexture: this.bloomRenderPass.sceneRenderTexture,
-        //     canvas: this.canvas,
         // });
 
         this.screenRenderPass = new ScreenRenderPass({
             name: 'screenRenderPass',
-            code: Resources.Get('/Resources/Shaders/screenRenderPass.wgsl'),
+            code: Resources.Load('/Resources/Shaders/screenRenderPass.wgsl'),
             canvas: this.canvas,
         });
-        this.screenRenderPass.renderTexture = this.gBufferRenderPass.normalRenderTexture;
+        this.screenRenderPass.renderTexture = this.gBufferRenderPass.colorRenderTexture;
 
         // this.gizmosRenderPass = new GizmosRenderPass({
         //     name: 'gizmosRenderPass',
-        //     code: Resources.Get('/Resources/Shaders/gizmosRenderPass.wgsl'),
+        //     code: Resources.Load('/Resources/Shaders/gizmosRenderPass.wgsl'),
         //     canvas: this.canvas,
         // });
 
         this.renderPasses = [
-            // this.shadowRenderPass,
+            this.shadowRenderPass,
             this.gBufferRenderPass,
 
             // this.lightingRenderPass,
-            // this.forwardRenderPass,
-            // this.finalRenderPass,
-
             // this.ssaoRenderPass,
-            // this.screenSpaceReflectionRenderPass,
             // this.bloomRenderPass,
             // this.tonemappingRenderPass,
 
@@ -73,8 +63,12 @@ class RenderPipeline {
         ];
     }
 
-    Render(camera, scene, commandEncoder) {
+    Render(camera, scene) {
+        camera.SendMessage("OnPreRender");
+        const commandEncoder = this.commandEncoder = GPU.CreateCommandEncoder();
         for (let renderPass of this.renderPasses) renderPass.Render(camera, scene, commandEncoder);
+        camera.SendMessage("OnPostRender");
+        GPU.Queue.submit([commandEncoder.finish()]);
     }
 
 }

@@ -74,33 +74,33 @@ class SkinnedMeshRenderer extends Renderer {
         return floatArray;
     }
 
-    OnDraw(renderPass, camera) {
-        if (!this.sharedMesh) return;
+    // OnDraw(renderPass, camera) {
+    //     if (!this.sharedMesh) return;
 
-        if (!this.jointsBindGroup) {
-            this.jointsBuffer = new Buffer(64 * 16, { usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, });
-            this.jointsBindGroup = GPU.CreateBindGroup({
-                label: 'JointBindGroup',
-                layout: Graphics.jointsBindGroupLayout,
-                entries: [
-                    this.jointsBuffer.GetBindGroupEntry(0),
-                ],
-            });
-        }
+    //     if (!this.jointsBindGroup) {
+    //         this.jointsBuffer = new Buffer(64 * 16, { usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, });
+    //         this.jointsBindGroup = GPU.CreateBindGroup({
+    //             label: 'JointBindGroup',
+    //             layout: Graphics.jointsBindGroupLayout,
+    //             entries: [
+    //                 this.jointsBuffer.GetBindGroupEntry(0),
+    //             ],
+    //         });
+    //     }
 
-        this.jointsBuffer.Set(this.updateJointMatrices());
+    //     this.jointsBuffer.Set(this.updateJointMatrices());
 
-        if (renderPass.name === 'shadowRenderPass') {
-            if (!this.castShadows) return;
-            for (let i = 0; i < this.sharedMesh.subMeshCount; i++) {
-                renderPass.DrawSkinnedMesh(this.sharedMesh, i, this.transform.transformBuffer.buffer, this.jointsBindGroup);
-            }
-        } else if (renderPass.name == 'gBufferRenderPass') {
-            for (let i = 0; i < this.materials.length && this.sharedMesh.subMeshCount; i++) {
-                (this.materials[i] ?? Engine.defaultMaterial).Use(renderPass);
-                renderPass.DrawSkinnedMesh(this.sharedMesh, i, this.transform.transformBuffer.buffer, this.jointsBindGroup);
-            }
-        }
-    }
+    //     if (renderPass.name === 'shadowRenderPass') {
+    //         if (!this.castShadows) return;
+    //         for (let i = 0; i < this.sharedMesh.subMeshCount; i++) {
+    //             renderPass.DrawSkinnedMesh(this.sharedMesh, i, this.transform.transformBuffer.buffer, this.jointsBindGroup);
+    //         }
+    //     } else if (renderPass.name == 'gBufferRenderPass') {
+    //         for (let i = 0; i < this.materials.length && this.sharedMesh.subMeshCount; i++) {
+    //             renderPass.SetMaterial(this.materials[i] ?? Engine.emptyMaterial);
+    //             renderPass.DrawSkinnedMesh(this.sharedMesh, i, this.transform.transformBuffer.buffer, this.jointsBindGroup);
+    //         }
+    //     }
+    // }
 
 }

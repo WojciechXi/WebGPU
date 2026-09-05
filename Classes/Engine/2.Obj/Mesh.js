@@ -1,9 +1,12 @@
 class Mesh extends Obj {
 
+    static _nextId = 0;
+
     constructor() {
         super();
         const object = this;
 
+        object.id = Mesh._nextId++;
         new Property(object, 'bounds', new Bounds(Vector3.zero, Vector3.zero));
         new Property(object, 'vertexBuffer', new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }));
         new Property(object, 'lineBuffer', new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }));

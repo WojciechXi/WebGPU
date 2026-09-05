@@ -22,12 +22,6 @@ class Camera extends Behaviour {
         new Property(object, 'orthographic', false);
         new Property(object, 'orthographicSize', 100);
 
-        new Property(object, 'viewMatrix', Matrix4x4.Identity());
-        new Property(object, 'projectionMatrix', Matrix4x4.Identity());
-        new Property(object, 'viewProjectionMatrix', Matrix4x4.Identity());
-        new Property(object, 'inverseViewMatrix', Matrix4x4.Identity());
-        new Property(object, 'inverseViewProjectionMatrix', Matrix4x4.Identity());
-
         new Property(object, 'cameraBuffer', new Buffer(16 + 16 + 16 + 16 + 16)); //view, projection, viewProjection, inverseView, inverseViewProjection
         new Property(object, 'cameraBindGroup', GPU.CreateBindGroup({
             label: 'ViewBindGroup',
@@ -36,6 +30,12 @@ class Camera extends Behaviour {
                 this.cameraBuffer.GetBindGroupEntry(0),
             ],
         }));
+
+        object.viewMatrix = Matrix4x4.Identity();
+        object.projectionMatrix = Matrix4x4.Identity();
+        object.viewProjectionMatrix = Matrix4x4.Identity();
+        object.inverseViewMatrix = Matrix4x4.Identity();
+        object.inverseViewProjectionMatrix = Matrix4x4.Identity();
 
         Engine.Instance.scene.cameras.push(this);
     }
@@ -58,11 +58,8 @@ class Camera extends Behaviour {
         });
 
         if (this.parentCamera) {
-            this.renderables = this.parentCamera.renderables;
             this.SendMessage('OnPreCull')
         } else {
-            const planes = GeometryUtility.CalculateFrustumPlanes(this);
-            this.renderables = this.scene.renderables.filter(c => c.isVisible && GeometryUtility.TestPlanesAABB(planes, c.bounds));
             this.SendMessage('OnPreCull')
         }
     }
@@ -104,7 +101,7 @@ class Camera extends Behaviour {
 
     OnDrawGizmos(renderPass, camera) {
         if (camera == this) return;
-        const cameraMesh = Resources.Get('/Resources/Primitives/Camera.gltf');
+        const cameraMesh = Resources.Load('/Resources/Primitives/Camera.gltf');
         renderPass.DrawMesh(cameraMesh.meshes[0], 0, this.transform.matrix4x4);
     }
 

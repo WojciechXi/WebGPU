@@ -1,9 +1,12 @@
 class Shader extends Obj {
 
+    static _nextId = 0;
+
     constructor() {
         super();
         const object = this;
 
+        object.id = Shader._nextId++;
         new Property(object, 'renderQueue', 2000);
         new Property(object, 'code', '', {
             set: function (value, oldValue) {
@@ -38,14 +41,6 @@ class Shader extends Obj {
         }
 
         return this.renderPipelines.get(stateKey);
-    }
-
-    Use(renderPass) {
-        let renderPipeline = this.GetPipeline(renderPass);
-        if (!renderPipeline) return null;
-
-        renderPass.SetPipeline(renderPipeline);
-        return renderPipeline;
     }
 
     _createPipeline(renderPass, states) {
