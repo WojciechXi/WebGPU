@@ -1,52 +1,35 @@
 class GBufferRenderPass extends RenderPass {
 
     Init(data) {
-        this.canvas = data.canvas;
-
-        this.positionRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
-            format: 'rgba16float',
-        });
-
-        this.normalRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
-            format: 'rgba8unorm',
-        });
-
-        this.colorRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
-            format: 'rgba8unorm',
-        });
-
-        this.pbrRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
-            format: 'rgba8unorm',
-        });
-
-        this.depthRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
-            format: 'depth24plus',
-            depth: true,
-        });
+        this.colorRenderTexture = data.colorRenderTexture;
+        this.worldNormalRenderTexture = data.worldNormalRenderTexture;
+        this.pbrRenderTexture = data.pbrRenderTexture;
+        this.emissiveRenderTexture = data.emissiveRenderTexture;
+        this.depthRenderTexture = data.depthRenderTexture;
     }
 
     GetTargets() {
         return [
-            this.positionRenderTexture.GetTarget(),
-            this.normalRenderTexture.GetTarget(),
             this.colorRenderTexture.GetTarget(),
+            this.worldNormalRenderTexture.GetTarget(),
             this.pbrRenderTexture.GetTarget(),
+            this.emissiveRenderTexture.GetTarget(),
         ];
     }
 
     Render(camera, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                this.positionRenderTexture.GetColorAttachment(),
-                this.normalRenderTexture.GetColorAttachment(),
                 this.colorRenderTexture.GetColorAttachment('clear', 'store', scene.ambientLight.color),
+                this.worldNormalRenderTexture.GetColorAttachment(),
                 this.pbrRenderTexture.GetColorAttachment(),
+                this.emissiveRenderTexture.GetColorAttachment(),
             ],
-            depthStencilAttachment: this.depthRenderTexture.GetDepthStencilAttachment(),
+            depthStencilAttachment: this.depthRenderTexture.GetDepthStencilAttachment('load', 'discard'),
         });
 
-        renderPass.setViewport(this.positionRenderTexture.width * camera.rect.x, this.positionRenderTexture.height * camera.rect.y, this.positionRenderTexture.width * camera.rect.width, this.positionRenderTexture.height * camera.rect.height, 0, 1);
-        renderPass.setScissorRect(this.positionRenderTexture.width * camera.rect.x, this.positionRenderTexture.height * camera.rect.y, this.positionRenderTexture.width * camera.rect.width, this.positionRenderTexture.height * camera.rect.height);
+        renderPass.setViewport(this.colorRenderTexture.width * camera.rect.x, this.colorRenderTexture.height * camera.rect.y, this.colorRenderTexture.width * camera.rect.width, this.colorRenderTexture.height * camera.rect.height, 0, 1);
+        renderPass.setScissorRect(this.colorRenderTexture.width * camera.rect.x, this.colorRenderTexture.height * camera.rect.y, this.colorRenderTexture.width * camera.rect.width, this.colorRenderTexture.height * camera.rect.height);
 
         renderPass.setBindGroup(0, camera.cameraBindGroup);
         RenderQueue.Flush(this, camera);

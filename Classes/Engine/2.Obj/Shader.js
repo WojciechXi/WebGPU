@@ -62,12 +62,12 @@ class Shader extends Obj {
                         arrayStride: 28 * 4, // 28 floats (pos + norm + tang + col + uv + joints + weights)
                         attributes: [
                             { shaderLocation: 0, offset: 0 * 4, format: 'float32x3' }, // position
-                            { shaderLocation: 1, offset: 3 * 4, format: 'float32x3' }, // normal (poprawiony offset!)
-                            { shaderLocation: 2, offset: 6 * 4, format: 'float32x4' }, // tangent
-                            { shaderLocation: 3, offset: 10 * 4, format: 'float32x4' }, // color
-                            { shaderLocation: 4, offset: 14 * 4, format: 'float32x2' }, // uv
-                            { shaderLocation: 5, offset: 16 * 4, format: 'float32x4' }, // joints
-                            { shaderLocation: 6, offset: 20 * 4, format: 'float32x4' }, // weights
+                            { shaderLocation: 1, offset: 4 * 4, format: 'float32x3' }, // normal (poprawiony offset!)
+                            { shaderLocation: 2, offset: 8 * 4, format: 'float32x4' }, // tangent
+                            { shaderLocation: 3, offset: 12 * 4, format: 'float32x4' }, // color
+                            { shaderLocation: 4, offset: 16 * 4, format: 'float32x2' }, // uv
+                            { shaderLocation: 5, offset: 20 * 4, format: 'float32x4' }, // joints
+                            { shaderLocation: 6, offset: 24 * 4, format: 'float32x4' }, // weights
                         ],
                     },
                     {

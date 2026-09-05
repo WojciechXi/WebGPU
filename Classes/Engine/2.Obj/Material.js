@@ -17,22 +17,21 @@ class Material extends Obj {
 
         new Property(object, 'renderQueue', 2000);
         new Property(object, 'shader', shader);
-        new Property(object, 'materialBuffer', new Buffer(4 + 4));
+        new Property(object, 'materialBuffer', new Buffer(4 + 4)); // color, pbr
 
         new Property(object, 'textures', {});
         new Property(object, 'sampler', GPU.CreateSampler({
+            magFilter: 'linear',
+            minFilter: 'linear',
+            mipmapFilter: 'linear',
             addressModeU: 'repeat',
             addressModeV: 'repeat',
-            magFilter: 'nearest',
-            minFilter: 'nearest',
-            mipmapFilter: 'nearest',
         }));
 
         object.SetTexture('albedo', Color32.white);
         object.SetTexture('normal', new Color32(0.5, 0.5, 1, 1));
-        object.SetTexture('roughness', Color32.white);
-        object.SetTexture('metallic', Color32.black);
-        object.SetTexture('occlusion', Color32.white);
+        object.SetTexture('pbr', new Color32(0, 0, 1, 0));
+        object.SetTexture('emissive', Color32.clear);
 
         object.materialBindGroup = GPU.CreateBindGroup({
             label: 'MaterialBindGroup',
@@ -49,9 +48,8 @@ class Material extends Obj {
                 { binding: 0, resource: object.sampler },
                 { binding: 1, resource: object.textures.albedo.createView() },
                 { binding: 2, resource: object.textures.normal.createView() },
-                { binding: 3, resource: object.textures.roughness.createView() },
-                { binding: 4, resource: object.textures.metallic.createView() },
-                { binding: 5, resource: object.textures.occlusion.createView() },
+                { binding: 3, resource: object.textures.pbr.createView() },
+                { binding: 4, resource: object.textures.emissive.createView() },
             ],
         });
 
@@ -70,6 +68,7 @@ class Material extends Obj {
                 });
             },
         });
+
         new Property(object, 'metallic', 0.1, {
             assigned: function (roughness) {
                 object.materialBuffer.Set({
@@ -77,6 +76,7 @@ class Material extends Obj {
                 });
             },
         });
+
         new Property(object, 'occlusion', 1, {
             assigned: function (occlusion) {
                 object.materialBuffer.Set({
@@ -84,6 +84,7 @@ class Material extends Obj {
                 });
             },
         });
+
         new Property(object, 'alphaCutoff', 0.5, {
             assigned: function (alphaCutoff) {
                 object.materialBuffer.Set({
@@ -111,7 +112,7 @@ class Material extends Obj {
                 { texture: this.textures[name] },
                 new Uint8Array([texture.r * 255, texture.g * 255, texture.b * 255, texture.a * 255]),
                 { bytesPerRow: 4 * 4 },
-                { width, height, depthOrArrayLayers: 1 }
+                { width, height, depthOrArrayLayers: 1 },
             );
         } else {
             const width = texture.width;
@@ -141,9 +142,8 @@ class Material extends Obj {
                 { binding: 0, resource: this.sampler },
                 { binding: 1, resource: this.textures.albedo.createView() },
                 { binding: 2, resource: this.textures.normal.createView() },
-                { binding: 3, resource: this.textures.roughness.createView() },
-                { binding: 4, resource: this.textures.metallic.createView() },
-                { binding: 5, resource: this.textures.occlusion.createView() },
+                { binding: 3, resource: this.textures.pbr.createView() },
+                { binding: 4, resource: this.textures.emissive.createView() },
             ],
         });
     }

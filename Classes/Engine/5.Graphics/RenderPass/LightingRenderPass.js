@@ -1,10 +1,13 @@
 class LightingRenderPass extends RenderPass {
 
     Init(data) {
-        const shadowRenderPass = this.shadowRenderPass = data.shadowRenderPass;
-        const gBufferRenderPass = this.gBufferRenderPass = data.gBufferRenderPass;
+        this.depthRenderTexture = data.depthRenderTexture;
+        this.colorRenderTexture = data.colorRenderTexture;
+        this.worldNormalRenderTexture = data.worldNormalRenderTexture;
+        this.pbrRenderTexture = data.pbrRenderTexture;
+        this.emissiveRenderTexture = data.emissiveRenderTexture;
 
-        this.sceneRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, { format: 'rgba16float', });
+        this.resultRenderTexture = data.resultRenderTexture;
 
         this.renderPipeline = GPU.CreateRenderPipeline({
             label: 'lightingRenderPipeline',
@@ -27,8 +30,8 @@ class LightingRenderPass extends RenderPass {
                     }),
                     GPU.CreateBindGroupLayout({
                         entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                            { binding: 0, visibility: GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering' } },
+                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'depth', viewDimension: '2d', multisampled: false, }, },
                             { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
                             { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
                             { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
@@ -45,28 +48,27 @@ class LightingRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    this.sceneRenderTexture.GetTarget(),
+                    this.resultRenderTexture.GetTarget(),
                 ]
             },
-        });
-
-        this.sampler = GPU.CreateSampler({
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
-            magFilter: 'nearest',
-            minFilter: 'nearest',
-            mipmapFilter: 'nearest',
         });
 
         this.bindGroup3 = GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(3),
             entries: [
-                { binding: 0, resource: this.sampler },
-                this.gBufferRenderPass.positionRenderTexture.GetBindGroupEntry(1),
-                this.gBufferRenderPass.normalRenderTexture.GetBindGroupEntry(2),
-                this.gBufferRenderPass.colorRenderTexture.GetBindGroupEntry(3),
-                this.gBufferRenderPass.pbrRenderTexture.GetBindGroupEntry(4),
-                this.shadowRenderPass.depthRenderTexture.GetBindGroupEntry(5),
+                {
+                    binding: 0, resource: GPU.CreateSampler({
+                        addressModeU: 'clamp-to-edge',
+                        addressModeV: 'clamp-to-edge',
+                        magFilter: 'nearest',
+                        minFilter: 'nearest',
+                    })
+                },
+                this.depthRenderTexture.GetBindGroupEntry(1),
+                this.colorRenderTexture.GetBindGroupEntry(2),
+                this.worldNormalRenderTexture.GetBindGroupEntry(3),
+                this.pbrRenderTexture.GetBindGroupEntry(4),
+                this.emissiveRenderTexture.GetBindGroupEntry(5),
             ],
         });
     }
@@ -74,7 +76,7 @@ class LightingRenderPass extends RenderPass {
     Render(camera, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                this.sceneRenderTexture.GetColorAttachment(),
+                this.resultRenderTexture.GetColorAttachment(),
             ],
         });
 
@@ -83,7 +85,7 @@ class LightingRenderPass extends RenderPass {
         if (scene.ambientLight) renderPass.setBindGroup(2, scene.ambientLight.lightBindGroup);
         renderPass.setBindGroup(3, this.bindGroup3);
 
-        renderPass.setScissorRect(this.sceneRenderTexture.width * camera.rect.x, this.sceneRenderTexture.height * camera.rect.y, this.sceneRenderTexture.width * camera.rect.width, this.sceneRenderTexture.height * camera.rect.height);
+        renderPass.setScissorRect(this.resultRenderTexture.width * camera.rect.x, this.resultRenderTexture.height * camera.rect.y, this.resultRenderTexture.width * camera.rect.width, this.resultRenderTexture.height * camera.rect.height);
         renderPass.setBindGroup(0, camera.cameraBindGroup);
         renderPass.draw(6);
 

@@ -1,13 +1,12 @@
 class BloomRenderPass extends RenderPass {
 
     Init(data) {
-        this.canvas = data.canvas;
         this.inputRenderTexture = data.inputRenderTexture;
+        this.resultRenderTexture = data.resultRenderTexture;
 
         this.brightRenderTexture = new RenderTexture(Graphics.Width / 2, Graphics.Height / 2, { format: 'rgba16float', });
         this.blurRenderTexture = new RenderTexture(Graphics.Width / 4, Graphics.Height / 4, { format: 'rgba16float', });
         this.bloomRenderTexture = new RenderTexture(Graphics.Width / 4, Graphics.Height / 4, { format: 'rgba16float', });
-        this.sceneRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, { format: 'rgba16float', });
 
         this.brightRenderPipeline = GPU.CreateRenderPipeline({
             label: 'brightRenderPipeline',
@@ -68,7 +67,7 @@ class BloomRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "sceneRenderPass",
                 targets: [
-                    this.sceneRenderTexture.GetTarget(),
+                    this.resultRenderTexture.GetTarget(),
                 ]
             }
         });
@@ -153,11 +152,11 @@ class BloomRenderPass extends RenderPass {
         //sceneRenderPass
         const sceneRenderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                this.sceneRenderTexture.GetColorAttachment(),
+                this.resultRenderTexture.GetColorAttachment(),
             ],
         });
         sceneRenderPass.setPipeline(this.sceneRenderPipeline);
-        sceneRenderPass.setScissorRect(this.sceneRenderTexture.width * camera.rect.x, this.sceneRenderTexture.height * camera.rect.y, this.sceneRenderTexture.width * camera.rect.width, this.sceneRenderTexture.height * camera.rect.height);
+        sceneRenderPass.setScissorRect(this.resultRenderTexture.width * camera.rect.x, this.resultRenderTexture.height * camera.rect.y, this.resultRenderTexture.width * camera.rect.width, this.resultRenderTexture.height * camera.rect.height);
         sceneRenderPass.setBindGroup(0, this.sceneBindGroup);
         sceneRenderPass.draw(6);
         sceneRenderPass.end();

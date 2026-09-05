@@ -74,23 +74,20 @@ struct Vertex {
 
 @group(1) @binding(0) var<uniform> jointMatrices : array<mat4x4f, 64>;
 
-// ----------------------
-// Vertex Shader
-// ----------------------
-struct VSOut {
+struct VertexOut {
   @builtin(position) clipPosition : vec4f,
 };
 
 @vertex
-fn vs(vert: Vertex) -> VSOut {
-  var vsOut: VSOut;
-  let matrix = mat4x4<f32>(vert.m0, vert.m1, vert.m2, vert.m3);
+fn vs(vertex: Vertex) -> VertexOut {
+  var vsOut: VertexOut;
+  let matrix = mat4x4<f32>(vertex.m0, vertex.m1, vertex.m2, vertex.m3);
   
-  var objectPosition = vert.position;
+  var objectPosition = vertex.position;
   var worldPosition : vec3f;
 
-  if(vert.weights.x > 0.001) {
-    let skinMatrix = jointMatrices[u32(vert.joints.x)];
+  if(vertex.weights.x > 0.001) {
+    let skinMatrix = jointMatrices[u32(vertex.joints.x)];
     worldPosition = (skinMatrix * vec4f(objectPosition, 1.0)).xyz;
   } else {
     worldPosition = (matrix * vec4f(objectPosition, 1.0)).xyz;

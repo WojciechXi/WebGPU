@@ -31,17 +31,14 @@ class Mesh extends Obj {
     get isReadable() { } // Returns true if the Mesh is read/write enabled, or false if it is not.
     get lodCount() { } // The number of LOD levels in this mesh.
     get lodSelectionCurve() { } // This struct represents the parameters that Unity uses to calculate which Mesh LOD level to select. It contains the lodBias and lodSlope properties, which scale logarithmically using screen space pixel area.
-    get normals() { } // An array of vectors that defines the surface orientation at each vertex of the mesh.
     get skinWeightBufferLayout() { } // The dimension of data in the bone weight buffer.
     get subMeshCount() { return this.subMeshes.length; } set subMeshCount(value) { this.subMeshes = new Array(value); }
-    get tangents() { return this.tangents; } // The tangents of the Mesh.
     get triangles() { } // An array containing all triangles in the Mesh.
-    get uv() { return this.uvs; } // The texture coordinates (UVs) in the first channel.
+    get uv() { return this.uvs[0] ?? []; } // The texture coordinates (UVs) in the first channel.
     get vertexAttributeCount() { } // Returns the number of vertex attributes that the mesh has. (Read Only)
     get vertexBufferCount() { } // Gets the number of vertex buffers present in the Mesh. (Read Only)
     get vertexBufferTarget() { } // The intended target usage of the Mesh GPU vertex buffer.
     get vertexCount() { return this.vertices.length; } // Returns the number of vertices in the Mesh (Read Only).
-    get vertices() { return this.vertices; } // Returns a copy of the vertex positions or assigns a new vertex positions array.
 
     AddBlendShapeFrame() { }
     Clear() {
@@ -135,7 +132,7 @@ class Mesh extends Obj {
         let tan2 = Array(this.vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
 
         for (let subMesh of this.subMeshes) {
-            let tris = subMesh.triangles;
+            let tris = subMesh.triangles.values;
             for (let i = 0; i < tris.length; i += 3) {
                 let i0 = tris[i], i1 = tris[i + 1], i2 = tris[i + 2];
 
@@ -213,7 +210,7 @@ class Mesh extends Obj {
         this.subMeshes[subMeshIndex].SetTriangles(triangles, baseVertex);
         // if (calculateBounds) this.RecalculateBounds();
     }
-    SetUVs(uvs) { this.uvs = uvs.map(u => u.Clone()); }
+    SetUVs(uvs, index = 0) { this.uvs[index] = uvs.map(u => u.Clone()); }
     SetFlatUvs(inUvs, stride = 4) {
         this.uvs = [];
         for (let i = 0; i < inUvs.length; i += stride) this.uvs.push(new Vector2(inUvs[i], inUvs[i + 1]));
@@ -240,7 +237,7 @@ class Mesh extends Obj {
             let normal = this.normals[i] ?? Vector3.up;
             let tangent = this.tangents[i] ?? new Vector4(0, 0, 0, 1);
             let color = this.colors[i] ?? Color32.white;
-            let uv = this.uvs[i] ?? Vector2.zero;
+            let uv = this.uv[i] ?? Vector2.zero;
             let joints = this.joints[i] ?? new Vector4(-1, -1, -1, -1);
             let weights = this.weights[i] ?? new Vector4(0, 0, 0, 0);
 
@@ -281,6 +278,8 @@ class SubMesh {
         if (data.triangles) this.SetTriangles(data.triangles);
         if (data.edges) this.SetEdges(data.edges);
     }
+
+    get triangles() { return this.triangleBuffer.values; }
 
     Clear() {
         this.triangleBuffer.Resize(0);

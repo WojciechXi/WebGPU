@@ -2,51 +2,70 @@ class Engine {
 
     constructor() {
         Engine.Instance = this;
+        this._isLooping = false;
+        this._lastFrameTime = performance.now();
 
         new Property(this, 'scene', null);
     }
 
     Init(callback) {
-        let object = this;
-
-        Graphics.Init(function () {
-            callback(object);
-        });
+        Graphics.Init(() => callback(this));
     }
 
     Start() {
-        let object = this;
+        if (this._isLooping) return;
+        this._isLooping = true;
+        this._lastFrameTime = performance.now();
 
-        requestAnimationFrame(function (time) {
-            Input.Start();
-            object.Loop(time);
-        });
+        Input.Start();
+
+        requestAnimationFrame(time => this.Loop(time));
     }
 
     Loop(time) {
-        let object = this;
+        if (!this._isLooping) return;
+
+        const now = performance.now();
+        Engine.frameTime = now - this._lastFrameTime;
+        this._lastFrameTime = now;
+
+        const cpuBegin = performance.now();
 
         Time.Update(time / 1000);
         Input.Update();
 
         if (this.scene) {
-            if (Time.fixedTime > Time.fixedDeltaTime) {
+            // CPU
+            while (Time.fixedTime > Time.fixedDeltaTime) {
                 Time.fixedTime -= Time.fixedDeltaTime;
                 for (let c of this.scene.fixedUpdateables) c.FixedUpdate();
             }
 
             for (let c of this.scene.updateables) c.Update();
 
+            // GPU
+            const gpuBegin = performance.now();
             if (this.renderPipeline) {
                 for (let camera of this.scene.cameras) this.renderPipeline.Render(camera, this.scene);
             }
 
             RenderQueue.Clear();
-        }
 
-        requestAnimationFrame(function (time) {
-            object.Loop(time);
-        });
+            Engine.gpuSubmitTime = (performance.now() - gpuBegin);
+        }
+        Engine.cpuWorkTime = performance.now() - cpuBegin;
+
+        window.inspector.innerText =
+            `FPS: ${(Time.frames).toFixed(0)} (${(Time.deltaTime * 1000).toFixed(2)}ms interval)\n` +
+            `CPU Work: ${Engine.cpuWorkTime.toFixed(2)}ms / 16.6ms\n` +
+            `  ├─ Update: ${(Engine.cpuWorkTime - Engine.gpuSubmitTime).toFixed(2)}ms\n` +
+            `  └─ Render Submit: ${Engine.gpuSubmitTime.toFixed(2)}ms`;
+
+        requestAnimationFrame(time => this.Loop(time));
+    }
+
+    Stop() {
+        this._isLooping = false;
     }
 
 }

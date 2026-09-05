@@ -154,9 +154,9 @@ class Importer {
                 let joints = [];
                 let weights = [];
 
-                if (_positions) for (let i = 0; i < _positions.length; i += 3)vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
-                if (_normals) for (let i = 0; i < _normals.length; i += 3)normals.push(new Vector3(_normals[i], _normals[i + 1], _normals[i + 2]));
-                if (_tangents) for (let i = 0; i < _tangents.length; i += 4)tangents.push(new Vector4(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
+                if (_positions) for (let i = 0; i < _positions.length; i += 3) vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
+                if (_normals) for (let i = 0; i < _normals.length; i += 3) normals.push(new Vector3(_normals[i], _normals[i + 1], _normals[i + 2]));
+                if (_tangents) for (let i = 0; i < _tangents.length; i += 4) tangents.push(new Vector4(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
                 if (_uvs) for (let i = 0; i < _uvs.length; i += 2) uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
 
                 if (_joints) for (let i = 0; i < _joints.length; i += 4) joints.push(new Vector4(_joints[i], _joints[i + 1], _joints[i + 2], _joints[i + 3]));
@@ -165,7 +165,7 @@ class Importer {
                 mesh.SetVertices(vertices);
                 mesh.SetNormals(normals);
                 mesh.SetTangents(tangents);
-                mesh.SetUVs(uvs);
+                mesh.SetUVs(uvs, 0);
                 mesh.joints = joints;
                 mesh.weights = weights;
 

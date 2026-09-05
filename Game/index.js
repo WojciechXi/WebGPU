@@ -18,6 +18,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
     });
 
     const engine = new Engine();
+    const hierarchy = window.hierarchy = this.document.querySelector('#hierarchy');
     const inspector = window.inspector = this.document.querySelector('#inspector');
 
     engine.Init(function (engine) {
@@ -33,11 +34,18 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             Engine.emptyMaterial = new Material(litShader);
             Engine.emptyMaterial.color = new Color32(1, 0.5, 0.25, 1.0);
 
-            engine.renderPipeline = new RenderPipeline();
+            const renderPipeline = engine.renderPipeline = new RenderPipeline();
 
             const defaultMaterial = new Material(litShader);
-            Resources.Load('/Resources/181_black concrete bare PBR texture-seamless.jpg', function (texture) {
-                defaultMaterial.SetTexture('albedo', texture, true);
+            Resources.Load('/Resources/Textures/Floor/512_Albedo.webp', function (texture) {
+                defaultMaterial.SetTexture('albedo', texture);
+                Resources.Load('/Resources/Textures/Floor/512_Normal.webp', function (texture) {
+                    defaultMaterial.SetTexture('normal', texture, true);
+                    Resources.Load('/Resources/Textures/Floor/512_PBR.webp', function (texture) {
+                        defaultMaterial.SetTexture('pbr', texture, true);
+                        defaultMaterial.Update();
+                    });
+                });
             });
 
             const scene = new Scene();
@@ -56,14 +64,19 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
 
             const mainCameraGameObject = new GameObject('Main Camera');
-            mainCameraGameObject.transform.localPosition.z = -5;
+            mainCameraGameObject.transform.localPosition.x = 0;
+            mainCameraGameObject.transform.localPosition.y = 0;
+            mainCameraGameObject.transform.localPosition.z = -10;
+            // mainCameraGameObject.transform.localEulerAngles = new Vector3(0, 45, 0);
             const mainCamera = mainCameraGameObject.AddComponent(Camera);
-            const freeCamera = mainCameraGameObject.AddComponent(FreeCamera);
+            // const freeCamera = mainCameraGameObject.AddComponent(FreeCamera);
 
-            Resources.Load('/Resources/Primitives/Monkey.gltf', function (object) {
+            Resources.Load('/Resources/Primitives/Krakow.gltf', function (object) {
                 const gameObject = new GameObject("Cube");
                 for (let mesh of object.meshes) {
                     const childGameObject = new GameObject(mesh.name);
+                    childGameObject.transform.SetParent(gameObject.transform);
+                    childGameObject.AddComponent(AutoRotator);
                     let meshRenderer = childGameObject.AddComponent(MeshRenderer);
                     meshRenderer.sharedMaterial = defaultMaterial;
                     meshRenderer.sharedMesh = mesh;
@@ -72,6 +85,24 @@ window.addEventListener('DOMContentLoaded', async function (event) {
 
             // Physics.simulate = true;
             inspector.innerHTML = ``;
+
+            let textures = [
+                'depthRenderTexture',
+                'colorRenderTexture',
+                'worldNormalRenderTexture',
+                'pbrRenderTexture',
+                'emissiveRenderTexture',
+                'lightingRenderTexture',
+                'tonemappingRenderTexture',
+            ];
+            for (let i = 0; i < textures.length; i++) {
+                const button = document.createElement('a');
+                button.addEventListener('click', function () {
+                    renderPipeline.screenRenderPass.renderTexture = renderPipeline[textures[i]];
+                });
+                button.innerText = textures[i];
+                hierarchy.appendChild(button);
+            }
         }, function (index, total, path) {
             inspector.innerHTML = `${index}/${total} - ${path}`;
         });

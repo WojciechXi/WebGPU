@@ -1,9 +1,10 @@
 class SSAORenderPass extends RenderPass {
 
     Init(data) {
-        const canvas = this.canvas = data.canvas;
-        this.gBufferRenderPass = data.gBufferRenderPass;
-        this.inputRenderTexture = data.inputRenderTexture;
+        this.depthRenderTexture = data.depthRenderTexture;
+        this.worldNormalRenderTexture = data.worldNormalRenderTexture;
+
+        this.resultRenderTexture = data.resultRenderTexture;
 
         this.radius = data.radius ?? 0.5;
         this.bias = data.bias ?? 0.025;
@@ -14,7 +15,6 @@ class SSAORenderPass extends RenderPass {
         this.ssaoRenderTexture = new RenderTexture(Graphics.Width / 2, Graphics.Height / 2, { format: 'r16float', });
         this.blurHorizontalRenderTexture = new RenderTexture(Graphics.Width / 2, Graphics.Height / 2, { format: 'r16float', });
         this.blurVerticalRenderTexture = new RenderTexture(Graphics.Width / 2, Graphics.Height / 2, { format: 'r16float', });
-        this.sceneRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, { format: 'rgba16float', });
 
         const noise = new Float32Array(16 * 4);
         for (let i = 0; i < 16; i++) {
@@ -85,7 +85,7 @@ class SSAORenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "ssaoRenderPass",
                 targets: [
-                    this.ssaoRenderTexture.GetTarget(),
+                    this.resultRenderTexture.GetTarget(),
                 ]
             },
         });
@@ -130,7 +130,7 @@ class SSAORenderPass extends RenderPass {
         //         module: this.shaderModule,
         //         entryPoint: "sceneRenderPass",
         //         targets: [
-        //             this.sceneRenderTexture.GetTarget(),
+        //             this.resultRenderTexture.GetTarget(),
         //         ]
         //     },
         // });
@@ -177,7 +177,6 @@ class SSAORenderPass extends RenderPass {
         //     entries: [
         //         { binding: 1, resource: this.sampler },
         //         this.blurVerticalRenderTexture.GetBindGroupEntry(6),
-        //         this.inputRenderTexture.GetBindGroupEntry(7),
         //     ],
         // });
     }
@@ -188,11 +187,11 @@ class SSAORenderPass extends RenderPass {
         //ssaoRenderPass
         const ssaoRenderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                this.ssaoRenderTexture.GetColorAttachment(),
+                this.resultRenderTexture.GetColorAttachment(),
             ],
         });
         ssaoRenderPass.setPipeline(this.ssaoRenderPipeline);
-        ssaoRenderPass.setScissorRect(this.ssaoRenderTexture.width * camera.rect.x, this.ssaoRenderTexture.height * camera.rect.y, this.ssaoRenderTexture.width * camera.rect.width, this.ssaoRenderTexture.height * camera.rect.height);
+        ssaoRenderPass.setScissorRect(this.resultRenderTexture.width * camera.rect.x, this.resultRenderTexture.height * camera.rect.y, this.resultRenderTexture.width * camera.rect.width, this.resultRenderTexture.height * camera.rect.height);
         ssaoRenderPass.setBindGroup(0, camera.cameraBindGroup);
         ssaoRenderPass.setBindGroup(1, this.noiseBindGroup);
         ssaoRenderPass.setBindGroup(2, this.ssaoBindGroup);
@@ -224,7 +223,7 @@ class SSAORenderPass extends RenderPass {
         // //sceneRenderPass
         // const sceneRenderPass = commandEncoder.beginRenderPass({
         //     colorAttachments: [
-        //         this.sceneRenderTexture.GetColorAttachment(),
+        //         this.resultRenderTexture.GetColorAttachment(),
         //     ],
         // });
         // sceneRenderPass.setPipeline(this.sceneRenderPipeline);

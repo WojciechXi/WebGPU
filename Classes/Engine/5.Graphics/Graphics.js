@@ -23,6 +23,7 @@ class Graphics {
             device: GPU.device,
             format: navigator.gpu.getPreferredCanvasFormat(),
             alphaMode: 'premultiplied',
+            presentMode: 'immediate',
         });
 
         this.viewBindGroupLayout = GPU.CreateBindGroupLayout({
@@ -40,21 +41,20 @@ class Graphics {
         });
 
         this.materialBindGroupLayout = GPU.CreateBindGroupLayout({
-            label: 'TransformBindGroupLayout',
+            label: 'MaterialBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
 
         this.pbrBindGroupLayout = GPU.CreateBindGroupLayout({
-            label: 'ViewBindGroupLayout',
+            label: 'PBRBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: {}, },
                 { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
                 { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
                 { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
                 { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
-                { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
             ],
         });
 

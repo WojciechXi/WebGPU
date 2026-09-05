@@ -56,6 +56,12 @@ canvas {
     z-index: 1;
     max-height: calc(100% - 2rem);
     overflow: auto;
+
+    a {
+        cursor: pointer;
+        display: block;
+        padding: 0.5rem;
+    }
 }
 
 #inspector {
@@ -68,5 +74,6 @@ canvas {
     top: 1rem;
     z-index: 1;
     max-height: calc(100% - 2rem);
+    min-width: 360px;
     overflow: auto;
 }
