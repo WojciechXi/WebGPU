@@ -102,8 +102,6 @@ class Matrix4x4 extends Float32Array {
         return dst;
     }
 
-
-
     static TRS(position, rotation, scale, dst = null) {
         dst = dst || new Matrix4x4();
 
@@ -205,8 +203,6 @@ class Matrix4x4 extends Float32Array {
         return { position, rotation, scale };
     }
 
-
-
     static Multiply(a, b, dst) {
         dst = dst || new Matrix4x4();
         const b00 = b[0], b01 = b[1], b02 = b[2], b03 = b[3];
@@ -297,8 +293,6 @@ class Matrix4x4 extends Float32Array {
 
         return d;
     }
-
-
 
     static SetTranslation(matrix, v) {
         matrix[12] = v.x;

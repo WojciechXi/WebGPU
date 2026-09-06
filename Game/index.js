@@ -80,18 +80,24 @@ window.addEventListener('DOMContentLoaded', async function (event) {
         directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
 
         const mainCameraGameObject = new GameObject('Main Camera');
-        mainCameraGameObject.transform.localPosition.x = -1.5;
-        mainCameraGameObject.transform.localPosition.y = 1.5;
-        mainCameraGameObject.transform.localPosition.z = -5;
+        mainCameraGameObject.transform.eulerAngles = new Vector3(0, 180, 0);
+        mainCameraGameObject.transform.localPosition.y = 0.5;
+        mainCameraGameObject.transform.localPosition.z = 2;
         // mainCameraGameObject.transform.localEulerAngles = new Vector3(0, 45, 0);
         const mainCamera = mainCameraGameObject.AddComponent(Camera);
         // const autoRotator = mainCameraGameObject.AddComponent(AutoRotator);
-        const freeCamera = mainCameraGameObject.AddComponent(FreeCamera);
+        // const freeCamera = mainCameraGameObject.AddComponent(FreeCamera);
 
-        const krakowObject = await Resources.Load('Models/Krakow.gltf');
-        if (krakowObject && krakowObject.meshes) {
+        // const gameObject = new GameObject("Furniture");
+        // const furniture = gameObject.AddComponent(Furniture);
+        // furniture.material = allMaterials['D3025_OW_DĄB_SONOMA'];
+        // console.log(furniture.rootNode.Split('x', 0.5)[0].Split('y', 0.5));
+        // furniture.Build();
+        const gltfObject = await Resources.Load('Models/Ablewicza 15.gltf');
+        if (gltfObject && gltfObject.meshes) {
             const gameObject = new GameObject("Cube");
-            for (let mesh of krakowObject.meshes) {
+            const autoRotator = gameObject.AddComponent(AutoRotator);
+            for (let mesh of gltfObject.meshes) {
                 const childGameObject = new GameObject(mesh.name);
                 childGameObject.transform.SetParent(gameObject.transform);
                 let meshRenderer = childGameObject.AddComponent(MeshRenderer);

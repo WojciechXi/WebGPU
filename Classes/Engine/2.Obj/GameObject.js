@@ -37,6 +37,7 @@ class GameObject extends Obj {
 
         if (this.scene) this.scene.AddComponent(component);
 
+        if (component.OnEnable) component.OnEnable();
         if (component.Awake) component.Awake();
 
         return component;

@@ -32,29 +32,42 @@ class Bounds extends Float32Array {
     ClosestPoint(point) {
         const min = this.min;
         const max = this.max;
-        return new Vector3(Mathf.Clamp(position.x, min.x, max.x), Mathf.Clamp(position.y, min.y, max.y), Mathf.Clamp(position.z, min.z, max.z));
+        return new Vector3(Mathf.Clamp(point.x, min.x, max.x), Mathf.Clamp(point.y, min.y, max.y), Mathf.Clamp(point.z, min.z, max.z));
     }
 
     Contains(point) {
         const min = this.min;
         const max = this.max;
-
-        return (
-            point.x >= min.x &&
-            point.y >= min.y &&
-            point.z >= min.z &&
-            point.x <= max.x &&
-            point.y <= max.y &&
-            point.z <= max.z
-        );
+        return (point.x >= min.x && point.y >= min.y && point.z >= min.z && point.x <= max.x && point.y <= max.y && point.z <= max.z);
     }
 
-    Encapsulate(point) {
-        return null;
+    Encapsulate(pointOrBounds) {
+        let nMin = this.min;
+        let nMax = this.max;
+
+        if (pointOrBounds instanceof Bounds) {
+            const oMin = pointOrBounds.min;
+            const oMax = pointOrBounds.max;
+            nMin = new Vector3(Math.min(nMin.x, oMin.x), Math.min(nMin.y, oMin.y), Math.min(nMin.z, oMin.z));
+            nMax = new Vector3(Math.max(nMax.x, oMax.x), Math.max(nMax.y, oMax.y), Math.max(nMax.z, oMax.z));
+        } else {
+            nMin = new Vector3(Math.min(nMin.x, pointOrBounds.x), Math.min(nMin.y, pointOrBounds.y), Math.min(nMin.z, pointOrBounds.z));
+            nMax = new Vector3(Math.max(nMax.x, pointOrBounds.x), Math.max(nMax.y, pointOrBounds.y), Math.max(nMax.z, pointOrBounds.z));
+        }
+
+        this.SetMinMax(nMin, nMax);
     }
 
     Expand(amount) {
-        return null;
+        if (typeof amount === 'number') {
+            this[3] += amount * 0.5;
+            this[4] += amount * 0.5;
+            this[5] += amount * 0.5;
+        } else {
+            this[3] += amount.x * 0.5;
+            this[4] += amount.y * 0.5;
+            this[5] += amount.z * 0.5;
+        }
     }
 
     IntersectRay(ray) {
@@ -80,15 +93,13 @@ class Bounds extends Float32Array {
 
         if ((tmin > tzmax) || (tzmin > tmax)) return false;
 
-        // jeśli potrzebujesz odległość do trafienia:
-        // return tmin >= 0 ? tmin : tmax;
-
         return true;
     }
 
     Intersects(otherBounds) {
         const aMin = this.min;
         const aMax = this.max;
+
         const bMin = otherBounds.min;
         const bMax = otherBounds.max;
 
@@ -102,7 +113,11 @@ class Bounds extends Float32Array {
     }
 
     SqrDistance(point) {
-        return null;
+        const cp = this.ClosestPoint(point);
+        const dx = point.x - cp.x;
+        const dy = point.y - cp.y;
+        const dz = point.z - cp.z;
+        return dx * dx + dy * dy + dz * dz;
     }
 
     ToString() {
@@ -110,13 +125,8 @@ class Bounds extends Float32Array {
     }
 
     Set(center, size) {
-        this[0] = center.x;
-        this[1] = center.y;
-        this[2] = center.z;
-
-        this[3] = size.x;
-        this[4] = size.y;
-        this[5] = size.z;
+        this[0] = center.x; this[1] = center.y; this[2] = center.z;
+        this[3] = size.x; this[4] = size.y; this[5] = size.z;
     }
 
     Clear() { this[0] = 0; this[1] = 0; this[2] = 0; this[3] = 0; this[4] = 0; this[5] = 0; }

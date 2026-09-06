@@ -64,6 +64,7 @@ class RenderQueue {
             if (!GeometryUtility.TestPlanesAABB(planes, item.bounds)) continue;
 
             const subMesh = item.mesh.GetSubMesh(item.subMeshIndex);
+            if (!subMesh) continue;
 
             if (cm != item.material.instanceID) {
                 cm = item.material.instanceID;

@@ -67,19 +67,20 @@ class Camera extends Behaviour {
     ScreenPointToRay(position) {
         const origin = this.transform.position;
         const ivp = this.inverseViewProjectionMatrix;
-        const ndc = new Vector2(
-            position.x * 2 - 1,
-            -(position.y * 2 - 1)
-        );
 
-        const clip = [ndc.x, ndc.y, -1, 1];
+        const ndc = new Vector2((position.x / Graphics.Width) * 2 - 1, 1 - (position.y / Graphics.Height) * 2);
 
-        const w = clip[0] * ivp[3] + clip[1] * ivp[7] + clip[2] * ivp[11] + clip[3] * ivp[15];
+        const clipX = ndc.x;
+        const clipY = ndc.y;
+        const clipZ = 0.0;
+        const clipW = 1.0;
+
+        const w = clipX * ivp[3] + clipY * ivp[7] + clipZ * ivp[11] + clipW * ivp[15];
 
         const nearPoint = new Vector3(
-            (clip[0] * ivp[0] + clip[1] * ivp[4] + clip[2] * ivp[8] + clip[3] * ivp[12]) / w,
-            (clip[0] * ivp[1] + clip[1] * ivp[5] + clip[2] * ivp[9] + clip[3] * ivp[13]) / w,
-            (clip[0] * ivp[2] + clip[1] * ivp[6] + clip[2] * ivp[10] + clip[3] * ivp[14]) / w
+            (clipX * ivp[0] + clipY * ivp[4] + clipZ * ivp[8] + clipW * ivp[12]) / w,
+            (clipX * ivp[1] + clipY * ivp[5] + clipZ * ivp[9] + clipW * ivp[13]) / w,
+            (clipX * ivp[2] + clipY * ivp[6] + clipZ * ivp[10] + clipW * ivp[14]) / w
         );
 
         const direction = Vector3.Subtract(nearPoint, origin).Normalize();

@@ -64,7 +64,15 @@ class BoxCollider extends Collider {
         const worldPoint = this.transform.TransformPoint(localPoint);
         const worldNormal = this.transform.TransformDirection(hitNormal);
 
-        return new RaycastHit(this, worldPoint, worldNormal, distance);
+        const raycastHit = new RaycastHit();
+
+        raycastHit.collider = this;
+        raycastHit.point = worldPoint;
+        raycastHit.normal = worldNormal;
+        raycastHit.distance = distance;
+        raycastHit.transform = transform;
+
+        return raycastHit;
     }
 
     OnDrawGizmos(renderPass, camera) {

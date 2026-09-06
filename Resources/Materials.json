@@ -24,6 +24,14 @@
             1
         ]
     },
+    "White": {
+        "color": [
+            1,
+            1,
+            1,
+            1
+        ]
+    },
     "Black": {
         "color": [
             0,
@@ -42,6 +50,14 @@
             "albedo": "Textures/H1386 ST40/Albedo.jpg"
         }
     },
+    "164VL_Antracyt": {
+        "color": [
+            0.2784313725490196,
+            0.27450980392156865,
+            0.26666666666666666,
+            1
+        ]
+    },
     "U702 PM": {
         "textures": {
             "albedo": "Textures/U702 PM/Albedo.webp"
@@ -50,6 +66,16 @@
     "U702 ST9": {
         "textures": {
             "albedo": "Textures/U702 ST9/Albedo.webp"
+        }
+    },
+    "D3025_OW_DĄB_SONOMA": {
+        "textures": {
+            "albedo": "Textures/D3025 OW/D3025 OW DAB SONOMA.jpg"
+        }
+    },
+    "U8681_SM_BIAŁY_ALASKA": {
+        "textures": {
+            "albedo": "Textures/U8681 SM/U8681 SM BIALY ALASKA.jpg"
         }
     }
 }

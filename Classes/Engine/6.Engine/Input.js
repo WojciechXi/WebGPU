@@ -38,13 +38,13 @@ class Input {
         window.addEventListener('mousedown', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            object._keys[event.button] = true;
+            object._keys[`Mouse${event.button}`] = true;
         });
 
         window.addEventListener('mouseup', function (event) {
             event.preventDefault();
             event.stopPropagation();
-            object._keys[event.button] = false;
+            object._keys[`Mouse${event.button}`] = false;
         });
 
         window.addEventListener('keydown', function (event) {

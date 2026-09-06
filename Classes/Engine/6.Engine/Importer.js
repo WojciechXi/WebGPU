@@ -193,9 +193,9 @@ class Importer {
 
                 mesh.subMeshes.push(subMesh);
 
-                mesh.RecalculateNormals?.();
-                mesh.RecalculateTangents?.();
-                mesh.RecalculateBounds?.();
+                // mesh.RecalculateNormals?.();
+                // mesh.RecalculateTangents?.();
+                // mesh.RecalculateBounds?.();
                 mesh.UploadMeshData();
 
                 meshes.push(mesh);

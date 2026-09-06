@@ -12,7 +12,7 @@ class Graphics {
 
     static async Init(callback) {
         this.canvas = document.querySelector('#view');
-        this.canvas.addEventListener('click', event => this.canvas.requestPointerLock({ unadjustedMovement: true, }));
+        // this.canvas.addEventListener('click', event => this.canvas.requestPointerLock({ unadjustedMovement: true, }));
         this.canvas.focus();
 
         this.canvas.width = this.canvas.clientWidth;

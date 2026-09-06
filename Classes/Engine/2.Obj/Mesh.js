@@ -15,6 +15,11 @@ class Mesh extends Obj {
         new Property(object, 'joints', []);
         new Property(object, 'weights', []);
         new Property(object, 'subMeshes', []);
+
+        new Property(object, 'subMeshCount', 0, {
+            get: () => this.subMeshes.length,
+            set: (value) => this.subMeshes.length = value,
+        });
     }
 
     get bindposeCount() { return 0; }
@@ -22,7 +27,6 @@ class Mesh extends Obj {
     get blendShapeCount() { return 0; }
     get boneWeights() { return this.weights; }
     get colors() { return this.colors; }
-    get subMeshCount() { return this.subMeshes.length; } set subMeshCount(value) { this.subMeshes = new Array(value); }
     get uv() { return this.uvs[0] ?? []; }
     get vertexCount() { return this.vertices.length; }
 
