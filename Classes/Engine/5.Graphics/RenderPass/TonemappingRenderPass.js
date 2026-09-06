@@ -11,7 +11,8 @@ class TonemappingRenderPass extends RenderPass {
                     GPU.CreateBindGroupLayout({
                         entries: [
                             { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, },
+                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
                         ],
                     })
                 ],
@@ -29,19 +30,30 @@ class TonemappingRenderPass extends RenderPass {
             }
         });
 
-        this.sampler = GPU.CreateSampler({
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
-            magFilter: 'nearest',
-            minFilter: 'nearest',
-            mipmapFilter: 'nearest',
+        this.paramsBuffer = new Buffer(4);
+
+        new Property(this, 'exposure', 1, {
+            assigned: value => {
+                this.paramsBuffer.Set({
+                    0: [value],
+                });
+            },
         });
 
-        const bindGroup = this.bindGroup = GPU.CreateBindGroup({
+        new Property(this, 'gamma', 2.2, {
+            assigned: value => {
+                this.paramsBuffer.Set({
+                    1: [value],
+                });
+            },
+        });
+
+        this.bindGroup = GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this.sampler },
-                this.inputRenderTexture.GetBindGroupEntry(1),
+                { binding: 0, resource: GPU.CreateSampler({ addressModeU: 'repeat', addressModeV: 'repeat', magFilter: 'nearest', minFilter: 'nearest', mipmapFilter: 'nearest', }), },
+                this.paramsBuffer.GetBindGroupEntry(1),
+                this.inputRenderTexture.GetBindGroupEntry(2),
             ],
         });
     }

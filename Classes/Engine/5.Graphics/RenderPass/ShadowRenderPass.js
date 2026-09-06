@@ -48,7 +48,7 @@ class ShadowRenderPass extends RenderPass {
             primitive: {
                 topology: "triangle-list",
                 cullMode: 'back',
-                frontFace: 'ccw',
+                frontFace: 'cw',
             },
             depthStencil: {
                 format: this.depthRenderTexture.format,

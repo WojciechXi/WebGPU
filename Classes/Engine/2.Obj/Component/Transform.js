@@ -60,7 +60,7 @@ class Transform extends Component {
             if (index !== -1) this.parent.children.splice(index, 1);
         }
 
-        this._parent = newParent;
+        this.parent = newParent;
         if (newParent) newParent.children.push(this);
 
         this.position = position;

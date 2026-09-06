@@ -1,18 +1,18 @@
 class RenderPipeline {
 
     async Init() {
+        this.screenRenderPass = new ScreenRenderPass({
+            name: 'screenRenderPass',
+            code: await Resources.Load('Shaders/screenRenderPass.wgsl'),
+            canvas: this.canvas,
+        });
+
         this.inputRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
             format: 'rgba8unorm',
         });
 
         this.outputRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
             format: 'rgba8unorm',
-        });
-
-        this.screenRenderPass = new ScreenRenderPass({
-            name: 'screenRenderPass',
-            code: await Resources.Load('Shaders/screenRenderPass.wgsl'),
-            canvas: this.canvas,
         });
 
         this.depthRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
@@ -58,7 +58,6 @@ class RenderPipeline {
             name: 'preDepthRenderPass',
 
             depthRenderTexture: this.depthRenderTexture,
-            code: await Resources.Load('Shaders/depthRenderPass.wgsl'),
         });
 
         this.shadowRenderPass = new ShadowRenderPass({

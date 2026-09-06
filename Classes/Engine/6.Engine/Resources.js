@@ -8,7 +8,7 @@ class Resources {
         const object = this;
         if (object.resources[path]) return object.resources[path];
 
-        if (path.endsWith('webp')) {
+        if (path.endsWith('webp') || path.endsWith('jpg') || path.endsWith('jpeg') || path.endsWith('png')) {
             await loadBitmap(`/Resources/${path}`, function (bitmap, image) {
                 object.resources[path] = bitmap;
             });

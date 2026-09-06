@@ -27,8 +27,8 @@ class RenderQueue {
         this.queue.sort((a, b) => {
             if (a.renderQueue !== b.renderQueue) return a.renderQueue - b.renderQueue;
             if (a.renderQueue >= 3000) return b.depth - a.depth;
-            if (a.material.shader.id !== b.material.shader.id) return a.material.shader.id - b.material.shader.id;
-            return a.material.id - b.material.id;
+            if (a.material.shader.instanceID !== b.material.shader.instanceID) return a.material.shader.instanceID - b.material.shader.instanceID;
+            return a.material.instanceID - b.material.instanceID;
         });
 
         for (let i = 0; i < this.queue.length; i++) {
@@ -52,8 +52,8 @@ class RenderQueue {
         this.queue.sort((a, b) => {
             if (a.renderQueue !== b.renderQueue) return a.renderQueue - b.renderQueue;
             if (a.renderQueue >= 3000) return b.depth - a.depth;
-            if (a.material.shader.id !== b.material.shader.id) return a.material.shader.id - b.material.shader.id;
-            return a.material.id - b.material.id;
+            if (a.material.shader.instanceID !== b.material.shader.instanceID) return a.material.shader.instanceID - b.material.shader.instanceID;
+            return a.material.instanceID - b.material.instanceID;
         });
 
         let cm = -1;
@@ -65,8 +65,8 @@ class RenderQueue {
 
             const subMesh = item.mesh.GetSubMesh(item.subMeshIndex);
 
-            if (cm != item.material.id) {
-                cm = item.material.id;
+            if (cm != item.material.instanceID) {
+                cm = item.material.instanceID;
                 renderPass.SetMaterial(item.material);
             }
 

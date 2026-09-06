@@ -7,7 +7,7 @@ class AutoRotator extends GameBehaviour {
     }
 
     Update() {
-        this.eulerAngles.y += 15.0 * Time.deltaTime;
+        this.eulerAngles.y += 45.0 * Time.deltaTime;
         this.transform.eulerAngles = this.eulerAngles;
     }
 

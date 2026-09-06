@@ -76,7 +76,7 @@ class LightingRenderPass extends RenderPass {
     Render(camera, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                this.resultRenderTexture.GetColorAttachment(),
+                this.resultRenderTexture.GetColorAttachment('clear', 'store', scene.ambientLight.color),
             ],
         });
 

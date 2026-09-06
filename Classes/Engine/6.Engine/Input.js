@@ -86,7 +86,7 @@ class Input {
     static Update() {
         const object = this;
 
-        object.mouseMove.SetXY(object.mousePosition.x - object.lastMousePosition.x, -(object.mousePosition.y - object.lastMousePosition.y));
+        object.mouseMove.SetXY(object.mousePosition.x - object.lastMousePosition.x, object.mousePosition.y - object.lastMousePosition.y);
         object.lastMousePosition.SetXY(object.mousePosition.x, object.mousePosition.y);
 
         Object.keys(object._keys).forEach(function (key) {

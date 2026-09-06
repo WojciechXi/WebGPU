@@ -83,7 +83,6 @@ class Importer {
         const res = await fetch(gltfPath);
         const gltf = await res.json();
 
-        // 2. Wczytujemy plik binarny
         const bufferUri = gltf.buffers[0].uri;
         const bufferRes = await fetch(binPath);
         const arrayBuffer = await bufferRes.arrayBuffer();
@@ -135,6 +134,8 @@ class Importer {
             return getAccessorData(gltf, accessorIndex);
         }
 
+        let materialBinding = {};
+
         // 4. Tworzymy meshe
         let meshes = [];
         gltf.meshes.forEach((_mesh) => {
@@ -156,9 +157,9 @@ class Importer {
                 let joints = [];
                 let weights = [];
 
-                if (_positions) for (let i = 0; i < _positions.length; i += 3) vertices.push(new Vector3(-_positions[i], _positions[i + 1], _positions[i + 2]));
-                if (_normals) for (let i = 0; i < _normals.length; i += 3) normals.push(new Vector3(_normals[i], _normals[i + 1], _normals[i + 2]));
-                if (_tangents) for (let i = 0; i < _tangents.length; i += 4) tangents.push(new Vector4(_tangents[i], _tangents[i + 1], _tangents[i + 2], _tangents[i + 3]));
+                if (_positions) for (let i = 0; i < _positions.length; i += 3) vertices.push(new Vector3(_positions[i], _positions[i + 1], -_positions[i + 2]));
+                if (_normals) for (let i = 0; i < _normals.length; i += 3) normals.push(new Vector3(_normals[i], _normals[i + 1], -_normals[i + 2]));
+                if (_tangents) for (let i = 0; i < _tangents.length; i += 4) tangents.push(new Vector4(_tangents[i], _tangents[i + 1], -_tangents[i + 2], -_tangents[i + 3]));
                 if (_uvs) for (let i = 0; i < _uvs.length; i += 2) uvs.push(new Vector2(_uvs[i], _uvs[i + 1]));
 
                 if (_joints) for (let i = 0; i < _joints.length; i += 4) joints.push(new Vector4(_joints[i], _joints[i + 1], _joints[i + 2], _joints[i + 3]));
@@ -171,20 +172,30 @@ class Importer {
                 mesh.joints = joints;
                 mesh.weights = weights;
 
-                let materialName = primitive.material !== undefined && gltf.materials
-                    ? gltf.materials[primitive.material]?.name || "default"
-                    : "default";
+                let materialName = primitive.material !== undefined && gltf.materials && gltf.materials[primitive.material] ? gltf.materials[primitive.material].name : "empty";
+
+                let indices = [];
+                if (_indices) {
+                    for (let i = 0; i < _indices.length; i += 3) {
+                        let i0 = _indices[i];
+                        let i1 = _indices[i + 1];
+                        let i2 = _indices[i + 2];
+
+                        // Zapisujemy jako i0, i2, i1
+                        indices.push(i0, i2, i1);
+                    }
+                }
 
                 let subMesh = new SubMesh({
-                    triangles: _indices || [],
+                    triangles: indices,
                     material: materialName,
                 });
 
                 mesh.subMeshes.push(subMesh);
 
-                // mesh.RecalculateNormals?.();
-                // mesh.RecalculateTangents?.();
-                // mesh.RecalculateBounds?.();
+                mesh.RecalculateNormals?.();
+                mesh.RecalculateTangents?.();
+                mesh.RecalculateBounds?.();
                 mesh.UploadMeshData();
 
                 meshes.push(mesh);

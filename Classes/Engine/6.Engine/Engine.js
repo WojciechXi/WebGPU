@@ -34,7 +34,7 @@ class Engine {
 
         const cpuBegin = performance.now();
 
-        Time.Update(time / 1000);
+        Time.Update(time);
         Input.Update();
 
         if (this.scene) {

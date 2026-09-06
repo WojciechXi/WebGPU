@@ -20,7 +20,7 @@ class GBufferRenderPass extends RenderPass {
     Render(camera, scene, commandEncoder) {
         const renderPass = this.renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                this.colorRenderTexture.GetColorAttachment('clear', 'store', scene.ambientLight.color),
+                this.colorRenderTexture.GetColorAttachment(),
                 this.worldNormalRenderTexture.GetColorAttachment(),
                 this.pbrRenderTexture.GetColorAttachment(),
                 this.emissiveRenderTexture.GetColorAttachment(),

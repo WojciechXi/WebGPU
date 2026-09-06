@@ -12,12 +12,12 @@ class Time {
         this.frames = 0;
     }
 
-    static Update(time) {
-        this.deltaTime = (time - this.time) * this.timeScale;
+    static Update(timeMs) {
+        this.deltaTime = ((timeMs - this.time) * this.timeScale) / 1000;
         this.frames = 1 / this.deltaTime;
 
         this.fixedTime += Mathf.Min(this.deltaTime, 0.25);
-        this.time = time;
+        this.time = timeMs;
     }
 
 }

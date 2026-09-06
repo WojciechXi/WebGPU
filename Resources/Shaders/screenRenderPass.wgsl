@@ -11,8 +11,9 @@ fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
         vec2f(-1.0,  1.0), vec2f(1.0, -1.0), vec2f(1.0, 1.0)
     );
 
-    out.pos = vec4f(pos[vid].x, -pos[vid].y, 0.0, 1.0);
-    out.uv = vec2f((pos[vid].x + 1.0) * 0.5, (1.0 - pos[vid].y) * 0.5);
+    let p = pos[vid];
+    out.pos = vec4f(p, 0.0, 1.0);
+    out.uv = vec2f((p.x + 1.0) * 0.5, (1.0 - p.y) * 0.5);
     return out;
 }
 

@@ -1,0 +1,55 @@
+{
+    "Glass": {},
+    "Plastic": {},
+    "Concrete": {},
+    "Floor": {
+        "textures": {
+            "albedo": "Textures/Floor/512_Albedo.webp",
+            "normal": "Textures/Floor/512_Normal.webp",
+            "pbr": "Textures/Floor/512_PBR.webp"
+        }
+    },
+    "Paint": {
+        "textures": {
+            "albedo": "Textures/Paint/Albedo.webp",
+            "normal": "Textures/Paint/Normal.webp"
+        }
+    },
+    "Top": {},
+    "Gold": {
+        "color": [
+            1,
+            0.75,
+            0.5,
+            1
+        ]
+    },
+    "Black": {
+        "color": [
+            0,
+            0,
+            0,
+            1
+        ]
+    },
+    "MDF": {
+        "textures": {
+            "albedo": "Textures/MDF/Albedo.webp"
+        }
+    },
+    "H1386 ST40": {
+        "textures": {
+            "albedo": "Textures/H1386 ST40/Albedo.jpg"
+        }
+    },
+    "U702 PM": {
+        "textures": {
+            "albedo": "Textures/U702 PM/Albedo.webp"
+        }
+    },
+    "U702 ST9": {
+        "textures": {
+            "albedo": "Textures/U702 ST9/Albedo.webp"
+        }
+    }
+}

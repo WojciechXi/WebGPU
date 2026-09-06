@@ -1,5 +1,9 @@
 class Color32 extends Float32Array {
 
+    static FromArray(array) {
+        return new this(array[0] ?? 1, array[1] ?? 1, array[2] ?? 1, array[3] ?? 1);
+    }
+
     /* Unity */
 
     // Static Properties

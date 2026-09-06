@@ -30,11 +30,30 @@ window.addEventListener('DOMContentLoaded', async function (event) {
         litShader.name = 'Lit';
         litShader.code = await Resources.Load('Shaders/Lit.wgsl');
 
+        const litNormalShader = new Shader();
+        litNormalShader.name = 'LitNormal';
+        litNormalShader.code = await Resources.Load('Shaders/LitNormal.wgsl');
+
         Engine.emptyMaterial = new Material(litShader);
         Engine.emptyMaterial.color = new Color32(1, 0.5, 0.25, 1.0);
 
         const renderPipeline = engine.renderPipeline = new RenderPipeline();
         await renderPipeline.Init();
+
+        const allMaterials = {};
+        const materialList = await Resources.Load('Materials.json');
+        const materialKeys = Object.keys(materialList);
+        for (let materialKey of materialKeys) {
+            const materialDefinition = materialList[materialKey];
+            const material = new Material(litShader);
+            if (materialDefinition.color) material.color = Color32.FromArray(materialDefinition.color);
+            for (let textureName of Object.keys(materialDefinition.textures ?? {})) {
+                const texture = await Resources.Load(materialDefinition.textures[textureName]);
+                material.SetTexture(textureName, texture);
+            }
+            material.Update();
+            allMaterials[materialKey] = material;
+        }
 
         const defaultMaterial = new Material(litShader);
         const defaultMaterialAlbedo = await Resources.Load('Textures/Floor/512_Albedo.webp');
@@ -51,7 +70,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
         const ambientLightGameObject = new GameObject("Ambient Light");
         const ambientLight = ambientLightGameObject.AddComponent(AmbientLight);
         scene.ambientLight = ambientLight;
-        ambientLight.color.Set(0.8, 0.9, 1, 0.25);
+        ambientLight.color.Set(0.98, 0.99, 1, 0.25);
 
         const directionalLightGameObject = new GameObject('Directional Light');
         directionalLightGameObject.transform.eulerAngles = new Vector3(60, -45, 0);
@@ -61,13 +80,13 @@ window.addEventListener('DOMContentLoaded', async function (event) {
         directionalLightGameObject.transform.position = Vector3.Multiply(directionalLightGameObject.transform.back, 25);
 
         const mainCameraGameObject = new GameObject('Main Camera');
-        mainCameraGameObject.transform.localPosition.x = -4;
-        mainCameraGameObject.transform.localPosition.y = -1;
-        mainCameraGameObject.transform.localPosition.z = 1;
+        mainCameraGameObject.transform.localPosition.x = -1.5;
+        mainCameraGameObject.transform.localPosition.y = 1.5;
+        mainCameraGameObject.transform.localPosition.z = -5;
         // mainCameraGameObject.transform.localEulerAngles = new Vector3(0, 45, 0);
         const mainCamera = mainCameraGameObject.AddComponent(Camera);
-        const autoRotator = mainCameraGameObject.AddComponent(AutoRotator);
-        // const freeCamera = mainCameraGameObject.AddComponent(FreeCamera);
+        // const autoRotator = mainCameraGameObject.AddComponent(AutoRotator);
+        const freeCamera = mainCameraGameObject.AddComponent(FreeCamera);
 
         const krakowObject = await Resources.Load('Models/Krakow.gltf');
         if (krakowObject && krakowObject.meshes) {
@@ -76,8 +95,14 @@ window.addEventListener('DOMContentLoaded', async function (event) {
                 const childGameObject = new GameObject(mesh.name);
                 childGameObject.transform.SetParent(gameObject.transform);
                 let meshRenderer = childGameObject.AddComponent(MeshRenderer);
-                meshRenderer.sharedMaterial = defaultMaterial;
                 meshRenderer.sharedMesh = mesh;
+
+                const materials = [];
+                for (let i = 0; i < mesh.subMeshCount; i++) {
+                    materials[i] = allMaterials[mesh.subMeshes[i].material] ?? null;
+                    if (!materials[i]) console.log(mesh.subMeshes[i].material);
+                }
+                meshRenderer.sharedMaterials = materials;
             }
         }
 

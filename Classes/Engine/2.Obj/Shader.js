@@ -1,12 +1,9 @@
 class Shader extends Obj {
 
-    static _nextId = 0;
-
     constructor() {
         super();
         const object = this;
 
-        object.id = Shader._nextId++;
         new Property(object, 'renderQueue', 2000);
         new Property(object, 'code', '', {
             set: function (value, oldValue) {
@@ -90,7 +87,7 @@ class Shader extends Obj {
             primitive: {
                 topology: "triangle-list",
                 cullMode: states.cull,
-                frontFace: 'ccw',
+                frontFace: 'cw',
             },
             depthStencil: {
                 format: "depth24plus",

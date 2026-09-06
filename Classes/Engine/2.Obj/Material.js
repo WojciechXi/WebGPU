@@ -4,13 +4,10 @@ class Material extends Obj {
         console.log('Material class loaded');
     }
 
-    static _nextId = 0;
-
     constructor(shaderOrMaterial) {
         super();
         const object = this;
 
-        object.id = Material._nextId++;
         let shader = null;
         if (shaderOrMaterial instanceof Shader) shader = shaderOrMaterial;
         else if (shaderOrMaterial instanceof Material) shader = shaderOrMaterial.shader;

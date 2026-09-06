@@ -1,12 +1,9 @@
 class Mesh extends Obj {
 
-    static _nextId = 0;
-
     constructor() {
         super();
         const object = this;
 
-        object.id = Mesh._nextId++;
         new Property(object, 'bounds', new Bounds(Vector3.zero, Vector3.zero));
         new Property(object, 'vertexBuffer', new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }));
         new Property(object, 'lineBuffer', new Buffer(0, { usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST }));
@@ -20,33 +17,23 @@ class Mesh extends Obj {
         new Property(object, 'subMeshes', []);
     }
 
-    get bindposeCount() { } // The number of bind poses in the Mesh.
-    get bindposes() { } // The bind poses. The bind pose at each index refers to the bone with the same index.
-    get blendShapeCount() { } // Returns BlendShape count on this mesh.
-    get boneWeights() { } // The BoneWeight for each vertex in the Mesh, which represents 4 bones per vertex.
-    get colors() { } // Vertex colors of the Mesh.
-    get colors32() { } // Vertex colors of the Mesh.
-    get indexBufferTarget() { } // The intended target usage of the Mesh GPU index buffer.
-    get indexFormat() { } // Format of the mesh index buffer data.
-    get isReadable() { } // Returns true if the Mesh is read/write enabled, or false if it is not.
-    get lodCount() { } // The number of LOD levels in this mesh.
-    get lodSelectionCurve() { } // This struct represents the parameters that Unity uses to calculate which Mesh LOD level to select. It contains the lodBias and lodSlope properties, which scale logarithmically using screen space pixel area.
-    get skinWeightBufferLayout() { } // The dimension of data in the bone weight buffer.
+    get bindposeCount() { return 0; }
+    get bindposes() { return []; }
+    get blendShapeCount() { return 0; }
+    get boneWeights() { return this.weights; }
+    get colors() { return this.colors; }
     get subMeshCount() { return this.subMeshes.length; } set subMeshCount(value) { this.subMeshes = new Array(value); }
-    get triangles() { } // An array containing all triangles in the Mesh.
-    get uv() { return this.uvs[0] ?? []; } // The texture coordinates (UVs) in the first channel.
-    get vertexAttributeCount() { } // Returns the number of vertex attributes that the mesh has. (Read Only)
-    get vertexBufferCount() { } // Gets the number of vertex buffers present in the Mesh. (Read Only)
-    get vertexBufferTarget() { } // The intended target usage of the Mesh GPU vertex buffer.
-    get vertexCount() { return this.vertices.length; } // Returns the number of vertices in the Mesh (Read Only).
+    get uv() { return this.uvs[0] ?? []; }
+    get vertexCount() { return this.vertices.length; }
 
-    AddBlendShapeFrame() { }
     Clear() {
         this.vertices = [];
         this.normals = [];
         this.tangents = [];
         this.colors = [];
         this.uvs = [];
+        this.joints = [];
+        this.weights = [];
 
         this.lineBuffer.Resize(0);
         this.vertexBuffer.Resize(0);
@@ -54,217 +41,264 @@ class Mesh extends Obj {
         for (let subMesh of this.subMeshes) subMesh.Clear();
         this.subMeshes = [];
     }
-    ClearBlendShapes() { }
-    CombineMeshes() { }
-    GetAllBoneWeights() { }
-    GetBaseVertex() { }
-    GetBindposes() { }
-    GetBlendShapeBuffer() { }
-    GetBlendShapeBufferRange() { }
-    GetBlendShapeFrameCount() { }
-    GetBlendShapeFrameVertices() { }
-    GetBlendShapeFrameWeight() { }
-    GetBlendShapeIndex() { }
-    GetBlendShapeName() { }
-    GetBonesPerVertex() { }
-    GetBoneWeightBuffer() { }
-    GetBoneWeights() { }
-    GetColors() { }
-    GetIndexBuffer() { }
-    GetIndexCount() { }
-    GetIndexStart() { }
-    GetIndices() { }
-    GetLod() { }
-    GetLods() { }
-    GetNativeIndexBufferPtr() { }
-    GetNativeVertexBufferPtr() { }
-    GetNormals() { }
+
     GetSubMesh(subMeshIndex) { return this.subMeshes[subMeshIndex]; }
-    GetTangents() { }
-    GetTopology() { }
-    GetTriangles() { }
-    GetUVDistributionMetric() { }
-    GetUVs() { }
-    GetVertexAttribute() { }
-    GetVertexAttributeDimension() { }
-    GetVertexAttributeFormat() { }
-    GetVertexAttributeOffset() { }
-    GetVertexAttributes() { }
-    GetVertexAttributeStream() { }
-    GetVertexBuffer() { }
-    GetVertexBufferStride() { }
-    GetVertices() { }
-    HasVertexAttribute() { }
-    MarkDynamic() { }
-    MarkModified() { }
-    Optimize() { }
-    OptimizeIndexBuffers() { }
-    OptimizeReorderVertexBuffer() { }
-    RecalculateBounds() { return this.bounds = GeometryUtility.CalculateBounds(this.vertices, Matrix4x4.Identity()); }
+
+    RecalculateBounds() {
+        return this.bounds = GeometryUtility.CalculateBounds(this.vertices, Matrix4x4.Identity());
+    }
+
     RecalculateNormals() {
-        this.normals = Array(this.vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
+        const vCount = this.vertices.length;
+        if (vCount === 0) return;
+
+        const normBuffer = new Float32Array(vCount * 3);
 
         for (let subMesh of this.subMeshes) {
-            let tris = subMesh.triangles;
+            const tris = subMesh.triangles;
             for (let i = 0; i < tris.length; i += 3) {
-                let i0 = tris[i], i1 = tris[i + 1], i2 = tris[i + 2];
-                let v0 = this.vertices[i0];
-                let v1 = this.vertices[i1];
-                let v2 = this.vertices[i2];
+                // Uzwojenie CW w LH: v0 -> v1 -> v2
+                const i0 = tris[i], i1 = tris[i + 1], i2 = tris[i + 2];
 
-                let e1 = Vector3.Subtract(v1, v0);
-                let e2 = Vector3.Subtract(v2, v0);
-                let n = e2.Cross(e1).normalized;
+                const v0 = this.vertices[i0], v1 = this.vertices[i1], v2 = this.vertices[i2];
 
-                this.normals[i0] = Vector3.Add(this.normals[i0], n);
-                this.normals[i1] = Vector3.Add(this.normals[i1], n);
-                this.normals[i2] = Vector3.Add(this.normals[i2], n);
+                const e1x = v1[0] - v0[0], e1y = v1[1] - v0[1], e1z = v1[2] - v0[2];
+                const e2x = v2[0] - v0[0], e2y = v2[1] - v0[1], e2z = v2[2] - v0[2];
+
+                // Iloczyn wektorowy w LH (Cross Product) dla krawędzi (v1-v0) x (v2-v0)
+                let nx = e1y * e2z - e1z * e2y;
+                let ny = e1z * e2x - e1x * e2z;
+                let nz = e1x * e2y - e1y * e2x;
+
+                normBuffer[i0 * 3] += nx; normBuffer[i0 * 3 + 1] += ny; normBuffer[i0 * 3 + 2] += nz;
+                normBuffer[i1 * 3] += nx; normBuffer[i1 * 3 + 1] += ny; normBuffer[i1 * 3 + 2] += nz;
+                normBuffer[i2 * 3] += nx; normBuffer[i2 * 3 + 1] += ny; normBuffer[i2 * 3 + 2] += nz;
             }
         }
 
-        for (let i = 0; i < this.normals.length; i++) {
-            this.normals[i] = this.normals[i].normalized;
+        this.normals = new Array(vCount);
+        for (let i = 0; i < vCount; i++) {
+            const idx = i * 3;
+            let nx = normBuffer[idx], ny = normBuffer[idx + 1], nz = normBuffer[idx + 2];
+            const len = Math.sqrt(nx * nx + ny * ny + nz * nz);
+
+            if (len > 1e-8) {
+                const invLen = 1.0 / len;
+                nx *= invLen; ny *= invLen; nz *= invLen;
+            } else {
+                nx = 0; ny = 1; nz = 0;
+            }
+            this.normals[i] = new Vector3(nx, ny, nz);
         }
     }
+
     RecalculateTangents() {
-        this.tangents = Array(this.vertices.length).fill(0).map(() => new Vector4(0, 0, 0, 1));
-        let tan1 = Array(this.vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
-        let tan2 = Array(this.vertices.length).fill(0).map(() => new Vector3(0, 0, 0));
+        const vCount = this.vertices.length;
+        if (vCount === 0) return;
+
+        if (this.normals.length !== vCount) this.RecalculateNormals();
+
+        const uvs = this.uv;
+        if (!uvs || uvs.length !== vCount) return;
+
+        const tan1 = new Float32Array(vCount * 3);
+        const tan2 = new Float32Array(vCount * 3);
 
         for (let subMesh of this.subMeshes) {
-            let tris = subMesh.triangles.values;
+            const tris = subMesh.triangles;
             for (let i = 0; i < tris.length; i += 3) {
-                let i0 = tris[i], i1 = tris[i + 1], i2 = tris[i + 2];
+                const i0 = tris[i], i1 = tris[i + 1], i2 = tris[i + 2];
 
-                let v0 = this.vertices[i0];
-                let v1 = this.vertices[i1];
-                let v2 = this.vertices[i2];
+                const v0 = this.vertices[i0], v1 = this.vertices[i1], v2 = this.vertices[i2];
+                const uv0 = uvs[i0], uv1 = uvs[i1], uv2 = uvs[i2];
 
-                let uv0 = this.uvs[i0];
-                let uv1 = this.uvs[i1];
-                let uv2 = this.uvs[i2];
+                const e1x = v1[0] - v0[0], e1y = v1[1] - v0[1], e1z = v1[2] - v0[2];
+                const e2x = v2[0] - v0[0], e2y = v2[1] - v0[1], e2z = v2[2] - v0[2];
 
-                let e1 = Vector3.Subtract(v1, v0);
-                let e2 = Vector3.Subtract(v2, v0);
+                const duv1x = uv1[0] - uv0[0], duv1y = uv1[1] - uv0[1];
+                const duv2x = uv2[0] - uv0[0], duv2y = uv2[1] - uv0[1];
 
-                let duv1 = Vector2.Subtract(uv1, uv0);
-                let duv2 = Vector2.Subtract(uv2, uv0);
+                const det = duv1x * duv2y - duv1y * duv2x;
+                const r = Math.abs(det) < 1e-8 ? 0.0 : 1.0 / det;
 
-                let r = 1.0 / (duv1.x * duv2.y - duv1.y * duv2.x);
+                const tx = (e1x * duv2y - e2x * duv1y) * r;
+                const ty = (e1y * duv2y - e2y * duv1y) * r;
+                const tz = (e1z * duv2y - e2z * duv1y) * r;
 
-                let t = new Vector3(
-                    (e1.x * duv2.y - e2.x * duv1.y) * r,
-                    (e1.y * duv2.y - e2.y * duv1.y) * r,
-                    (e1.z * duv2.y - e2.z * duv1.y) * r
-                );
+                const bx = (e2x * duv1x - e1x * duv2x) * r;
+                const by = (e2y * duv1x - e1y * duv2x) * r;
+                const bz = (e2z * duv1x - e1z * duv2x) * r;
 
-                let b = new Vector3(
-                    (e2.x * duv1.x - e1.x * duv2.x) * r,
-                    (e2.y * duv1.x - e1.y * duv2.x) * r,
-                    (e2.z * duv1.x - e1.z * duv2.x) * r
-                );
+                tan1[i0 * 3] += tx; tan1[i0 * 3 + 1] += ty; tan1[i0 * 3 + 2] += tz;
+                tan1[i1 * 3] += tx; tan1[i1 * 3 + 1] += ty; tan1[i1 * 3 + 2] += tz;
+                tan1[i2 * 3] += tx; tan1[i2 * 3 + 1] += ty; tan1[i2 * 3 + 2] += tz;
 
-                tan1[i0] = Vector3.Add(tan1[i0], t);
-                tan1[i1] = Vector3.Add(tan1[i1], t);
-                tan1[i2] = Vector3.Add(tan1[i2], t);
-                tan2[i0] = Vector3.Add(tan2[i0], b);
-                tan2[i1] = Vector3.Add(tan2[i1], b);
-                tan2[i2] = Vector3.Add(tan2[i2], b);
+                tan2[i0 * 3] += bx; tan2[i0 * 3 + 1] += by; tan2[i0 * 3 + 2] += bz;
+                tan2[i1 * 3] += bx; tan2[i1 * 3 + 1] += by; tan2[i1 * 3 + 2] += bz;
+                tan2[i2 * 3] += bx; tan2[i2 * 3 + 1] += by; tan2[i2 * 3 + 2] += bz;
             }
         }
 
-        for (let i = 0; i < this.vertices.length; i++) {
-            let n = this.normals[i];
-            let t = tan1[i];
+        this.tangents = new Array(vCount);
 
-            let tangent = (Vector3.Subtract(t, Vector3.Multiply(n, n.Dot(t)))).normalized;
+        for (let i = 0; i < vCount; i++) {
+            const idx = i * 3;
+            const n = this.normals[i];
+            const nx = n[0], ny = n[1], nz = n[2];
 
-            let handedness = (n.Cross(t).Dot(tan2[i]) < 0.0) ? -1.0 : 1.0;
+            const tx = tan1[idx], ty = tan1[idx + 1], tz = tan1[idx + 2];
+            const bx = tan2[idx], by = tan2[idx + 1], bz = tan2[idx + 2];
 
-            this.tangents[i] = new Vector4(tangent.x, tangent.y, tangent.z, handedness);
+            // Gram-Schmidt
+            const dot = nx * tx + ny * ty + nz * tz;
+            let ox = tx - nx * dot;
+            let oy = ty - ny * dot;
+            let oz = tz - nz * dot;
+
+            let len = Math.sqrt(ox * ox + oy * oy + oz * oz);
+            if (len > 1e-8) {
+                const invLen = 1.0 / len;
+                ox *= invLen; oy *= invLen; oz *= invLen;
+            } else {
+                ox = 1; oy = 0; oz = 0;
+            }
+
+            // W układzie LH iloczyn N x Tangent daje Bitangent kierujący się w stronę wzrostu UV.V
+            const cx = ny * oz - nz * oy;
+            const cy = nz * ox - nx * oz;
+            const cz = nx * oy - ny * ox;
+
+            // Skrętność (Handedness W) – dla DirectX LH przy odwrotnym V
+            const handedness = (cx * bx + cy * by + cz * bz < 0.0) ? -1.0 : 1.0;
+
+            this.tangents[i] = new Vector4(ox, oy, oz, handedness);
         }
     }
-    RecalculateUVDistributionMetric() { }
-    RecalculateUVDistributionMetrics() { }
-    SetBindposes(matrices) { }
-    SetBoneWeights(bonesPerVertex, weights) { }
+
     SetColors(inColors) { this.colors = inColors.map(c => c.Clone()); }
-    SetIndexBufferData(data, dataStart, meshBufferStart, count, flags = 0) { }
-    SetIndexBufferParams(indexCount, format) { }
-    SetIndices(indices, topology, subMesh, calculateBounds = true, baseVertex = 0) { }
-    SetLod(subMesh, level, levelRange, flags = 0) { }
-    SetLods(levels, subMesh, flags) { }
     SetNormals(inNormals) { this.normals = inNormals.map(n => n.Clone()); }
-    SetFlatNormals(inNormals, stride = 4) {
+    SetFlatNormals(inNormals, stride = 3) {
         this.normals = [];
-        for (let i = 0; i < inNormals.length; i += stride) this.normals.push(new Vector3(inNormals[i], inNormals[i + 1], inNormals[i + 2]));
+        for (let i = 0; i < inNormals.length; i += stride) {
+            this.normals.push(new Vector3(inNormals[i], inNormals[i + 1], inNormals[i + 2]));
+        }
     }
     SetSubMesh(index, subMesh) { this.subMeshes[index] = subMesh; }
     SetSubMeshes(subMeshes) { this.subMeshes = subMeshes; }
     SetTangents(inTangents) { this.tangents = inTangents.map(t => t.Clone()); }
     SetFlatTangents(inTangents, stride = 4) {
         this.tangents = [];
-        for (let i = 0; i < inTangents.length; i += stride) this.tangents.push(new Vector4(inTangents[i], inTangents[i + 1], inTangents[i + 2], inTangents[i + 3]));
+        for (let i = 0; i < inTangents.length; i += stride) {
+            this.tangents.push(new Vector4(inTangents[i], inTangents[i + 1], inTangents[i + 2], inTangents[i + 3]));
+        }
     }
     SetTriangles(triangles, subMeshIndex, calculateBounds = true, baseVertex = 0) {
         this.subMeshes[subMeshIndex].SetTriangles(triangles, baseVertex);
-        // if (calculateBounds) this.RecalculateBounds();
+        if (calculateBounds) this.RecalculateBounds();
     }
-    SetUVs(uvs, index = 0) { this.uvs[index] = uvs.map(u => u.Clone()); }
-    SetFlatUvs(inUvs, stride = 4) {
-        this.uvs = [];
-        for (let i = 0; i < inUvs.length; i += stride) this.uvs.push(new Vector2(inUvs[i], inUvs[i + 1]));
+    SetUVs(uvs, index = 0) {
+        if (!this.uvs[index]) this.uvs[index] = [];
+        this.uvs[index] = uvs.map(u => u.Clone());
     }
-    SetVertexBufferData(data, dataStart, meshBufferStart, count, stream, flags = 0) { }
-    SetVertexBufferParams(vertexCount, attributes) { }
+    SetFlatUvs(inUvs, stride = 2, index = 0) {
+        this.uvs[index] = [];
+        for (let i = 0; i < inUvs.length; i += stride) {
+            this.uvs[index].push(new Vector2(inUvs[i], inUvs[i + 1]));
+        }
+    }
     SetVertices(inVertices, calculateBounds = true) {
         this.vertices = inVertices.map(v => v.Clone());
         if (calculateBounds) this.RecalculateBounds();
     }
-    SetFlatVertices(inVertices, stride = 4, calculateBounds = true) {
+    SetFlatVertices(inVertices, stride = 3, calculateBounds = true) {
         this.vertices = [];
-        for (let i = 0; i < inVertices.length; i += stride) this.vertices.push(new Vector3(inVertices[i], inVertices[i + 1], inVertices[i + 2]));
+        for (let i = 0; i < inVertices.length; i += stride) {
+            this.vertices.push(new Vector3(inVertices[i], inVertices[i + 1], inVertices[i + 2]));
+        }
         if (calculateBounds) this.RecalculateBounds();
     }
+
     UploadMeshData() {
-        let offset = 4 + 4 + 4 + 4 + 4 + 4 + 4; // position + normal + tangent + color + uv + joints + weights
+        const vCount = this.vertices.length;
+        if (vCount === 0) return;
 
-        let vertices = new Float32Array(this.vertices.length * offset);
-        let lines = new Float32Array(this.vertices.length * 4);
+        const stride = 28;
+        const verticesData = new Float32Array(vCount * stride);
+        const linesData = new Float32Array(vCount * 4);
 
-        for (let i = 0; i < this.vertices.length; i++) {
-            let vertex = this.vertices[i] ?? Vector3.zero;
-            let normal = this.normals[i] ?? Vector3.up;
-            let tangent = this.tangents[i] ?? new Vector4(0, 0, 0, 1);
-            let color = this.colors[i] ?? Color32.white;
-            let uv = this.uv[i] ?? Vector2.zero;
-            let joints = this.joints[i] ?? new Vector4(-1, -1, -1, -1);
-            let weights = this.weights[i] ?? new Vector4(0, 0, 0, 0);
+        const activeUv = this.uv;
 
-            vertices.set([
-                vertex.x, vertex.y, vertex.z, 0,
-                normal.x, normal.y, normal.z, 0,
-                tangent.x, tangent.y, tangent.z, tangent.w,
-                color.r, color.g, color.b, color.a,
-                uv.x, uv.y, 0, 0,
-                joints.x, joints.y, joints.z, joints.w,
-                weights.x, weights.y, weights.z, weights.w,
-            ], i * offset);
+        for (let i = 0; i < vCount; i++) {
+            const v = this.vertices[i];
+            const n = this.normals[i] ?? Vector3.up;
+            const t = this.tangents[i] ?? [0, 0, 0, 1];
+            const c = this.colors[i] ?? [1, 1, 1, 1];
+            const uv = activeUv[i] ?? [0, 0];
+            const j = this.joints[i] ?? [-1, -1, -1, -1];
+            const w = this.weights[i] ?? [0, 0, 0, 0];
 
-            lines.set([
-                vertex.x, vertex.y, vertex.z, 0,
-            ], i * 4);
+            const offset = i * stride;
+
+            // Position
+            verticesData[offset] = v[0];
+            verticesData[offset + 1] = v[1];
+            verticesData[offset + 2] = v[2];
+            verticesData[offset + 3] = 1.0;
+
+            // Normal
+            verticesData[offset + 4] = n[0];
+            verticesData[offset + 5] = n[1];
+            verticesData[offset + 6] = n[2];
+            verticesData[offset + 7] = 0.0;
+
+            // Tangent
+            verticesData[offset + 8] = t[0];
+            verticesData[offset + 9] = t[1];
+            verticesData[offset + 10] = t[2];
+            verticesData[offset + 11] = t[3];
+
+            // Color
+            verticesData[offset + 12] = c[0];
+            verticesData[offset + 13] = c[1];
+            verticesData[offset + 14] = c[2];
+            verticesData[offset + 15] = c[3];
+
+            // UV
+            verticesData[offset + 16] = uv[0];
+            verticesData[offset + 17] = uv[1];
+            verticesData[offset + 18] = 0.0;
+            verticesData[offset + 19] = 0.0;
+
+            // Joints
+            verticesData[offset + 20] = j[0];
+            verticesData[offset + 21] = j[1];
+            verticesData[offset + 22] = j[2];
+            verticesData[offset + 23] = j[3];
+
+            // Weights
+            verticesData[offset + 24] = w[0];
+            verticesData[offset + 25] = w[1];
+            verticesData[offset + 26] = w[2];
+            verticesData[offset + 27] = w[3];
+
+            // Line buffer
+            const lineOffset = i * 4;
+            linesData[lineOffset] = v[0];
+            linesData[lineOffset + 1] = v[1];
+            linesData[lineOffset + 2] = v[2];
+            linesData[lineOffset + 3] = 1.0;
         }
 
-        this.vertexBuffer.Resize(vertices.length);
-        this.vertexBuffer.Set(vertices);
+        this.vertexBuffer.Resize(verticesData.length);
+        this.vertexBuffer.Set(verticesData);
 
-        this.lineBuffer.Resize(lines.length);
-        this.lineBuffer.Set(lines);
+        this.lineBuffer.Resize(linesData.length);
+        this.lineBuffer.Set(linesData);
 
-        for (let subMesh of this.subMeshes) subMesh.UploadMeshData();
+        for (let subMesh of this.subMeshes) {
+            subMesh.UploadMeshData();
+        }
     }
-
 }
 
 class SubMesh {
@@ -300,5 +334,4 @@ class SubMesh {
         this.triangleBuffer.WriteBuffer();
         this.edgeBuffer.WriteBuffer();
     }
-
 }
