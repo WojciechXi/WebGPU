@@ -12,14 +12,6 @@ class RenderPipeline {
             depth: true,
         });
 
-        this.inputRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
-            format: 'rgba8unorm',
-        });
-
-        this.outputRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
-            format: 'rgba8unorm',
-        });
-
         this.colorRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
             format: 'rgba8unorm',
         });
@@ -37,15 +29,19 @@ class RenderPipeline {
         });
 
         this.lightingRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
-            format: 'rgba8unorm',
+            format: 'rgba16float',
+        });
+
+        this.ssaoRenderTexture = new RenderTexture(Mathf.FloorToInt(Graphics.Width / 4), Mathf.FloorToInt(Graphics.Height / 4), {
+            format: 'r8unorm',
         });
 
         this.ssgiRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
-            format: 'rgba8unorm',
+            format: 'rgba16float',
         });
 
-        this.ssaoRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
-            format: 'rgba8unorm',
+        this.compositionRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
+            format: 'rgba16float',
         });
 
         this.bloomRenderTexture = new RenderTexture(Graphics.Width, Graphics.Height, {
@@ -56,7 +52,7 @@ class RenderPipeline {
             format: 'rgba8unorm',
         });
 
-        this.screenRenderPass.renderTexture = this.ssaoRenderTexture;
+        this.screenRenderPass.renderTexture = this.tonemappingRenderTexture;
 
         this.preDepthRenderPass = new PreDepthRenderPass({
             name: 'preDepthRenderPass',
@@ -99,7 +95,6 @@ class RenderPipeline {
             worldNormalRenderTexture: this.worldNormalRenderTexture,
             pbrRenderTexture: this.pbrRenderTexture,
             emissiveRenderTexture: this.emissiveRenderTexture,
-            ssaoRenderTexture: this.ssaoRenderTexture,
 
             resultRenderTexture: this.lightingRenderTexture,
         });
@@ -117,11 +112,23 @@ class RenderPipeline {
             resultRenderTexture: this.ssgiRenderTexture,
         });
 
+        this.compositionRenderPass = new CompositionRenderPass({
+            name: 'compositionRenderPass',
+            code: await Resources.Load('Shaders/compositionRenderPass.wgsl'),
+
+            colorRenderTexture: this.colorRenderTexture,
+            lightingRenderTexture: this.lightingRenderTexture,
+            ssaoRenderTexture: this.ssaoRenderTexture,
+            ssgiRenderTexture: this.ssgiRenderTexture,
+
+            resultRenderTexture: this.compositionRenderTexture,
+        });
+
         this.bloomRenderPass = new BloomRenderPass({
             name: 'bloomRenderPass',
             code: await Resources.Load('Shaders/bloomRenderPass.wgsl'),
 
-            inputRenderTexture: this.ssgiRenderTexture,
+            inputRenderTexture: this.compositionRenderTexture,
             resultRenderTexture: this.bloomRenderTexture,
         });
 
@@ -129,7 +136,7 @@ class RenderPipeline {
             name: 'tonemappingRenderPass',
             code: await Resources.Load('Shaders/tonemappingRenderPass.wgsl'),
 
-            inputRenderTexture: this.bloomRenderTexture,
+            inputRenderTexture: this.compositionRenderTexture,
             resultRenderTexture: this.tonemappingRenderTexture,
         });
 
@@ -143,11 +150,13 @@ class RenderPipeline {
             this.preDepthRenderPass,
             this.shadowRenderPass,
             this.gBufferRenderPass,
+            this.ssaoRenderPass,
 
             this.lightingRenderPass,
             this.ssgiRenderPass,
-            this.ssaoRenderPass,
-            this.bloomRenderPass,
+            this.compositionRenderPass,
+
+            // this.bloomRenderPass,
             this.tonemappingRenderPass,
 
             this.screenRenderPass,

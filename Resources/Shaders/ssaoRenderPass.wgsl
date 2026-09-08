@@ -74,12 +74,12 @@ fn getSampleOffset(sampleIdx: u32, totalSamples: u32, uv: vec2<f32>) -> vec3<f32
 }
 
 @fragment
-fn fs(in: VSOut) -> @location(0) vec4<f32> {
+fn fs(in: VSOut) -> @location(0) f32 {
     let uv = in.uv;
 
     let rawDepth = textureSampleLevel(depthTexture, samplerPoint, uv, 0);
     if (rawDepth >= 1.0) {
-        return vec4f(1, 0, 0, 1);
+        return 1.0;
     }
 
     let worldPos = getWorldPos(uv, rawDepth);
@@ -131,5 +131,5 @@ fn fs(in: VSOut) -> @location(0) vec4<f32> {
 
     // Normalizacja i wyliczenie czystego współczynnika widoczności [0, 1]
     let ao = 1.0 - (occlusion / f32(sampleCount)) * ssao.intensity;
-    return vec4f(max(0.0, ao), 0, 0, 1);
+    return max(0.0, ao);
 }

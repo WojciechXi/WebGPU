@@ -40,6 +40,32 @@ window.addEventListener('DOMContentLoaded', async function (event) {
         const renderPipeline = engine.renderPipeline = new RenderPipeline();
         await renderPipeline.Init();
 
+        const materialsRemap = {
+            'White': 'U8681_SM_BIAŁY_ALASKA',
+            'White.001': 'U8681_SM_BIAŁY_ALASKA',
+            'White.002': 'U8681_SM_BIAŁY_ALASKA',
+            'White Glossy': 'U8681_SM_BIAŁY_ALASKA',
+            'Walnut': 'D3025_OW_DĄB_SONOMA',
+            'Walnut.001': 'D3025_OW_DĄB_SONOMA',
+            'Tiles': 'Floor',
+            'Beige': 'Paint',
+            'Wall S': 'Paint',
+            'Wall N': 'Paint',
+            'Wall E': 'Paint',
+            'Wall W': 'Paint',
+            'Wall K': 'Paint',
+            'Wall K S': 'Paint',
+            'Wall K S 2': 'Paint',
+            'Wall K S 3': 'Paint',
+            'Wall K S 4': 'Paint',
+            'Wall K W': 'Paint',
+            'Wall K 2': 'Paint',
+            'Bedroom S': 'Paint',
+            'Bedroom N': 'Paint',
+            'Bedroom E': 'Paint',
+            'Bedroom W': 'Paint',
+        };
+
         const allMaterials = {};
         const materialList = await Resources.Load('Materials.json');
         const materialKeys = Object.keys(materialList);
@@ -81,11 +107,11 @@ window.addEventListener('DOMContentLoaded', async function (event) {
 
         const mainCameraGameObject = new GameObject('Main Camera');
         mainCameraGameObject.transform.eulerAngles = new Vector3(0, 180, 0);
-        mainCameraGameObject.transform.localPosition.y = 0.5;
+        mainCameraGameObject.transform.localPosition.y = 1.5;
         mainCameraGameObject.transform.localPosition.z = 2;
         // mainCameraGameObject.transform.localEulerAngles = new Vector3(0, 45, 0);
         const mainCamera = mainCameraGameObject.AddComponent(Camera);
-        // const autoRotator = mainCameraGameObject.AddComponent(AutoRotator);
+        const autoRotator = mainCameraGameObject.AddComponent(AutoRotator);
         // const freeCamera = mainCameraGameObject.AddComponent(FreeCamera);
 
         // const gameObject = new GameObject("Furniture");
@@ -105,7 +131,9 @@ window.addEventListener('DOMContentLoaded', async function (event) {
 
                 const materials = [];
                 for (let i = 0; i < mesh.subMeshCount; i++) {
-                    materials[i] = allMaterials[mesh.subMeshes[i].material] ?? null;
+                    let materialName = mesh.subMeshes[i].material;
+                    materialName = materialsRemap[materialName] ?? materialName;
+                    materials[i] = allMaterials[materialName] ?? null;
                     if (!materials[i]) console.log(mesh.subMeshes[i].material);
                 }
                 meshRenderer.sharedMaterials = materials;
@@ -121,9 +149,10 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             'worldNormalRenderTexture',
             'pbrRenderTexture',
             'emissiveRenderTexture',
+            'ssaoRenderTexture',
             'lightingRenderTexture',
             'ssgiRenderTexture',
-            'ssaoRenderTexture',
+            'compositionRenderTexture',
             'tonemappingRenderTexture',
         ];
         for (let i = 0; i < textures.length; i++) {

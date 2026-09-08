@@ -6,44 +6,12 @@ class ssgiRenderPass extends RenderPass {
         this.worldNormalRenderTexture = data.worldNormalRenderTexture;
         this.pbrRenderTexture = data.pbrRenderTexture;
         this.emissiveRenderTexture = data.emissiveRenderTexture;
-        this.resultRenderTexture = data.resultRenderTexture;
 
-        this.renderPipeline = GPU.CreateRenderPipeline({
-            label: 'ssgiRenderPipeline',
-            layout: GPU.CreatePipelineLayout({
-                label: 'ssgiPipelineLayout',
-                bindGroupLayouts: [
-                    Graphics.timeBindGroupLayout,
-                    Graphics.viewBindGroupLayout,
-                    GPU.CreateBindGroupLayout({
-                        label: 'ssgiBindGroupLayout',
-                        entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, },
-                            { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering' } },
-                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'depth', viewDimension: '2d', multisampled: false, }, },
-                            { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                            { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                            { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                            { binding: 6, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        ],
-                    }),
-                ],
-            }),
-            vertex: {
-                module: this.shaderModule,
-                entryPoint: "vs"
-            },
-            fragment: {
-                module: this.shaderModule,
-                entryPoint: "fs",
-                targets: [
-                    this.resultRenderTexture.GetTarget(),
-                ]
-            },
-            primitive: {
-                topology: 'triangle-list'
-            }
+        this.ssgiRenderTexture = new RenderTexture(Mathf.FloorToInt(Graphics.Width / 4), Mathf.FloorToInt(Graphics.Height / 4), {
+            format: 'rgba16float',
         });
+
+        this.resultRenderTexture = data.resultRenderTexture;
 
         this.buffer = new Buffer(12);
 
@@ -55,15 +23,15 @@ class ssgiRenderPass extends RenderPass {
             assigned: value => this.buffer.Set({ 1: [value] }),
         });
 
-        new Property(this, 'stepSize', 0.08, {
+        new Property(this, 'stepSize', 0.02, {
             assigned: value => this.buffer.Set({ 2: [value] }),
         });
 
-        new Property(this, 'thickness', 0.25, {
+        new Property(this, 'thickness', 0.5, {
             assigned: value => this.buffer.Set({ 3: [value] }),
         });
 
-        new Property(this, 'bias', 0.05, {
+        new Property(this, 'bias', 0.025, {
             assigned: value => this.buffer.Set({ 4: [value] }),
         });
 
@@ -83,9 +51,22 @@ class ssgiRenderPass extends RenderPass {
             assigned: value => this.buffer.Set({ 8: [value] }),
         });
 
+        this.ssgiBindGroupLayout = GPU.CreateBindGroupLayout({
+            label: 'ssgiBindGroupLayout',
+            entries: [
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, },
+                { binding: 1, visibility: GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering' } },
+                { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'depth', viewDimension: '2d', multisampled: false, }, },
+                { binding: 3, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                { binding: 4, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                { binding: 5, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+                { binding: 6, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
+            ],
+        });
+
         this.bindGroup = GPU.CreateBindGroup({
             label: 'ssgiBingGroup',
-            layout: this.renderPipeline.getBindGroupLayout(2),
+            layout: this.ssgiBindGroupLayout,
             entries: [
                 this.buffer.GetBindGroupEntry(0),
                 { binding: 1, resource: GPU.CreateSampler({ addressModeU: 'repeat', addressModeV: 'repeat', magFilter: 'nearest', minFilter: 'nearest', mipmapFilter: 'nearest', }), },
@@ -96,12 +77,38 @@ class ssgiRenderPass extends RenderPass {
                 this.emissiveRenderTexture.GetBindGroupEntry(6),
             ],
         });
+
+        this.renderPipeline = GPU.CreateRenderPipeline({
+            label: 'ssgiRenderPipeline',
+            layout: GPU.CreatePipelineLayout({
+                label: 'ssgiPipelineLayout',
+                bindGroupLayouts: [
+                    Graphics.timeBindGroupLayout,
+                    Graphics.viewBindGroupLayout,
+                    this.ssgiBindGroupLayout,
+                ],
+            }),
+            vertex: {
+                module: this.shaderModule,
+                entryPoint: "vs"
+            },
+            fragment: {
+                module: this.shaderModule,
+                entryPoint: "fs",
+                targets: [
+                    this.ssgiRenderTexture.GetTarget(),
+                ]
+            },
+            primitive: {
+                topology: 'triangle-list'
+            }
+        });
     }
 
     Render(camera, scene, commandEncoder) {
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                this.resultRenderTexture.GetColorAttachment(),
+                this.ssgiRenderTexture.GetColorAttachment(),
             ],
         });
 

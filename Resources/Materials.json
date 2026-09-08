@@ -40,6 +40,14 @@
             1
         ]
     },
+    "Black Mat": {
+        "color": [
+            0,
+            0,
+            0,
+            1
+        ]
+    },
     "MDF": {
         "textures": {
             "albedo": "Textures/MDF/Albedo.webp"
