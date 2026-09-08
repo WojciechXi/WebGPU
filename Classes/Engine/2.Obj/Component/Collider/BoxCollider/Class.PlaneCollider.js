@@ -1,7 +1,8 @@
 class PlaneCollider extends BoxCollider {
 
-    Init() {
-        super.Init();
+    constructor() {
+        super();
+
         this.center = new Vector3(0, -0.5, 0);
         this.size = new Vector3(1, 1, 1); // rozmiar plane w lokalnej skali
     }

@@ -1,7 +1,8 @@
 class TerrainCollider extends Collider {
 
-    Init() {
-        super.Init();
+    constructor() {
+        super();
+
         this.terrain = this.GetComponent(Terrain);
     }
 

@@ -1,7 +1,8 @@
 class SphereCollider extends Collider {
 
-    Init() {
-        super.Init();
+    constructor() {
+        super();
+
         this.center = Vector3.zero;
         this.radius = 0.5;
     }

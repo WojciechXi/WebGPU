@@ -1,11 +1,11 @@
 class BoxCollider extends Collider {
 
-    constructor(data = {}, parameters = {}) {
-        super(data, {
-            ...parameters,
-            center: { value: data._center ?? data.center ?? Vector3.zero, },
-            size: { value: data._size ?? data.size ?? Vector3.one, },
-        });
+    constructor() {
+        super();
+        const object = this;
+
+        new Property(object, 'center', Vector3.zero);
+        new Property(object, 'size', Vector3.one);
     }
 
     get worldCenter() { return this.transform.TransformPoint(this.center); }
@@ -64,7 +64,15 @@ class BoxCollider extends Collider {
         const worldPoint = this.transform.TransformPoint(localPoint);
         const worldNormal = this.transform.TransformDirection(hitNormal);
 
-        return new RaycastHit(this, worldPoint, worldNormal, distance);
+        const raycastHit = new RaycastHit();
+
+        raycastHit.collider = this;
+        raycastHit.point = worldPoint;
+        raycastHit.normal = worldNormal;
+        raycastHit.distance = distance;
+        raycastHit.transform = transform;
+
+        return raycastHit;
     }
 
     OnDrawGizmos(renderPass, camera) {

@@ -9,7 +9,7 @@ class TriangleMeshGeometry {
     }
 
     get triangles() {
-        return this.mesh._subMeshes[0].triangles;
+        return this.mesh.subMeshes[0].triangles;
     }
 
     GetVertex(index) {

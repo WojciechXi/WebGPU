@@ -14,11 +14,6 @@ class Plane {
     }
 
     // Gettery i Settery
-    get distance() { return this._distance; }
-    set distance(value) { this._distance = value; }
-
-    get normal() { return this._normal; }
-    set normal(value) { this._normal = value; }
 
     get flipped() {
         return new Plane(
@@ -29,8 +24,8 @@ class Plane {
 
     // Constructors
     constructor(normal, distance) {
-        this._normal = normal;
-        this._distance = distance;
+        this.normal = normal;
+        this.distance = distance;
     }
 
     // Publiczne Metody

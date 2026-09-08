@@ -1,0 +1,81 @@
+{
+    "Glass": {},
+    "Plastic": {},
+    "Concrete": {},
+    "Floor": {
+        "textures": {
+            "albedo": "Textures/Floor/512_Albedo.webp",
+            "normal": "Textures/Floor/512_Normal.webp",
+            "pbr": "Textures/Floor/512_PBR.webp"
+        }
+    },
+    "Paint": {
+        "textures": {
+            "albedo": "Textures/Paint/Albedo.webp",
+            "normal": "Textures/Paint/Normal.webp"
+        }
+    },
+    "Top": {},
+    "Gold": {
+        "color": [
+            1,
+            0.75,
+            0.5,
+            1
+        ]
+    },
+    "White": {
+        "color": [
+            1,
+            1,
+            1,
+            1
+        ]
+    },
+    "Black": {
+        "color": [
+            0,
+            0,
+            0,
+            1
+        ]
+    },
+    "MDF": {
+        "textures": {
+            "albedo": "Textures/MDF/Albedo.webp"
+        }
+    },
+    "H1386 ST40": {
+        "textures": {
+            "albedo": "Textures/H1386 ST40/Albedo.jpg"
+        }
+    },
+    "164VL_Antracyt": {
+        "color": [
+            0.2784313725490196,
+            0.27450980392156865,
+            0.26666666666666666,
+            1
+        ]
+    },
+    "U702 PM": {
+        "textures": {
+            "albedo": "Textures/U702 PM/Albedo.webp"
+        }
+    },
+    "U702 ST9": {
+        "textures": {
+            "albedo": "Textures/U702 ST9/Albedo.webp"
+        }
+    },
+    "D3025_OW_DĄB_SONOMA": {
+        "textures": {
+            "albedo": "Textures/D3025 OW/D3025 OW DAB SONOMA.jpg"
+        }
+    },
+    "U8681_SM_BIAŁY_ALASKA": {
+        "textures": {
+            "albedo": "Textures/U8681 SM/U8681 SM BIALY ALASKA.jpg"
+        }
+    }
+}

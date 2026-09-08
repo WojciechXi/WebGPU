@@ -1,7 +1,8 @@
 class CapsuleCollider extends BoxCollider {
 
-    Init() {
-        super.Init();
+    constructor() {
+        super();
+
         this.center = new Vector3(0, 0.5, 0);
         this.radius = 0.25;
         this.height = 1.0; // odległość między końcami kapsuły

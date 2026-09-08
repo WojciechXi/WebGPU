@@ -11,11 +11,13 @@ class Obj {
         return instance;
     }
 
+    static _nextId = 0;
+
     constructor() {
         const object = this;
 
         new Property(object, 'name', object.constructor.name);
-        new Property(object, 'instanceID', Guid.New());
+        new Property(object, 'instanceID', Obj._nextId++);
         new Property(object, 'hideFlags', 0);
 
         Obj.objs.push(this);

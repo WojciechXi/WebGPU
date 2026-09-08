@@ -1,60 +1,17 @@
-fn transpose3(m: mat3x3f) -> mat3x3f {
-    return mat3x3f(
-        vec3f(m[0][0], m[1][0], m[2][0]),
-        vec3f(m[0][1], m[1][1], m[2][1]),
-        vec3f(m[0][2], m[1][2], m[2][2])
-    );
-}
-
-fn inverse3(m: mat3x3f) -> mat3x3f {
-    let a = m[0][0]; let b = m[0][1]; let c = m[0][2];
-    let d = m[1][0]; let e = m[1][1]; let f = m[1][2];
-    let g = m[2][0]; let h = m[2][1]; let i = m[2][2];
-
-    let A =  (e*i - f*h);
-    let B = -(d*i - f*g);
-    let C =  (d*h - e*g);
-    let D = -(b*i - c*h);
-    let E =  (a*i - c*g);
-    let F = -(a*h - b*g);
-    let G =  (b*f - c*e);
-    let H = -(a*f - c*d);
-    let I =  (a*e - b*d);
-
-    let det = a*A + b*B + c*C;
-    let invDet = 1.0 / det;
-
-    return mat3x3f(
-        vec3f(A, D, G) * invDet,
-        vec3f(B, E, H) * invDet,
-        vec3f(C, F, I) * invDet
-    );
-}
-
-fn getNormalMatrix(modelMatrix: mat4x4f) -> mat3x3f {
-    let m3 = mat3x3f(
-        modelMatrix[0].xyz,
-        modelMatrix[1].xyz,
-        modelMatrix[2].xyz
-    );
-    return transpose3(inverse3(m3));
-}
-
 struct View {
-    matrix : mat4x4f,
-    projection : mat4x4f,
-    viewProjection : mat4x4f,
-    inverseView : mat4x4f,
-    inverseViewProjection : mat4x4f,
+    matrix: mat4x4f,
+    projection: mat4x4f,
+    viewProjection: mat4x4f,
+    inverseView: mat4x4f,
+    inverseViewProjection: mat4x4f,
 };
 
 struct Material {
-    color : vec4f,
-    emissive: vec4f,
-    pbr : vec4f,
+    color: vec4f,
+    pbr: vec4f,
 };
 
-struct Vertex {
+struct VertexInput {    
     @location(0) position: vec3f,
     @location(1) normal: vec3f,
     @location(2) tangent: vec4f,
@@ -62,134 +19,160 @@ struct Vertex {
     @location(4) uv: vec2f,
     @location(5) joints: vec4f,
     @location(6) weights: vec4f,
-
-    @location(7) m0 : vec4<f32>,
-    @location(8) m1 : vec4<f32>,
-    @location(9) m2 : vec4<f32>,
-    @location(10) m3 : vec4<f32>,
+    @location(7) m0: vec4f,
+    @location(8) m1: vec4f,
+    @location(9) m2: vec4f,
+    @location(10) m3: vec4f,
 };
 
-@group(0) @binding(0) var<uniform> view : View;
-@group(1) @binding(0) var<uniform> material : Material;
+@group(0) @binding(0) var<uniform> view: View;
+@group(1) @binding(0) var<uniform> material: Material;
 
-@group(2) @binding(0) var textureSampler : sampler;
-@group(2) @binding(1) var albedoTexture : texture_2d<f32>;
-@group(2) @binding(2) var normalTexture : texture_2d<f32>;
-@group(2) @binding(3) var roughnessTexture : texture_2d<f32>;
-@group(2) @binding(4) var metallicTexture : texture_2d<f32>;
-@group(2) @binding(5) var occlusionTexture : texture_2d<f32>;
+@group(2) @binding(0) var textureSampler: sampler;
+@group(2) @binding(1) var albedoTexture: texture_2d<f32>;
+@group(2) @binding(2) var normalTexture: texture_2d<f32>;
+@group(2) @binding(3) var pbrTexture: texture_2d<f32>;
+@group(2) @binding(4) var emissiveTexture: texture_2d<f32>;
 
-@group(3) @binding(0) var<uniform> jointMatrices : array<mat4x4f, 64>;
+@group(3) @binding(0) var<uniform> jointMatrices: array<mat4x4f, 64>;
 
-struct VSOut {
-  @builtin(position) clipPosition : vec4f,
-  @location(0) worldPosition : vec3f,
-  @location(1) worldTangent  : vec3f,
-  @location(2) worldBitangent  : vec3f,
-  @location(3) worldNormal  : vec3f,
-  @location(4) uv : vec2f,
+struct VertexOutput {
+    @builtin(position) clipPosition: vec4f,
+    @location(0) worldPosition: vec3f,
+    @location(1) worldNormal: vec3f,
+    @location(2) worldTangent: vec3f,
+    @location(3) worldBitangent: vec3f,
+    @location(4) uv: vec2f,
 };
+
+
+fn inverse3x3(m: mat3x3f) -> mat3x3f {
+    let a00 = m[0][0]; let a01 = m[0][1]; let a02 = m[0][2];
+    let a10 = m[1][0]; let a11 = m[1][1]; let a12 = m[1][2];
+    let a20 = m[2][0]; let a21 = m[2][1]; let a22 = m[2][2];
+
+    let b01 = a22 * a11 - a12 * a21;
+    let b11 = -a22 * a10 + a12 * a20;
+    let b21 = a21 * a10 - a11 * a20;
+
+    let det = a00 * b01 + a01 * b11 + a02 * b21;
+    let invDet = 1.0 / det;
+
+    return mat3x3f(
+        vec3f(b01, (-a22 * a01 + a02 * a21), (a12 * a01 - a02 * a11)) * invDet,
+        vec3f(b11, (a22 * a00 - a02 * a20), (-a12 * a00 + a02 * a10)) * invDet,
+        vec3f(b21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) * invDet
+    );
+}
+
+fn getNormalMatrix(m: mat4x4f) -> mat3x3f {
+    let m3 = mat3x3f(m[0].xyz, m[1].xyz, m[2].xyz);
+    
+    return transpose(inverse3x3(m3));
+}
 
 @vertex
-fn vs(vert: Vertex) -> VSOut {
-  var vsOut: VSOut;
-  let matrix = mat4x4<f32>(vert.m0, vert.m1, vert.m2, vert.m3);
+fn vs(vertexInput: VertexInput) -> VertexOutput {
+    var output: VertexOutput;
+    
+    
+    let modelMatrix = mat4x4f(vertexInput.m0, vertexInput.m1, vertexInput.m2, vertexInput.m3);
+    
+    let pos = vertexInput.position;
+    let norm = vertexInput.normal;
+    let tang = vertexInput.tangent.xyz;
 
-  var objectPosition = vert.position;
-  var objectNormal = vert.normal;
-  var objectTangent = vert.tangent;
-  var worldPosition : vec3f;
+    var worldPos: vec3f;
+    var normalMat: mat3x3f;
+    var model3x3: mat3x3f;
 
-  if(vert.weights.x > 0.001) {
-    let skinMatrix = jointMatrices[u32(vert.joints.x)];
-    worldPosition = (skinMatrix * vec4f(objectPosition, 1.0)).xyz;
+    
+    if (vertexInput.weights.x > 0.0) {
+        
+        let w = vertexInput.weights;
+        let j = vec4u(vertexInput.joints);
+        
+        let skinMatrix = jointMatrices[j.x] * w.x +
+                         jointMatrices[j.y] * w.y +
+                         jointMatrices[j.z] * w.z +
+                         jointMatrices[j.w] * w.w;
 
-    let skinMatrix3 = mat3x3f(skinMatrix[0].xyz, skinMatrix[1].xyz, skinMatrix[2].xyz);
-    objectNormal = skinMatrix3 * objectNormal;
-    objectTangent = vec4f(skinMatrix3 * objectTangent.xyz, objectTangent.w);
-  } else {
-    worldPosition = (matrix * vec4f(objectPosition, 1.0)).xyz;
-  }
+        worldPos = (skinMatrix * vec4f(pos, 1.0)).xyz;
+        normalMat = getNormalMatrix(skinMatrix);
+        model3x3 = mat3x3f(skinMatrix[0].xyz, skinMatrix[1].xyz, skinMatrix[2].xyz);
+    } else {
+        worldPos = (modelMatrix * vec4f(pos, 1.0)).xyz;
+        normalMat = getNormalMatrix(modelMatrix);
+        model3x3 = mat3x3f(modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz);
+    }
 
-  vsOut.worldPosition = worldPosition;
-  vsOut.clipPosition = view.viewProjection * vec4f(worldPosition, 1.0);
+    
+    let N = normalize(normalMat * norm);
+    let T_unaligned = normalize(model3x3 * tang);
+    
+    
+    let T = normalize(T_unaligned - dot(T_unaligned, N) * N);
+    
+    
+    let tangentSign = select(1.0, -1.0, vertexInput.tangent.w < 0.0);
+    let B = normalize(cross(N, T) * tangentSign);
 
-  let normalMatrix = getNormalMatrix(matrix);
-  
-  let T = normalize(normalMatrix * objectTangent.xyz);
-  let N = normalize(normalMatrix * objectNormal);
-  let B = normalize(cross(N, T) * objectTangent.w);
+    output.clipPosition = view.viewProjection * vec4f(worldPos, 1.0);
+    output.worldPosition = worldPos;
+    output.worldNormal = N;
+    output.worldTangent = T;
+    output.worldBitangent = B;
+    output.uv = vertexInput.uv;
 
-  vsOut.worldTangent = T;
-  vsOut.worldBitangent = B;
-  vsOut.worldNormal = N;
-  vsOut.uv = vert.uv; 
-  
-  return vsOut;
+    return output;
 }
 
-//shadowRenderPass
-
-struct ShadowRenderPass {
-  @location(0) depthOut : vec4f,
-}
+struct PreDepthRenderPass {
+    @location(0) depth: vec4f,
+};
 
 @fragment
-fn shadowRenderPass(vsOut: VSOut) -> ShadowRenderPass {
-  var shadowRenderPass: ShadowRenderPass;
-
-  let clipPosition = vsOut.clipPosition;
-  let ndc = (clipPosition.xyz / clipPosition.w);
-
-  shadowRenderPass.depthOut = vec4f(ndc.z, 0, 0, 1.0);
-
-  return shadowRenderPass;
+fn preDepthRenderPass(input: VertexOutput) -> PreDepthRenderPass {
+    var output: PreDepthRenderPass;
+    output.depth = vec4f(input.clipPosition.z, 0.0, 0.0, 1.0);
+    return output;
 }
-
-//gBufferRenderPass
 
 struct GBufferRenderPass {
-  @location(0) positionOut : vec4f,
-  @location(1) normalOut : vec4f,
-  
-  @location(2) colorOut : vec4f, // Color
-  @location(3) emissiveOut : vec4f, // Emission
-  @location(4) pbrOut : vec4f, // Smoothness / Metallic / Ambient Occlusion
-  
-  @location(5) depthOut : vec4f,
-}
+    @location(0) color: vec4f,
+    @location(1) worldNormal: vec4f,
+    @location(2) pbr: vec4f,
+    @location(3) emissive: vec4f,
+};
 
 @fragment
-fn gBufferRenderPass(vsOut: VSOut) -> GBufferRenderPass {
-  var gBufferRenderPass: GBufferRenderPass;
+fn gBufferRenderPass(input: VertexOutput) -> GBufferRenderPass {
+    var output: GBufferRenderPass;
+    
+    let albedo = textureSample(albedoTexture, textureSampler, input.uv) * material.color;
+    if (albedo.a < material.pbr.a) {
+        discard;
+    }
 
-  let _alphaCutoff = material.pbr.a;
+    
+    let rawNormal = textureSample(normalTexture, textureSampler, input.uv).xyz * 2.0 - 1.0;
+    
+    
+    let TBN = mat3x3f(
+        normalize(input.worldTangent), 
+        normalize(input.worldBitangent), 
+        normalize(input.worldNormal)
+    );
 
-  let albedo = textureSample(albedoTexture, textureSampler, vsOut.uv);
-  let color = albedo * material.color;
-  if(color.a < _alphaCutoff) {
-    discard;
-  }
-  
-  let _roughness = material.pbr.r;
-  let _metallic = material.pbr.g;
-  let _occlusion = material.pbr.b;
+    let worldNormal = normalize(TBN * rawNormal);
 
-  let normal = textureSample(normalTexture, textureSampler, vsOut.uv).xyz * 2.0 - 1.0;
-  let roughness = textureSample(roughnessTexture, textureSampler, vsOut.uv);
-  let metallic = textureSample(metallicTexture, textureSampler, vsOut.uv);
-  let occlusion = textureSample(occlusionTexture, textureSampler, vsOut.uv);
+    output.color = albedo;
+    
+    output.worldNormal = vec4f(worldNormal * 0.5 + 0.5, 1.0);
+    
+    let rawPbr = textureSample(pbrTexture, textureSampler, input.uv);
+    output.pbr = vec4f(rawPbr.rgb * material.pbr.rgb, 1.0);
+    output.emissive = textureSample(emissiveTexture, textureSampler, input.uv);
 
-  gBufferRenderPass.positionOut = vec4f(vsOut.worldPosition, 1.0);
-
-  let TBN = mat3x3f(vsOut.worldTangent, vsOut.worldBitangent, vsOut.worldNormal);
-  gBufferRenderPass.normalOut = vec4f(normalize(TBN * normal) * 0.5 + 0.5, 0.0);
-
-  gBufferRenderPass.colorOut = albedo * material.color;
-  gBufferRenderPass.emissiveOut = material.emissive;
-  gBufferRenderPass.pbrOut = vec4f(roughness.r * _roughness, metallic.r * _metallic, occlusion.r * _occlusion, 0);
-
-  gBufferRenderPass.depthOut = vec4f(vsOut.clipPosition.z / vsOut.clipPosition.w, 0.0, 0.0, 1.0);
-
-  return gBufferRenderPass;
+    return output;
 }

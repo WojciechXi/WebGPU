@@ -1,0 +1,3 @@
+class ScriptableObject extends Obj {
+
+}

@@ -1,7 +1,8 @@
 class MeshCollider extends Collider {
 
-    Init() {
-        super.Init();
+    constructor() {
+        super();
+
         this.mesh = null;
     }
 
