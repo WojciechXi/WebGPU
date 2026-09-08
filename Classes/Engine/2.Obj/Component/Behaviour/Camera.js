@@ -22,7 +22,7 @@ class Camera extends Behaviour {
         new Property(object, 'orthographic', false);
         new Property(object, 'orthographicSize', 100);
 
-        new Property(object, 'cameraBuffer', new Buffer(16 + 16 + 16 + 16 + 16)); //view, projection, viewProjection, inverseView, inverseViewProjection
+        new Property(object, 'cameraBuffer', new Buffer(16 + 16 + 16 + 16 + 16 + 16)); //view, projection, viewProjection, inverseView, inverseProjection, inverseViewProjection
         new Property(object, 'cameraBindGroup', GPU.CreateBindGroup({
             label: 'ViewBindGroup',
             layout: Graphics.viewBindGroupLayout,
@@ -35,6 +35,7 @@ class Camera extends Behaviour {
         object.projectionMatrix = Matrix4x4.Identity();
         object.viewProjectionMatrix = Matrix4x4.Identity();
         object.inverseViewMatrix = Matrix4x4.Identity();
+        object.inverseProjectionMatrix = Matrix4x4.Identity();
         object.inverseViewProjectionMatrix = Matrix4x4.Identity();
 
         Engine.Instance.scene.cameras.push(this);
@@ -47,6 +48,7 @@ class Camera extends Behaviour {
         Matrix4x4.Inverse(this.viewMatrix, this.inverseViewMatrix);
         Matrix4x4.PerspectiveLH(Mathf.DegToRad(this.fieldOfView), this.aspect, this.nearClipPlane, this.farClipPlane, this.projectionMatrix);
         Matrix4x4.Multiply(this.projectionMatrix, this.viewMatrix, this.viewProjectionMatrix);
+        Matrix4x4.Inverse(this.projectionMatrix, this.inverseProjectionMatrix);
         Matrix4x4.Inverse(this.viewProjectionMatrix, this.inverseViewProjectionMatrix);
 
         this.cameraBuffer.Set({
@@ -54,14 +56,9 @@ class Camera extends Behaviour {
             16: this.projectionMatrix,
             32: this.viewProjectionMatrix,
             48: this.inverseViewMatrix,
-            64: this.inverseViewProjectionMatrix,
+            64: this.inverseProjectionMatrix,
+            80: this.inverseViewProjectionMatrix,
         });
-
-        if (this.parentCamera) {
-            this.SendMessage('OnPreCull')
-        } else {
-            this.SendMessage('OnPreCull')
-        }
     }
 
     ScreenPointToRay(position) {

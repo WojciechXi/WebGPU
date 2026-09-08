@@ -64,9 +64,8 @@ class Engine {
 
             // GPU
             const gpuBegin = performance.now();
-            if (this.renderPipeline) {
-                for (let camera of this.scene.cameras) this.renderPipeline.Render(camera, this.scene);
-            }
+            Graphics.timeBuffer.Set([Time.time, Time.deltaTime, Time.frame, 0]);
+            if (this.renderPipeline) for (let camera of this.scene.cameras) this.renderPipeline.Render(camera, this.scene);
             RenderQueue.Clear();
             Engine.gpuTime = (performance.now() - gpuBegin);
 

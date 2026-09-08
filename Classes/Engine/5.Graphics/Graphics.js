@@ -27,29 +27,36 @@ class Graphics {
             presentMode: 'immediate',
         });
 
+        this.timeBindGroupLayout = GPU.CreateBindGroupLayout({
+            label: 'timeBindGroupLayout',
+            entries: [
+                { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
+            ],
+        });
+
         this.viewBindGroupLayout = GPU.CreateBindGroupLayout({
-            label: 'ViewBindGroupLayout',
+            label: 'viewBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
 
         this.lightBindGroupLayout = GPU.CreateBindGroupLayout({
-            label: 'LightBindGroupLayout',
+            label: 'lightBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
 
         this.materialBindGroupLayout = GPU.CreateBindGroupLayout({
-            label: 'MaterialBindGroupLayout',
+            label: 'materialBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
 
         this.pbrBindGroupLayout = GPU.CreateBindGroupLayout({
-            label: 'PBRBindGroupLayout',
+            label: 'pbrBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: {}, },
                 { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: {}, },
@@ -60,11 +67,20 @@ class Graphics {
         });
 
         this.jointsBindGroupLayout = GPU.CreateBindGroupLayout({
-            label: 'JointBindGroupLayout',
+            label: 'jointsBindGroupLayout',
             entries: [
                 { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, }
             ],
         });
+
+        new Property(this, 'timeBuffer', new Buffer(4)); //time, deltaTime, frame
+        new Property(this, 'timeBindGroup', GPU.CreateBindGroup({
+            label: 'timeBindGroup',
+            layout: Graphics.timeBindGroupLayout,
+            entries: [
+                this.timeBuffer.GetBindGroupEntry(0),
+            ],
+        }));
 
         callback();
     }

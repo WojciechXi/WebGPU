@@ -9,10 +9,13 @@ class Time {
         this.time = 0.0;
         this.fixedTime = 0.0;
 
+        this.frame = 0;
         this.frames = 0;
     }
 
     static Update(timeMs) {
+        this.frame++;
+
         this.deltaTime = ((timeMs - this.time) * this.timeScale) / 1000;
         this.frames = 1 / this.deltaTime;
 

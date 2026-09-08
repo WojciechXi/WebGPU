@@ -10,11 +10,12 @@
 @group(3) @binding(5) var gEmissive : texture_2d<f32>;
 
 struct View {
-    matrix : mat4x4f,
-    projection : mat4x4f,
-    viewProjection : mat4x4f,
-    inverseView : mat4x4f,
-    inverseViewProjection : mat4x4f,
+    view: mat4x4f,
+    projection: mat4x4f,
+    viewProjection: mat4x4f,
+    inverseView: mat4x4f,
+    inverseProjection: mat4x4f,
+    inverseViewProjection: mat4x4f,
 };
 
 struct DirectionalLight {

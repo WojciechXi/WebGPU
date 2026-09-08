@@ -96,7 +96,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
         const gltfObject = await Resources.Load('Models/Ablewicza 15.gltf');
         if (gltfObject && gltfObject.meshes) {
             const gameObject = new GameObject("Cube");
-            const autoRotator = gameObject.AddComponent(AutoRotator);
+            // const autoRotator = gameObject.AddComponent(AutoRotator);
             for (let mesh of gltfObject.meshes) {
                 const childGameObject = new GameObject(mesh.name);
                 childGameObject.transform.SetParent(gameObject.transform);
@@ -122,6 +122,8 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             'pbrRenderTexture',
             'emissiveRenderTexture',
             'lightingRenderTexture',
+            'ssgiRenderTexture',
+            'ssaoRenderTexture',
             'tonemappingRenderTexture',
         ];
         for (let i = 0; i < textures.length; i++) {
