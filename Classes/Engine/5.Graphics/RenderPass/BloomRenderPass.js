@@ -72,16 +72,10 @@ class BloomRenderPass extends RenderPass {
             }
         });
 
-        this.sampler = GPU.CreateSampler({
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
-        });
-
         this.brightBindGroup = GPU.CreateBindGroup({
             layout: this.brightRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this.sampler },
+                this.sampler.GetBindGroupEntry(0),
                 this.inputRenderTexture.GetBindGroupEntry(1),
             ],
         });
@@ -89,7 +83,7 @@ class BloomRenderPass extends RenderPass {
         this.blurBindGroup = GPU.CreateBindGroup({
             layout: this.blurRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this.sampler },
+                this.sampler.GetBindGroupEntry(0),
                 this.brightRenderTexture.GetBindGroupEntry(1),
             ],
         });
@@ -97,7 +91,7 @@ class BloomRenderPass extends RenderPass {
         this.bloomBindGroup = GPU.CreateBindGroup({
             layout: this.bloomRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this.sampler },
+                this.sampler.GetBindGroupEntry(0),
                 this.blurRenderTexture.GetBindGroupEntry(1),
             ],
         });
@@ -105,7 +99,7 @@ class BloomRenderPass extends RenderPass {
         this.sceneBindGroup = GPU.CreateBindGroup({
             layout: this.sceneRenderPipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: this.sampler },
+                this.sampler.GetBindGroupEntry(0),
                 this.bloomRenderTexture.GetBindGroupEntry(1),
                 this.inputRenderTexture.GetBindGroupEntry(2),
             ],

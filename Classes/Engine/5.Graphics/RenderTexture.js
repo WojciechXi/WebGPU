@@ -15,8 +15,23 @@ class RenderTexture {
         this.textureView = this.texture.createView();
     }
 
-    GetBindGroupLayoutEntry(binding = 0, visibility = GPUShaderStage.FRAGMENT, texture = { sampleType: 'float' }) {
-        return { binding: binding, visibility: visibility, texture: texture, };
+    GetBindGroupLayoutEntry(binding = 0, visibility = GPUShaderStage.FRAGMENT, sampleType = 'float', multisampled = false, viewDimension = '2d') {
+        return {
+            binding: binding,
+            visibility: visibility,
+            texture: {
+                sampleType: sampleType,
+                viewDimension: viewDimension,
+                multisampled: multisampled,
+            },
+        };
+    }
+
+    GetBindGroupEntry(binding = 0) {
+        return {
+            binding: binding,
+            resource: this.textureView
+        };
     }
 
     GetColorAttachment(loadOp = 'clear', storeOp = 'store', clearValue = { r: 0, g: 0, b: 0, a: 0 }) {
@@ -25,10 +40,6 @@ class RenderTexture {
 
     GetDepthStencilAttachment() {
         return { view: this.textureView, depthClearValue: 1.0, depthLoadOp: "clear", depthStoreOp: "store", };
-    }
-
-    GetBindGroupEntry(binding = 0) {
-        return { binding: binding, resource: this.textureView };
     }
 
     GetTarget() {

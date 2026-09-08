@@ -51,7 +51,6 @@ class RenderQueue {
 
         this.queue.sort((a, b) => {
             if (a.renderQueue !== b.renderQueue) return a.renderQueue - b.renderQueue;
-            if (a.renderQueue >= 3000) return b.depth - a.depth;
             if (a.material.shader.instanceID !== b.material.shader.instanceID) return a.material.shader.instanceID - b.material.shader.instanceID;
             return a.material.instanceID - b.material.instanceID;
         });
@@ -61,6 +60,7 @@ class RenderQueue {
             const item = this.queue[i];
             if (item.layer != layer) continue;
             if (item.camera && item.camera != camera) continue;
+            if (!renderPass.CanDraw(item.renderQueue)) continue;
             if (!GeometryUtility.TestPlanesAABB(planes, item.bounds)) continue;
 
             const subMesh = item.mesh.GetSubMesh(item.subMeshIndex);

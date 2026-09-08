@@ -1,5 +1,7 @@
 {
-    "Glass": {},
+    "Glass": {
+        "shader": "Glass"
+    },
     "Plastic": {},
     "Concrete": {},
     "Floor": {
@@ -15,6 +17,30 @@
             "normal": "Textures/Paint/Normal.webp"
         }
     },
+    "KL19": {
+        "textures": {
+            "albedo": "Textures/Paint/Albedo.webp",
+            "normal": "Textures/Paint/Normal.webp"
+        },
+        "color": [
+            0.8745098039215686,
+            0.8313725490196079,
+            0.7843137254901961,
+            1
+        ]
+    },
+    "KL24": {
+        "textures": {
+            "albedo": "Textures/Paint/Albedo.webp",
+            "normal": "Textures/Paint/Normal.webp"
+        },
+        "color": [
+            0.6549019607843137,
+            0.6627450980392157,
+            0.5803921568627451,
+            1
+        ]
+    },
     "Top": {},
     "Gold": {
         "color": [
@@ -22,7 +48,8 @@
             0.75,
             0.5,
             1
-        ]
+        ],
+        "metallic": 0.5
     },
     "White": {
         "color": [
@@ -78,8 +105,10 @@
     },
     "D3025_OW_DĄB_SONOMA": {
         "textures": {
-            "albedo": "Textures/D3025 OW/D3025 OW DAB SONOMA.jpg"
-        }
+            "albedo": "Textures/D3025 OW/D3025 OW DAB SONOMA.jpg",
+            "normal": "Textures/D3025 OW/NormalMap.png"
+        },
+        "normalStrength": 0.1
     },
     "U8681_SM_BIAŁY_ALASKA": {
         "textures": {

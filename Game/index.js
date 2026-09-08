@@ -27,12 +27,10 @@ window.addEventListener('DOMContentLoaded', async function (event) {
         engine.Start();
 
         const litShader = new Shader();
-        litShader.name = 'Lit';
         litShader.code = await Resources.Load('Shaders/Lit.wgsl');
 
-        const litNormalShader = new Shader();
-        litNormalShader.name = 'LitNormal';
-        litNormalShader.code = await Resources.Load('Shaders/LitNormal.wgsl');
+        const glassShader = new Shader();
+        glassShader.code = await Resources.Load('Shaders/Glass.wgsl');
 
         Engine.emptyMaterial = new Material(litShader);
         Engine.emptyMaterial.color = new Color32(1, 0.5, 0.25, 1.0);
@@ -47,23 +45,24 @@ window.addEventListener('DOMContentLoaded', async function (event) {
             'White Glossy': 'U8681_SM_BIAŁY_ALASKA',
             'Walnut': 'D3025_OW_DĄB_SONOMA',
             'Walnut.001': 'D3025_OW_DĄB_SONOMA',
+            'D2610_MX': 'D3025_OW_DĄB_SONOMA',
             'Tiles': 'Floor',
-            'Beige': 'Paint',
-            'Wall S': 'Paint',
-            'Wall N': 'Paint',
-            'Wall E': 'Paint',
-            'Wall W': 'Paint',
-            'Wall K': 'Paint',
-            'Wall K S': 'Paint',
-            'Wall K S 2': 'Paint',
-            'Wall K S 3': 'Paint',
-            'Wall K S 4': 'Paint',
-            'Wall K W': 'Paint',
-            'Wall K 2': 'Paint',
-            'Bedroom S': 'Paint',
-            'Bedroom N': 'Paint',
-            'Bedroom E': 'Paint',
-            'Bedroom W': 'Paint',
+            'Beige': 'KL19',
+            'Wall S': 'KL24',
+            'Wall N': 'KL24',
+            'Wall E': 'KL24',
+            'Wall W': 'KL24',
+            'Wall K': 'KL24',
+            'Wall K S': 'KL24',
+            'Wall K S 2': 'KL24',
+            'Wall K S 3': 'KL24',
+            'Wall K S 4': 'KL24',
+            'Wall K W': 'KL24',
+            'Wall K 2': 'KL24',
+            'Bedroom S': 'KL24',
+            'Bedroom N': 'KL24',
+            'Bedroom E': 'KL24',
+            'Bedroom W': 'KL24',
         };
 
         const allMaterials = {};
@@ -71,12 +70,17 @@ window.addEventListener('DOMContentLoaded', async function (event) {
         const materialKeys = Object.keys(materialList);
         for (let materialKey of materialKeys) {
             const materialDefinition = materialList[materialKey];
-            const material = new Material(litShader);
-            if (materialDefinition.color) material.color = Color32.FromArray(materialDefinition.color);
+            const material = new Material(Shader.Find(materialDefinition.shader ?? 'Lit'));
             for (let textureName of Object.keys(materialDefinition.textures ?? {})) {
                 const texture = await Resources.Load(materialDefinition.textures[textureName]);
                 material.SetTexture(textureName, texture);
             }
+
+            if (materialDefinition.color) material.color = Color32.FromArray(materialDefinition.color);
+            if (materialDefinition.emissive) material.SetTexture('emissive', Color32.FromArray(materialDefinition.emissive));
+            if (materialDefinition.metallic) material.metallic = materialDefinition.metallic;
+            if (materialDefinition.normalStrength) material.normalStrength = materialDefinition.normalStrength;
+
             material.Update();
             allMaterials[materialKey] = material;
         }
@@ -109,8 +113,10 @@ window.addEventListener('DOMContentLoaded', async function (event) {
         mainCameraGameObject.transform.eulerAngles = new Vector3(0, 180, 0);
         mainCameraGameObject.transform.localPosition.y = 1.5;
         mainCameraGameObject.transform.localPosition.z = 2;
+        mainCameraGameObject.transform.localPosition.x = 2;
         // mainCameraGameObject.transform.localEulerAngles = new Vector3(0, 45, 0);
         const mainCamera = mainCameraGameObject.AddComponent(Camera);
+        mainCamera.fieldOfView = 90;
         const autoRotator = mainCameraGameObject.AddComponent(AutoRotator);
         // const freeCamera = mainCameraGameObject.AddComponent(FreeCamera);
 

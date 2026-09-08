@@ -4,32 +4,6 @@ class TonemappingRenderPass extends RenderPass {
         this.inputRenderTexture = data.inputRenderTexture;
         this.resultRenderTexture = data.resultRenderTexture;
 
-        this.renderPipeline = GPU.CreateRenderPipeline({
-            label: 'tonemappingRenderPipeline',
-            layout: GPU.CreatePipelineLayout({
-                bindGroupLayouts: [
-                    GPU.CreateBindGroupLayout({
-                        entries: [
-                            { binding: 0, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, sampler: { type: 'non-filtering', }, },
-                            { binding: 1, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, buffer: { type: 'uniform' }, },
-                            { binding: 2, visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, texture: { sampleType: 'unfilterable-float', viewDimension: '2d', multisampled: false, }, },
-                        ],
-                    })
-                ],
-            }),
-            vertex: {
-                module: this.shaderModule,
-                entryPoint: "vs"
-            },
-            fragment: {
-                module: this.shaderModule,
-                entryPoint: "fs",
-                targets: [
-                    this.resultRenderTexture.GetTarget(),
-                ]
-            }
-        });
-
         this.paramsBuffer = new Buffer(4);
 
         new Property(this, 'exposure', 1, {
@@ -48,13 +22,42 @@ class TonemappingRenderPass extends RenderPass {
             },
         });
 
-        this.bindGroup = GPU.CreateBindGroup({
-            layout: this.renderPipeline.getBindGroupLayout(0),
+
+        this.bindGroupLayout = GPU.CreateBindGroupLayout({
             entries: [
-                { binding: 0, resource: GPU.CreateSampler({ addressModeU: 'repeat', addressModeV: 'repeat', magFilter: 'nearest', minFilter: 'nearest', mipmapFilter: 'nearest', }), },
+                this.sampler.GetBindGroupLayoutEntry(0),
+                this.paramsBuffer.GetBindGroupLayoutEntry(1),
+                this.inputRenderTexture.GetBindGroupLayoutEntry(2),
+            ],
+        });
+
+        this.bindGroup = GPU.CreateBindGroup({
+            layout: this.bindGroupLayout,
+            entries: [
+                this.sampler.GetBindGroupEntry(0),
                 this.paramsBuffer.GetBindGroupEntry(1),
                 this.inputRenderTexture.GetBindGroupEntry(2),
             ],
+        });
+
+        this.renderPipeline = GPU.CreateRenderPipeline({
+            label: 'tonemappingRenderPipeline',
+            layout: GPU.CreatePipelineLayout({
+                bindGroupLayouts: [
+                    this.bindGroupLayout,
+                ],
+            }),
+            vertex: {
+                module: this.shaderModule,
+                entryPoint: "vs"
+            },
+            fragment: {
+                module: this.shaderModule,
+                entryPoint: "fs",
+                targets: [
+                    this.resultRenderTexture.GetTarget(),
+                ]
+            }
         });
     }
 

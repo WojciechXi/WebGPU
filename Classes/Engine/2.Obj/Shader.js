@@ -1,21 +1,34 @@
 class Shader extends Obj {
 
+    static {
+        this.shaders = [];
+    }
+
+    static Find(name) {
+        return this.shaders.find(s => s.name == name);
+    }
+
     constructor() {
         super();
-        const object = this;
+        Shader.shaders.push(this);
 
-        new Property(object, 'renderQueue', 2000);
-        new Property(object, 'code', '', {
-            set: function (value, oldValue) {
-                if (value == oldValue) return value;
+        new Property(this, 'renderPipelines', new Map());
+        new Property(this, 'renderPipelineBuffers', []);
+
+        new Property(this, 'shaderModule', null);
+
+        new Property(this, 'renderQueue', 2000);
+        new Property(this, 'code', '', {
+            assigned: value => {
+                let match = value ? value.match(/\/\/\s*name:\s*(.+)/i) : null;
+                this.name = match ? match[1].trim() : `Shader_${this.instanceID}`;
+
+                match = value ? value.match(/\/\/\s*renderQueue:\s*(.+)/i) : null;
+                this.renderQueue = parseInt(match ? match[1].trim() : 2000);
+
                 this.shaderModule = null;
-                return value;
             },
         });
-        new Property(object, 'shaderModule', null);
-
-        new Property(object, 'renderPipelines', new Map());
-        new Property(object, 'renderPipelineBuffers', []);
     }
 
     Compile() {

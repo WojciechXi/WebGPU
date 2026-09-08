@@ -32,12 +32,6 @@ class ScreenSpaceReflectionRenderPass extends RenderPass {
             }
         });
 
-        this.sampler = GPU.CreateSampler({
-            magFilter: 'nearest',
-            minFilter: 'nearest',
-            mipmapFilter: 'nearest',
-        });
-
         const bindGroup = this.bindGroup = GPU.CreateBindGroup({
             layout: this.renderPipeline.getBindGroupLayout(0),
             entries: [
@@ -45,7 +39,7 @@ class ScreenSpaceReflectionRenderPass extends RenderPass {
                 this.gBufferRenderPass.positionRenderTexture.GetBindGroupEntry(1),
                 this.gBufferRenderPass.normalRenderTexture.GetBindGroupEntry(2),
                 this.inputRenderTexture.GetBindGroupEntry(3),
-                { binding: 4, resource: this.sampler },
+                { binding: 4, resource: this.samplerPoint, },
             ],
         });
     }

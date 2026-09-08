@@ -4,13 +4,9 @@ class RenderPass {
         this.name = data.name ?? 'renderPass';
         this.canvas = data.canvas ?? null;
         this.shaderModule = data.code ? GPU.CreateShaderModule({ code: data.code }) : null;
-        this.sampler = GPU.CreateSampler({
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
-        });
+
+        this.sampler = new Sampler('linear');
+        this.samplerPoint = new Sampler('nearest');
         this.renderPipeline = null;
 
         this.emptyBuffer = new Buffer(64 * 16, { usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, });
@@ -35,6 +31,10 @@ class RenderPass {
 
     Render(camera, scene, commandEncoder) {
 
+    }
+
+    CanDraw(renderQueue) {
+        return true;
     }
 
     SetBindGroup(index, bindGroup) {

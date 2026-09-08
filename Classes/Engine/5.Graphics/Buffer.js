@@ -39,8 +39,23 @@ class Buffer {
         GPU.Queue.writeBuffer(this.buffer, 0, this.values);
     }
 
+    GetBindGroupLayoutEntry(binding = 0, visibility = GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT, type = 'uniform') {
+        return {
+            binding: binding,
+            visibility: visibility,
+            buffer: {
+                type: type,
+            },
+        };
+    }
+
     GetBindGroupEntry(binding = 0) {
-        return { binding: binding, resource: { buffer: this.buffer } };
+        return {
+            binding: binding,
+            resource: {
+                buffer: this.buffer
+            }
+        };
     }
 
     Destroy() {

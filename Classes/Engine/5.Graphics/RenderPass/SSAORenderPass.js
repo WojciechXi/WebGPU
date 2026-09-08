@@ -4,7 +4,7 @@ class ssaoRenderPass extends RenderPass {
         this.depthRenderTexture = data.depthRenderTexture;
         this.worldNormalRenderTexture = data.worldNormalRenderTexture;
 
-        this.ssaoRenderTexture = new RenderTexture(Mathf.FloorToInt(Graphics.Width / 4), Mathf.FloorToInt(Graphics.Height / 4), {
+        this.ssaoRenderTexture = new RenderTexture(Mathf.FloorToInt(Graphics.Width / 2), Mathf.FloorToInt(Graphics.Height / 2), {
             format: 'r8unorm',
         });
 
@@ -20,7 +20,7 @@ class ssaoRenderPass extends RenderPass {
             assigned: value => this.buffer.Set({ 1: [value] }),
         });
 
-        new Property(this, 'intensity', 0.25, {
+        new Property(this, 'intensity', 2, {
             assigned: value => this.buffer.Set({ 2: [value] }),
         });
 

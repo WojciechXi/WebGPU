@@ -102,7 +102,7 @@ fn fs(in: VSOut) -> @location(0) vec4<f32> {
     }
 
     let worldPos = getWorldPos(uv, rawDepth);
-    let normal = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, uv, 0).xyz);
+    let normal = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, uv, 0).xyz * 2.0 - 1.0);
     let albedo = textureSampleLevel(colorTexture, samplerPoint, uv, 0).rgb;
 
     var indirectLight = vec3<f32>(0.0);
@@ -119,12 +119,11 @@ fn fs(in: VSOut) -> @location(0) vec4<f32> {
     for (var r = 0u; r < raysPerPixel; r = r + 1u) {
         let rayDir = getHemisphereVector(normal, uv, r, 1);
 
-        // Skalowanie offsetu - im bardziej równoległy promień do powierzchni, tym większy bias
         let NdotD = max(dot(normal, rayDir), 0.001);
         let normalBias = normal * (ssgi.bias / NdotD);
         
-        // Startujemy z dodanym jitterem, żeby uniknąć równomiernych pasów
-        var rayPos = worldPos + normalBias + rayDir * (stepSize * jitter);
+        let rayStartOffset = normal * (ssgi.bias + 0.02) + rayDir * (stepSize * (jitter + 0.5));
+        var rayPos = worldPos + rayStartOffset;
 
         for (var i = 1; i <= maxSteps; i = i + 1) {
             rayPos += rayDir * stepSize;
@@ -145,11 +144,10 @@ fn fs(in: VSOut) -> @location(0) vec4<f32> {
             }
 
             let sampledDepth = textureSampleLevel(depthTexture, samplerPoint, sampleUV, 0);
-            if (sampledDepth >= 1.0) { continue; }
+            if (sampledDepth >= 0.9999) { continue; }
 
             let sampledWorldPos = getWorldPos(sampleUV, sampledDepth);
 
-            // Left-Handed View Space Z porównanie
             let rayPosViewZ = (view.view * vec4<f32>(rayPos, 1.0)).z;
             let sampledPosViewZ = (view.view * vec4<f32>(sampledWorldPos, 1.0)).z;
             
@@ -157,18 +155,21 @@ fn fs(in: VSOut) -> @location(0) vec4<f32> {
 
             if (rayPosViewZ > ssgi.maxDistance) { break; }
 
-            // Ignorujemy samokolizje na tej samej płaszczyźnie (minimalny proóg zależy od odległości od kamery)
             let minThickness = 0.04 * (1.0 + rayPosViewZ * 0.1);
 
             if (depthDiff > minThickness && depthDiff < ssgi.thickness) {
-                let hitColor = textureSampleLevel(colorTexture, samplerPoint, sampleUV, 0).rgb;
-                let hitEmissive = textureSampleLevel(emissiveTexture, samplerPoint, sampleUV, 0).rgb;
-                
-                let dist = length(sampledWorldPos - worldPos);
-                let attenuation = 1.0 / (1.0 + dist * dist);
+                let hitNormal = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, sampleUV, 0).xyz * 2.0 - 1.0);
 
-                indirectLight += (hitEmissive + hitColor) * attenuation * fade; 
-                break;
+                if (dot(hitNormal, rayDir) > 0.0) {
+                    let hitColor = textureSampleLevel(colorTexture, samplerPoint, sampleUV, 0).rgb;
+                    let hitEmissive = textureSampleLevel(emissiveTexture, samplerPoint, sampleUV, 0).rgb;
+                    
+                    let dist = length(sampledWorldPos - worldPos);
+                    let attenuation = 1.0 / (1.0 + dist * dist);
+
+                    indirectLight += (hitEmissive + hitColor) * NdotD * attenuation * fade; 
+                    break;
+                }
             }
         }
     }

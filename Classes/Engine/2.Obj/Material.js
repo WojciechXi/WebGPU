@@ -1,11 +1,17 @@
 class Material extends Obj {
 
     static {
-        console.log('Material class loaded');
+        this.materials = [];
+    }
+
+    static Find(name) {
+        return this.materials.find(s => s.name == name);
     }
 
     constructor(shaderOrMaterial) {
         super();
+        Material.materials.push(this);
+
         const object = this;
 
         let shader = null;
@@ -13,17 +19,16 @@ class Material extends Obj {
         else if (shaderOrMaterial instanceof Material) shader = shaderOrMaterial.shader;
 
         new Property(object, 'renderQueue', 2000);
-        new Property(object, 'shader', shader);
-        new Property(object, 'materialBuffer', new Buffer(4 + 4)); // color, pbr
+        new Property(object, 'shader', shader, {
+            assigned: value => {
+                this.renderQueue = value ? value.renderQueue : 2000;
+                this.name = value ? value.name : `Material_${this.instanceID}`;
+            }
+        });
+        new Property(object, 'materialBuffer', new Buffer(4 + 4 + 4)); // color, pbr, normalStrength
 
         new Property(object, 'textures', {});
-        new Property(object, 'sampler', GPU.CreateSampler({
-            magFilter: 'linear',
-            minFilter: 'linear',
-            mipmapFilter: 'linear',
-            addressModeU: 'repeat',
-            addressModeV: 'repeat',
-        }));
+        new Property(object, 'sampler', new Sampler());
 
         object.SetTexture('albedo', Color32.white);
         object.SetTexture('normal', new Color32(0.5, 0.5, 1, 1));
@@ -42,7 +47,7 @@ class Material extends Obj {
             label: 'gBufferBindGroup',
             layout: Graphics.pbrBindGroupLayout,
             entries: [
-                { binding: 0, resource: object.sampler },
+                object.sampler.GetBindGroupEntry(0),
                 { binding: 1, resource: object.textures.albedo.createView() },
                 { binding: 2, resource: object.textures.normal.createView() },
                 { binding: 3, resource: object.textures.pbr.createView() },
@@ -50,45 +55,12 @@ class Material extends Obj {
             ],
         });
 
-        new Property(object, 'color', Color32.white, {
-            assigned: function (color) {
-                object.materialBuffer.Set({
-                    0: color,
-                });
-            },
-        });
-
-        new Property(object, 'roughness', 1, {
-            assigned: function (roughness) {
-                object.materialBuffer.Set({
-                    4: [roughness],
-                });
-            },
-        });
-
-        new Property(object, 'metallic', 0.1, {
-            assigned: function (roughness) {
-                object.materialBuffer.Set({
-                    5: [roughness],
-                });
-            },
-        });
-
-        new Property(object, 'occlusion', 1, {
-            assigned: function (occlusion) {
-                object.materialBuffer.Set({
-                    6: [occlusion],
-                });
-            },
-        });
-
-        new Property(object, 'alphaCutoff', 0.5, {
-            assigned: function (alphaCutoff) {
-                object.materialBuffer.Set({
-                    7: [alphaCutoff],
-                });
-            },
-        });
+        new Property(object, 'color', Color32.white, { assigned: color => object.materialBuffer.Set({ 0: color, }), });
+        new Property(object, 'roughness', 1, { assigned: roughness => object.materialBuffer.Set({ 4: [roughness], }), });
+        new Property(object, 'metallic', 0.1, { assigned: metallic => object.materialBuffer.Set({ 5: [metallic], }), });
+        new Property(object, 'occlusion', 1, { assigned: occlusion => object.materialBuffer.Set({ 6: [occlusion], }), });
+        new Property(object, 'alphaCutoff', 0.5, { assigned: alphaCutoff => object.materialBuffer.Set({ 7: [alphaCutoff], }), });
+        new Property(object, 'normalStrength', 0.5, { assigned: normalStrength => object.materialBuffer.Set({ 8: [normalStrength], }), });
 
         object.cull = 'back';
         object.depthWrite = true;
@@ -136,7 +108,7 @@ class Material extends Obj {
             label: 'gBufferBindGroup',
             layout: Graphics.pbrBindGroupLayout,
             entries: [
-                { binding: 0, resource: this.sampler },
+                this.sampler.GetBindGroupEntry(0),
                 { binding: 1, resource: this.textures.albedo.createView() },
                 { binding: 2, resource: this.textures.normal.createView() },
                 { binding: 3, resource: this.textures.pbr.createView() },

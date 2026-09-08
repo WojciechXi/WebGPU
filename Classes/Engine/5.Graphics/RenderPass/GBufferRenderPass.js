@@ -37,4 +37,8 @@ class GBufferRenderPass extends RenderPass {
         renderPass.end();
     }
 
+    CanDraw(renderQueue) {
+        return renderQueue >= 1000 && renderQueue < 2500;
+    }
+
 }

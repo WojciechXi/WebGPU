@@ -52,8 +52,6 @@ class RenderPipeline {
             format: 'rgba8unorm',
         });
 
-        this.screenRenderPass.renderTexture = this.tonemappingRenderTexture;
-
         this.preDepthRenderPass = new PreDepthRenderPass({
             name: 'preDepthRenderPass',
 
@@ -101,7 +99,9 @@ class RenderPipeline {
 
         this.ssgiRenderPass = new ssgiRenderPass({
             name: 'ssgiRenderPass',
-            code: await Resources.Load('Shaders/ssgiRenderPass.wgsl'),
+            ssgiRenderPass: await Resources.Load('Shaders/ssgiRenderPass.wgsl'),
+            ssgiHorizontalRenderPass: await Resources.Load('Shaders/ssgiHorizontalRenderPass.wgsl'),
+            ssgiVerticalRenderPass: await Resources.Load('Shaders/ssgiVerticalRenderPass.wgsl'),
 
             depthRenderTexture: this.depthRenderTexture,
             colorRenderTexture: this.lightingRenderTexture,
@@ -145,6 +145,8 @@ class RenderPipeline {
         //     code: await Resources.Load('Shaders/gizmosRenderPass.wgsl'),
         //     canvas: this.canvas,
         // });
+
+        this.screenRenderPass.renderTexture = this.tonemappingRenderTexture;
 
         this.renderPasses = [
             this.preDepthRenderPass,

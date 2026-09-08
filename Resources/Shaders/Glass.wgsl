@@ -1,5 +1,20 @@
-// name: Lit
-// renderQueue: 2000
+// name: Glass
+// renderQueue: 3000
+
+struct View {
+    view: mat4x4f,
+    projection: mat4x4f,
+    viewProjection: mat4x4f,
+    inverseView: mat4x4f,
+    inverseProjection: mat4x4f,
+    inverseViewProjection: mat4x4f,
+};
+
+struct Material {
+    color: vec4f,
+    pbr: vec4f,
+    normalStrength: f32,
+};
 
 struct VertexInput {    
     @location(0) position: vec3f,
@@ -13,24 +28,6 @@ struct VertexInput {
     @location(8) m1: vec4f,
     @location(9) m2: vec4f,
     @location(10) m3: vec4f,
-};
-
-struct View {
-    view: mat4x4f,
-    projection: mat4x4f,
-    viewProjection: mat4x4f,
-    inverseView: mat4x4f,
-    inverseProjection: mat4x4f,
-    inverseViewProjection: mat4x4f,
-};
-
-struct Material {
-    color: vec4f,
-    roughness: f32,
-    metallic: f32,
-    occlusion: f32,
-    alphaCutoff: f32,
-    normalStrength: f32,
 };
 
 @group(0) @binding(0) var<uniform> view: View;
@@ -53,7 +50,6 @@ struct VertexOutput {
     @location(4) uv: vec2f,
 };
 
-
 fn inverse3x3(m: mat3x3f) -> mat3x3f {
     let a00 = m[0][0]; let a01 = m[0][1]; let a02 = m[0][2];
     let a10 = m[1][0]; let a11 = m[1][1]; let a12 = m[1][2];
@@ -75,6 +71,7 @@ fn inverse3x3(m: mat3x3f) -> mat3x3f {
 
 fn getNormalMatrix(m: mat4x4f) -> mat3x3f {
     let m3 = mat3x3f(m[0].xyz, m[1].xyz, m[2].xyz);
+    
     return transpose(inverse3x3(m3));
 }
 
@@ -114,7 +111,9 @@ fn vs(vertexInput: VertexInput) -> VertexOutput {
     let N = normalize(normalMat * norm);
     let T_unaligned = normalize(model3x3 * tang);
     
+    
     let T = normalize(T_unaligned - dot(T_unaligned, N) * N);
+    
     
     let tangentSign = select(1.0, -1.0, vertexInput.tangent.w < 0.0);
     let B = normalize(cross(N, T) * tangentSign);
@@ -150,29 +149,6 @@ struct GBufferRenderPass {
 @fragment
 fn gBufferRenderPass(input: VertexOutput) -> GBufferRenderPass {
     var output: GBufferRenderPass;
-    
-    let albedo = textureSample(albedoTexture, textureSampler, input.uv) * material.color;
-    if (albedo.a < material.alphaCutoff) {
-        discard;
-    }
-    
-    let rawNormal = textureSample(normalTexture, textureSampler, input.uv).xyz * 2.0 - 1.0;
-    let scaledNormal = normalize(vec3f(rawNormal.x * material.normalStrength, rawNormal.y * material.normalStrength, rawNormal.z));
-    
-    let TBN = mat3x3f(
-        normalize(input.worldTangent), 
-        normalize(input.worldBitangent), 
-        normalize(input.worldNormal)
-    );
-
-    let worldNormal = normalize(TBN * scaledNormal);
-
-    output.color = albedo;
-    output.worldNormal = vec4f(worldNormal * 0.5 + 0.5, 1.0);
-    
-    let rawPbr = textureSample(pbrTexture, textureSampler, input.uv);
-    output.pbr = vec4f(rawPbr.r * material.roughness, rawPbr.g * material.metallic, rawPbr.b * material.occlusion, 1.0);
-    output.emissive = textureSample(emissiveTexture, textureSampler, input.uv);
-
+    discard;
     return output;
 }

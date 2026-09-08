@@ -3,13 +3,6 @@ struct VSOut {
     @location(0) uv : vec2f,
 };
 
-struct Time {
-    time: f32,
-    deltaTime: f32,
-    frame: u32,
-    slot: f32,
-};
-
 struct View {
     view: mat4x4f,
     projection: mat4x4f,
@@ -53,12 +46,10 @@ fn getWorldPos(uv: vec2<f32>, depth: f32) -> vec3<f32> {
     return worldPos.xyz / worldPos.w;
 }
 
-// Generowanie półsferycznego szumu na podstawie UV i indeksu próbki
 fn getSampleOffset(sampleIdx: u32, totalSamples: u32, uv: vec2<f32>) -> vec3<f32> {
     let seed = u32(uv.x * 1254.0) ^ u32(uv.y * 8732.0) ^ (sampleIdx * 1013u);
     let r1 = fract(sin(f32(seed) * 0.00001) * 43758.5453);
     let r2 = fract(cos(f32(seed) * 0.00002) * 22578.1459);
-    let r3 = fract(sin(f32(seed) * 0.00003) * 12345.6789);
 
     let phi = 2.0 * 3.14159265 * r1;
     let cosTheta = 1.0 - r2;
@@ -66,7 +57,6 @@ fn getSampleOffset(sampleIdx: u32, totalSamples: u32, uv: vec2<f32>) -> vec3<f32
 
     var dir = vec3<f32>(sinTheta * cos(phi), sinTheta * sin(phi), cosTheta);
     
-    // Zagęszczanie próbek bliżej środka (scale bias)
     var scale = f32(sampleIdx) / f32(totalSamples);
     scale = mix(0.1, 1.0, scale * scale);
     
@@ -83,25 +73,28 @@ fn fs(in: VSOut) -> @location(0) f32 {
     }
 
     let worldPos = getWorldPos(uv, rawDepth);
-    let normal = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, uv, 0).xyz);
+    let normal = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, uv, 0).xyz * 2.0 - 1.0);
 
-    // Baza TBN do zorientowania półsfery według wektora normalnego
+    // Pozycja i normalna w przestrzeni widoku (View Space)
+    let viewPos = (view.view * vec4<f32>(worldPos, 1.0)).xyz;
+    let viewNormal = normalize((view.view * vec4<f32>(normal, 0.0)).xyz);
+
     var up = vec3<f32>(0.0, 1.0, 0.0);
-    if (abs(normal.y) > 0.99) { up = vec3<f32>(0.0, 0.0, 1.0); }
-    let tangent = normalize(cross(up, normal));
-    let bitangent = cross(normal, tangent);
-    let tbn = mat3x3<f32>(tangent, bitangent, normal);
+    if (abs(viewNormal.y) > 0.99) { up = vec3<f32>(0.0, 0.0, 1.0); }
+    let tangent = normalize(cross(up, viewNormal));
+    let bitangent = cross(viewNormal, tangent);
+    let tbn = mat3x3<f32>(tangent, bitangent, viewNormal);
 
     var occlusion = 0.0;
     let sampleCount = u32(ssao.sampleCount);
 
     for (var i = 0u; i < sampleCount; i = i + 1u) {
-        // Próbka w przestrzeni świata zorientowana względem normalnej
-        let sampleDir = tbn * getSampleOffset(i, sampleCount, uv);
-        let samplePos = worldPos + sampleDir * ssao.radius;
+        // Generujemy próbkę bezpośrednio w przestrzeni widoku
+        let sampleOffset = tbn * getSampleOffset(i, sampleCount, uv);
+        let samplePosView = viewPos + sampleOffset * ssao.radius;
 
-        // Projekcja pozycji próbki na ekran (UV)
-        let clipPos = view.viewProjection * vec4<f32>(samplePos, 1.0);
+        // Rzutowanie próbki z View Space na ekran
+        let clipPos = view.projection * vec4<f32>(samplePosView, 1.0);
         if (clipPos.w <= 0.0001) { continue; }
 
         let ndc = clipPos.xyz / clipPos.w;
@@ -111,25 +104,22 @@ fn fs(in: VSOut) -> @location(0) f32 {
             continue;
         }
 
-        // Pobranie rzeczywiście istniejącej głębokości w tym punkcie ekranu
+        // Odczyt RZECZYWISTEJ głębokości w tym miejscu ekranu
         let realDepth = textureSampleLevel(depthTexture, samplerPoint, sampleUV, 0);
         let realWorldPos = getWorldPos(sampleUV, realDepth);
+        let realViewZ = (view.view * vec4<f32>(realWorldPos, 1.0)).z;
 
-        // Porównanie odległości (w przestrzeni świata)
-        let distToReal = length(realWorldPos - worldPos);
-        let distToSample = length(samplePos - worldPos);
+        // Różnica głębokości View Z (w leworęcznym układzie Z rośnie w głąb ekranu)
+        let depthDiff = samplePosView.z - realViewZ;
 
-        // Wykrycie zasłonięcia (occlusion Check z uwzględnieniem zasięgu)
-        let depthDiff = distToSample - distToReal;
-        
-        if (depthDiff > ssao.bias) {
-            // Wygaszanie liniowe dla odległych obiektów (range check zapobiega zjawisku halos)
+        // Właściwy test zasłonięcia:
+        // realViewZ musi być bliżej kamery niż samplePosView.z o co najmniej bias
+        if (depthDiff >= ssao.bias) {
             let rangeCheck = smoothstep(1.0, 0.0, depthDiff / ssao.radius);
             occlusion += rangeCheck;
         }
     }
 
-    // Normalizacja i wyliczenie czystego współczynnika widoczności [0, 1]
     let ao = 1.0 - (occlusion / f32(sampleCount)) * ssao.intensity;
     return max(0.0, ao);
 }

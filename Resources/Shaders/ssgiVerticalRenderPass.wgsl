@@ -15,14 +15,10 @@ struct View {
 @group(0) @binding(0) var<uniform> view: View;
 
 @group(1) @binding(0) var samplerPoint : sampler;
-@group(1) @binding(1) var ssgiTexture : texture_2d<f32>; // Tekstura po rozmyciu poziomym (0.5x)
-@group(1) @binding(2) var depthTexture : texture_depth_2d; // Pełnowymiarowa głębokość (1.0x)
-@group(1) @binding(3) var worldNormalTexture : texture_2d<f32>; // Pełnowymiarowe normalne (1.0x)
-
-struct VSOut {
-  @builtin(position) pos : vec4f,
-  @location(0) uv : vec2f,
-};
+@group(1) @binding(1) var depthTexture : texture_depth_2d;
+@group(1) @binding(2) var samplerLinear : sampler;
+@group(1) @binding(3) var ssgiTexture : texture_2d<f32>;
+@group(1) @binding(4) var worldNormalTexture : texture_2d<f32>;
 
 @vertex
 fn vs(@builtin(vertex_index) vid: u32) -> VSOut {
@@ -49,21 +45,23 @@ fn linearizeDepth(depth: f32) -> f32 {
 fn fs(in: VSOut) -> @location(0) vec4<f32> {
     let uv = in.uv;
     let texSize = vec2<f32>(textureDimensions(ssgiTexture));
-    let texelSize = vec2<f32>(0.0, 1.0 / texSize.y); // Offset tylko w osi Y
+    let texelSize = vec2<f32>(0.0, 1.0 / texSize.y);
 
-    // Pobieramy wzorcowe właściwości geometrii z buforów w PEŁNEJ rozdzielczości (1.0x)
-    let centerDepth = linearizeDepth(textureSampleLevel(depthTexture, samplerPoint, uv, 0));
-    let centerNormal = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, uv, 0).xyz);
+    let rawDepth = textureSampleLevel(depthTexture, samplerPoint, uv, 0);
+    if (rawDepth >= 1.0) {
+        return vec4<f32>(0.0, 0.0, 0.0, 1.0);
+    }
 
-    var totalColor = vec3<f32>(0.0);
-    var totalWeight = 0.0001;
+    let centerDepth = max(0.001, linearizeDepth(rawDepth));
+    let centerNormal = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, uv, 0).xyz * 2.0 - 1.0);
+
+    // DLA SSGI UŻYWAMY SAMPLERA LINIOWEGO
+    let centerColor = textureSampleLevel(ssgiTexture, samplerLinear, uv, 0).rgb;
+
+    var totalColor = centerColor * 0.38;
+    var totalWeight = 0.38;
 
     let weights = array<f32, 4>(0.26, 0.16, 0.07, 0.01);
-
-    // Próbkowanie punktu centralnego
-    let centerColor = textureSampleLevel(ssgiTexture, samplerPoint, uv, 0).rgb;
-    totalColor += centerColor * 0.38;
-    totalWeight += 0.38;
 
     for (var i = 1; i <= 4; i = i + 1) {
         let offset = vec2<f32>(f32(i)) * texelSize;
@@ -73,11 +71,16 @@ fn fs(in: VSOut) -> @location(0) vec4<f32> {
 
         // --- Próbka P ---
         let depthP = linearizeDepth(textureSampleLevel(depthTexture, samplerPoint, uvP, 0));
-        let normalP = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, uvP, 0).xyz);
-        let colorP = textureSampleLevel(ssgiTexture, samplerPoint, uvP, 0).rgb;
+        let normalP = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, uvP, 0).xyz * 2.0 - 1.0);
+        let colorP = textureSampleLevel(ssgiTexture, samplerLinear, uvP, 0).rgb;
 
-        let depthWeightP = exp(-abs(centerDepth - depthP) * 10.0);
-        let normalWeightP = pow(max(0.0, dot(centerNormal, normalP)), 16.0);
+        // Skalowanie czułości głębokości względnie do dystansu od kamery
+        let depthDiffP = abs(centerDepth - depthP);
+        let depthWeightP = exp(-depthDiffP / (centerDepth * 0.05 + 0.001));
+        
+        // Łagodniejszy spadek wagi normalnych (potęga 4.0 zamiast 16.0)
+        let normalWeightP = pow(max(0.0, dot(centerNormal, normalP)), 4.0);
+        
         let weightP = weights[i - 1] * depthWeightP * normalWeightP;
 
         totalColor += colorP * weightP;
@@ -85,11 +88,13 @@ fn fs(in: VSOut) -> @location(0) vec4<f32> {
 
         // --- Próbka N ---
         let depthN = linearizeDepth(textureSampleLevel(depthTexture, samplerPoint, uvN, 0));
-        let normalN = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, uvN, 0).xyz);
-        let colorN = textureSampleLevel(ssgiTexture, samplerPoint, uvN, 0).rgb;
+        let normalN = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, uvN, 0).xyz * 2.0 - 1.0);
+        let colorN = textureSampleLevel(ssgiTexture, samplerLinear, uvN, 0).rgb;
 
-        let depthWeightN = exp(-abs(centerDepth - depthN) * 10.0);
-        let normalWeightN = pow(max(0.0, dot(centerNormal, normalN)), 16.0);
+        let depthDiffN = abs(centerDepth - depthN);
+        let depthWeightN = exp(-depthDiffN / (centerDepth * 0.05 + 0.001));
+        let normalWeightN = pow(max(0.0, dot(centerNormal, normalN)), 4.0);
+        
         let weightN = weights[i - 1] * depthWeightN * normalWeightN;
 
         totalColor += colorN * weightN;
