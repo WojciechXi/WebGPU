@@ -96,7 +96,7 @@ class ssgiRenderPass extends RenderPass {
                 module: this.shaderModule,
                 entryPoint: "fs",
                 targets: [
-                    this.ssgiRenderTexture.GetTarget(),
+                    this.resultRenderTexture.GetTarget(),
                 ]
             },
             primitive: {
@@ -108,7 +108,7 @@ class ssgiRenderPass extends RenderPass {
     Render(camera, scene, commandEncoder) {
         const renderPass = commandEncoder.beginRenderPass({
             colorAttachments: [
-                this.ssgiRenderTexture.GetColorAttachment(),
+                this.resultRenderTexture.GetColorAttachment(),
             ],
         });
 
