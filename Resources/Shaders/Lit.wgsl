@@ -1,4 +1,5 @@
 // name: Lit
+// renderType: Opaque
 // renderQueue: 2000
 
 struct VertexInput {    
