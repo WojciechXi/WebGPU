@@ -12,21 +12,10 @@ class ssaoRenderPass extends RenderPass {
 
         this.buffer = new Buffer(4);
 
-        new Property(this, 'radius', 0.25, {
-            assigned: value => this.buffer.Set({ 0: [value] }),
-        });
-
-        new Property(this, 'bias', 0.025, {
-            assigned: value => this.buffer.Set({ 1: [value] }),
-        });
-
-        new Property(this, 'intensity', 2, {
-            assigned: value => this.buffer.Set({ 2: [value] }),
-        });
-
-        new Property(this, 'sampleCount', 32, {
-            assigned: value => this.buffer.Set({ 3: [value] }),
-        });
+        new Property(this, 'radius', 0.5, { assigned: value => this.buffer.Set({ 0: [value] }), });
+        new Property(this, 'bias', 0.05, { assigned: value => this.buffer.Set({ 1: [value] }), });
+        new Property(this, 'intensity', 2, { assigned: value => this.buffer.Set({ 2: [value] }), });
+        new Property(this, 'sampleCount', 32, { assigned: value => this.buffer.Set({ 3: [value] }), });
 
         this.bindGroupLayout = GPU.CreateBindGroupLayout({
             label: 'ssaoBindGroupLayout',

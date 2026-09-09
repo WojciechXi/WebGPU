@@ -75,7 +75,6 @@ fn fs(in: VSOut) -> @location(0) f32 {
     let worldPos = getWorldPos(uv, rawDepth);
     let normal = normalize(textureSampleLevel(worldNormalTexture, samplerPoint, uv, 0).xyz * 2.0 - 1.0);
 
-    // Pozycja i normalna w przestrzeni widoku (View Space)
     let viewPos = (view.view * vec4<f32>(worldPos, 1.0)).xyz;
     let viewNormal = normalize((view.view * vec4<f32>(normal, 0.0)).xyz);
 
@@ -89,11 +88,9 @@ fn fs(in: VSOut) -> @location(0) f32 {
     let sampleCount = u32(ssao.sampleCount);
 
     for (var i = 0u; i < sampleCount; i = i + 1u) {
-        // Generujemy próbkę bezpośrednio w przestrzeni widoku
         let sampleOffset = tbn * getSampleOffset(i, sampleCount, uv);
         let samplePosView = viewPos + sampleOffset * ssao.radius;
 
-        // Rzutowanie próbki z View Space na ekran
         let clipPos = view.projection * vec4<f32>(samplePosView, 1.0);
         if (clipPos.w <= 0.0001) { continue; }
 
@@ -104,16 +101,11 @@ fn fs(in: VSOut) -> @location(0) f32 {
             continue;
         }
 
-        // Odczyt RZECZYWISTEJ głębokości w tym miejscu ekranu
         let realDepth = textureSampleLevel(depthTexture, samplerPoint, sampleUV, 0);
         let realWorldPos = getWorldPos(sampleUV, realDepth);
         let realViewZ = (view.view * vec4<f32>(realWorldPos, 1.0)).z;
 
-        // Różnica głębokości View Z (w leworęcznym układzie Z rośnie w głąb ekranu)
         let depthDiff = samplePosView.z - realViewZ;
-
-        // Właściwy test zasłonięcia:
-        // realViewZ musi być bliżej kamery niż samplePosView.z o co najmniej bias
         if (depthDiff >= ssao.bias) {
             let rangeCheck = smoothstep(1.0, 0.0, depthDiff / ssao.radius);
             occlusion += rangeCheck;
