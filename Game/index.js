@@ -117,6 +117,7 @@ window.addEventListener('DOMContentLoaded', async function (event) {
         // mainCameraGameObject.transform.localEulerAngles = new Vector3(0, 45, 0);
         const mainCamera = mainCameraGameObject.AddComponent(Camera);
         mainCamera.fieldOfView = 90;
+        mainCamera.orthographic = true;
         const autoRotator = mainCameraGameObject.AddComponent(AutoRotator);
         // const freeCamera = mainCameraGameObject.AddComponent(FreeCamera);
 

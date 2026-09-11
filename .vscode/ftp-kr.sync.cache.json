@@ -9,7 +9,7 @@
     ".htaccess": {
       "type": "-",
       "size": 232,
-      "lmtime": 1788542681438.9211,
+      "lmtime": 0,
       "modified": false
     },
     "Assets": {
@@ -923,8 +923,8 @@
               "Camera.js": {
                 "type": "-",
                 "size": 3959,
-                "lmtime": 1788699611140.7036,
-                "modified": true
+                "lmtime": 1788874993404.0166,
+                "modified": false
               },
               "Canvas.js": {
                 "type": "-",
@@ -1013,21 +1013,21 @@
           "GameObject": {},
           "GameObject.js": {
             "type": "-",
-            "size": 5219,
+            "size": 5164,
             "lmtime": 0,
-            "modified": true
+            "modified": false
           },
           "Material.js": {
             "type": "-",
-            "size": 4861,
-            "lmtime": 1788897610727.0742,
+            "size": 5102,
+            "lmtime": 1788696631793.2617,
             "modified": false
           },
           "Mesh.js": {
             "type": "-",
-            "size": 13105,
+            "size": 13053,
             "lmtime": 1788702651736.1758,
-            "modified": true
+            "modified": false
           },
           "Prefab.js": {
             "type": "-",
@@ -1055,8 +1055,8 @@
           },
           "Shader.js": {
             "type": "-",
-            "size": 4514,
-            "lmtime": 1788893050000.4985,
+            "size": 4142,
+            "lmtime": 1788701398835.1292,
             "modified": false
           },
           "Skin.js": {
@@ -1077,8 +1077,8 @@
         "5.Graphics": {
           "Buffer.js": {
             "type": "-",
-            "size": 2091,
-            "lmtime": 1788895782628.2825,
+            "size": 1727,
+            "lmtime": 0,
             "modified": false
           },
           "ComputeBuffer.js": {
@@ -1096,8 +1096,8 @@
           "Graphics.js": {
             "type": "-",
             "size": 4858,
-            "lmtime": 1788704033032.475,
-            "modified": true
+            "lmtime": 1788874462910.9702,
+            "modified": false
           },
           "GraphicsBuffer.js": {
             "type": "-",
@@ -1108,14 +1108,14 @@
           "RenderPass": {
             "BloomRenderPass.js": {
               "type": "-",
-              "size": 6484,
-              "lmtime": 1788896567590.1587,
+              "size": 6668,
+              "lmtime": 0,
               "modified": false
             },
             "CompositionRenderPass.js": {
               "type": "-",
-              "size": 3274,
-              "lmtime": 1788887490735.1714,
+              "size": 3204,
+              "lmtime": 1788881749635.257,
               "modified": false
             },
             "ForwardRenderPass.js": {
@@ -1126,8 +1126,8 @@
             },
             "GBufferRenderPass.js": {
               "type": "-",
-              "size": 1922,
-              "lmtime": 1788892878460.717,
+              "size": 1826,
+              "lmtime": 1788702196577.457,
               "modified": false
             },
             "GizmosRenderPass.js": {
@@ -1139,7 +1139,7 @@
             "LightingRenderPass.js": {
               "type": "-",
               "size": 4882,
-              "lmtime": 1788702228621.9084,
+              "lmtime": 1788873365974.113,
               "modified": false
             },
             "PreDepthRenderPass.js": {
@@ -1156,8 +1156,8 @@
             },
             "ScreenSpaceReflectionRenderPass.js": {
               "type": "-",
-              "size": 2224,
-              "lmtime": 1788896378060.3755,
+              "size": 2385,
+              "lmtime": 0,
               "modified": false
             },
             "ShadowRenderPass.js": {
@@ -1168,51 +1168,45 @@
             },
             "TonemappingRenderPass.js": {
               "type": "-",
-              "size": 2317,
-              "lmtime": 1788896399537.0466,
+              "size": 2735,
+              "lmtime": 1788883057846.667,
               "modified": false
             },
             "ssaoRenderPass.js": {
               "type": "-",
-              "size": 3562,
-              "lmtime": 1788891684110.0696,
+              "size": 3565,
+              "lmtime": 1788882930736.0583,
               "modified": false
             },
             "ssgiRenderPass.js": {
               "type": "-",
-              "size": 10095,
-              "lmtime": 1788896508315.975,
+              "size": 5136,
+              "lmtime": 1788883604595.264,
               "modified": false
             }
           },
           "RenderPass.js": {
             "type": "-",
-            "size": 2043,
-            "lmtime": 1788896429403.453,
+            "size": 2118,
+            "lmtime": 0,
             "modified": false
           },
           "RenderPipeline.js": {
             "type": "-",
-            "size": 6958,
-            "lmtime": 1788892035382.8296,
+            "size": 6748,
+            "lmtime": 1788883554477.4143,
             "modified": false
           },
           "RenderQueue.js": {
             "type": "-",
             "size": 3393,
-            "lmtime": 1788892837892.5498,
-            "modified": false
+            "lmtime": 1788696676148.1116,
+            "modified": true
           },
           "RenderTexture.js": {
             "type": "-",
-            "size": 1494,
-            "lmtime": 1788895682663.255,
-            "modified": false
-          },
-          "Sampler.js": {
-            "type": "-",
-            "size": 1569,
-            "lmtime": 1788895542397.5813,
+            "size": 1238,
+            "lmtime": 0,
             "modified": false
           },
           "Screen.js": {
@@ -1226,8 +1220,8 @@
           "Engine.js": {
             "type": "-",
             "size": 3338,
-            "lmtime": 1788703542745.1677,
-            "modified": true
+            "lmtime": 1788874296208.382,
+            "modified": false
           },
           "Importer.js": {
             "type": "-",
@@ -1250,8 +1244,8 @@
           "Time.js": {
             "type": "-",
             "size": 524,
-            "lmtime": 1788703607195.9316,
-            "modified": true
+            "lmtime": 1788874301636.5728,
+            "modified": false
           }
         },
         "Object.js": {
@@ -1267,8 +1261,8 @@
       "AutoRotator.js": {
         "type": "-",
         "size": 281,
-        "lmtime": 1788699576362.091,
-        "modified": true
+        "lmtime": 1788882705124.9438,
+        "modified": false
       },
       "FreeCamera.js": {
         "type": "-",
@@ -1279,8 +1273,8 @@
       "Furniture": {},
       "index.js": {
         "type": "-",
-        "size": 7932,
-        "lmtime": 1788897435403.5593,
+        "size": 7513,
+        "lmtime": 1788882422736.0881,
         "modified": false
       }
     },
@@ -1331,8 +1325,8 @@
       },
       "Materials.json": {
         "type": "-",
-        "size": 2627,
-        "lmtime": 1788897313807.511,
+        "size": 1862,
+        "lmtime": 1788882343521.2573,
         "modified": false
       },
       "Models": {
@@ -1459,16 +1453,10 @@
       },
       "Primitives": {},
       "Shaders": {
-        "Glass.wgsl": {
-          "type": "-",
-          "size": 4603,
-          "lmtime": 1788896810692.2688,
-          "modified": false
-        },
         "Lit.wgsl": {
           "type": "-",
-          "size": 5628,
-          "lmtime": 1788897714572.552,
+          "size": 5339,
+          "lmtime": 1788875004966.6868,
           "modified": false
         },
         "bloomRenderPass.wgsl": {
@@ -1479,27 +1467,27 @@
         },
         "compositionRenderPass.wgsl": {
           "type": "-",
-          "size": 1490,
-          "lmtime": 1788887490745.1807,
+          "size": 1447,
+          "lmtime": 1788881780565.1067,
           "modified": false
         },
         "depthRenderPass.wgsl": {
           "type": "-",
           "size": 2575,
-          "lmtime": 0,
-          "modified": true
+          "lmtime": 1788875013889.8982,
+          "modified": false
         },
         "gizmosRenderPass.wgsl": {
           "type": "-",
           "size": 908,
-          "lmtime": 0,
-          "modified": true
+          "lmtime": 1788875011482.1946,
+          "modified": false
         },
         "lightingRenderPass.wgsl": {
           "type": "-",
           "size": 4904,
-          "lmtime": 1788703198498.5032,
-          "modified": true
+          "lmtime": 1788875008958.6843,
+          "modified": false
         },
         "screenRenderPass.wgsl": {
           "type": "-",
@@ -1515,26 +1503,26 @@
         },
         "ssaoRenderPass.wgsl": {
           "type": "-",
-          "size": 4380,
-          "lmtime": 1788891603820.1355,
+          "size": 4666,
+          "lmtime": 1788880511308.4373,
           "modified": false
         },
         "ssgiHorizontalRenderPass.wgsl": {
           "type": "-",
-          "size": 3704,
-          "lmtime": 1788890948859.1387,
+          "size": 3471,
+          "lmtime": 1788883483538.5962,
           "modified": false
         },
         "ssgiRenderPass.wgsl": {
           "type": "-",
-          "size": 6196,
-          "lmtime": 1788890936371.527,
+          "size": 6051,
+          "lmtime": 1788880503482.0222,
           "modified": false
         },
         "ssgiVerticalRenderPass.wgsl": {
           "type": "-",
-          "size": 3842,
-          "lmtime": 1788890920602.6853,
+          "size": 3595,
+          "lmtime": 1788883534750.931,
           "modified": false
         },
         "tonemappingRenderPass.wgsl": {
@@ -1748,31 +1736,31 @@
     "assets.php": {
       "type": "-",
       "size": 722,
-      "lmtime": 1788641621225.4763,
+      "lmtime": 0,
       "modified": false
     },
     "engine.js": {
       "type": "-",
-      "size": 319340,
+      "size": 315214,
       "lmtime": 0,
       "modified": true
     },
     "functions.php": {
       "type": "-",
       "size": 1091,
-      "lmtime": 1788641620298.63,
+      "lmtime": 0,
       "modified": false
     },
     "game.js": {
       "type": "-",
-      "size": 15092,
+      "size": 13943,
       "lmtime": 0,
       "modified": true
     },
     "index.css": {
       "type": "-",
       "size": 1207,
-      "lmtime": 1788641619448.4868,
+      "lmtime": 0,
       "modified": false
     },
     "index.php": {
@@ -1784,7 +1772,7 @@
     "readme.txt": {
       "type": "-",
       "size": 81,
-      "lmtime": 1788641615620.1868,
+      "lmtime": 0,
       "modified": false
     },
     "resources.php": {
